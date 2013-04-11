@@ -1,0 +1,1520 @@
+Info file: libtool-ja.info,    -*-Text-*-
+produced by `texinfo-format-buffer'
+from file `libtool-ja.texi'
+using `texinfmt.el' version 2.38 of 3 July 1998.
+
+
+
+
+INFO-DIR-SECTION GNU programming tools
+START-INFO-DIR-ENTRY
+* Libtool(ja): (libtool-ja).           Generic shared library support script.
+END-INFO-DIR-ENTRY
+
+
+INFO-DIR-SECTION Individual utilities
+START-INFO-DIR-ENTRY
+* libtoolize(ja): (libtool-ja)Invoking libtoolize.     Adding libtool support.
+END-INFO-DIR-ENTRY
+
+
+This file documents GNU Libtool 1.4.2
+
+このファイルは，GNU Libtool 1.4.2を説明します．
+
+Copyright (C) 1996-2000 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.1 or
+any later version published by the Free Software Foundation; with the no
+Invariant Sections, with no Front-Cover Texts, and with no Back-Cover
+Texts.  A copy of the license is included in the section entitled "GNU
+Free Documentation License".
+
+
+
+
+
+
+File: libtool-ja.info, Node: New ports, Next: Tested platforms, Prev: Maintaining, Up: Maintaining
+
+新しいシステムへのlibtoolの移植
+===============================
+
+サポートされていないシステムへのlibtoolの移植に乗り出す前に，既存の仕事
+と重複していないことを確認するために， the libtool mailing list
+@email{libtool@@gnu.org}に電子メールを送る価値はあります．
+
+移植の文章が見つからない場合，文句を言ってください！ パッチを用いた苦情
+と，ドキュメントやlibtool自身の改良は十分に歓迎されます．
+
+* Menu:
+
+* Information sources::         Where to find relevant documentation
+* Porting inter-library dependencies::  Implementation details explained
+
+
+
+File: libtool-ja.info, Node: Information sources, Next: Porting inter-library dependencies, Prev: New ports, Up: New ports
+
+情報源
+------
+
+新たな移植の必要性が明らかになると，通常，以下の情報が必要となります．
+
+標準的なシステム名
+     他のシステムに影響しないようにlibtoolのコンフィグレーション処理を変
+     更可能にするため，このシステムに対する`config.guess'の出力が必要で
+     す．
+
+`ld'と`cc'に対するmanページ
+     共有ライブラリを作成するため，共有ライブラリのみにリンクするため，
+     そして，PICを生成するために使用するフラグを，通常これらは記述してい
+     ます．必要な情報を見つけるため，以下の相互参照が必要かもしれません．
+
+`ld.so'，`rtld'，または，その同等物のmanページ
+     これらは，システムで共有ライブラリがロードされる仕組みを理解するた
+     めの，有益な情報源です．
+
+`ldconfig'やその同等物のmanページ
+     このページは，通常，共有ライブラリをインストールする方法を記述しま
+     す．
+
+`ls -l /lib /usr/lib'の出力
+     これは，システムの共有ライブラリの命名規則を表示し，それは，シンボ
+     リックリンクの名前も含んでいます．
+
+あらゆる追加の文章
+     共有ライブラリの構築とインストール方法の特別な文章があるシステムも
+     あります．
+
+Bourneシェルプログラムの方法を知っている場合，完全に自分で移植することが
+可能です．それ以外の場合，関連する作業を行う腕のある人を探す必要がありま
+す．libtoolメーリングリストの人々は，新たな移植への援助を志願する意思が
+あるので，彼らに情報を送ることができます．
+
+独自に移植するためには，プラットフォーム特有のコンフィグレーションプロセ
+スの変更を行うため，`libtool.m4'マクロを明確に修正する必要があります．
+`PORTME'キーワードに対するファイルを検索する必要があり，それで，変更に必
+要なヒントを得られるでしょう．一般的に，呼び出されるものは，適切なコンフィ
+グレーション変数の編集です(*Note libtool script contents::)．
+
+最善策は，既にサポートされている良く似たシステムを見つけ，変更の基本とす
+ることです．しかし，システムが他のサポートされているシステムと，大きく異
+なる場合や，新しいコンフィグレーション変数を加え，それに応じて
+`ltmain.in'スクリプトを変更する必要がある場合もあります．欲しいものを達
+成するための，最も効果的な方法の助言がある可能性があるので，`ltmain.in'
+を変更する前に，メーリングリストに書いて確認してください．
+
+
+
+
+File: libtool-ja.info, Node: Porting inter-library dependencies, Prev: Information sources, Up: New ports
+
+ライブラリ内部の依存性のサポートの移植
+--------------------------------------
+
+バージョン1.2c以降，libtoolは，Toshio Kuratomi badger@prtr-13.ucsc.eduの
+パッチのおかげで，ライブラリ内部の依存性を可能とする機能が再導入されてる
+プラットフォームもあります．パッチに含まれるメッセージの短いバージョンは
+以下のようになります．
+
+基本的な体系はこのようになります．`libtool.m4'で，libtoolを書いている人
+は，`$deplibs'が`$archive_cmds'のどこかに含まれていること，また，変数
+`$deplibs_check_method'と，`deplibs_check_method'がファイルマジックの場
+合は`$file_magic_cmd'が設定されていることを確認します．
+
+`deplibs_check_method'は，以下の５つの内の一つのはずです．
+`file_magic [REGEX]'
+     ライブラリリンクパスで正しいlibnameを持つライブラリを探します．そし
+     て，ライブラリで`$file_magic_cmd'を実行し，`egrep'を使用したREGEXに
+     一致することを調査します．FILE_MAGIC_TEST_FILEが`libtool.m4'によっ
+     て設定されているとき，正規表現がその出力と一致するかどうかを検証し，
+     それ以外ではユーザが警告を受けるようにするため，それは
+     `$file_magic_cmd'への引数として使用されます．
+
+`test_compile'
+     ライブラリリストの出力以外とプログラムがリンク可能かどうかのみを調
+     査し，それらが`ldd'の出力でリストアップされていることを調査します．
+     それは現在，使用されておらず，将来は打ち切る可能性があります．
+
+`pass_all'
+     調査せず，すべて通過します．例えばDEC OSF/1 3 と 4のような，デフォ
+     ルトで，コードが位置に依存せず，ライブラリ内部の依存性がダイナミッ
+     クリンカで適切にサポートされているプラットフォームで，これは動作す
+     るでしょう．
+
+`none'
+     deplibsをdeplibs=""に再設定します．そのように，`archive_cmds'は，す
+     べてのプラットフォームでdeplibsを含むはずですが，deplibは必要がなけ
+     れば使用されません．
+
+`unknown'
+     `libtool.m4'で優先されない場合，すべてのシステムでデフォルトです．
+     それは`none'と同じですが，正しい値が何か，我々が本当に知らないこと
+     を文章化していて，我々はそれを改善するパッチを歓迎します．
+
+`ltmain.in'で，我々は本当に一生懸命作業しました．それは，(libname_spec等
+の評価を使用するための変数を設定/リリース行う)小さな初期化と移植，そして
+使用するメソッドを決定するケース文です．これは，実際にはコードです... 
+もう少し凝縮できれば良かったのですが，関数呼び出しを用いずにできるとは思
+えませんでした．私はほとんどの(ループの外に出す等の)最適化を行いましたが，
+余分なものがあるかもしれません．明確な最適化を考える前に，前進を止め，発
+見されたバグに対して作業すべきだと考えました．
+
+
+
+
+File: libtool-ja.info, Node: Tested platforms, Next: Platform quirks, Prev: New ports, Up: Maintaining
+
+テストされたプラットフォーム
+============================
+
+この表は，共有ライブラリのサポートを謡っているプラットフォームで，
+libtoolがテストされたことが分かっている最後の時期を記述しています．
+
+     -------------------------------------------------------
+     標準的なホスト名            コンパイラ libtool   結果
+     (ツールのバージョン)                   リリース
+     -------------------------------------------------------
+     alpha-dec-osf5.1		cc	 1.3e	  ok (1.910)
+     alpha-dec-osf4.0f               gcc      1.3e     ok (1.910)
+     alpha-dec-osf4.0f               cc       1.3e     ok (1.910)
+     alpha-dec-osf3.2                gcc      0.8      ok
+     alpha-dec-osf3.2                cc       0.8      ok
+     alpha-dec-osf2.1                gcc      1.2f     NS
+     alpha*-unknown-linux-gnu        gcc      1.3b     ok
+       (egcs-1.1.2, GNU ld 2.9.1.0.23)
+     hppa2.0w-hp-hpux11.00           cc       1.2f     ok
+     hppa2.0-hp-hpux10.20            cc       1.3.2    ok
+     hppa1.1-hp-hpux10.20            gcc      1.2f     ok
+     hppa1.1-hp-hpux10.20            cc       1.3c     ok (1.821)
+     hppa1.1-hp-hpux10.10            gcc      1.2f     ok
+     hppa1.1-hp-hpux10.10            cc       1.2f     ok
+     hppa1.1-hp-hpux9.07             gcc      1.2f     ok
+     hppa1.1-hp-hpux9.07             cc       1.2f     ok
+     hppa1.1-hp-hpux9.05             gcc      1.2f     ok
+     hppa1.1-hp-hpux9.05             cc       1.2f     ok
+     hppa1.1-hp-hpux9.01             gcc      1.2f     ok
+     hppa1.1-hp-hpux9.01             cc       1.2f     ok
+     i*86-*-beos                     gcc      1.2f     ok
+     i*86-*-bsdi4.0.1                gcc      1.3c     ok
+       (gcc-2.7.2.1)
+     i*86-*-bsdi4.0                  gcc      1.2f     ok
+     i*86-*-bsdi3.1                  gcc      1.2e     NS
+     i*86-*-bsdi3.0                  gcc      1.2e     NS
+     i*86-*-bsdi2.1                  gcc      1.2e     NS
+     i*86-pc-cygwin                  gcc      1.3b     NS
+       (egcs-1.1 stock b20.1 compiler)
+     i*86-*-dguxR4.20MU01            gcc      1.2      ok
+     i*86-*-freebsd4.3		gcc      1.3e     ok (1.912)
+     i*86-*-freebsdelf4.0            gcc      1.3c     ok
+       (egcs-1.1.2)
+     i*86-*-freebsdelf3.2            gcc      1.3c     ok
+       (gcc-2.7.2.1)
+     i*86-*-freebsdelf3.1            gcc      1.3c     ok
+       (gcc-2.7.2.1)
+     i*86-*-freebsdelf3.0            gcc      1.3c     ok
+     i*86-*-freebsd3.0               gcc      1.2e     ok
+     i*86-*-freebsd2.2.8             gcc      1.3c     ok
+       (gcc-2.7.2.1)
+     i*86-*-freebsd2.2.6             gcc      1.3b     ok
+       (egcs-1.1 & gcc-2.7.2.1, native ld)
+     i*86-*-freebsd2.1.5             gcc      0.5      ok
+     i*86-*-netbsd1.5                gcc      1.3e     ok (1.901)
+       (egcs-1.1.2)
+     i*86-*-netbsd1.4                gcc      1.3c     ok
+       (egcs-1.1.1)
+     i*86-*-netbsd1.4.3A             gcc      1.3e     ok (1.901)
+     i*86-*-netbsd1.3.3              gcc      1.3c     ok
+       (gcc-2.7.2.2+myc2)
+     i*86-*-netbsd1.3.2              gcc      1.2e     ok
+     i*86-*-netbsd1.3I               gcc      1.2e     ok
+       (egcs 1.1?)
+     i*86-*-netbsd1.2                gcc      0.9g     ok
+     i*86-*-linux-gnu		gcc	 1.3e	  ok (1.901)
+       (Red Hat 7.0, gcc "2.96")
+     i*86-*-linux-gnu		gcc	 1.4.2	  ok
+       (SuSE 7.0, gcc 2.95.2)
+     i*86-*-linux-gnulibc1           gcc      1.2f     ok
+     i*86-*-openbsd2.5               gcc      1.3c     ok
+       (gcc-2.8.1)
+     i*86-*-openbsd2.4               gcc      1.3c     ok
+       (gcc-2.8.1)
+     i*86-*-solaris2.7               gcc      1.3b     ok
+       (egcs-1.1.2, native ld)
+     i*86-*-solaris2.6               gcc      1.2f     ok
+     i*86-*-solaris2.5.1             gcc      1.2f     ok
+     i*86-ncr-sysv4.3.03             gcc      1.2f     ok
+     i*86-ncr-sysv4.3.03             cc       1.2e     ok
+       (cc -Hnocopyr)
+     i*86-pc-sco3.2v5.0.5		cc	 1.3c	  ok
+     i*86-pc-sco3.2v5.0.5		gcc	 1.3c	  ok
+       (gcc 95q4c)
+     i*86-pc-sco3.2v5.0.5		gcc	 1.3c	  ok
+       (egcs-1.1.2)
+     i*86-sco-sysv5uw7.1.1		gcc	 1.3e	  ok (1.901)
+       (gcc-2.95.2, SCO linker)
+     i*86-UnixWare7.1.0-sysv5	cc	 1.3c	  ok
+     i*86-UnixWare7.1.0-sysv5	gcc	 1.3c	  ok
+       (egcs-1.1.1)
+     m68k-next-nextstep3             gcc      1.2f     NS
+     m68k-sun-sunos4.1.1             gcc      1.2f     NS
+       (gcc-2.5.7)
+     m88k-dg-dguxR4.12TMU01          gcc      1.2      ok
+     m88k-motorola-sysv4             gcc      1.3      ok
+       (egcs-1.1.2)
+     mips-sgi-irix6.5                gcc      1.2f     ok
+       (gcc-2.8.1)
+     mips-sgi-irix6.4                gcc      1.2f     ok
+     mips-sgi-irix6.3                gcc      1.3b     ok
+       (egcs-1.1.2, native ld)
+     mips-sgi-irix6.3                cc       1.3b     ok
+       (cc 7.0)
+     mips-sgi-irix6.2                gcc      1.2f     ok
+     mips-sgi-irix6.2                cc       0.9      ok
+     mips-sgi-irix5.3                gcc      1.2f     ok
+       (egcs-1.1.1)
+     mips-sgi-irix5.3                gcc      1.2f     NS
+       (gcc-2.6.3)
+     mips-sgi-irix5.3                cc       0.8      ok
+     mips-sgi-irix5.2                gcc      1.3b     ok
+       (egcs-1.1.2, native ld)
+     mips-sgi-irix5.2                cc       1.3b     ok
+       (cc 3.18)
+     mips-sni-sysv4			cc       1.3.5    ok
+       (Siemens C-compiler)
+     mips-sni-sysv4			gcc      1.3.5    ok
+       (gcc-2.7.2.3, GNU assembler 2.8.1, native ld) 
+     mipsel-unknown-openbsd2.1       gcc      1.0      ok
+     powerpc-ibm-aix4.3.1.0          gcc      1.2f     ok
+       (egcs-1.1.1)
+     powerpc-ibm-aix4.2.1.0          gcc      1.2f     ok
+       (egcs-1.1.1)
+     powerpc-ibm-aix4.1.5.0          gcc      1.2f     ok
+       (egcs-1.1.1)
+     powerpc-ibm-aix4.1.5.0          gcc      1.2f     NS
+       (gcc-2.8.1)
+     powerpc-ibm-aix4.1.4.0          gcc      1.0      ok
+     powerpc-ibm-aix4.1.4.0          xlc      1.0i     ok
+     rs6000-ibm-aix4.1.5.0           gcc      1.2f     ok
+       (gcc-2.7.2)
+     rs6000-ibm-aix4.1.4.0           gcc      1.2f     ok
+       (gcc-2.7.2)
+     rs6000-ibm-aix3.2.5             gcc      1.0i     ok
+     rs6000-ibm-aix3.2.5             xlc      1.0i     ok
+     sparc-sun-solaris2.8		gcc	 1.4.2	  ok
+       (gcc-2.95.2 & native ld)
+     sparc-sun-solaris2.8		gcc	 1.4.2	  ok
+       (gcc-3.0.1 & GNU ld 2.11.2)
+     sparc-sun-solaris2.7            gcc      1.3e     ok (1.913)
+       (gcc-2.95.3 & native ld)
+     sparc-sun-solaris2.6            gcc      1.3e     ok (1.913)
+       (gcc-2.95.3 & native ld)
+     sparc-sun-solaris2.5.1          gcc      1.4.2    ok
+       (gcc-2.95.1 & GNU ld 2.9.1)
+     sparc-sun-solaris2.5            gcc      1.3b     ok
+       (egcs-1.1.2, GNU ld 2.9.1 & native ld)
+     sparc-sun-solaris2.5            cc       1.3b     ok
+       (SC 3.0.1)
+     sparc-sun-solaris2.4            gcc      1.0a     ok
+     sparc-sun-solaris2.4            cc       1.0a     ok
+     sparc-sun-solaris2.3            gcc      1.2f     ok
+     sparc-sun-sunos4.1.4            gcc      1.2f     ok
+     sparc-sun-sunos4.1.4            cc       1.0f     ok
+     sparc-sun-sunos4.1.3_U1         gcc      1.2f     ok
+     sparc-sun-sunos4.1.3C           gcc      1.2f     ok
+     sparc-sun-sunos4.1.3            gcc      1.3b     ok
+       (egcs-1.1.2, GNU ld 2.9.1 & native ld)
+     sparc-sun-sunos4.1.3            cc       1.3b     ok
+     sparc-unknown-bsdi4.0           gcc      1.2c     ok
+     sparc-unknown-linux-gnulibc1    gcc      1.2f     ok
+     sparc-unknown-linux-gnu         gcc      1.3b     ok
+       (egcs-1.1.2, GNU ld 2.9.1.0.23)
+     sparc64-unknown-linux-gnu       gcc      1.2f     ok
+
+     注意:
+     - "ok" は，"すべてのテストを通過した"ことを意味します．
+     - "NS" は，"共有に失敗"("Not Shared")を意味しますが，
+           スタティックライブラリはOKです．
+注：ベンダー配布されているHP-UXの`sed'(1)プログラムは，ひどく壊れて
+いて，libtoolの要求を処理することができないため，ユーザは異常の問題を報
+告する可能性があります．これらのシステムで動作する(GNU `sed')のよう
+な`sed'をインストールする以外に，回避方法はありません．
+
+注：ベンダー配布されているNCR MP-RAS `cc'プログラムは，標準エラーに
+著作権を出力し，`conftest.err'の大きさのテストで混乱します．回避方
+法は，`configure'を実行するとき，`CC='cc -Hnocopyr''を用いて
+`CC' を指定します．
+
+
+
+
+File: libtool-ja.info, Node: Platform quirks, Next: libtool script contents, Prev: Tested platforms, Up: Maintaining
+
+プラットフォームの癖
+====================
+
+このセクションは，libtoolの管理者の健康に捧げます．それは，libtoolが使用
+するプログラム，システムごとの違い，そしてテストの方法を記述します．
+
+libtoolはシェルスクリプトなので，最初から最後まで読むだけで理解すること
+は難しいはずです．このセクションは，libtoolが特定の方法で行う理由の理解
+を助けます．スクリプト自身が組み合わされているので，libtoolの改善や，独
+自に書く方法の，より良いセンスが必要でしょう．
+
+* Menu:
+
+* References::                  Finding more information.
+* Compilers::                   Creating object files from source files.
+* Reloadable objects::          Binding object files together.
+* Multiple dependencies::	Removing duplicate dependant libraries.
+* Archivers::                   Programs that create static archives.
+
+
+
+File: libtool-ja.info, Node: References, Next: Compilers, Prev: Platform quirks, Up: Platform quirks
+
+リファレンス
+------------
+
+以下は，価値のある文章の参照リストです．
+
+   * SGIのIRIXのマニュアルページで，それは
+     `http://techpubs.sgi.com/cgi-bin/infosrch.cgi?cmd=browse&db=man'で見
+     つかります．
+
+   * Sunのフリーサービス領域
+     (`http://www.sun.com/service/online/free.html')とドキュメントサーバ
+     (`http://docs.sun.com/')．
+
+   * CompaqのTru64 UNIXオンラインドキュメントは
+     (`http://tru64unix.compaq.com/faqs/publications/pub_page/doc_list.html') 
+     にあり，C++ドキュメントは
+     (`http://tru64unix.compaq.com/cplus/docs/index.htm')です．
+
+   * Hewlett-Packardは(`http://docs.hp.com/index.html')にオンラインドキュ
+     メントがあります．
+
+   * IBMは(`http://www.rs6000.ibm.com/resource/aix_resource/Pubs/')にオン
+     ラインドキュメントがあります．
+
+
+
+
+File: libtool-ja.info, Node: Compilers, Next: Reloadable objects, Prev: References, Up: Platform quirks
+
+コンパイラ
+----------
+
+libtoolに影響するコンパイラの特徴は，PICオブジェクトを生成するための(存
+在する場合は)必要なフラグのみです．一般的に，Cコンパイラが特定のPICフラ
+グをサポートする場合，あらゆる派生的なコンパイラは同じフラグをサポートし
+ます．この規則に対し，注目すべき若干の例外があるまでは，このセクションで
+はCコンパイラのみを説明します．
+
+プラットフォームに関係なく，以下のCコンパイラは，標準のコマンドライオプ
+ションがあります．
+
+`gcc'
+
+     これはGNU Cコンパイラで，多くのフリーオペレーティングシステム(少し例をあ
+     げると，FreeBSD，GNU/Hurd，GNU/Linux，Lites，NetBSD，そしてOpenBSDです)
+     に対する，システムコンパイラでもあります．
+
+     `-fpic'や`-fPIC'フラグは，位置に依存しないコードを生成するため
+     に使用可能です．`-fPIC'は動作するコードを生成することを保証しますが，
+     m68k，m88k，そしてSparcチップ上ではコードは遅くなります．しかし，これら
+     のチップで`-fpic'を使用すると，共有ライブラリでの自由なサイズが強制
+     的に制限されます．
+
+このサブセクションの残りは，バンドルされているオペレーティングシステムの
+コンパイラをリストアップします．
+
+
+`aix3*'
+`aix4*'
+     AIXはPowerPCとRS/6000チップのみに移植されているので，AIXコンパイラ
+     はPIC フラグはありません． (1) (*Note Compilers-Footnotes::)
+
+`hpux10*'
+     PICを生成するために`+Z'を使用してください
+
+`osf3*'
+     Digital/UNIX 3.xは，少なくともPowerPCプラットフォームでなければ，PICフラ
+     グはありません．
+
+`solaris2*'
+     PICを生成するために`-KPIC'を使用してください．
+
+`sunos4*'
+     PICを生成するために`-PIC'を使用してください．
+
+
+
+File: libtool-ja.info  Node: Compilers-Footnotes, Up: Compilers
+
+(1) PowerPCとRS/6000チップ(`powerpc-*-*'，`powerpcle-*-*'，
+そして`rs6000-*-*')に対しコンパイルされているすべてのコードは，
+オペレーティングシステムやコンパイラスイートに関係なく位置に依存し
+ません．そのため，"標準オブジェクト"はこれらのシステムの共有ライブ
+ラリの構築で使用され，特別なPICコンパイラフラグは要求されません．
+
+
+
+File: libtool-ja.info, Node: Reloadable objects, Next: Multiple dependencies, Prev: Compilers, Up: Platform quirks
+
+リロード可能なオブジェクト
+--------------------------
+
+すべての既知のシステム上で，リロード可能なオブジェクトは`ld -r -o
+OUTPUT.o INPUT1.o INPUT2.o'を実行することで生成可能で
+す．このリロード可能なオブジェクトは，他のオブジェクトと完全な同義語とし
+て扱うことが可能です．
+
+
+
+
+File: libtool-ja.info, Node: Multiple dependencies, Next: Archivers, Prev: Reloadable objects, Up: Platform quirks
+
+複数の依存性
+------------
+
+ほとんどの近代的なプラットフォームでは，依存するライブラリがリストアップ
+される順序はオブジェクトの生成で影響がありません．理論上，シンボルを提供
+しているライブラリの後に，リストアップされている他のライブラリに足りない
+シンボルを提供するライブラリを要求するプラットフォームがあります．
+
+特に，一組のスタティックアーカイブのそれぞれが，他のシンボルのいくつかを
+解決する場合，それらのアーカイブの前後両方に他のものをリストアップするこ
+とが必要かもしれません．複製されたライブラリはリンク行から削除されるので，
+libtoolは，現在この状況に十分に対処していません．
+
+正しくリンクされたオブジェクトを生成するために，ライブラリを複数回リスト
+アップすることを要求するホストで開発していることが分かった場合，以下のよ
+うにして，libtoolの除去アルゴリズムを無効にすることが可能です．
+
+     $ libtool ... -lfoo -lbar -Wl,-lfoo
+
+
+
+
+File: libtool-ja.info, Node: Archivers, Prev: Multiple dependencies, Up: Platform quirks
+
+アーカイバ
+----------
+
+すべての既知のシステム上で，スタティックライブラリのビルドは，`ar cru
+libNAME.a OBJ1.o OBJ2.o ...'の実行で完成するはずで，そこでは，`.a'ファイ
+ルは出力ライブラリで，それぞれの`.o' ファイルはオブジェクトファイルです．
+
+すべての既知のシステム上で，`ranlib'という名のプログラムがある場合，リン
+クする前に`ranlib libNAME.a'コマンドを用いて，作成されるライブラリを"祝
+福"するために使用する必要があります．Irixのように，代わりに`ar ts'を使用
+するシステムもあります．
+
+
+
+
+File: libtool-ja.info, Node: libtool script contents, Next: Cheap tricks, Prev: Platform quirks, Up: Maintaining
+
+`libtool'スクリプトの内容
+=========================
+
+バージョン1.4からは，`libtool'スクリプトは`configure'によって生成されま
+す(*Note Configuring::．以前のバージョンでは，`ltconfig' と呼ばれるへル
+パースクリプトを呼び出すことで，`configure'はそれを達成していました．
+libtoolのバージョン0.7から1.0までは，このスクリプトは，単純にシェル変数
+を設定し，libtoolのバックエンドの`ltmain.sh'の源となっていました．
+libtoolバージョン1.1から1.3までの`ltconfig'は，`ltmain.sh'の内容を，生成
+された`libtool'にインライン化し，それは多くのシステムでパフォーマンスを
+改善しました．`ltconfig'が実行するために使用するテストは，現在
+`libtool.m4'にあり，そこで我々はAutoconfを使用して書くことが可能となって
+います．これは，インライン化された`ltmain.sh'の実行時の動作に有利で，*そ
+して*，管理が必要な生のシェルコードの量をかなり取り除くことで，構築時間
+を短くする改善を行いました．
+
+後で評価するもの対するシェルコマンドを保持する変数の命名に使用される規則
+は，有効な単一行のシェルスクリプトが必要とされるところで接尾子`_cmd'，複
+数行のシェルスクリプトが後で評価することが*可能な* ところで接尾子`_cmds'
+を使用することです．規則では，`_cmds'変数は，必要なところで，`~'文字で評
+価ユニットを区切ります．
+
+それぞれのコンフィグレーション変数と，`ltmain.sh'で使用する方法のリスト
+は，以下のようになります(*Note Configuring::)．
+
+ -- Variable: AR
+     システムライブラリアーカイバの名前です．
+
+ -- Variable: CC
+     libtoolをコンフィグレーションするために使用するCコンパイラの名前で
+     す．
+
+ -- Variable: LD
+     リロード可能にするリンクとおそらく共有ライブラリに対し，libtoolが内
+     部で使用するリンカの名前です．
+
+ -- Variable: NM
+     BSD互換の`nm'プログラムの名前で，それは以下の書式の一つで，大域的な
+     シンボルを生成します．
+
+          ADDRESS C GLOBAL-VARIABLE-NAME
+          ADDRESS D GLOBAL-VARIABLE-NAME
+          ADDRESS T GLOBAL-FUNCTION-NAME
+
+ -- Variable: RANLIB
+     存在する場合，ranlibプログラムの名前を設定します．
+
+ -- Variable: allow_undefined_flag
+     結果として生じる共有ライブラリに，未解決のシンボルがあることを宣言
+     するために，`archive_cmds'で使用されるフラグです．そのようなフラグ
+     が不要な場合は空です．ライブラリで定義されていないシンボルを参照し
+     て，共有ライブラリを生成する方法がない場合，`unsupported'を設定しま
+     す．
+
+ -- Variable: always_export_symbols
+     アーカイブとリンクする前に，EXPORT_SYMBOLS_CMDSを使用してエクスポー
+     トされるシンボルのリストを，libtoolが自動的に生成するかどうかです．
+     `yes'または`no'に設定します．デフォルトは`no'です．
+
+ -- Variable: archive_cmds
+ -- Variable: archive_expsym_cmds
+ -- Variable: old_archive_cmds
+     それぞれ，共有ライブラリ，`-export-symbols'を用いた共有ライブラリ，
+     そしてスタティックライブラリを生成するために使用するコマンドです．
+
+ -- Variable: old_archive_from_new_cmds
+     共有ライブラリがスタティックライブラリに依存する場合，
+     `old_archive_from_new_cmds'はスタティックライブラリを生成するために
+     使用するコマンドを含みます．この変数が空の場合，`old_archive_cmds' 
+     は使用されません．
+
+ -- Variable: old_archive_from_expsyms_cmds
+     スタティックライブラリが，共有ライブラリで正しくリンクするために，
+     エクスポートシンボルリストから作成される必要がある場合，
+     `old_archive_from_expsyms_cmds'は，そのスタティックライブラリを作成
+     するために必要なコマンドを含みます．これらのコマンドが実行されると
+     き，変数SONAMEは，共有ライブラリの名前を疑問符の中に含み，
+     $OBJDIR/$NEWLIBは，これらのコマンドがビルドする静的ライブラリのパス
+     を含みます．これらのコマンドを実行した後，libtoolは，SONAMEの代わり
+     に$OBJDIR/$NEWLIBに対してリンクするための処理を行います．
+
+ -- Variable: build_libtool_libs
+     このシステムで，libtoolが共有ライブラリをビルドできるかどうかです．
+     `yes'または`no'に設定します．
+
+ -- Variable: build_old_libs
+     このシステムで，libtoolがスタティックライブラリをビルドできるかどう
+     かです．`yes'または`no'に設定します．
+
+ -- Variable: compiler_c_o
+     コンパイラが，同時に`-c'と`-o'オプションをサポートするかどうかです．
+     `yes'または`no'に設定します．
+
+ -- Variable: compiler_o_lo
+     コンパイラが，直接".lo"ファイルへのコンパイルをサポートするかどうか
+     で，例えば，オブジェクトファイルが，接尾子".o"を持つ必要があるかど
+     うかです．`yes'または`no'に設定します．
+
+ -- Variable: dlopen_support
+     プラットフォームで，`dlopen'をサポートするかどうかです．`yes' また
+     は`no'に設定します．
+
+ -- Variable: dlopen_self
+     実行形式自身が`dlopen'可能かどうかです．`yes'または`no' に設定しま
+     す．
+
+ -- Variable: dlopen_self_static
+     静的にリンクされているとき(`-all-static')，実行形式自身が`dlopen'可
+     能かどうかです．`yes'または`no'に設定します．
+
+ -- Variable: echo
+     バックスラッシュをエスケープ文字と解釈しない`echo'プログラムです．
+
+ -- Variable: exclude_expsyms
+     プリリードされているシンボルにリストアップされないシンボルのリスト
+     です．
+
+ -- Variable: export_dynamic_flag_spec
+     dlopenされる共有ライブラリが，プログラムで定義されているシンボルへ
+     の参照を可能にするコンパイラリンクフラグです．
+
+ -- Variable: export_symbols_cmds
+     LIBOBJSからファイルEXPORT_SYMBOLSへエクスポートされたシンボルを抽出
+     するコマンドです．
+
+ -- Variable: extract_expsyms_cmds
+     共有ライブラリからエクスポートされたシンボルリストを抽出するコマン
+     ドです．これらのコマンドは，ファイル$OBJDIR/$SONAME-DEFが無い場合に
+     実行され，`old_archive_from_expsyms_cmds'が使用するため，エクスポー
+     トされたシンボル名をそのファイルに書き出します．
+
+ -- Variable: fast_install
+     libtoolが特権を与える人を，インストール者または開発者のどちらかに決
+     定します．インストール者がビルドツリーでプログラムを実行することは
+     滅多になく，開発者は滅多にインストールしないしないと仮定します．こ
+     れは，SHLIBPATH_OVERRIDES_RUNPATHが`yes'でないプラットフォーム上で
+     のみ意味があるので，この場合，FAST_INSTALLは`needless'設定されます．
+     FAST_INSTALLが`yes'に設定される場合，libtoolはインストールされたラ
+     イブラリを検索するプログラムを作成し，プログラムがビルドツリーで実
+     行される場合，まだインストールされていないライブラリを使用するため，
+     要求があれば，新しいコピーがリンクされます．`no'に設定されている場
+     合，libtoolは，まだインストールされていないライブラリを使用するプロ
+     グラムを作成し，インストール時にプログラムの新しいコピーをリンクし
+     ます．デフォルト値は`yes'または`needless'で，それは，プラットフォー
+     ムとコンフィグレーションフラグに依存し，コンフィグレーションフラグ
+     `--disable-fast-install'を用いると，`yes'から`no'に切り替えられます．
+
+ -- Variable: finish_cmds
+     指定されたディレクトリで共有ライブラリを見つける方法を，ダイナミッ
+     クリンカに伝えるコマンドです．
+
+ -- Variable: finish_eval
+     コマンドが表示されない以外，FINISH_CMDSと同じです．
+
+ -- Variable: fix_srcfile_path
+     コンパイラに対するシェル変数$srcfileを修正する式です．
+
+ -- Variable: global_symbol_pipe
+     NMの出力を受け，Cの名前が続く生のシンボルのリストを生成するパイプラ
+     インです．例えば，以下のようになります．
+
+          $ eval "$NM progname | $global_symbol_pipe"
+          D SYMBOL1 C-SYMBOL1
+          T SYMBOL2 C-SYMBOL2
+          C SYMBOL3 C-SYMBOL3
+          ...
+          $
+
+     最初の列は，(いくつかのプラットフォーム上でコードからデータを伝える
+     ために使用される)シンボル形式を含みますが，その意味はシステムに依存
+     します．
+
+ -- Variable: global_symbol_to_cdecl
+     GLOBAL_SYMBOL_PIPEの出力を厳密なC宣言に変換するパイプラインです．
+     HP/UXのような，リンカがコードとデータを区別するプラットフォームでは，
+     データシンボルはそのように宣言され，コードシンボルは関数として宣言
+     されます．気にしないプラットフォームではすべてがデータと仮定されま
+     す．
+
+ -- Variable: hardcode_action
+     `immediate'または`relink'のいずれかで，共有ライブラリパスがインストー
+     ルされる前に実行形式にハードコードされるか，または，再リンクする必
+     要があるかに依存します．
+
+ -- Variable: hardcode_direct
+     HARDCODE_LIBDIR_FLAG_SPECが指定されたとき，(`DIR/libNAME.a'のような)
+     コマンド行でライブラリが直接していされる場合，リンカがディレクトリ
+     をハードコードするかどうかに依存し，`yes'または`no'に設定します．
+
+ -- Variable: hardcode_into_libs
+     ライブラリ内の実行パスのハードコードをプラットフォームがサポートす
+     るかどうかです．可能な場合，プログラムのリンクはより単純になります
+     が，ライブラリはインストール時に再リンクが必要です．`yes'または`no'
+     に設定します．
+
+ -- Variable: hardcode_libdir_flag_spec
+     実行時に，共有ライブラリに対しダイナミックリンカがLIBDIRを検索する
+     ために，バイナリにLIBDIR変数をハードコードするためのフラグです．空
+     の場合，libtoolは他のハードコーディングメカニズムの使用を試みます．
+
+ -- Variable: hardcode_libdir_separator
+     コンパイラが単一のHARDCODE_LIBDIR_FLAGのみ受け入れる場合，この変数
+     はそのフラグに対する複数の引数を分ける文字列を含みます．
+
+ -- Variable: hardcode_minus_L
+     HARDCODE_LIBDIR_FLAG_SPECが指定されたとき，結果として生じる実行形式
+     に`-L'フラグで指定されるディレクトリを，リンカがハードコードするか
+     どうかに依存し，`yes'または`no'に設定します．
+
+ -- Variable: hardcode_shlibpath_var
+     HARDCODE_LIBDIR_FLAG_SPECが指定されたとき，結果として生じる実行形式
+     に`$shlibpath_var'の内容を書き込むことで，リンカがディレクトリをハー
+     ドコードするかどうかに依存し，`yes'または`no'に設定します．
+     `$shlibpath_var'で指定されたディレクトリが，リンク時ではなく実行時
+     に検索される場合，`unsupported'に設定します．
+
+ -- Variable: host
+ -- Variable: host_alias
+     情報を目的として，libtoolがコンフィグレーションされたシステムの指定
+     された標準名に設定します．
+
+ -- Variable: include_expsyms
+     EXPORT_SYMBOLSの使用時に，常にエクスポートされる必要があるシンボル
+     のリストです．
+
+ -- Variable: libext
+     標準的な，古いアーカイブの接尾子(通常は"a")です．
+
+ -- Variable: libname_spec
+     ライブラリ名の接頭辞の書式です．Unixシステムでは，スタティックライ
+     ブラリは`libNAME.a'と呼ばれますが，(OS/2やMS-DOSのような)システムで
+     は，ライブラリは`NAME.a'のみで呼ばれることもあります．
+
+ -- Variable: library_names_spec
+     共有ライブラリ名のリストです．最初はファイル名で，残りはファイルへ
+     のシンボリックリンクです．リスト内の名前は，`-lNAME'で与えられたと
+     きリンカが見つけるファイル名です．
+
+ -- Variable: link_all_deplibs
+     libtoolが，全ての依存するプログラムに対しプログラムをリンクする必要
+     があるかどうかです．`yes'または`no'に設定します．デフォルトは
+     `unknown'で，それは`yes'と同じです．
+
+ -- Variable: link_static_flag
+     ダイナミックリンクを避けるために使用する(Cコンパイラに渡す)リンカフ
+     ラグです．
+
+ -- Variable: need_lib_prefix
+     自動的にモジュール名に'lib'接尾子を付けるかどうかです．`yes'または
+     `no'に設定します．デフォルトで，それは`unknown'になり，それは`yes'
+     と同じ意味ですが，本当に確かめたわけではないことを告げています．
+     `yes'は`dlopen'と'lib'接頭辞がないライブラリにリンク可能なことを意
+     味し，すなわち，それはHARDCODE_DIRECTを`yes'にすることを要求します．
+
+ -- Variable: need_version
+     バージョン管理がライブラリに必要とされるかどうかで，すなわち，ダイ
+     ナミックリンカが，すべてのライブラリに対しバージョンの接尾子を必要
+     とするかどうかです．`yes'または`no'に設定します．デフォルトで，それ
+     は`unknown'で，それは`yes'と同じ意味を持ちますが，それを実際には確
+     かめていないことを告げています．
+
+ -- Variable: need_locks
+     同時にコンパイルするとき，衝突を避けるためにファイルをロックする必
+     要があるかどうかです．`yes'または`no'に設定します．
+
+ -- Variable: no_builtin_flag
+     `char'として外部グローバルシンボルを宣言することと衝突する組み込み
+     関数を，利用不可能にするコンパイラフラグです．
+
+ -- Variable: no_undefined_flag
+     結果として生じる共有ライブラリに，未解決のシンボルがないことを宣言
+     するための，`archive_cmds'で使用されるフラグです．
+
+ -- Variable: objdir
+     一時的なlibtoolファイルが含まれるディレクトリ名です．
+
+ -- Variable: objext
+     標準的なオブジェクトファイルの接尾子(通常は"o")です．
+
+ -- Variable: pic_flag
+     ライブラリオブジェクトファイルをビルドするための，あらゆる追加のコ
+     ンパイルフラグです．
+
+ -- Variable: postinstall_cmds
+ -- Variable: old_postinstall_cmds
+     それぞれ，共有またはスタティックライブラリをインストールした後に実
+     行するコマンドです．
+
+ -- Variable: postuninstall_cmds
+ -- Variable: old_postuninstall_cmds
+     それぞれ，共有またはスタティックライブラリをアンインストールした後
+     に実行するコマンドです．
+
+ -- Variable: reload_cmds
+ -- Variable: reload_flag
+     リロード可能なオブジェクトを作成するコマンドです．
+
+ -- Variable: runpath_var
+     結果として生じる実行形式内にハードコードするディレクトリをリンカに
+     伝える環境変数です．
+
+ -- Variable: shlibpath_overrides_runpath
+     環境変数でプログラムのハードコードされたライブラリ検索パスを優先可
+     能かどうかを示します．これが`no'に設定されている場合，libtoolはビル
+     ドツリーにプログラムのコピーを２つ作成する必要がある可能性があり，
+     一つはインストールされ，もう一つはビルドツリーのみで実行されます．
+     これらのコピーのどちらかが作成されるとき，`fast_install'の値に依存
+     します．デフォルト値は`unknown'で，それは`no'と同じです．
+
+ -- Variable: shlibpath_var
+     ダイナミックリンカに共有ライブラリを探す場所を伝える環境変数です．
+
+ -- Variable: soname_spec
+     共有ライブラリがファイルの本当の名前と異なる場合，その中に符号化さ
+     れたコードされた名前です．
+
+ -- Variable: striplib
+ -- Variable: old_striplib
+     共有(`striplib')やスタティック(`old_striplib')のライブラリをstripす
+     るコマンドです．これらの変数が空の場合，インストールモードのstrip 
+     フラグは，ライブラリに対し無視されます(*Note Install mode::)．
+
+ -- Variable: sys_lib_dlsearch_path_spec
+     実行時にライブラリの検索パスを取得する式です．このリストに現れるディ
+     レクトリが実行形式にハードコードされることは決してありません．
+
+ -- Variable: sys_lib_search_path_spec
+     コンパイル時にライブラリの検索パスを取得する式です．この変数は，特
+     定のライブラリが共有かスタティックかをテストする必要があるとき，
+     libtoolが使用します．SHLIBPATH_VARでリストアップされるディレクトリ
+     は，このリストに自動的に現れ，ライブラリ検索パスを拡張するためにこ
+     の変数を使用するリンカもあるので，毎回(すなわち，コンフィグレーショ
+     ン時以外)libtoolは実行します．リンカは`-L'のような検索パス引数も切
+     り替えます．
+
+ -- Variable: thread_safe_flag_spec
+     スレッドセーフなライブラリを生成するために使用する(Cコンパイラに渡
+     す)リンカフラグです．
+
+ -- Variable: version_type
+     ライブラリバージョンナンバーの形式です．`libtool'，`freebsd-aout'，
+     `freebsd-elf'，`irix'，`linux'，`osf'，`sunos'，`windows'，または
+     `none'の一つです．
+
+ -- Variable: whole_archive_flag_spec
+     便利なアーカイバから共有ライブラリを生成するコンパイラフラグです．
+
+ -- Variable: wl
+     libtoolが直接リンカにフラグを渡すことを可能とするCコンパイラフラグ
+     です．`${wl}SOME-FLAG'として使用されます．
+
+`_cmds'や`_eval'で終わる変数は，`~'で分けられた，順番に`eval'されるコマ
+ンドのリストを含みます．ゼロ以外の終了ステータスを返すコマンドがある場合，
+libtoolは一般的にエラーメッセージとともに終了します．
+
+`_spec'で終わる変数は，libtoolで使用される前に`eval'されます．
+
+
+
+
+File: libtool-ja.info, Node: Cheap tricks, Prev: libtool script contents, Up: Maintaining
+
+安っぽい手段
+============
+
+より簡単にメンテナーシップを作成するために使用することが可能な手段は以下
+のようになっています．
+
+   * 人々がバグを報告したとき，彼らを助けたいと思う場合は，`--config'，
+     `--debug'，または`--features'フラグを使用したかどうかを尋ねてくださ
+     い．これらのフラグは，中古の調査を信頼しなければならない代わりに，
+     情報を直接得る手助けとなるものです．
+
+   * `ltmain.in'を変更するたび毎に再コンフィグレーションする代わりに，
+     PATHに永久的な`libtool'スクリプトを保持し，それは直接`ltmain.in'の
+     元となります．
+
+     以下のステップは，そのようなスクリプトを作成する方法を記述し，そこ
+     では`/home/src/libtool'はlibtoolソースツリーを含むディレクトリ，
+     `/home/src/libtool/libtool'はプラットフォームに対し以前にコンフィグ
+     レーションしたlibtooolスクリプト，そして`~/bin'はPATHにあるディレク
+     トリになっています．
+
+          trick$ cd ~/bin
+          trick$ sed '/^# ltmain\.sh/q' /home/src/libtool/libtool > libtool
+          trick$ echo '. /home/src/libtool/ltmain.in' >> libtool
+          trick$ chmod +x libtool
+          trick$ libtool --version
+          ltmain.sh (GNU @PACKAGE@) @VERSION@@TIMESTAMP@
+          trick$
+
+`libtool --version'コマンドの最終的な出力は，`ltmain.in'スクリプトが直接
+使用されていることを示します．`configure'を再実行する必要なく新しい変更
+をテストするため，すぐに，`~/bin/libtool'や`/home/src/libtool/ltmain.in'
+を編集してください．
+
+
+
+File: libtool-ja.info, Node: GNU Free Documentation License
+
+GNU Free Documentation License
+******************************
+
+
+                        Version 1.1, March 2000
+
+     Copyright (C) 2000  Free Software Foundation, Inc.
+         59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+     Everyone is permitted to copy and distribute verbatim copies
+     of this license document, but changing it is not allowed.
+
+
+Preamble
+========
+
+The purpose of this License is to make a manual, textbook, or other
+written document "free" in the sense of freedom: to assure everyone the
+effective freedom to copy and redistribute it, with or without modifying
+it, either commercially or noncommercially.  Secondarily, this License
+preserves for the author and publisher a way to get credit for their
+work, while not being considered responsible for modifications made by
+others.
+
+This License is a kind of "copyleft", which means that derivative works
+of the document must themselves be free in the same sense.  It
+complements the GNU General Public License, which is a copyleft license
+designed for free software.
+
+We have designed this License in order to use it for manuals for free
+software, because free software needs free documentation: a free program
+should come with manuals providing the same freedoms that the software
+does.  But this License is not limited to software manuals; it can be
+used for any textual work, regardless of subject matter or whether it is
+published as a printed book.  We recommend this License principally for
+works whose purpose is instruction or reference.
+
+
+APPLICABILITY AND DEFINITIONS
+=============================
+
+This License applies to any manual or other work that contains a notice
+placed by the copyright holder saying it can be distributed under the
+terms of this License.  The "Document", below, refers to any such manual
+or work.  Any member of the public is a licensee, and is addressed as
+"you".
+
+A "Modified Version" of the Document means any work containing the
+Document or a portion of it, either copied verbatim, or with
+modifications and/or translated into another language.
+
+A "Secondary Section" is a named appendix or a front-matter section of
+the Document that deals exclusively with the relationship of the
+publishers or authors of the Document to the Document's overall subject
+(or to related matters) and contains nothing that could fall directly
+within that overall subject.  (For example, if the Document is in part a
+textbook of mathematics, a Secondary Section may not explain any
+mathematics.)  The relationship could be a matter of historical
+connection with the subject or with related matters, or of legal,
+commercial, philosophical, ethical or political position regarding them.
+
+The "Invariant Sections" are certain Secondary Sections whose titles are
+designated, as being those of Invariant Sections, in the notice that
+says that the Document is released under this License.
+
+The "Cover Texts" are certain short passages of text that are listed, as
+Front-Cover Texts or Back-Cover Texts, in the notice that says that the
+Document is released under this License.
+
+A "Transparent" copy of the Document means a machine-readable copy,
+represented in a format whose specification is available to the general
+public, whose contents can be viewed and edited directly and
+straightforwardly with generic text editors or (for images composed of
+pixels) generic paint programs or (for drawings) some widely available
+drawing editor, and that is suitable for input to text formatters or for
+automatic translation to a variety of formats suitable for input to text
+formatters.  A copy made in an otherwise Transparent file format whose
+markup has been designed to thwart or discourage subsequent modification
+by readers is not Transparent.  A copy that is not "Transparent" is
+called "Opaque".
+
+Examples of suitable formats for Transparent copies include plain ASCII
+without markup, Texinfo input format, LaTeX input format, SGML or XML
+using a publicly available DTD, and standard-conforming simple HTML
+designed for human modification.  Opaque formats include PostScript,
+PDF, proprietary formats that can be read and edited only by proprietary
+word processors, SGML or XML for which the DTD and/or processing tools
+are not generally available, and the machine-generated HTML produced by
+some word processors for output purposes only.
+
+The "Title Page" means, for a printed book, the title page itself, plus
+such following pages as are needed to hold, legibly, the material this
+License requires to appear in the title page.  For works in formats
+which do not have any title page as such, "Title Page" means the text
+near the most prominent appearance of the work's title, preceding the
+beginning of the body of the text.
+
+
+VERBATIM COPYING
+================
+
+You may copy and distribute the Document in any medium, either
+commercially or noncommercially, provided that this License, the
+copyright notices, and the license notice saying this License applies to
+the Document are reproduced in all copies, and that you add no other
+conditions whatsoever to those of this License.  You may not use
+technical measures to obstruct or control the reading or further copying
+of the copies you make or distribute.  However, you may accept
+compensation in exchange for copies.  If you distribute a large enough
+number of copies you must also follow the conditions in section 3.
+
+You may also lend copies, under the same conditions stated above, and
+you may publicly display copies.
+
+
+COPYING IN QUANTITY
+===================
+
+If you publish printed copies of the Document numbering more than 100,
+and the Document's license notice requires Cover Texts, you must enclose
+the copies in covers that carry, clearly and legibly, all these Cover
+Texts: Front-Cover Texts on the front cover, and Back-Cover Texts on the
+back cover.  Both covers must also clearly and legibly identify you as
+the publisher of these copies.  The front cover must present the full
+title with all words of the title equally prominent and visible.  You
+may add other material on the covers in addition.  Copying with changes
+limited to the covers, as long as they preserve the title of the
+Document and satisfy these conditions, can be treated as verbatim
+copying in other respects.
+
+If the required texts for either cover are too voluminous to fit
+legibly, you should put the first ones listed (as many as fit
+reasonably) on the actual cover, and continue the rest onto adjacent
+pages.
+
+If you publish or distribute Opaque copies of the Document numbering
+more than 100, you must either include a machine-readable Transparent
+copy along with each Opaque copy, or state in or with each Opaque copy a
+publicly-accessible computer-network location containing a complete
+Transparent copy of the Document, free of added material, which the
+general network-using public has access to download anonymously at no
+charge using public-standard network protocols.  If you use the latter
+option, you must take reasonably prudent steps, when you begin
+distribution of Opaque copies in quantity, to ensure that this
+Transparent copy will remain thus accessible at the stated location
+until at least one year after the last time you distribute an Opaque
+copy (directly or through your agents or retailers) of that edition to
+the public.
+
+It is requested, but not required, that you contact the authors of the
+Document well before redistributing any large number of copies, to give
+them a chance to provide you with an updated version of the Document.
+
+
+MODIFICATIONS
+=============
+
+You may copy and distribute a Modified Version of the Document under the
+conditions of sections 2 and 3 above, provided that you release the
+Modified Version under precisely this License, with the Modified Version
+filling the role of the Document, thus licensing distribution and
+modification of the Modified Version to whoever possesses a copy of it.
+In addition, you must do these things in the Modified Version:
+
+  A. Use in the Title Page (and on the covers, if any) a title distinct
+     from that of the Document, and from those of previous versions
+     (which should, if there were any, be listed in the History section
+     of the Document).  You may use the same title as a previous version
+     if the original publisher of that version gives permission.
+
+  B.  List on the Title Page, as authors, one or more persons or
+     entities responsible for authorship of the modifications in the
+     Modified Version, together with at least five of the principal
+     authors of the Document (all of its principal authors, if it has
+     less than five).
+
+  C. State on the Title page the name of the publisher of the Modified
+     Version, as the publisher.
+
+  D.  Preserve all the copyright notices of the Document.
+
+  E. Add an appropriate copyright notice for your modifications adjacent
+     to the other copyright notices.
+
+  F. Include, immediately after the copyright notices, a license notice
+     giving the public permission to use the Modified Version under the
+     terms of this License, in the form shown in the Addendum below.
+
+  G. Preserve in that license notice the full lists of Invariant
+     Sections and required Cover Texts given in the Document's license
+     notice.
+
+  H. Include an unaltered copy of this License.
+
+  I. Preserve the section entitled "History", and its title, and add to
+     it an item stating at least the title, year, new authors, and
+     publisher of the Modified Version as given on the Title Page.  If
+     there is no section entitled "History" in the Document, create one
+     stating the title, year, authors, and publisher of the Document as
+     given on its Title Page, then add an item describing the Modified
+     Version as stated in the previous sentence.
+
+  J. Preserve the network location, if any, given in the Document for
+     public access to a Transparent copy of the Document, and likewise
+     the network locations given in the Document for previous versions
+     it was based on.  These may be placed in the "History" section.
+     You may omit a network location for a work that was published at
+     least four years before the Document itself, or if the original
+     publisher of the version it refers to gives permission.
+
+  K. In any section entitled "Acknowledgements" or "Dedications",
+     preserve the section's title, and preserve in the section all the
+     substance and tone of each of the contributor acknowledgements
+     and/or dedications given therein.
+
+  L. Preserve all the Invariant Sections of the Document, unaltered in
+     their text and in their titles.  Section numbers or the equivalent
+     are not considered part of the section titles.
+
+  M. Delete any section entitled "Endorsements".  Such a section may not
+     be included in the Modified Version.
+
+  N. Do not retitle any existing section as "Endorsements" or to
+     conflict in title with any Invariant Section.
+
+If the Modified Version includes new front-matter sections or appendices
+that qualify as Secondary Sections and contain no material copied from
+the Document, you may at your option designate some or all of these
+sections as invariant.  To do this, add their titles to the list of
+Invariant Sections in the Modified Version's license notice.  These
+titles must be distinct from any other section titles.
+
+You may add a section entitled "Endorsements", provided it contains
+nothing but endorsements of your Modified Version by various
+parties--for example, statements of peer review or that the text has
+been approved by an organization as the authoritative definition of a
+standard.
+
+You may add a passage of up to five words as a Front-Cover Text, and a
+passage of up to 25 words as a Back-Cover Text, to the end of the list
+of Cover Texts in the Modified Version.  Only one passage of Front-Cover
+Text and one of Back-Cover Text may be added by (or through arrangements
+made by) any one entity.  If the Document already includes a cover text
+for the same cover, previously added by you or by arrangement made by
+the same entity you are acting on behalf of, you may not add another;
+but you may replace the old one, on explicit permission from the
+previous publisher that added the old one.
+
+The author(s) and publisher(s) of the Document do not by this License
+give permission to use their names for publicity for or to assert or
+imply endorsement of any Modified Version.
+
+
+COMBINING DOCUMENTS
+===================
+
+You may combine the Document with other documents released under this
+License, under the terms defined in section 4 above for modified
+versions, provided that you include in the combination all of the
+Invariant Sections of all of the original documents, unmodified, and
+list them all as Invariant Sections of your combined work in its license
+notice.
+
+The combined work need only contain one copy of this License, and
+multiple identical Invariant Sections may be replaced with a single
+copy.  If there are multiple Invariant Sections with the same name but
+different contents, make the title of each such section unique by adding
+at the end of it, in parentheses, the name of the original author or
+publisher of that section if known, or else a unique number.  Make the
+same adjustment to the section titles in the list of Invariant Sections
+in the license notice of the combined work.
+
+In the combination, you must combine any sections entitled "History" in
+the various original documents, forming one section entitled "History";
+likewise combine any sections entitled "Acknowledgements", and any
+sections entitled "Dedications".  You must delete all sections entitled
+"Endorsements."
+
+
+COLLECTIONS OF DOCUMENTS
+========================
+
+You may make a collection consisting of the Document and other documents
+released under this License, and replace the individual copies of this
+License in the various documents with a single copy that is included in
+the collection, provided that you follow the rules of this License for
+verbatim copying of each of the documents in all other respects.
+
+You may extract a single document from such a collection, and distribute
+it individually under this License, provided you insert a copy of this
+License into the extracted document, and follow this License in all
+other respects regarding verbatim copying of that document.
+
+
+AGGREGATION WITH INDEPENDENT WORKS
+==================================
+
+A compilation of the Document or its derivatives with other separate and
+independent documents or works, in or on a volume of a storage or
+distribution medium, does not as a whole count as a Modified Version of
+the Document, provided no compilation copyright is claimed for the
+compilation.  Such a compilation is called an "aggregate", and this
+License does not apply to the other self-contained works thus compiled
+with the Document, on account of their being thus compiled, if they are
+not themselves derivative works of the Document.
+
+If the Cover Text requirement of section 3 is applicable to these copies
+of the Document, then if the Document is less than one quarter of the
+entire aggregate, the Document's Cover Texts may be placed on covers
+that surround only the Document within the aggregate.  Otherwise they
+must appear on covers around the whole aggregate.
+
+
+TRANSLATION
+===========
+
+Translation is considered a kind of modification, so you may distribute
+translations of the Document under the terms of section 4.  Replacing
+Invariant Sections with translations requires special permission from
+their copyright holders, but you may include translations of some or all
+Invariant Sections in addition to the original versions of these
+Invariant Sections.  You may include a translation of this License
+provided that you also include the original English version of this
+License.  In case of a disagreement between the translation and the
+original English version of this License, the original English version
+will prevail.
+
+
+TERMINATION
+===========
+
+You may not copy, modify, sublicense, or distribute the Document except
+as expressly provided for under this License.  Any other attempt to
+copy, modify, sublicense or distribute the Document is void, and will
+automatically terminate your rights under this License.  However,
+parties who have received copies, or rights, from you under this License
+will not have their licenses terminated so long as such parties remain
+in full compliance.
+
+
+FUTURE REVISIONS OF THIS LICENSE
+================================
+
+The Free Software Foundation may publish new, revised versions of the
+GNU Free Documentation License from time to time.  Such new versions
+will be similar in spirit to the present version, but may differ in
+detail to address new problems or concerns.  See
+http://www.gnu.org/copyleft/.
+
+Each version of the License is given a distinguishing version number.
+If the Document specifies that a particular numbered version of this
+License "or any later version" applies to it, you have the option of
+following the terms and conditions either of that specified version or
+of any later version that has been published (not as a draft) by the
+Free Software Foundation.  If the Document does not specify a version
+number of this License, you may choose any version ever published (not
+as a draft) by the Free Software Foundation.
+
+
+
+
+ADDENDUM: How to use this License for your documents
+====================================================
+
+To use this License in a document you have written, include a copy of
+the License in the document and put the following copyright and license
+notices just after the title page:
+
+     Copyright (c)  YEAR  YOUR NAME.
+     Permission is granted to copy, distribute and/or modify this document
+     under the terms of the GNU Free Documentation License, Version 1.1
+     or any later version published by the Free Software Foundation;
+     with the Invariant Sections being LIST THEIR TITLES, with the
+     Front-Cover Texts being LIST, and with the Back-Cover Texts being LIST.
+     A copy of the license is included in the section entitled "GNU
+     Free Documentation License".
+
+If you have no Invariant Sections, write "with no Invariant Sections"
+instead of saying which ones are invariant.  If you have no Front-Cover
+Texts, write "no Front-Cover Texts" instead of "Front-Cover Texts being
+LIST"; likewise for Back-Cover Texts.
+
+If your document contains nontrivial examples of program code, we
+recommend releasing these examples in parallel under your choice of free
+software license, such as the GNU General Public License, to permit
+their use in free software.
+
+
+
+File: libtool-ja.info, Node: Index, Prev: Maintaining, Up: Top
+
+索引
+****
+
+
+* Menu:
+
+* libtool implementation:       libtool script contents.  4.
+* implementation of libtool:    libtool script contents.  4.
+* unknown:                      Porting inter-library dependencies.  46.
+* none:                         Porting inter-library dependencies.  40.
+* pass_all:                     Porting inter-library dependencies.  33.
+* test_compile:                 Porting inter-library dependencies.  27.
+* file_magic_test_file:         Porting inter-library dependencies.  18.
+* file_magic_cmd:               Porting inter-library dependencies.  18.
+* file_magic:                   Porting inter-library dependencies.  18.
+* deplibs_check_method:         Porting inter-library dependencies.  4.
+* inter-library dependency:     Porting inter-library dependencies.  4.
+* problem reports:              Reporting bugs.         4.
+* reporting bugs:               Reporting bugs.         4.
+* bug reports:                  Reporting bugs.         4.
+* tests, failed:                When tests fail.        4.
+* failed tests:                 When tests fail.        4.
+* suffix.test:                  Test descriptions.      204.
+* sh.test:                      Test descriptions.      200.
+* quote.test:                   Test descriptions.      196.
+* nomode.test:                  Test descriptions.      192.
+* link-2.test:                  Test descriptions.      187.
+* link.test:                    Test descriptions.      182.
+* assign.test:                  Test descriptions.      177.
+* dryrun.test:                  Test descriptions.      172.
+* mdemo-shared.test:            Test descriptions.      152.
+* mdemo-static.test:            Test descriptions.      152.
+* mdemo-unst.test:              Test descriptions.      152.
+* mdemo-make.test:              Test descriptions.      152.
+* mdemo-inst.test:              Test descriptions.      152.
+* mdemo-exec.test:              Test descriptions.      152.
+* mdemo-conf.test:              Test descriptions.      152.
+* depdemo-nofast.test:          Test descriptions.      119.
+* depdemo-shared.test:          Test descriptions.      119.
+* depdemo-static.test:          Test descriptions.      119.
+* depdemo-unst.test:            Test descriptions.      119.
+* depdemo-make.test:            Test descriptions.      119.
+* depdemo-inst.test:            Test descriptions.      119.
+* depdemo-exec.test:            Test descriptions.      119.
+* depdemo-conf.test:            Test descriptions.      119.
+* noinst-link.test:             Test descriptions.      99.
+* build-relink.test:            Test descriptions.      93.
+* hardcode.test:                Test descriptions.      85.
+* deplibs.test:                 Test descriptions.      78.
+* demo-nopic.test:              Test descriptions.      57.
+* demo-pic.test:                Test descriptions.      57.
+* demo-nofast.test:             Test descriptions.      57.
+* demo-shared.test:             Test descriptions.      57.
+* demo-static.test:             Test descriptions.      57.
+* demo-unst.test:               Test descriptions.      57.
+* demo-make.test:               Test descriptions.      57.
+* demo-inst.test:               Test descriptions.      57.
+* demo-exec.test:               Test descriptions.      57.
+* demo-conf.test:               Test descriptions.      57.
+* cdemo-shared.test:            Test descriptions.      19.
+* cdemo-static.test:            Test descriptions.      19.
+* cdemo-make.test:              Test descriptions.      19.
+* cdemo-exec.test:              Test descriptions.      19.
+* cdemo-conf.test:              Test descriptions.      19.
+* test suite:                   Libtool test suite.     4.
+* problems, blaming somebody else for: Troubleshooting.  4.
+* solving problems:             Troubleshooting.        4.
+* problems, solving:            Troubleshooting.        4.
+* troubleshooting:              Troubleshooting.        4.
+* C++, pitfalls:                C++ libraries.          4.
+* pitfalls using C++:           C++ libraries.          4.
+* trouble with C++:             C++ libraries.          4.
+* C++, using:                   Other languages.        4.
+* languages, non-C:             Other languages.        4.
+* C, not using:                 Other languages.        4.
+* application-level dynamic linking: Using libltdl.     4.
+* modules, dynamic:             Using libltdl.          4.
+* dlopening modules:            Using libltdl.          4.
+* dynamic linking, applications: Using libltdl.         4.
+* shl_load:                     Using libltdl.          4.
+* dlerror:                      Using libltdl.          4.
+* dlclose:                      Using libltdl.          4.
+* dlsym:                        Using libltdl.          4.
+* dlopen:                       Using libltdl.          4.
+* libltdl:                      Using libltdl.          4.
+* trouble with dlopen:          Dlopen issues.          4.
+* dlopening, pitfalls:          Dlopen issues.          4.
+* pitfalls with dlopen:         Dlopen issues.          4.
+* dynamic modules, names:       Finding the dlname.     4.
+* names of dynamic modules:     Finding the dlname.     4.
+* application-level dynamic linking: Dlopened modules.  4.
+* modules, dynamic:             Dlopened modules.       4.
+* dlopening modules:            Dlopened modules.       4.
+* dynamic linking, applications: Dlopened modules.      4.
+* shl_load:                     Dlopened modules.       4.
+* dlclose:                      Dlopened modules.       4.
+* dlsym:                        Dlopened modules.       4.
+* dlopen:                       Dlopened modules.       4.
+* inter-library dependencies:   Inter-library dependencies.  4.
+* dependencies between libraries: Inter-library dependencies.  4.
+* include files, portable:      C header files.         4.
+* C header files, portable:     C header files.         4.
+* portable C headers:           C header files.         4.
+* global functions:             Library tips.           48.
+* header files:                 Library tips.           41.
+* opaque data types:            Library tips.           29.
+* renaming interface functions: Library tips.           22.
+* design of library interfaces: Library tips.           4.
+* library interfaces, design:   Library tips.           4.
+* versioning, formal:           Libtool versioning.     4.
+* formal versioning:            Libtool versioning.     4.
+* libtool library versions:     Libtool versioning.     4.
+* library interfaces:           Interfaces.             4.
+* shared library versions:      Versioning.             4.
+* dependency versioning:        Versioning.             4.
+* dynamic dependencies:         Versioning.             4.
+* saving time:                  Static-only libraries.  4.
+* time, saving:                 Static-only libraries.  4.
+* shared libraries, not using:  Static-only libraries.  4.
+* using shared libraries, not:  Static-only libraries.  4.
+* eliding shared libraries:     Static-only libraries.  4.
+* avoiding shared libraries:    Static-only libraries.  4.
+* double-compilation, avoiding: Static-only libraries.  4.
+* developing libraries:         Static-only libraries.  4.
+* debugging libraries:          Static-only libraries.  4.
+* AC_REPLACE_FUNCS:             Autoconf .o macros.     17.
+* AC_FUNC_ALLOCA:               Autoconf .o macros.     13.
+* AC_CONFIG_AUX_DIR:            Invoking libtoolize.    54.
+* options, libtoolize command:  Invoking libtoolize.    4.
+* command options, libtoolize:  Invoking libtoolize.    4.
+* libtoolize command options:   Invoking libtoolize.    4.
+* libtoolize:                   Invoking libtoolize.    4.
+* ltmain.sh:                    Distributing.           17.
+* config.sub:                   Distributing.           13.
+* config.guess:                 Distributing.           9.
+* aclocal:                      AC_PROG_LIBTOOL.        160.
+* configuring libtool:          Configuring.            4.
+* LTLIBRARIES:                  Using Automake.         5.
+* Makefile.in:                  Makefile rules.         4.
+* Makefile.am:                  Makefile rules.         4.
+* Makefile:                     Makefile rules.         4.
+* mode, clean:                  Clean mode.             4.
+* clean mode:                   Clean mode.             4.
+* mode, uninstall:              Uninstall mode.         4.
+* uninstall mode:               Uninstall mode.         4.
+* mode, finish:                 Finish mode.            4.
+* finish mode:                  Finish mode.            4.
+* mode, install:                Install mode.           4.
+* install mode:                 Install mode.           4.
+* mode, execute:                Execute mode.           4.
+* execute mode:                 Execute mode.           4.
+* linking, partial:             Link mode.              129.
+* partial linking:              Link mode.              129.
+* unresolved symbols, allowing: Link mode.              13.
+* undefined symbols, allowing:  Link mode.              13.
+* mode, link:                   Link mode.              4.
+* link mode:                    Link mode.              4.
+* compile mode:                 Compile mode.           4.
+* mode, compile:                Compile mode.           4.
+* command options, libtool:     Invoking libtool.       4.
+* options, libtool command:     Invoking libtool.       4.
+* libtool command options:      Invoking libtool.       4.
+* libtool:                      Invoking libtool.       4.
+* standalone binaries:          Static libraries.       58.
+* convenience libraries:        Static libraries.       5.
+* static linking:               Static libraries.       5.
+* libraries, finishing installation: Installing libraries.  53.
+* installation, finishing:      Installing libraries.   53.
+* postinstallation:             Installing libraries.   53.
+* libraries, stripping:         Installing libraries.   44.
+* stripping libraries:          Installing libraries.   44.
+* install:                      Installing libraries.   19.
+* su:                           Installing libraries.   9.
+* strip:                        Installing libraries.   5.
+* program wrapper scripts:      Linking executables.    77.
+* wrapper scripts for programs: Linking executables.    77.
+* linking with installed libtool libraries: Linking executables.  48.
+* linking against uninstalled libraries: Linking executables.  23.
+* bugs, subtle ones caused by buggy linkers: Linking executables.  15.
+* security problems with buggy linkers: Linking executables.  15.
+* buggy system linkers:         Linking executables.    10.
+* linking against installed libraries: Linking executables.  5.
+* ` .libs' subdirectory:        Linking libraries.      68.
+* `.la' files:                  Linking libraries.      23.
+* libtool libraries:            Linking libraries.      23.
+* ranlib:                       Linking libraries.      11.
+* ar:                           Linking libraries.      5.
+* object files, library:        Creating object files.  26.
+* `.lo' files:                  Creating object files.  26.
+* library object file:          Creating object files.  26.
+* PIC (position-independent code): Creating object files.  22.
+* position-independent code:    Creating object files.  22.
+* object files, compiling:      Creating object files.  5.
+* compiling object files:       Creating object files.  5.
+* libtool examples:             Using libtool.          5.
+* examples of using libtool:    Using libtool.          5.
+* libraries, definition of:     Libtool paradigm.       10.
+* definition of libraries:      Libtool paradigm.       10.
+* complexity of library systems: Postmortem.            9.
+* reusability of library systems: Postmortem.           5.
+* other implementations, flaws in: Postmortem.          5.
+* design issues:                Issues.                 5.
+* tricky design issues:         Issues.                 5.
+* libtool specifications:       Motivation.             18.
+* specifications for libtool:   Motivation.             18.
+* design philosophy:            Motivation.             5.
+* motivation for writing libtool: Motivation.           5.
+
+
+

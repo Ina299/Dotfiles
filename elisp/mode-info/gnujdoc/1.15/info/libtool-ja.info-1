@@ -1,0 +1,1786 @@
+Info file: libtool-ja.info,    -*-Text-*-
+produced by `texinfo-format-buffer'
+from file `libtool-ja.texi'
+using `texinfmt.el' version 2.38 of 3 July 1998.
+
+
+
+
+INFO-DIR-SECTION GNU programming tools
+START-INFO-DIR-ENTRY
+* Libtool(ja): (libtool-ja).           Generic shared library support script.
+END-INFO-DIR-ENTRY
+
+
+INFO-DIR-SECTION Individual utilities
+START-INFO-DIR-ENTRY
+* libtoolize(ja): (libtool-ja)Invoking libtoolize.     Adding libtool support.
+END-INFO-DIR-ENTRY
+
+
+This file documents GNU Libtool 1.4.2
+
+このファイルは，GNU Libtool 1.4.2を説明します．
+
+Copyright (C) 1996-2000 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.1 or
+any later version published by the Free Software Foundation; with the no
+Invariant Sections, with no Front-Cover Texts, and with no Back-Cover
+Texts.  A copy of the license is included in the section entitled "GNU
+Free Documentation License".
+
+
+
+
+
+
+File: libtool-ja.info, Node: Top, Next: Introduction, Prev: (dir), Up: (dir)
+
+Shared library support for GNU
+******************************
+
+このファイルはGNU Libtoolの説明で，それは，パッケージ開発者が一般的な共
+有ライブラリを提供することを可能にするスクリプトです．このエディションは
+バージョン 1.4.2を説明します．
+
+libtoolを用いたときの問題の報告方法の情報は，*Note Reporting bugs::.
+
+* Menu:
+
+* Introduction::                What the heck is libtool?
+* Libtool paradigm::            How libtool's view of libraries is different.
+* Using libtool::               Example of using libtool to build libraries.
+* Invoking libtool::            Running the `libtool' script.
+* Integrating libtool::         Using libtool in your own packages.
+* Versioning::                  Using library interface versions.
+* Library tips::                Tips for library interface design.
+* Inter-library dependencies::  Libraries that depend on other libraries.
+* Dlopened modules::            `dlopen'ing libtool-created libraries.
+* Using libltdl::               Libtool's portable `dlopen' wrapper library.
+* Other languages::             Using libtool without a C compiler.
+* Troubleshooting::             When libtool doesn't work as advertised.
+* Maintaining::                 Information used by the libtool maintainer.
+* GNU Free Documentation License:: License for this manual.
+* Index::                       Full index.
+
+ --詳細なノードリスト---
+
+はじめに
+
+* Motivation::                  Why does GNU need a libtool?
+* Issues::                      The problems that need to be addressed.
+* Other implementations::       How other people have solved these issues.
+* Postmortem::                  Learning from past difficulties.
+
+libtoolを使用する
+
+* Creating object files::       Compiling object files for libraries.
+* Linking libraries::           Creating libraries from object files.
+* Linking executables::         Linking object files against libtool libraries.
+* Debugging executables::       Running GDB on libtool-generated programs.
+* Installing libraries::        Making libraries available to users.
+* Installing executables::      Making programs available to users.
+* Static libraries::            When shared libraries are not wanted.
+
+`libtool'の呼び出し
+
+* Compile mode::                Creating library object files.
+* Link mode::                   Generating executables and libraries.
+* Execute mode::                Debugging libtool-generated programs.
+* Install mode::                Making libraries and executables public.
+* Finish mode::                 Completing a library installation.
+* Uninstall mode::              Removing installed executables and libraries.
+* Clean mode::                  Removing uninstalled executables and libraries.
+
+パッケージとlibtoolの統合
+
+* Makefile rules::              Writing `Makefile' rules for libtool.
+* Using Automake::              Automatically supporting libtool.
+* Configuring::                 Configuring libtool for a host system.
+* Distributing::                What files to distribute with your package.
+* Static-only libraries::       Sometimes shared libraries are just a pain.
+
+libtoolのコンフィグレーション
+
+* AC_PROG_LIBTOOL::             Configuring `libtool' in `configure.in'.
+
+パッケージにlibtoolを含める
+
+* Invoking libtoolize::         `libtoolize' command line options.
+* Autoconf .o macros::          Autoconf macros that set object file names.
+
+ライブラリインターフェースのバージョン
+
+* Interfaces::                  What are library interfaces?
+* Libtool versioning::          Libtool's versioning system.
+* Updating version info::       Changing version information before releases.
+* Release numbers::             Breaking binary compatibility for aesthetics.
+
+インターフェースデザインへの助言
+
+* C header files::              How to write portable include files.
+
+dlopenモジュール
+
+* Building modules::            Creating dlopenable objects and libraries.
+* Dlpreopening::                Dlopening that works on static platforms.
+* Finding the dlname::          Choosing the right file to `dlopen'.
+* Dlopen issues::               Unresolved problems that need your attention.
+
+libltdlを使用する
+
+* Libltdl interface::           How to use libltdl in your programs.
+* Modules for libltdl::         Creating modules that can be `dlopen'ed.
+* Thread Saftey in libltdl::	Registering callbacks for multi-thread safety.
+* User defined module data::    Associating data with loaded modules.
+* Module loaders for libltdl::  Creating user defined module loaders.
+* Distributing libltdl::        How to distribute libltdl with your package.
+
+他の言語でlibtoolを使用する
+
+* C++ libraries::
+
+トラブルシューティング
+
+* Libtool test suite::          Libtool's self-tests.
+* Reporting bugs::              How to report problems with libtool.
+
+libtoolのテストスイート
+
+* Test descriptions::           The contents of the test suite.
+* When tests fail::             What to do when a test fails.
+
+libtoolのための管理メモ
+
+* New ports::                   How to port libtool to new systems.
+* Tested platforms::            When libtool was last tested.
+* Platform quirks::             Information about different library systems.
+* libtool script contents::     Configuration information that libtool uses.
+* Cheap tricks::                Making libtool maintainership easier.
+
+新しいシステムへlibtoolを移植する
+
+* Information sources::         Where to find relevant documentation
+* Porting inter-library dependencies::  Implementation details explained
+
+プラットフォームの癖
+
+* References::                  Finding more information.
+* Compilers::                   Creating object files from source files.
+* Reloadable objects::          Binding object files together.
+* Multiple dependencies::	Removing duplicate dependant libraries.
+* Archivers::                   Programs that create static archives.
+
+
+
+
+
+File: libtool-ja.info, Node: Introduction, Next: Libtool paradigm, Prev: Top, Up: Top
+
+はじめに
+********
+
+これまで，ソースコードパッケージの開発者が共有ライブラリの能力を利用した
+い場合，パッケージを実行するそれぞれのプラットフォームに対し，カスタムサ
+ポートコードを書く必要がありました．パッケージインストーラがビルドされる
+ライブラリの種類を選択できるように，コンフィグレーションインターフェース
+を設計する必要もありました．
+
+GNU Libtoolは，一つのスクリプトでプラットフォーム特有の依存性とユーザイ
+ンターフェースの両方をカプセル化することで，開発者の仕事を単純にします．
+GNU Libtoolは，それぞれのホストの形式の完全な機能を，一般的なインタフェー
+スを通して利用できるが，やっかいな癖はプログラマから隠されるように設計さ
+れています．
+
+GNU Libtoolの一貫したインターフェースは再保証されます... ユーザは好みの
+ソースコードパッケージを共有ライブラリにビルドするため，不明瞭なドキュメ
+ントを読む必要がありません．パッケージの`configure'スクリプト(またはその
+同等品)を実行するだけで，libtoolがいやな仕事をすべて行ってくれます．
+
+このドキュメント全体にいくつかの例があります．すべて同じ環境を仮定してい
+ます．我々は，ライブラリ`libhello'を一般的な方法でビルドしたいと思ってい
+ます．
+
+`libhello'は，共有ライブラリ，スタティックライブラリ，または，その両方に
+なります... libtoolで移植できるホストシステムで利用可能なすべてのもので
+す．
+
+この章では，libtoolの最初の設計思想を説明します．歴史に興味がなかったり，
+堅実な方法で拡張されているlibtoolのコードを書きたい場合，自由に飛ばして
+次の章へ行ってください．
+
+* Menu:
+
+* Motivation::                  Why does GNU need a libtool?
+* Issues::                      The problems that need to be addressed.
+* Other implementations::       How other people have solved these issues.
+* Postmortem::                  Learning from past difficulties.
+
+
+
+File: libtool-ja.info, Node: Motivation, Next: Issues, Prev: Introduction, Up: Introduction
+
+libtoolを書いた動機
+===================
+
+1995年初頭から，数人のGNU開発者はそれぞれ，パッケージに対する共有ライブ
+ラリのサポートの重要性を認識していました．そのように変更する主な動機は，
+GNUプログラムでのコードのモジュール化と再利用を(概念的，物理的の両方で) 
+促進するためです．
+
+そのような要求は，パッケージのインストーラが要求するあらゆるライブラリの
+形式が可能になるように，GNUパッケージにライブラリを組み込む方法を一般的
+なものにする必要があることを意味します．問題は，異なるプラットフォームで
+共有ライブラリを作成する標準手続きが無いことです．
+
+以下のセクションで，GNUでの共有ライブラリのサポートが直面している重大な
+問題と，共有ライブラリのサポートをlibtoolで標準化した方法を概説します．
+
+以下の仕様書が，このシステムの開発と評価で使用されました．
+
+  1. システムはできる限り簡潔である必要があります．
+
+  2. システムは，GNU管理者がより簡単に使用できるように，GNU Autoconfと
+     Automakeユーティリティと完全に統合する必要があります．しかし，GNUパッ
+     ケージ以外でも使用できるように，これらのツールを要求してはなりませ
+     ん．
+
+  3. 他の(GNUでない)アーキテクチャとツールへの移植が望まれます．
+
+
+
+
+File: libtool-ja.info, Node: Issues, Next: Other implementations, Prev: Motivation, Up: Introduction
+
+問題の実装
+==========
+
+以下の問題は，再利用可能なあらゆる共有ライブラリシステム，特にlibtoolで
+扱う必要があります．
+
+  1. パッケージのインストーラで，ビルドされるライブラリの種類を制御可能
+     にすべきです．
+
+  2. インストールされていないライブラリと動的にリンクされるプログラムの
+     実行を巧妙に行うことを可能にします．`LD_LIBRARY_PATH'が(サポートし
+     ている場合は)正しく設定されている必要があり，そうでなければプログラ
+     ムの実行に失敗するでしょう．
+
+  3. システムは，共有ライブラリをサポートしていないホストでさえ，堅実に
+     処理する必要があります．
+
+  4. 共有ライブラリをビルドするときに必要なコマンドは，ホスト毎に大きく
+     異なる可能性があります．これらは，コンフィグレーション時に一定の方
+     法で決定する必要があります．
+
+  5. インストールされる共有ライブラリの接尾子が常に明確なわけではありま
+     せん．通常，ファイル名はホスト毎に同じだということを仮定されるので，
+     `Makefile'規則が難しくなります．
+
+  6. 共有ライブラリをその場でアップグレード可能なように，システムは，単
+     純なライブラリバージョンナンバーの抽象化が必要です．バイナリ互換を
+     最大にするため，ライブラリへのインターフェースの設計方法を，プログ
+     ラマに伝えるべきです．
+
+  7. インストールする`Makefile'ターゲットは，パッケージインストーラに特
+     定の環境変数(`LD_LIBRARY_PATH'または同等のもの)を設定したり，
+     `ldconfig'を実行するよう，警告する必要があります．
+
+
+
+File: libtool-ja.info, Node: Other implementations, Next: Postmortem, Prev: Issues, Up: Introduction
+
+その他の実装
+============
+
+libtoolが開発されるまで，多くのフリーソフトウエアパッケージは，独自の共
+有ライブラリをビルドしインストールしていました．既存の機能の再発明を避け
+るために，これらのパッケージを最初に調査しました．
+
+さて，これらのパッケージに，libtoolが必要としている共有ライブラリシステ
+ムの詳細な文章が無いのは明らかです．そのため，それ以外のパッケージは影響
+するので多少断念されました．
+
+
+
+
+File: libtool-ja.info, Node: Postmortem, Prev: Other implementations, Up: Introduction
+
+その他の実装の近代的な解析
+==========================
+
+調査されたそれぞれの実装は，多くの異なるホストシステムに対して，予定して
+いた仕事をすべて公平に行いました．しかし，再利用できるコンポーネントとし
+て一般的に機能するものは，これらの解決法にはないようでした．
+
+ほとんどのものは，実装で行なわれていることを正確に理解すること無く使用す
+る(まして，変更する)には複雑すぎ，それらは通常，文章化されていませんでし
+た．
+
+異なるベンダーはライブラリについて異なる見解を持つこと，そして，当然*動
+作する*という単一のパラダイムを自信を持って定めているものが調査したパッ
+ケージには無かったことが主な難点です．
+
+理想としては，拡張シリーズとして，そして既存のシステムが絶えず動作するよ
+うは変更物として実装されている標準物に，libtoolがなることです．しかし，
+オペレーティングシステム開発者に悪い方法を修正させることは簡単な仕事では
+なく，バグが多く，壊れていて，混乱したオペレーティングシステム上でさえ，
+今すぐに共有ライブラリをビルドしたいと，人々は思っていました．
+
+このため，libtoolは独立したシェルスクリプトとして設計されました．それは，
+異なるプラットフォーム上のコンパイラスイートを，堅実で強力なインターフェー
+スを用いて包み隠すことで，`Makefile'の書き手を悩ませるライブラリ構築での
+問題と矛盾から隔離しています．
+
+運が良ければ，libtoolは役に立ち，GNUコミュニティで使用され，そして，それ
+を書くとき学んだ教訓は，将来のライブラリシステムの設計に採用されるでしょ
+う．
+
+
+
+
+File: libtool-ja.info, Node: Libtool paradigm, Next: Using libtool, Prev: Introduction, Up: Top
+
+libtoolのパラダイム
+*******************
+
+最初は，ライブラリのオブジェクト形式の不特定多数をサポートするように
+libtoolは設計されました．その後，libtoolはより多くのプラットフォームに移
+植され，ライブラリとプログラムの間の関係を記述するため，新しいパラダイム
+が徐々に開発されました．
+
+要約すると，"ライブラリは複数のエントリポイントと，より正式に定義された
+インターフェースがあるプログラムである．"ということです．
+
+libtoolのバージョン0.7は，この新しいパラダイムを反映するため，完全に再設
+計され書き換えられました．今のところ成功しているようです．libtoolは，以
+前よりより単純になり，より役に立ちます．
+
+libtoolパラダイムを導入する最善の方法は，それぞれの例を用いて，既存のラ
+イブラリシステムのパラダイムと比較することです．それは新しい考え方なので
+吸収するまで少し時間がかかるかもしれませんが，理解したとき世界がより単純
+化されるでしょう．
+
+
+
+
+File: libtool-ja.info, Node: Using libtool, Next: Invoking libtool, Prev: Libtool paradigm, Up: Top
+
+libtoolを使用する
+*****************
+
+libtoolが人生をより単純にする方法が分かるまで，独自のパッケージでlibtool 
+を使用することを話す意味はありません．この章の例は，標準的なライブラリの
+ビルド処理と，libtoolの処理を，2つの異なるプラットフォームで比較すること
+で，主な特徴を紹介します．
+
+`a23'
+     スタティックライブラリのみのUltrix 4.2プラットフォーム．
+
+`burger'
+     共有ライブラリを持つ，NetBSD/i386 1.2プラットフォーム．
+
+独自のプラットフォームの例をこれに続けることが可能で，それは，libtoolで
+インストールされた，前もってコンフィグレーションされたlibtoolスクリプト
+を使用します(*Note Configuring::)．
+
+以下の例のソースファイルは，libtool配布物の`demo'サブディレクトリから持っ
+てきています．ファイル`foo.c'と`hello.c'からライブラリ`libhello'をビルド
+していると仮定してください．
+
+`foo.c'ソースファイルが`cos'数学ライブラリ関数を使用していて，それは通常，
+Cライブラリではなく単独の数学ライブラリで見つかることに注意してください
+(*Note Trigonometric Functions: (libc)Trig Functions.)．そのため，
+`foo.o'や`foo.lo' を実行形式やライブラリにリンクするときは，常にリンク行
+の最後に`-lm' を加える必要があります(*Note Inter-library dependencies::)．
+
+同じ規則は，標準Cライブラリに無い関数を使用するとき，常に当てはまります
+... これらのオブジェクトに対しリンクするときは，適切な
+`-lNAME'フラグをリンク行の終りに加える必要があります．
+
+ライブラリをビルドした後，`libhello'に対して`main.o'をリンクすることでプ
+ログラムを作成したいと思います．
+
+* Menu:
+
+* Creating object files::       Compiling object files for libraries.
+* Linking libraries::           Creating libraries from object files.
+* Linking executables::         Linking object files against libtool libraries.
+* Debugging executables::       Running GDB on libtool-generated programs.
+* Installing libraries::        Making libraries available to users.
+* Installing executables::      Making programs available to users.
+* Static libraries::            When shared libraries are not wanted.
+
+
+
+File: libtool-ja.info, Node: Creating object files, Next: Linking libraries, Prev: Using libtool, Up: Using libtool
+
+オブジェクトファイルの作成
+==========================
+
+ソースファイルからオブジェクトファイルを作成するため，コンパイラは`-c'フ
+ラグ(とその他の必要なあらゆるフラグ)とともに呼び出されます．
+
+     burger$ gcc -g -O -c main.c
+     burger$
+
+上記のコンパイラコマンドは，ソースファイル`main.c'からオブジェクトファイ
+ル`main.o'を生成します．
+
+ほとんどのライブラリシステムでは，スタティックライブラリの一部となるオブ
+ジェクトファイルを作成することは，実行可能な形式にリンクされるオブジェク
+トファイルを作成することと同じくらい単純です．
+
+     burger$ gcc -g -O -c foo.c
+     burger$ gcc -g -O -c hello.c
+     burger$
+
+しかし，共有ライブラリは"position-independent code" (PIC)のみからビルド
+されます．そのため，標準のposition-dependent codeではなくPICを生成するよ
+うコンパイラに伝えるため，特定のフラグを渡す必要があります．
+
+これがライブラリ実装の詳細なので，libtoolは個別の(`.o'の代わりに`.lo'で
+終わる)ライブラリオブジェクトファイルを用いて，複雑なPICコンパイラフラグ
+を隠蔽します．共有ライブラリが無い(または，特定のPICフラグが無い)システ
+ムでは，これらのライブラリオブジェクトファイルは"標準の"オブジェクトファ
+イルと同じです．
+
+`foo.c'と`hello.c'に対するライブラリオブジェクトファイルを作成するため，
+単純に標準のコンパイルコマンドを引数として，libtoolを呼び出してください
+(*Note Compile mode::)．
+
+     a23$ libtool gcc -g -O -c foo.c
+     gcc -g -O -c foo.c
+     echo timestamp > foo.lo
+     a23$ libtool gcc -g -O -c hello.c
+     gcc -g -O -c hello.c
+     echo timestamp > hello.lo
+     a23$
+
+それぞれの呼び出しで，libtoolが２つのファイルを作成することに注意してく
+ださい．`.lo'ファイルはライブラリオブジェクトで，それは共有ライブラリに
+ビルドされ，`.o'ファイルは標準的なオブジェクトファイルです．`a23'では，
+スタティックライブラリのみサポートされているので，ライブラリオブジェクト
+はタイムスタンプのみです．
+
+共有ライブラリのあるシステムでは，ライブラリオブジェクトと標準オブジェク
+トが異なるように，libtoolはPIC生成フラグをコンパイルコマンドに自動的に挿
+入します．
+
+     burger$ libtool gcc -g -O -c foo.c
+     gcc -g -O -c -fPIC -DPIC foo.c
+     mv -f foo.o foo.lo
+     gcc -g -O -c foo.c >/dev/null 2>&1
+     burger$ libtool gcc -g -O -c hello.c
+     gcc -g -O -c -fPIC -DPIC hello.c
+     mv -f hello.o hello.lo
+     gcc -g -O -c hello.c >/dev/null 2>&1
+     burger$
+
+２番目に実行されるGCCがその出力を破棄していることに注意してください．こ
+れは，コンパイラの警告がうるさく重複しないために行われます．
+
+
+
+
+File: libtool-ja.info, Node: Linking libraries, Next: Linking executables, Prev: Creating object files, Up: Using libtool
+
+ライブラリのリンク
+==================
+
+libtoolを用いない場合，スタティックライブラリを作成するため，プログラマ
+は`ar'コマンドを呼び出していました．
+
+     burger$ ar cru libhello.a hello.o foo.o
+     burger$
+
+しかしもちろん，それだけではあまりに単純すぎて，多くのシステムでは(それ
+以上のカルマや何かを与えるため)結果として生成されたライブラリ上で，
+`ranlib'コマンドを実行する必要があります．
+
+     burger$ ranlib libhello.a
+     burger$
+
+libtoolの"ライブラリはプログラム"というアプローチで与えられるこの作業に
+対して，Cコンパイラを使用することは，より自然に感じられます．そのため，
+共有ライブラリが無いプラットフォームでは，libtoolは単純にシステムの`ar'
+(そして可能なら`ranlib')コマンドのラッパーとして動作します．
+
+また，libtoolのライブラリ名は，標準の名前(`.a'接尾子の代わりに`.la' 接尾
+子を持ちます)と異なります．libtoolの引数は，コンパイラで`libhello.la'と
+いう名の実行形式を生成するために使用したのと同じものです(*Note Link
+mode::)．
+
+     a23$ libtool gcc -g -O -o libhello.la foo.o hello.o
+     libtool: cannot build libtool library `libhello.la' from non-libtool \
+                     objects
+     a23$
+
+あぁ！libtoolは通常のエラーを得てしまった... ライブラリオブジェクトの代
+わりに，標準のオブジェクトからライブラリをビルドしています．これはスタ
+ティックライブラリでは問題ありませんが，共有ライブラリシステムでは非常に
+重要です．
+
+そのため，今回はライブラリオブジェクトファイルを用いて，もう一度試してみ
+ましょう．`foo.c'が`cos'数学ライブラリを使用しているので，コマンドライン
+に`-lm'を加える必要があることも忘れないでください(*Note Using libtool::)．
+
+共有ライブラリをビルドするその他の複雑なことは，(最終的に)インストールさ
+れるディレクトリパス(この場合は，`/usr/local/lib') (1) (*Note Linking
+libraries-Footnotes::) を指定する必要があることです．
+
+     a23$ libtool gcc -g -O -o libhello.la foo.lo hello.lo \
+                     -rpath /usr/local/lib -lm
+     mkdir  .libs
+     ar cru  .libs/libhello.a foo.o hello.o
+     ranlib  .libs/libhello.a
+     creating libhello.la
+     a23$
+
+さて，共有ライブラリのプラットフォーム上で同じトリックを試してみましょう．
+
+     burger$ libtool gcc -g -O -o libhello.la foo.lo hello.lo \
+                     -rpath /usr/local/lib -lm
+     mkdir  .libs
+     ld -Bshareable -o  .libs/libhello.so.0.0 foo.lo hello.lo -lm
+     ar cru  .libs/libhello.a foo.o hello.o
+     ranlib  .libs/libhello.a
+     creating libhello.la
+     burger$
+
+さてそれはかなり賢いです... libtoolは共有ライブラリを作成するため，スタ
+ティックライブラリと同様に，曖昧な`ld'コマンドを実行しただけです．
+
+libtoolが，現在のディレクトリではなく，` .libs'サブディレクトリに余分な
+ファイルを作成することに注意してください．この機能は，ビルドディレクトリ
+をきれいにするのをより簡単にするためと，たまたまlibtoolの使用を忘れてい
+て他のプログラムを実行するとき，確実に手ひどく失敗するので役に立ちます．
+
+
+
+File: libtool-ja.info  Node: Linking libraries-Footnotes, Up: Linking libraries
+
+(1) `rpath'を指定しない場合，libtoolは便利なアーカイブをビルドしま
+すが，それは共有ライブラリではありません(*Note Static libraries::)．
+
+
+
+File: libtool-ja.info, Node: Linking executables, Next: Debugging executables, Prev: Linking libraries, Up: Using libtool
+
+実行形式のリンク
+================
+
+ライブラリを実行形式とリンクする前に，"インストール"する(永久に位置する
+場所にそれを配置する)場所を選択した場合，リンクするためにlibtoolを使用す
+る必要はありません．ライブラリの位置を指定するため，単純に適切な`-L'と
+`-l'フラグを使用してください．
+
+システムのリンカによっては，結果として生じる実行形式に，共有ライブラリの
+完全なディレクトリ名の符号化を強要するものもあります．libtoolは，永久に
+配置されるディレクトリ名のみをインストールされた実行形式に書き込むことを
+確実にするため，特別な魔法でこの設計ミスに関して動作する必要があります．
+
+このバグの重要性は見落としてはなりません．それによるプログラムの暴走は明
+白ではありません．それはセキュリティホールを作成し，さらに悪いことには，
+パッケージのインストール後にライブラリソースコードを編集した場合，インス
+トールされたプログラムの動作を変更してしまうでしょう！
+
+そのため，インストールする前にライブラリとプログラムをリンクさせたい場合，
+リンクするためにlibtoolを使用する必要があります．
+
+インストールされていないライブラリとリンクする古い方法は，以下のようにな
+ります．
+
+
+     burger$ gcc -g -O -o hell.old main.o libhello.a -lm
+     burger$
+
+libtoolの方法は，ほとんど同じです (1) (*Note Linking
+executables-Footnotes::)(*Note Link mode::)．
+
+     a23$ libtool gcc -g -O -o hell main.o libhello.la -lm
+     gcc -g -O -o hell main.o ./ .libs/libhello.a -lm
+     a23$
+
+真実としてはあまりに単純に見えます．libtoolが行うことは，`libhello.la'を
+`./ .libs/libhello.a'に変換することがすべてですが，`a23'は共有ライブラリ
+がないことを忘れないでください．
+
+`burger'では，状況が異なります．
+
+     burger$ libtool gcc -g -O -o hell main.o libhello.la -lm
+     gcc -g -O -o  .libs/hell main.o -L./ .libs -R/usr/local/lib -lhello -lm
+     creating hell
+     burger$
+
+
+さて，`libhello.la'が既にインストールされていると仮定し，新しいプログラ
+ムをそれとリンクしたいとします．自分でそれがある場所を探し，以下を実行し
+ます．
+
+     burger$ gcc -g -O -o test test.o -L/usr/local/lib -lhello
+
+しかし，`/usr/local/lib'が標準のライブラリ検索パスに無い場合，`test'を実
+行することはできません．しかし，既にインストールされているlibtoolライブ
+ラリとリンクするためlibtoolを使用する場合，それは The Right Thing (TM)と
+なります．
+
+     burger$ libtool gcc -g -O -o test test.o /usr/local/lib/libhello.la
+     gcc -g -O -o  .libs/test test.o -Wl,--rpath
+     -Wl,/usr/local/lib /usr/local/lib/libhello.a -lm
+     creating test
+     burger$
+
+libtoolが，ライブラリlibhello.laが依存している`-lm'同様，必要なランタイ
+ムパスフラグを追加していることに注意してください．いいですね，ふっふ？
+
+libtoolがラッパースクリプトを作成したので，インストールとデバッグにも
+libtoolを使用したほうがいいでしょう．しかし，プログラムはインストールさ
+れていないlibtoolライブラリには全く依存しないので，ラッパースクリプトを
+用いない場合でもおそらく有用でしょう．この場合は，ラッパースクリプトの作
+成を避けるため，おそらくより賢くlibtoolを作成できたでしょうが，これは読
+者の演習として残しておきます．
+
+
+実行形式`hell'は，実際には` .libs'サブディレクトリに作成されることに注意
+してください．そして，ラッパースクリプトは現在のディレクトリに作成されま
+す．
+
+NetBSD 1.2では，libtoolは`-R/usr/local/lib'コンパイラフラグを使用して，
+`libhello'のディレクトリのインストールを符号化します．そして，ラッパース
+クリプトは，正しくインストールされるまで実行形式が正しい(`./ .libs'にあ
+る)共有ライブラリを見つけることを保証します．
+
+2つの異なるプログラムを比較してみましょう．
+
+     burger$ time ./hell.old
+     Welcome to GNU Hell!
+     ** This is not GNU Hello.  There is no built-in mail reader. **
+             0.21 real         0.02 user         0.08 sys
+     burger$ time ./hell
+     Welcome to GNU Hell!
+     ** This is not GNU Hello.  There is no built-in mail reader. **
+             0.63 real         0.09 user         0.59 sys
+     burger$
+
+ラッパースクリプトは実行にかなり時間がかかりますが，共有ライブラリがイン
+ストールされていなくても，少なくとも結果は正しくなります．
+
+そのため，共有ライブラリがもたらした，全体的なスペース削減ははどうなって
+いるのでしょう？
+
+     burger$ ls -l hell.old libhello.a
+     -rwxr-xr-x  1 gord  gord  15481 Nov 14 12:11 hell.old
+     -rw-r--r--  1 gord  gord   4274 Nov 13 18:02 libhello.a
+     burger$ ls -l  .libs/hell  .libs/libhello.*
+     -rwxr-xr-x  1 gord  gord  11647 Nov 14 12:10  .libs/hell
+     -rw-r--r--  1 gord  gord   4274 Nov 13 18:44  .libs/libhello.a
+     -rwxr-xr-x  1 gord  gord  12205 Nov 13 18:44  .libs/libhello.so.0.0
+     burger$
+
+うーん，だめだなあ (2) (*Note Linking executables-Footnotes::)．おそらく，
+私はこのプロジェクトを破壊し，作成中のゆりかごを取り上げたほうがいいでしょ
+う．
+
+実際，それは重要なことを証明しています．共有ライブラリには，それが(関連
+する)複雑さのため，オーバーへッドをがあります．この状況では，ダイナミッ
+クの価値は8キロバイトで，報酬は約4キロバイトです．そのため，少なくとも2，
+3個以上のプログラムとリンクするまで，共有される`libhello'を維持すること
+は利点になりません．
+
+
+
+File: libtool-ja.info  Node: Linking executables-Footnotes, Up: Linking executables
+
+(1) しかし，インストールされていないlibtoolライブラリにリンクするために，
+`-L'や`-l'フラグの使用は避けたほうがいいでしょう．`.la'ファ
+イルに対する，`../intl/libintl.la'のような相対パスのみを指定してく
+ださい．これは，インストールされていない共有ライブラリに対しリンクすると
+き，あらゆる曖昧さを取り除くため決定された設計です．
+
+(2) 訳注：原文は，Well, that sucks.
+
+
+
+File: libtool-ja.info, Node: Debugging executables, Next: Installing libraries, Prev: Linking executables, Up: Using libtool
+
+実行形式のデバッグ
+==================
+
+`hell'が複雑なプログラムの場合，システムにインストールする前にそれのテス
+トとデバッグを間違いなく行いたいでしょう．上記のセクションで，libtoolラッ
+パースクリプトが，プログラムを直接実行することを可能にする方法を見ました
+が，残念ながら，このメカニズムはデバッガの邪魔になります．
+
+     burger$ gdb hell
+     GDB is free software and you are welcome to distribute copies of it
+      under certain conditions; type "show copying" to see the conditions.
+     There is no warranty for GDB; type "show warranty" for details.
+     GDB 4.16 (i386-unknown-netbsd), (C) 1996 Free Software Foundation, Inc.
+
+     "hell": not in executable format: File format not recognized
+
+     (gdb) quit
+     burger$
+
+残念です．GDBは実行形式がある場所が分からないので動作しません．そのため，
+もう一度実行形式でGDBを呼び出してみてください．
+
+     burger$ gdb  .libs/hell
+     trick:/home/src/libtool/demo$ gdb .libs/hell
+     GDB is free software and you are welcome to distribute copies of it
+      under certain conditions; type "show copying" to see the conditions.
+     There is no warranty for GDB; type "show warranty" for details.
+     GDB 4.16 (i386-unknown-netbsd), (C) 1996 Free Software Foundation, Inc.
+     (gdb) break main
+     Breakpoint 1 at 0x8048547: file main.c, line 29.
+     (gdb) run
+     Starting program: /home/src/libtool/demo/.libs/hell
+     /home/src/libtool/demo/.libs/hell: can't load library 'libhello.so.2'
+
+     Program exited with code 020.
+     (gdb) quit
+     burger$
+
+あぁ．さて，GDBは，`hell'がリンクしている共有ライブラリを見つけることが
+できないため文句を言いました．そのため，正しいライブラリパスを設定してデ
+バッガを実行するために，libtoolを使う必要があります．幸い，` .libs'ディ
+レクトリを完全に忘れて，そのままの実行形式のラッパーで実行可能です(*Note
+Execute mode::)．
+
+     burger$ libtool gdb hell
+     GDB is free software and you are welcome to distribute copies of it
+      under certain conditions; type "show copying" to see the conditions.
+     There is no warranty for GDB; type "show warranty" for details.
+     GDB 4.16 (i386-unknown-netbsd), (C) 1996 Free Software Foundation, Inc.
+     (gdb) break main
+     Breakpoint 1 at 0x8048547: file main.c, line 29.
+     (gdb) run
+     Starting program: /home/src/libtool/demo/.libs/hell
+
+     Breakpoint 1, main (argc=1, argv=0xbffffc40) at main.c:29
+     29	  printf ("Welcome to GNU Hell!\n");
+     (gdb) quit
+     The program is running.  Quit anyway (and kill it)? (y or n) y
+     burger$
+
+
+
+
+File: libtool-ja.info, Node: Installing libraries, Next: Installing executables, Prev: Debugging executables, Up: Using libtool
+
+ライブラリのインストール
+========================
+
+libtoolが無いシステムでライブラリをインストールすることは，全く簡単です... 
+それらをその場所にコピーするだけです． (1) (*Note Installing
+libraries-Footnotes::)
+
+     burger$ su
+     Password: ********
+     burger# cp libhello.a /usr/local/lib/libhello.a
+     burger#
+
+おっと，`ranlib'コマンドを忘れないでください．
+
+     burger# ranlib /usr/local/lib/libhello.a
+     burger#
+
+libtoolのインストールは，同様に全く単純です．通常使用する，`install'や
+`cp'コマンドをそのまま使用してください(*Note Install mode::)．
+
+     a23# libtool cp libhello.la /usr/local/lib/libhello.la
+     cp libhello.la /usr/local/lib/libhello.la
+     cp  .libs/libhello.a /usr/local/lib/libhello.a
+     ranlib /usr/local/lib/libhello.a
+     a23#
+
+アンインストールでlibtoolを助け(*Note Uninstall mode::)，リンクし(*Note
+Linking executables::)，dlopenでプログラムを助ける(*Note Dlopened
+modules::)ため，libtoolのライブラリ`libhello.la'もインストールされること
+に注意してください．
+
+Here is the shared library example:
+
+共有ライブラリの例は，以下のようになります．
+
+     burger# libtool install -c libhello.la /usr/local/lib/libhello.la
+     install -c  .libs/libhello.so.0.0 /usr/local/lib/libhello.so.0.0
+     install -c libhello.la /usr/local/lib/libhello.la
+     install -c  .libs/libhello.a /usr/local/lib/libhello.a
+     ranlib /usr/local/lib/libhello.a
+     burger#
+
+ライブラリインストール時にBSD互換のinstallプログラムを使用する場合，
+`-s'(シンボルのstrip)フラグを指定すると安全です．libtoolは`-s' フラグを
+無視する，またはライブラリからデバッグとコンパイラシンボルのみをstripす
+るプログラムを実行します．
+
+ライブラリを一度配置すると，使用する前に必要な追加のコンフィグレーション
+を行います．最初に，ビルド時に使用した`-rpath'フラグと同じ場所に，ライブ
+ラリが実際にインストールされていることを確かめる必要があります．
+
+そして，`libtool -n --finish LIBDIR'を実行すると，行うことのヒントが与え
+られるはずです(*Note Finish mode::)．
+
+     burger# libtool -n --finish /usr/local/lib
+     PATH="$PATH:/sbin" ldconfig -m /usr/local/lib
+     -----------------------------------------------------------------
+     Libraries have been installed in:
+        /usr/local/lib
+
+     To link against installed libraries in a given directory, LIBDIR,
+     you must use the `-LLIBDIR' flag during linking.
+
+      You will also need to do one of the following:
+        - add LIBDIR to the `LD_LIBRARY_PATH' environment variable
+          during execution
+        - add LIBDIR to the `LD_RUN_PATH' environment variable
+          during linking
+        - use the `-RLIBDIR' linker flag
+
+     See any operating system documentation about shared libraries for
+     more information, such as the ld and ld.so manual pages.
+     -----------------------------------------------------------------
+     burger#
+
+これらのステップを完了した後，インストールされたライブラリの使用開始が可
+能になります．作成されたライブラリに依存する実行形式もインストールできま
+す．
+
+
+
+File: libtool-ja.info  Node: Installing libraries-Footnotes, Up: Installing libraries
+
+(1) 偶発的にライブラリをstripしないでください，そうすると使用不可能にな
+ります．
+
+
+
+File: libtool-ja.info, Node: Installing executables, Next: Static libraries, Prev: Installing libraries, Up: Using libtool
+
+実行形式のインストール
+======================
+
+インストールされていないlibtoolライブラリに対して，実行形式をリンクする
+ためにlibtoolを使用した場合(*Note Linking executables::)，ライブラリをイ
+ンストールした後に実行形式をインストールするため，libtoolを使用する必要
+があります．
+
+それでは，Ultrixの例を対象に，以下のように実行します．
+
+     a23# libtool install -c hell /usr/local/bin/hell
+     install -c hell /usr/local/bin/hell
+     a23#
+
+共有ライブラリシステムでは，libtoolはラッパースクリプトを無視し，正しい
+バイナリをインストールします．
+
+     burger# libtool install -c hell /usr/local/bin/hell
+     install -c  .libs/hell /usr/local/bin/hell
+     burger#
+
+
+
+
+File: libtool-ja.info, Node: Static libraries, Prev: Installing executables, Up: Using libtool
+
+スタティックライブラリとのリンク
+================================
+
+libtoolの旨味を知って，`ar'と`ranlib'の愚かさへなぜ戻るのでしょう？さて，
+決して共有されるはずがないスタティックアーカイブをつくることが望ましいと
+きもあります．最もよくある状況として，複数の異なるプログラムをビルドする
+ために使用する，オブジェクトファイルの集まりを持っているときがあります．
+個々のプログラムに対し，すべてのオブジェクトファイルをリストアップする代
+わりに，それらのオブジェクトから"便利なライブラリ"を作成し，ライブラリと
+プログラムをリンクすることが可能です．この技術は，他のディレクトリのライ
+ブラリへのリンクをサポートするので，他のディレクトリのソースからビルドさ
+れるオブジェクトファイルをリンクするサポートが欠けている，GNU automakeを
+補うためによく使用されます．この制限は，リリース1.4までのGNU automakeに
+当てはまります．より新しいリリースは，他のディレクトリのソースをサポート
+するでしょう．
+
+この便利なライブラリとプログラムをリンクしたいだけの場合，完全にlibtool 
+を無視し，古い`ar'と`ranlib'コマンド(や，対応するGNU automake
+`_LIBRARIES'規則)が使用可能です．(おそらく使用したくはないでしょうが)
+libtoolを使用して，便利なライブラリをインストールすることさえ可能です．
+
+     burger$ libtool ./install-sh -c libhello.a /local/lib/libhello.a
+     ./install-sh -c libhello.a /local/lib/libhello.a
+     ranlib /local/lib/libhello.a
+     burger$
+
+スタティックライブラリのインストールにlibtoolを使用すると，ライブラリが
+(`-s'フラグを使用したインストーラの場合のように)偶然stripされることから
+守り，自動的に実行される正しい`ranlib'コマンドと同様になります．
+
+しかし，libtoolライブラリは単にオブジェクトファイルの集合以上です．それ
+らは古いアーカイブにはない，ライブラリの依存情報をも運ぶことが可能です．
+libtoolの静的な便利なライブラリを作成したい場合，スタティックライブラリ
+のみに興味があることを示すため，`-rpath'フラグを省略し`-static'を使用す
+ることができます．そのようなスタティックライブラリとリンクするとき，
+libtoolは実際にすべてのオブジェクトファイルと依存するライブラリをプログ
+ラムにリンクします．
+
+`-rpath'と`-static'の両方を省略した場合，libtoolは，他のlibtoolライブラ
+リで，共有ライブラリの作成にすら使用可能なlibtoolの便利なライブラリを作
+成します．静的な場合のように，ライブラリは一組のオブジェクトファイルと依
+存するライブラリの別名として動作しますが，この場合，オブジェクトファイル
+は共有ライブラリに含まれるほうが適しています．しかし，直接または間接的に，
+単一のプログラムやライブラリに単一の便利なライブラリをリンクしないように
+注意して下さい．さもなければ，シンボル再定義に関するエラーを得るでしょう．
+
+GNU automakeを使用するとき，`-rpath'オプションがリンク時に渡されないよう
+に，便利なライブラリに対する`lib_LTLIBRARIES'の代わりに
+`noinst_LTLIBRARIES'を使用した方が良いでしょう．
+
+経験的に，最大一つのlibtoolライブラリにlibtoolの便利なライブラリをリンク
+し，プログラムにはリンクしないようにしてください，そして，libtoolの便利
+なスタティックライブラリを一つのプログラムにのみリンクし，それは，ライブ
+ラリ依存情報を便利なスタティックライブラリのユーザに運ぶことが必要な場合
+のみにしてください．
+
+静的なリンクが適している，その他の一般的な状況は，独立したバイナリを作成
+するときです．リンクにlibtoolを使用し，`-all-static'フラグを加えてくださ
+い．
+
+
+
+
+File: libtool-ja.info, Node: Invoking libtool, Next: Integrating libtool, Prev: Using libtool, Up: Top
+
+`libtool'の呼び出し
+*******************
+
+`libtool'プログラムは以下の構文を持ちます．
+
+     libtool [OPTION]... [MODE-ARG]...
+
+そして，以下のオプションを受け入れます．
+
+`--config'
+     libtoolのコンフィグレーション変数を表示し終了します．
+
+`--debug'
+     シェルスクリプトの実行の追跡を標準出力にダンプします．これは多くの
+     出力を生成するので，`less'(や`more')にパイプしたり，ファイルにリダ
+     イレクトしたいかもしれません．
+
+`-n'
+`--dry-run'
+     あらゆるファイルを作成，編集，削除せず，libtoolで実行されるコマンド
+     のみを表示します．
+
+`--features'
+     基本的なコンフィグレーションオプションを表示します．これは，パッケー
+     ジがビルドするライブラリを，スタティックまたは共有のいずれにするか
+     決定する方法を提供します．
+
+`--finish'
+     `--mode=finish'と同じです．
+
+`--help'
+     へルプメッセージを表示し終了します．`--mode=MODE'が指定された場合，
+     MODEの詳細へルプを表示します．
+
+`--mode=MODE'
+     処理モードとしてMODEを使用します．デフォルトで，処理モードは
+     MODE-ARGSから推測されます．
+
+     MODEが指定された場合，それは以下の一つにする必要があります．
+
+     `compile'
+          ソースファイルをlibtoolオブジェクトにコンパイルします．
+
+     `execute'
+          インストールされていない，libtoolが生成したプログラムやライブ
+          ラリを他のプログラムが使用できるように，自動的にライブラリパス
+          を設定します．
+
+     `finish'
+          libtoolライブラリのシステムへのインストールを完全に行います．
+
+     `install'
+          ライブラリや実行形式をインストールします．
+
+     `link'
+          ライブラリや実行形式を作成します．
+
+     `uninstall'
+          インストールされたライブラリや実行形式を削除します．
+
+     `clean'
+          アンインストールされたライブラリや実行形式を削除します．
+
+`--version'
+     ibtoolのバージョン情報を出力し終了します．
+
+MODE-ARGSは引数の変数の数で，それは処理モードの選択に依存します．一般的
+に，それぞれのMODE-ARGは，libtool自身ではなく，libtoolが呼び出すプログラ
+ムで解釈されます．
+
+* Menu:
+
+* Compile mode::                Creating library object files.
+* Link mode::                   Generating executables and libraries.
+* Execute mode::                Debugging libtool-generated programs.
+* Install mode::                Making libraries and executables public.
+* Finish mode::                 Completing a library installation.
+* Uninstall mode::              Removing installed executables and libraries.
+* Clean mode::                  Removing uninstalled executables and libraries.
+
+
+
+File: libtool-ja.info, Node: Compile mode, Next: Link mode, Prev: Invoking libtool, Up: Invoking libtool
+
+コンパイルモード
+================
+
+"コンパイル"モードに対し，MODE-ARGSは，`標準的な'オブジェクトファイルを
+作成するとき使用するコンパイルコマンドです．これらの引数は，C コンパイラ
+の名前で始まり，オブジェクトファイルのみを作成するための`-c'コンパイラフ
+ラグを含みます．
+
+libtoolは，ソースファイル名からディレクトリ要素を削除して出力ファイル名
+を決定し，ソースコードの接尾子(例えば，Cソースコードに対する`.c')をライ
+ブラリオブジェクト接尾子`.lo'に置換します．
+
+共有ライブラリをビルドする場合は，必要なPIC生成フラグがコンパイルコマン
+ドに置換されます．`-Wc,FLAG'と`-Xcompiler FLAG'を使用したり，`-Wl,FLAG'
+と`-Xlinker FLAG'を使用したりして，それぞれ，コンパイラとリンカに指定し
+たフラグを渡すことが可能です．
+
+`-static'オプションが与えられている場合は，libtoolが`--disable-static'で
+コンフィグレーションされていた場合でも，`.o'ファイルがビルされてます．
+
+現在は`-o'オプションが，完全にサポートされていることに注意してください．
+それがサポートされていないプラットフォームでは，(オブジェクトのロックと
+移動によって)エミュレートされるので，Makefileを少し編集するだけでlibtool 
+は本当に簡単に使用できます．入力例は以下のようになります．libtool gcc -c
+foo/x.c -o foo/x.lo これは期待したことを行います．
+
+しかし，コンパイラが`-c'と`-o'をサポートしていない場合，既存の`./x.o'を
+上書きせずに`foo/x.c'をコンパイルすることが不可能なことに注意してくださ
+い．そのため，ソースファイル`./x.c'がある場合，`./x.o'(や`./x.lo')が，サ
+ブディレクトリのあらゆる`x.lo'の後で再作成されることを確実にするため，
+`Makefile'に依存性の導入を必ず行ってください．x.o x.lo: foo/x.lo
+bar/x.lo これは，プログラムやライブラリを作成するため，一時的に壊れた
+`x.o'の使用を試みないことを確実にします．それは，`-c'と`-o'を同時にサポー
+トするプラットフォームで，不必要な再コンパイルを引き起こすかもしれません
+が，それは，そうでないものに対して安全にする唯一の方法です．
+
+
+
+
+File: libtool-ja.info, Node: Link mode, Next: Execute mode, Prev: Compile mode, Up: Invoking libtool
+
+リンクモード
+============
+
+"リンク"モードは，(ライブラリオブジェクトを含む)オブジェクトファイルと，
+その他のライブラリや作成された実行可能なプログラムをリンクします．
+
+MODE-ARGSは，いくつかのオブジェクトファイルから(`-o'フラグを用いた)出力
+ファイルを作成するためにCコンパイラが使用するコマンドから成り立ちます．
+
+以下のMODE-ARGSの組は特別に扱われます．
+
+`-all-static'
+     OUTPUT-FILEがプログラムの場合，共有ライブラリと全くリンクしません．
+     OUTPUT-FILEがライブラリの場合，スタティックライブラリのみ作成します．
+
+`-avoid-version'
+     ライブラリとモジュールに対しバージョン管理(*Note Versioning::)を避
+     けようとし，すなわち，バージョン情報は保存されず，シンボリックリン
+     クも作成されません．プラットフォームがバージョニングを要求する場合，
+     このオプションは効果がありません．
+
+`-dlopen FILE'
+     ネイティブなdlopenがホストプラットフォームでサポートされていない場
+     合(*Note Dlopened modules::)や，プログラムが`-static'や
+     `-all-static'でリンクされている場合，`-dlpreopen FILE'と同じです．
+     それ以外では効果はありません．FILEが`self'の場合，`-export-dynamic'
+     を可能にする，または，`-dlpreopen self'に後退することにより，
+     libtoolはプログラムがそれ自身を`dlopen'可能であることを確かめます．
+
+`-dlpreopen FILE'
+     FILEを出力プログラムにリンクし，そのシンボルをLT_PRELOADED_SYMBOLS
+     に含めます(*Note Dlpreopening::)．FILEが`self'の場合，プログラムの
+     シンボル自身がLT_PRELOADED_SYMBOLS に加えられます．FILEが`force'の
+     場合，libtoolは，LT_PRELOADED_SYMBOLSが空であろうがなかろうが，常に
+     *定義済*であることを確実にします．
+
+`-export-dynamic'
+     OUTPUT-FILEからのシンボルが`dlsym'で解決されることを可能にします
+     (*Note Dlopened modules::)．
+
+`-export-symbols SYMFILE'
+     リンカにSYMFILEでリストアップされているシンボルのみエクスポートする
+     よう伝えます．シンボルファイルは`.sym'で終わるべきで，一行毎に一シ
+     ンボル名を含める必要があります．このオプションに効果がないプラット
+     フォームがあります．デフォルトですべてのシンボルがエクスポートされ
+     ます．
+
+`-export-symbols-regex REGEX'
+     正規表現REGEXに一致するシンボルのみエクスポートされる以外，
+     `-export-symbols'と同じです．デフォルトですべてのシンボルがエクスポー
+     トされます．
+
+`-LLIBDIR'
+     既にインストールされている，要求されているライブラリに対し，LIBDIR 
+     を検索します．
+
+`-lNAME'
+     OUTPUT-FILEはインストールされているライブラリ`libNAME' を要求します．
+     このオプションはOUTPUT-FILEが実行形式でないときも要求されます．
+
+`-module'
+     dlopen可能なライブラリを作成します(*Note Dlopened modules::)．この
+     オプションはプログラムでは動作しません．モジュール名の'lib'の前置は
+     不要です．しかし，名前の破壊を避けるため，'libname'と'name' パッケー
+     ジで同時に使用してはなりません．
+
+`-no-fast-install'
+     実行形式OUTPUT-FILEの高速インストールモードを利用不可にします．プロ
+     グラムをインストールする必要がないとき役に立ちます．
+
+`-no-install'
+     インストール不可能で，そのためラップスクリプトが不要な実行形式
+     OUTPUT-FILEをリンクします．プログラムがビルドツリーでのみ使用される
+     場合，例えば，テストしたり他のファイルを生成するプログラムに対して
+     役に立ちます．
+
+`-no-undefined'
+     OUTPUT-FILEが他のライブラリに依存しないことを宣言します．他のライブ
+     ラリに依存する共有ライブラリを作成不可能なプラットフォームもありま
+     す(*Note Inter-library dependencies::)．
+
+`-o OUTPUT-FILE'
+     指定されたオブジェクトとライブラリからOUTPUT-FILEを作成します．
+
+`-release RELEASE'
+     ユーザが他より新しいバージョンを簡単に伝えられるよう，パッケージの
+     リリースRELEASEで生成されたライブラリを指定します．このフラグを使用
+     する場合，パッケージの２つのリリースがバイナリ互換でないことを警告
+     されます．バイナリ互換が欲しい場合，代わりに`-version-info'フラグを
+     使用してください(*Note Versioning::)．
+
+`-rpath LIBDIR'
+     OUTPUT-FILEがlibtoolライブラリの場合，それをビルドするために，バー
+     ジョン情報CURRENT，REVISION，そしてAGEを使用します(*Note
+     Versioning::)．このフラグをパッケージのリリース情報の指定に使用せず，
+     そのためには`-release'を参照してください．
+
+`-R LIBDIR'
+     OUTPUT-FILEがプログラムの場合，プログラムの実行時のパスをLIBDIRに加
+     えます．OUTPUT-FILEがライブラリの場合，ライブラリがプログラムとリン
+     クされるときは，常にLIBDIRが実行時のパスに加えられるように，その
+     DEPENDENCY_LIBSに-RLIBDIRを加えます．
+
+`-static'
+     OUTPUT-FILEがプログラムの場合，インストールされていない共有ライブラ
+     リとリンクしません．OUTPUT-FILEがライブラリの場合，スタティックライ
+     ブラリのみ作成します．
+
+`-version-info CURRENT[:REVISION[:AGE]]'
+     OUTPUT-FILEがlibtoolライブラリの場合，それをビルドするために，バー
+     ジョン情報CURRENT，REVISION，そしてAGEを使用します(*Note
+     Versioning::)．このフラグをパッケージのリリース情報の指定に使用せず，
+     そのためには`-release'を参照してください．
+
+`-Wl,FLAG'
+`-Xlinker FLAG'
+     リンカ指定のフラグを直接リンカに渡します．
+
+OUTPUT-FILEが`.la'で終わる場合，libtoolライブラリが作成され，それはライ
+ブラリオブジェクト(`.lo'ファイル)のみから作成される必要があります．
+`-rpath'オプションは要求されません．現在の実装では，libtoolライブラリが
+他のインストールされていないlibtoolライブラリに依存することはできません
+(*Note Inter-library dependencies::)．
+
+OUTPUT-FILEが`.a'で終わる場合，標準的なライブラリは`ar' と，おそらく
+`ranlib'を使用して作成されます．
+
+OUTPUT-FILEが`.o'や`.lo'で終わる場合，リロード可能なオブジェクトファイル
+は，(通常`ld -r'を用いて)入力ファイルから作成されます．この手法は"部分的
+なリンク"と呼ばれることが多いです．
+
+それ以外の場合，実行可能なプログラムが作成されます．
+
+
+
+
+File: libtool-ja.info, Node: Execute mode, Next: Install mode, Prev: Link mode, Up: Invoking libtool
+
+実行モード
+==========
+
+`実行'モードに対し，ライブラリパスは自動的に設定され，プログラムは実行さ
+れます．
+
+MODE-ARGSの最初は，プログラム名として扱われ，残りはプログラムの引数とな
+ります．
+
+以下のMODE-ARGSの組は特別に扱われます．
+
+`-dlopen FILE'
+     ライブラリパスにFILEを含むディレクトリを加えます．
+
+このモードは，あらゆる`-dlopen'フラグによって，ライブラリパス環境変数を
+設定します．
+
+すべてのARGSがlibtoolの実行形式のラッパーの場合，それらは対応するインス
+トールされていないバイナリの名前に変換され，それらが要求するすべてのライ
+ブラリディレクトリがライブラリパスに加えられます．
+
+
+
+
+File: libtool-ja.info, Node: Install mode, Next: Finish mode, Prev: Execute mode, Up: Invoking libtool
+
+インストールモード
+==================
+
+"インストール"モードでは，libtoolはMODE-ARGSを，`cp'で始まるインストール
+コマンドやBSD互換の`install'プログラムとして解釈します．
+
+MODE-ARGSの残りは，そのコマンドの引数として解釈されます．
+
+コマンドが実行され，特権の不要な必要なインストール後のコマンドも完全に実
+行されます．
+
+
+
+
+File: libtool-ja.info, Node: Finish mode, Next: Uninstall mode, Prev: Install mode, Up: Invoking libtool
+
+フィニッシュモード
+==================
+
+"フィニッシュ"モードは，ユーザプログラムにlibtoolライブラリを配置しリン
+クできるよう，システム管理者のインストールを助けます．
+
+それぞれのMODE-ARGはライブラリのディレクトリの名前として解釈されます．こ
+のコマンドの実行は，`--dry-run'オプションが役に立つように，スーパーユー
+ザの特権を要求するかもしれません．
+
+
+
+
+File: libtool-ja.info, Node: Uninstall mode, Next: Clean mode, Prev: Finish mode, Up: Invoking libtool
+
+アンインストールモード
+======================
+
+"アンインストール"モードはインストールされているライブラリ，実行形式，そ
+してオブジェクトを削除します．
+
+MODE-ARGの最初はファイルの削除に使用するプログラム名(通常は`/bin/rm')で
+す．
+
+残りのMODE-ARGSは，(`-'で始まる)削除プログラムに対するフラグ，または削除
+するファイル名です．
+
+
+
+
+File: libtool-ja.info, Node: Clean mode, Prev: Uninstall mode, Up: Invoking libtool
+
+クリーンモード
+==============
+
+"クリーン"モードはアンインストールされたライブラリ，実行形式，オブジェク
+ト，そして，それらに関連があるlibtoolの一時ファイルを削除します．
+
+最初のMODE-ARGは，ファイルを削除するために使用するプログラムの名前(通常
+は`/bin/rm')です．
+
+残りのMODE-ARGSは削除プログラムに対する(`-'で始まる)フラグ，または削除す
+るファイル名です．
+
+
+
+
+File: libtool-ja.info, Node: Integrating libtool, Next: Versioning, Prev: Invoking libtool, Up: Top
+
+パッケージとlibtoolの統合
+*************************
+
+この章は，ユーザが混乱せずに共有ライブラリをインストールできるように，パッ
+ケージとlibtoolの統合方法を記述します．
+
+* Menu:
+
+* Makefile rules::              Writing `Makefile' rules for libtool.
+* Using Automake::              Automatically supporting libtool.
+* Configuring::                 Configuring libtool for a host system.
+* Distributing::                What files to distribute with your package.
+* Static-only libraries::       Sometimes shared libraries are just a pain.
+
+
+
+File: libtool-ja.info, Node: Makefile rules, Next: Using Automake, Prev: Integrating libtool, Up: Integrating libtool
+
+libtoolに対する`Makefile'規則を書く
+===================================
+
+libtoolは，完全にAutomake(*Note Introduction: (automake)Top.)と統合され
+ていて，それはAutomake version 1.2から開始されています．
+
+通常の`Makefile'(や`Makefile.in')で，libtoolを使用したい場合は，独自のも
+のとなります．Automake 1.2を使用せず，パッケージにlibtoolの組み込み方を
+知らない場合，以下の一つが必要になります．
+
+  1. Automake(バージョン1.2以降)を近くのGNUのミラーからダウンロードし，
+     インストールし，その使用を開始してください．
+
+  2. `Makefile'規則の手での書き方を学んでください．複雑なときもあります
+     が，古いライブラリをコンパイルするための規則を書けるぐらいの知識が
+     ある場合，libtoolライブラリに対する新しい規則の理解は可能でしょう
+     (ヒント：libtool 配布物の`demo'サブディレクトリの`Makefile.in'を調
+     べてください... 特に，それがAutomakeによって`Makefile.am'から自動的
+     に生成されたことに注意してください)．
+
+
+
+
+File: libtool-ja.info, Node: Using Automake, Next: Configuring, Prev: Makefile rules, Up: Integrating libtool
+
+libtoolと共にAutomakeを使用する
+===============================
+
+libtoolライブラリのサポートは，`LTLIBRARIES'プライマリの下で実装されてい
+ます．
+
+libtool配布物の`demo'サブディレクトリの，Automake `Makefile.am'からの例
+は，以下のようになっています．
+
+最初に，プログラムをlibtoolライブラリとリンクするため，`program_LDADD'変
+数のみを使用してください．
+
+     bin_PROGRAMS = hell hell.debug
+
+     # Build hell from main.c and libhello.la
+     hell_SOURCES = main.c
+     hell_LDADD = libhello.la
+
+     # Create an easier-to-debug version of hell.
+     hell_debug_SOURCES = main.c
+     hell_debug_LDADD = libhello.la
+     hell_debug_LDFLAGS = -static
+
+フラグ`-dlopen'と`-dlpreopen'(*Note Link mode::)は，PROGRAM_LDADD変数で，
+より適切になります．残念ながら，リリース1.4までのGNU automakeは，
+PROGRAM_LDADD変数でこれらのフラグを受け入れないため，以下で代用します．
+
+   * それらをPROGRAM_LDFLAGSに加え，PROGRAM_DEPENDENCIESにライブラリをリ
+     ストアップし，それらが属するこれらのフラグを受け入れるGNU automake
+     のリリースを待ってください．
+
+   * フラグの回りを引用符で囲みます，しかし，PROGRAM_DEPENDENCIESも設定
+     する必要があります．
+
+          program_LDADD = "-dlopen" libfoo.la
+          program_DEPENDENCIES = libfoo.la
+
+   * `configure.in'の`AC_SUBST'で，変数DLOPENとDLPREOPENを設定し，
+     `program_LDADD'での明確なフラグ`-dlopen'と`-dlpreopen'に対する置換
+     物として，`@DLOPEN@' と`@DLPREOPEN@'を使用します．Automakeは，依存
+     性から`AC_SUBST'された変数を捨てるので，`program_LDADD'のこれらのフ
+     ラグを受け入れたとき，それは正確に期待したように動作します．
+
+(インストールされていない共有libtoolライブラリとのリンクを避けるため
+`-static'を使用するような)`program'をリンクしている間，libtool に渡した
+いあらゆるフラグを詰め込むため，`program_LDFLAGS'変数を使用することも可
+能です．
+
+libtoolライブラリをビルドすることは，ほとんど冒険です...
+`-version-info'(*Note Versioning::)オプションをlibtoolに渡すため，
+`libhello_la_LDFLAGS'を使用することに注意してください．
+
+     # Build a libtool library, libhello.la for installation in libdir.
+     lib_LTLIBRARIES = libhello.la
+     libhello_la_SOURCES = hello.c foo.c
+     libhello_la_LDFLAGS = -version-info 3:12:1
+
+`-rpath'オプションは，(`noinst_LTLIBRARIES'としてリストアップされるライ
+ブラリ以外)Automakeにより自動的に渡されるので，指定する必要はありません．
+
+詳細は，*Note Building a Shared Library: (automake)A Shared Library.
+
+
+
+
+File: libtool-ja.info, Node: Configuring, Next: Distributing, Prev: Using Automake, Up: Integrating libtool
+
+libtoolのコンフィグレーション
+=============================
+
+libtoolは，共有ライブラリを作成し適切なものにリンクするため，コンパイラ
+セットとオペレーティングシステムの詳細な知識を必要とします．libtool配布
+物をインストールするとき，システム特有のlibtoolスクリプトはバイナリディ
+レクトリにインストールされます．
+
+しかし，独自のパッケージとともにlibtoolを配布するとき(*Note
+Distributing::)，パッケージをコンパイルするために使用されるコンパイラセッ
+トとオペレーティングシステムを，常に知っているわけではありません．
+
+このため，libtoolを使用する前に"コンフィグレーション"する必要があります．
+この考えは，GNU `configure'スクリプトを使用するものに似ています．
+`configure'は，システムの特徴に対しいくつものテストを行い，`Makefiles'
+(と，おそらく`config.h'ヘッダファイル)を生成し，その後，`make'を実行しパ
+ケージをビルドすることが可能です．
+
+libtoolは，インストーラのホストマシンに対するlibtoolスクリプトを生成する
+ために，独自のテストを`configure'スクリプトに加えます．
+
+* Menu:
+
+* AC_PROG_LIBTOOL::             Configuring `libtool' in `configure.in'.
+
+
+
+File: libtool-ja.info, Node: AC_PROG_LIBTOOL, Prev: Configuring, Up: Configuring
+
+`AC_PROG_LIBTOOL'マクロ
+-----------------------
+
+GNU Autoconf(やAutomake)を使用している場合，`AC_PROG_LIBTOOL'の呼び出し
+を`configure.in'に加える必要があります．このマクロは，生成されたlibtool
+スクリプトがホストの特徴を理解できるようにするため，多くの新しいテストを
+`configure'スクリプトに加えます．
+
+ -- Macro: AC_PROG_LIBTOOL
+ -- Macro: AM_PROG_LIBTOOL
+     `--enable-shared'と`--disable-shared'の`configure'フラグに対するサ
+     ポートを加えます． (1) (*Note AC_PROG_LIBTOOL-Footnotes::)
+     `AM_PROG_LIBTOOL'は，このマクロに対する古い名前で，しばらくはサポー
+     トされますが，やめた方がいいでしょう．
+
+     デフォルトで，このマクロは，利用可能な場合は共有ライブラリを開始し，
+     共有ライブラリと衝突しない場合はスタティックライブラリも可能としま
+     す．これらのデフォルトは，`AC_DISABLE_SHARED'や`AC_DISABLE_STATIC'
+     マクロのどちらかで修正可能です．
+
+          # Turn off shared libraries during beta-testing, since they
+          # make the build process take too long.
+          AC_DISABLE_SHARED
+          AC_PROG_LIBTOOL
+
+     ユーザは，パッケージ名を元にビルドされる，共有またはスタティックラ
+     イブラリを選択するため，`--enable-shared'と`--enable-static'コンフィ
+     グレーションフラグで指定を修正できます．例えば，共有する`bfd'と
+     `gdb'ライブラリをビルドし，`libg++'を共有にしないため，以下の
+     `configure'スクリプトの実行で，３つのことのすべて可能となります．
+
+          trick$ ./configure --enable-shared=bfd,gdb
+
+     一般的に，`--enable-shared=PKGS'の指定は，カンマで分けられたPKGSリ
+     ストに名前があるすべてのパッケージを`--enable-shared'で，それ以外の
+     すべてのパッケージを`--disable-shared'でコンフィグレーションするこ
+     と同じです．`--enable-static=PKGS'フラグは，同様に動作しますが，そ
+     の場合は`--enable-static'と`--disable-static'を使用します．同様に，
+     `--enable-fast-install=PKGS'フラグは適用され，それは，
+     `--enable-fast-install'と`--disable-fast-install'を使用します．
+
+     パッケージ名`default'は，`PACKAGE'環境変数に名前が設定されていない，
+     あらゆるパッケージに一致します．
+
+     このマクロは，シェル変数LIBTOOL_DEPSも設定し，それで，libtoolスクリ
+     プトが時代遅れになった場合の自動的な更新に使用できるようになります．
+     そうするために`configure.in'に以下を加えてください．
+
+          AC_PROG_LIBTOOL
+          AC_SUBST(LIBTOOL_DEPS)
+
+     そして，`Makefile.in'や`Makefile.am'に，以下を加えてください．
+
+          LIBTOOL_DEPS = @LIBTOOL_DEPS@
+          libtool: $(LIBTOOL_DEPS)
+                  $(SHELL) ./config.status --recheck
+
+     GNU automakeを使用してる場合，automakeが面倒をみるので，指示の省略
+     が可能です．`libtool'での依存性を明確に作成する必要があります．
+
+
+ -- Macro: AC_LIBTOOL_DLOPEN
+     dlopenサポートの調査を可能にします．パッケージで`-dlopen'と
+     `-dlpreopen'フラグを使用する場合，このマクロ使用すべきで，そうしな
+     い場合，libtoolはシステムがdlopenをサポートしていないと仮定します．
+     マクロは`AC_PROG_LIBTOOL'の*前で*呼び出す必要があります．
+
+ -- Macro: AC_LIBTOOL_WIN32_DLL
+     このマクロは，win32プラットフォームでクリーンなdllをビルドするため
+     に移植する場合，使用する必要があります．通常，これは，あらゆるライ
+     ブラリデータ項目を`__declspec(dllexport)'でエクスポートし，
+     `__declspec(dllimport)'でインポートすることを意味します．このマクロ
+     が使用されていない場合，libtoolはパッケージライブラリがクリーンな
+     dllではなく，win32ホストでのスタティックライブラリのみをビルドする
+     と仮定します．
+
+     このマクロは`AC_PROG_LIBTOOL'の*前で*呼び出す必要があり，パッケージ
+     の`Makefile'でのリンクモードでの準備として，`libtool'に
+     `-no-undefined'を渡させる必要があります．通常，`-no-undefined' を渡
+     す場合，すべてのライブラリシンボルが，リンク時には*本当に*定義され
+     ていることを確かめる必要があります！
+
+ -- Macro: AC_DISABLE_FAST_INSTALL
+     `AC_PROG_LIBTOOL'のデフォルトの動作を，高速インストールに対する最適
+     化を不可能にするよう変更します．ユーザはこのデフォルトを，プラット
+     フォームのサポートに依存して，`--enable-fast-install'を指定すること
+     で優先させることができます．
+
+ -- Macro: AC_DISABLE_SHARED
+ -- Macro: AM_DISABLE_SHARED
+     `AC_PROG_LIBTOOL'のデフォルトの動作を，共有ライブラリを利用不可能に
+     変更します．ユーザはこのデフォルトを，`--enable-shared'を指定するこ
+     とで優先させることができます．
+
+ -- Macro: AC_DISABLE_STATIC
+ -- Macro: AM_DISABLE_STATIC
+     `AC_PROG_LIBTOOL'のデフォルトの動作を，スタティックライブラリを利用
+     不可能に変更します．ユーザはこのデフォルトを，`--enable-static'を指
+     定することで優先させることができます．
+
+`AC_PROG_LIBTOOL'内のテストは，以下の環境変数も認識します．
+
+ -- Variable: CC
+     生成された`libtool'が使用するCコンパイラです．これが設定されていな
+     い場合，`AC_PROG_LIBTOOL'は`gcc'や`cc'を探します．
+
+ -- Variable: CFLAGS
+     標準的なオブジェクトファイルを生成するために使用するコンパイラフラ
+     グです．これが設定されていない場合，`AC_PROG_LIBTOOL'はそのようなフ
+     ラグを全く使用しません．それは，`AC_PROG_LIBTOOL'がテストを実行する
+     方法にのみ効果があり，生成された`libtool'には効果はありません．
+
+ -- Variable: CPPFLAGS
+     Cプリプロセッサフラグです．これが設定されていない場合，
+     `AC_PROG_LIBTOOL'はそのようなフラグを全く使用しません．それは，
+     `AC_PROG_LIBTOOL'がテストを実行する方法にのみ効果があり，生成された
+     `libtool'には効果はありません．
+
+ -- Variable: LD
+     (生成された`libtool'が要求する場合は)システムリンカです．これが設定
+     されていない場合，`AC_PROG_LIBTOOL'は，CCで使用されるリンカが何かを
+     判別しようとします．
+
+ -- Variable: LDFLAGS
+     プログラムをリンクするとき，`libtool'が使用するフラグです．これが設
+     定されていない場合，`AC_PROG_LIBTOOL'はそのようなフラグを全く使用し
+     ません．それは，`AC_PROG_LIBTOOL'がテストを実行する方法にのみ効果が
+     あり，生成された`libtool'には効果はありません．
+
+ -- Variable: LIBS
+     プログラムのリンクとき，`AC_PROG_LIBTOOL'が使用するライブラリです．
+     これが設定されていない場合，`AC_PROG_LIBTOOL'はそのようなフラグを使
+     用しません．それは`AC_PROG_LIBTOOL'が実行するテストにのみに効果があ
+     り，生成された`libtool'には効果はありません．
+
+ -- Variable: NM
+     使用するプログラムで，`nm'の調査ではありません．
+
+ -- Variable: RANLIB
+     使用するプログラムで，`ranlib'の調査ではありません．
+
+ -- Variable: LN_S
+     プログラムのリンクを作成するコマンドで，可能な場合はソフトリンク，
+     それ以外ではハードリンクです．この変数が設定されていない場合，
+     `AC_PROG_LIBTOOL'は適切なプログラムを調査します．
+
+ -- Variable: DLLTOOL
+     使用するプログラムで，`dlltool'の調査ではありません．
+     Cygwin/MS-Windowsでのみ意味があります．
+
+ -- Variable: OBJDUMP
+     使用するプログラムで，`objdump'の調査ではありません．
+     Cygwin/MS-Windowsでのみ意味があります．
+
+ -- Variable: AS
+     使用するプログラムで，`as'の調査ではありません．しばらくは，
+     Cygwin/MS-Windows でのみ使用されます．
+
+`libtoolize'プログラムを呼び出すとき(*Note Invoking libtoolize::)，それ
+は`AC_PROG_LIBTOOL'の定義が見つかる場所を伝えます．Automakeを使用してい
+る場合，`aclocal'プログラムは自動的に，`configure'スクリプトに
+`AC_PROG_LIBTOOL'サポートを`configure'スクリプトに加えます．
+
+それにもかかわらず，`acinclude.m4'に`libtool.m4'のコピーを含めることは賢
+明で，そのため，`aclocal.m4'と`configure'がとある理由で再びビルドされた
+場合も，適切なlibtoolマクロが使用されます．代わりに，ユーザが
+`libtool.m4'の互換バージョンをインストールしていて，`aclocal'にアクセス
+可能なことを期待します．これは，バージョンが一致しない場合，不運なエラー
+を導くかもしれません．
+
+
+
+File: libtool-ja.info  Node: AC_PROG_LIBTOOL-Footnotes, Up: AC_PROG_LIBTOOL
+
+(1) `AC_PROG_LIBTOOL'は，`Makefile.in'での`Makefile'
+変数の`top_builddir'の定義を要求します．Automakeはこれを自動的
+に行いますが，Autoconfユーザは，ビルドディレクトリのトップへの相対
+パス(例えば，`../..')を設定する必要があります．
+
+
+
+File: libtool-ja.info, Node: Distributing, Next: Static-only libraries, Prev: Configuring, Up: Integrating libtool
+
+パッケージにlibtoolを含める
+===========================
+
+libtoolを使用するため，パッケージに以下のファイルを含める必要があります．
+
+`config.guess'
+     標準的なシステム名の判別を試みます．
+
+`config.sub'
+     標準的なシステム名を評価する，サブルーチンスクリプトです．
+
+`ltmain.sh'
+     基本的なlibtool機能を実装する一般的なスクリプトです．
+
+libtoolスクリプト自身はパッケージに含まれないことに注意してください．
+*Note Configuring::.
+
+手動でこれらのファイルをパッケージにコピーするより，`libtoolize'プログラ
+ムを使用した方がよいでしょう．
+
+* Menu:
+
+* Invoking libtoolize::         `libtoolize' command line options.
+* Autoconf .o macros::          Autoconf macros that set object file names.
+
+
+
+File: libtool-ja.info, Node: Invoking libtoolize, Next: Autoconf .o macros, Prev: Distributing, Up: Distributing
+
+`libtoolize'の呼び出し
+----------------------
+
+`libtoolize'プログラムは，libtoolサポートをパッケージに追加する標準的な
+方法を提供します．将来は，より良い調査の使用法や，より簡単にlibtool を作
+成する特徴を実装するかもしれません．
+
+`libtoolize'プログラムは以下の構文です．
+
+     libtoolize [OPTION]...
+
+そして，以下のオプションを受け入れます．
+
+`--automake'
+     静かに動作し，libtoolがサポートされているAutomakeを仮定します．
+
+     `libtoolize --automake'は，`AC_PROG_LIBTOOL'が`configure.in'にある
+     とき，Automakeがlibtoolファイルをパッケージに追加するために使用しま
+     す．
+
+`--copy'
+`-c'
+     libtoolデータディレクトリから，シンボリックリンクを作成するのではな
+     く，ファイルをコピーします．
+
+`--debug'
+     シェルスクリプトの実行の追跡を，標準出力にダンプします．これは大量
+     の出力を生成するため，`less'(や`more')にパイプしたり，ファイルにリ
+     ダイレクトしたいかもしれません．
+
+`--dry-run'
+`-n'
+     ファイルシステムを変更するコマンドは実行せず，それらを出力するだけ
+     です．
+
+`--force'
+`-f'
+     既存のlibtoolのファイルを置換します．デフォルトで，`libtoolize'は既
+     存のファイルを上書きしません．
+
+`--help'
+     へルプメッセージを出力し終了します．
+
+`--ltdl'
+     パッケージのサブディレクトリに，libltdlをインストールします．
+
+`--ltdl-tar'
+     ファイルlibltdl.tar.gzをパッケージに追加します．
+
+`--version'
+     `libtoolize'のバージョン情報を出力し終了します．
+
+`libtoolize'が，パッケージの`configure.in'で，明確な`AC_CONFIG_AUX_DIR'
+の呼び出しを検出した場合(*Note The Autoconf Manual: (autoconf)Input.)，
+指定されたディレクトリにファイルを配置します．
+
+`libtoolize'は，パッケージにlibtoolサポートを加えるヒントも同様に表示し
+ます．
+
+
+
+
+File: libtool-ja.info, Node: Autoconf .o macros, Prev: Invoking libtoolize, Up: Distributing
+
+Autoconfの`.o'マクロ
+--------------------
+
+utoconfパッケージは，テストを実行するいくつかのマクロをもたらし，それは，
+オブジェクトファイル名に対応して変数を設定します．libtoolオブジェクトに
+対応する名前を使用する必要があるときもあります．
+
+ここにlibtoolオブジェクトがリストアップする変数名があります．
+
+ -- Variable: LTALLOCA
+     `AC_FUNC_ALLOCA'で置換されます(*Note Particular Function Checks:
+     (autoconf)Particular Functions.)．空，または`alloca.lo'を含みます．
+
+ -- Variable: LTLIBOBJS
+     `AC_REPLACE_FUNCS'(*Note Generic Function Checks: (autoconf)Generic
+     Functions.)とその他の関数で置換されます．
+
+残念ながら，安定版のリリースのAutoconf(これを書いている時期は，2.13)は，
+libtoolでこれらの変数を提供する方法が全くありません．そのため，それに依
+存して，パッケージの`configure.in'で`AC_OUTPUT'を呼び出す前に，以下のコー
+ドの実装を使用してください．
+
+     LTLIBOBJS=`echo "$LIBOBJS" | sed 's/\.[^.]* /.lo /g;s/\.[^.]*$/.lo/'`
+     AC_SUBST(LTLIBOBJS)
+     LTALLOCA=`echo "$ALLOCA" | sed 's/\.[^.]* /.lo /g;s/\.[^.]*$/.lo/'`
+     AC_SUBST(LTALLOCA)
+     AC_OUTPUT(...)
+
+
+
+
+File: libtool-ja.info, Node: Static-only libraries, Prev: Distributing, Up: Integrating libtool
+
+スタティックのみのライブラリ
+============================
+
+パッケージを開発しているとき，パッケージを`--disable-shared'フラグでコン
+フィグレーションしたり，`AC_DISABLE_SHARED' Autoconfマクロ(*Note The
+`AC_PROG_LIBTOOL' macro: AC_PROG_LIBTOOL.)を使用して，`AC_PROG_LIBTOOL'
+のデフォルトに優先することに価値があることもよくあります．これは，
+libtoolが共有ライブラリをビルドすることを避け，それには，いくつかの利点
+があります．
+
+   * 2回目のコンパイルを速くし，開発サイクルを高速にします．
+
+   * 共有ライブラリによって加えられる複雑さの詳細が不要なので，デバッグ
+     がより簡単になります．
+
+   * スタティックのみのプラットフォームでのlibtoolの動作方法が分かります．
+
+パッケージの`README'に，他の開発者に`--disable-shared'で時間を稼げること
+を知らせるため，ちょっとした注意を書きたいかもしれません．以下の例の注意
+は，GIMP (1) (*Note Static-only libraries-Footnotes::) 配布物の`README'
+から持ってきました．
+
+     The GIMP uses GNU Libtool in order to build shared libraries on a
+     variety of systems. While this is very nice for making usable
+     binaries, it can be a pain when trying to debug a program. For that
+     reason, compilation of shared libraries can be turned off by
+     specifying the `--disable-shared' option to `configure'.
+
+
+

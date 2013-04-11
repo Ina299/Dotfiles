@@ -1,0 +1,2030 @@
+Info file: textutils-ja.info,    -*-Text-*-
+produced by `texinfo-format-buffer'
+from file `textutils-ja.texi'
+using `texinfmt.el' version 2.38 of 3 July 1998.
+
+
+
+
+
+
+START-INFO-DIR-ENTRY
+* Text utilities(ja): (textutils-ja).           GNU text utilities.
+* cat(ja): (textutils-ja)cat invocation.        Concatenate and write files.
+* cksum(ja): (textutils-ja)cksum invocation.    Print POSIX CRC checksum.
+* comm(ja): (textutils-ja)comm invocation.      Compare sorted files by line.
+* csplit(ja): (textutils-ja)csplit invocation.  Split by context.
+* cut(ja): (textutils-ja)cut invocation.        Print selected parts of lines.
+* expand(ja): (textutils-ja)expand invocation.  Convert tabs to spaces.
+* fmt(ja): (textutils-ja)fmt invocation.        Reformat paragraph text.
+* fold(ja): (textutils-ja)fold invocation.      Wrap long input lines.
+* head(ja): (textutils-ja)head invocation.      Output the first part of files.
+* join(ja): (textutils-ja)join invocation.      Join lines on a common field.
+* md5sum(ja): (textutils-ja)md5sum invocation.  Print or check message-digests.
+* nl(ja): (textutils-ja)nl invocation.          Number lines and write files.
+* od(ja): (textutils-ja)od invocation.          Dump files in octal, etc.
+* paste(ja): (textutils-ja)paste invocation.    Merge lines of files.
+* pr(ja): (textutils-ja)pr invocation.          Paginate or columnate files.
+* ptx(ja): (textutils-ja)ptx invocation.        Produce permuted indexes.
+* sort(ja): (textutils-ja)sort invocation.      Sort text files.
+* split(ja): (textutils-ja)split invocation.    Split into fixed-size pieces.
+* sum(ja): (textutils-ja)sum invocation.        Print traditional checksum.
+* tac(ja): (textutils-ja)tac invocation.        Reverse files.
+* tail(ja): (textutils-ja)tail invocation.      Output the last part of files.
+* tsort(ja): (textutils-ja)tsort invocation.    Topological sort.
+* tr(ja): (textutils-ja)tr invocation.          Translate characters.
+* unexpand(ja): (textutils-ja)unexpand invocation.  Convert spaces to tabs.
+* uniq(ja): (textutils-ja)uniq invocation.      Uniquify files.
+* wc(ja): (textutils-ja)wc invocation.          Byte, word, and line counts.
+END-INFO-DIR-ENTRY
+
+This file documents the GNU text utilities.
+
+Copyright (C) 1994, 95, 96 Free Software Foundation, Inc.
+
+Permission is granted to make and distribute verbatim copies of this
+manual provided the copyright notice and this permission notice are
+preserved on all copies.
+
+Permission is granted to copy and distribute modified versions of this
+manual under the conditions for verbatim copying, provided that the
+entire resulting derived work is distributed under the terms of a
+permission notice identical to this one.
+
+Permission is granted to copy and distribute translations of this manual
+into another language, under the above conditions for modified versions,
+except that this permission notice may be stated in a translation
+approved by the Foundation.
+
+
+
+
+
+File: textutils-ja.info, Node: Top, Next: Introduction, Prev: (dir), Up: (dir)
+
+GNU text utilities
+******************
+
+
+このマニュアルは，GNUテキストユーティリティのバージョン 2.0の，ドキュメ
+ントです．
+
+* Menu:
+
+* Introduction::                       Caveats, overview, and authors.
+* Common options::                     Common options.
+* Output of entire files::             cat tac nl od
+* Formatting file contents::           fmt pr fold
+* Output of parts of files::           head tail split csplit
+* Summarizing files::                  wc sum cksum md5sum
+* Operating on sorted files::          sort uniq comm ptx tsort
+* Operating on fields within a line::  cut paste join
+* Operating on characters::            tr expand unexpand
+* Opening the software toolbox::       The software tools philosophy.
+* Index::                              General index.
+
+ -- 詳細なノードリスト ---
+
+ファイル全体の出力
+
+* cat invocation::              Concatenate and write files.
+* tac invocation::              Concatenate and write files in reverse.
+* nl invocation::               Number lines and write files.
+* od invocation::               Write files in octal or other formats.
+
+ファイル内容の書式化
+
+* fmt invocation::              Reformat paragraph text.
+* pr invocation::               Paginate or columnate files for printing.
+* fold invocation::             Wrap input lines to fit in specified width.
+
+ファイルの一部を出力
+
+* head invocation::             Output the first part of files.
+* tail invocation::             Output the last part of files.
+* split invocation::            Split a file into fixed-size pieces.
+* csplit invocation::           Split a file into context-determined pieces.
+
+ファイルの要約
+
+* wc invocation::               Print byte, word, and line counts.
+* sum invocation::              Print checksum and block counts.
+* cksum invocation::            Print CRC checksum and byte counts.
+* md5sum invocation::           Print or check message-digests.
+
+ソートされたファイルの処理
+
+* sort invocation::             Sort text files.
+* uniq invocation::             Uniquify files.
+* comm invocation::             Compare two sorted files line by line.
+* ptx invocation::              Produce a permuted index of file contents.
+* tsort invocation::            Topological sort.
+
+`ptx': Produce permuted indexes
+
+* General options in ptx::      Options which affect general program behavior.
+* Charset selection in ptx::    Underlying character set considerations.
+* Input processing in ptx::     Input fields, contexts, and keyword selection.
+* Output formatting in ptx::    Types of output format, and sizing the fields.
+* Compatibility in ptx::        The GNU extensions to `ptx'
+
+行のフィールド上の処理
+
+* cut invocation::              Print selected parts of lines.
+* paste invocation::            Merge lines of files.
+* join invocation::             Join lines on a common field.
+
+文字上の処理
+
+* tr invocation::               Translate, squeeze, and/or delete characters.
+* expand invocation::           Convert tabs to spaces.
+* unexpand invocation::         Convert spaces to tabs.
+
+`tr': 文字の変換，圧縮そして/または，削除
+
+* Character sets::              Specifying sets of characters.
+* Translating::                 Changing one characters to another.
+* Squeezing::                   Squeezing repeats and deleting.
+* Warnings in tr::              Warning messages.
+
+ソフトウェアツールボックスを開く
+
+* Toolbox introduction::        Toolbox introduction
+* I/O redirection::             I/O redirection
+* The who command::             The `who' command
+* The cut command::             The `cut' command
+* The sort command::            The `sort' command
+* The uniq command::            The `uniq' command
+* Putting the tools together::  Putting the tools together
+
+
+
+
+
+File: textutils-ja.info, Node: Introduction, Next: Common options, Prev: Top, Up: Top
+
+はじめに
+********
+
+
+このマニュアルは不完全です．初心者に適した方法で，基本的な概念を説明しよ
+うとしていません．それゆえ，興味があればこのマニュアルの改善に係わってく
+ださい．GNUコミュニティ全体が利益を得るでしょう．
+
+GNUテキストユーティリティーは，ほとんどPOSIX.2標準と互換性があります．
+
+
+バグをbug-textutils@gnu.orgに報告してください．バージョンナンバー，マシ
+ンアーキテクチャ，入力ファイルと，バグの再現に必要なあらゆる情報含めるこ
+とを忘れないでください．入力と，期待したものと，得たものと，間違っている
+理由です．diffは歓迎しますが，これは推測が難しいときもあるので，問題の記
+述も含めてください．*Note Bugs: (gcc)Bugs.
+
+このマニュアルは配布物のUNIX man page に基づいていて，それは，元々David
+MacKenzieによって書かれ，Jim Meyeringによって更新されました．元となる 
+`fmt' man pageは，Ross Patersonによって書かれました．Franc,ois Pinardは，
+Texinfoフォーマットへの最初の変換を行いました．Karl Berryは索引の追加と，
+いくつかの再編成と，結果の編集を行いました．Richard Stallman は，全体的
+なプロセスに，彼のいつもの貴重な洞察を寄稿しました．
+
+
+
+File: textutils-ja.info, Node: Common options, Next: Output of entire files, Prev: Introduction, Up: Top
+
+共通のオプション
+****************
+
+
+特定のオプションは，これらすべてのプログラムで利用可能です．それぞれのプ
+ログラムのために，同一の記述を書くのではなく，それらはここで記述されます．
+(実際，すべてのGNUプログラムが，これらのオプションを受け入れる(あるいは
+受け入れるべき)です．)
+
+これらのプログラムには，任意の文字列を引数として持つものもあります．その
+場合，`--help'と`--version'は，1つあり，正確に1つのコマンドライン引数の
+場合のみ，オプションとして受け入れられます．
+
+
+`--help'
+     すべての利用可能なオプションをリストアップした，使用法のメッセージ
+     を出力し，正しく終了します．
+
+`--version'
+     バージョンナンバーを出力して，正しく終了します．
+
+
+
+
+
+File: textutils-ja.info, Node: Output of entire files, Next: Formatting file contents, Prev: Common options, Up: Top
+
+ファイル全体の出力
+******************
+
+
+これらのコマンドは，いくつかの方法で，できる限りファイルを変換しながら，
+ファイル全体を読み込み，そして書き出します．
+
+* Menu:
+
+* cat invocation::              Concatenate and write files.
+* tac invocation::              Concatenate and write files in reverse.
+* nl invocation::               Number lines and write files.
+* od invocation::               Write files in octal or other formats.
+
+
+
+File: textutils-ja.info, Node: cat invocation, Next: tac invocation, Prev: Output of entire files, Up: Output of entire files
+
+`cat': ファイルを連結し書き込む
+===============================
+
+
+`cat'は，それぞれのFILE(`-'は標準入力を意味します)か，与えられない場合は
+標準入力を，標準出力へコピーします．概要です．
+
+     cat [OPTION] [FILE]...
+
+プログラムは以下のオプションを受け入れます．*Note Common options::,も参
+照してください．
+
+
+`-A'
+`--show-all'
+     `-vET' と同じです．
+
+`-B'
+`--binary'
+     MS-DOSとMS-Windowsのみで，ファイルをバイナリモードで読み書きします．
+     デフォルトで，MS-DOS/MS-Windowsでの`cat'は，標準出力がファイルやパ
+     イプにリダイレクトされているときのみ，バイナリモードを使用します．
+     このオプションは優先されます．バイナリファイルのI/Oでは，`cat'はファ
+     イルのコピープログラムとして使用されることが多いので，それらの書式
+     (DOSテキストとバイナリに対するUnixテキスト)を保つために使われます．
+     (以下の)オプションには，ときとして元ファイルの内容が重要でないので，
+     `cat'にテキストモードで読み書きさせるものもあります(例えば，行が
+     `cat'で番号付けされるときや行の終りに印を付けるとき)．これは，これ
+     らのオプションがDOS/Windowsユーザーが期待したように働くためのもので
+     す．例えば，DOS形式のテキストファイルは，テキストモードで読まれない
+     場合，`-b'で空の行として扱われない，CR-LF というペアの文字を行末に
+     持ちます．
+
+`-b'
+`--number-nonblank'
+     空白でない全ての出力行に，1で始まる番号を付けます．MS-DOSと
+     MS-Windowsでは，このオプションで，`cat'はテキストモードでファイルを
+     読み書きします．
+
+`-e'
+     `-vE' と同じです．
+
+`-E'
+`--show-ends'
+     それぞれの行末の後に`$'を表示します．MS-DOSとMS-Windowsでは，このオ
+     プションで，`cat'はテキストモードでファイルを読み書きします．
+
+`-n'
+`--number'
+     全ての出力行に，1で始まる番号を付けます．MS-DOSとMS-Windowsでは，こ
+     のオプションで，`cat'はテキストモードでファイルを読み書きします．
+
+`-s'
+`--squeeze-blank'
+     複数の隣接した空白行を，1行のブランク行に置換します．MS-DOSと
+     MS-Windows では，このオプションで，`cat'はテキストモードでファイル
+     を読み書きします．
+
+`-t'
+     `-vT'と同じです．
+
+`-T'
+`--show-tabs'
+     TAB文字を `^I'として表示します．
+
+`-u'
+     無視されます．Unix互換性のためです．
+
+`-v'
+`--show-nonprinting'
+     LFDとTAB以外のコントロール文字を，`^'表記法を使って表示し，`M-'を使っ
+     たハイビットセットを持っている文字に優先します．MS-DOSとMS-Windows
+     では，このオプションで，`cat'はDOSバイナリモードでファイルと標準入
+     力を読むので，それぞれの行末のCR文字は表示されます．
+
+
+
+
+File: textutils-ja.info, Node: tac invocation, Next: nl invocation, Prev: cat invocation, Up: Output of entire files
+
+`tac': 逆順にファイルを連結し書き込む
+=====================================
+
+
+`tac'は，それぞれのFILE(`-' は，標準入力を意味します)か，与えられない場
+合は標準入力を，それぞれに分けられたレコード(デフォルトは行)を，逆順に標
+準出力へコピーします．概要です．
+
+     tac [OPTION]... [FILE]...
+
+"レコード"は，文字列のインスタンス(デフォルトは改行)で分けられています．
+デフォルトで，このセパレータ文字列はファイルに続くレコードの終りに付加さ
+れます．
+
+プログラムは以下のオプションを受け入れます．*Note Common options::,も参
+照してください．
+
+
+`-b'
+`--before'
+     セパレータを，ファイルの前の，レコードの最初に付加します．
+
+`-r'
+`--regex'
+     セパレータ文字列を正規表現として扱います．MS-DOS/MS-Windowsで`tac' 
+     ユーザは，`tac'はファイルをバイナリモードで読むので，テキストファイ
+     ルのそれぞれの行は，UnixスタイルのLFの代わりにCR/LFのペアで終ること
+     に注意してください．
+
+`-s SEPARATOR'
+`--separator=SEPARATOR'
+     SEPARATORを，改行の代わりに，セパレータ文字列として用います．
+
+
+
+
+
+File: textutils-ja.info, Node: nl invocation, Next: od invocation, Prev: tac invocation, Up: Output of entire files
+
+`nl': 行に番号を付けファイルに書き込む
+======================================
+
+
+`nl'は，それぞれのFILE(`-' は標準入力を意味します)か，与えられない場合は
+標準入力を，行のいくつか，または全てに行番号を加えて，標準出力へ書き出し
+ます．概要です．
+
+     nl [OPTION]... [FILE]...
+
+`nl'は，入力を(論理)ページに分解します．デフォルトで，それぞれの論理ペー
+ジのトップで，行番号は1にリセットされます．`nl'は，全ての入力ファイルを
+単一のドキュメントとして扱います．行番号や論理ページをファイル間でリセッ
+トしません．
+
+論理ページは，3つのセクションから成立ちます．ヘッダとボディとフッタです．
+あらゆるセクションは，空にすることもできます．それぞれは，異なるスタイル
+で番号を付けられます．
+
+論理ページのセクションの最初は，以下のデリミタ文字列の1つを，入力ファイ
+ルに単一行で含めることで示されます．
+
+`\:\:\:'
+     ヘッダの始まり．
+
+`\:\:'
+     ボディの始まり
+
+`\:'
+     フッタの始まり．
+
+
+これらの文字列を構成する2つの文字は，`\'と`:'からの変更はオプション(以下
+を参照)で可能ですが，パターンと文字列の長さは変更できません．
+
+セクションデリミタは，出力では空行に置換されます．入力ファイルの，最初の
+セクションのデリミタ文字列より前のあらゆるテキストは，ボディセクションの
+一部と考えられるので，`nl'は，セクションデリミタが無いファイルを，1 つの
+ボディセクションとして扱います．
+
+プログラムは以下のオプションを受け入れます．*Note Common options::,も参
+照してください．
+
+
+`-b STYLE'
+`--body-numbering=STYLE'
+     それぞれの論理ページのボディセクションの行に対し，番号付けのスタイ
+     ルを選択します．行が番号付けされないとき，現在の行番号は増加しませ
+     んが，行番号を分ける文字列は行に前置されます．スタイルは以下のとお
+     りです．
+
+     `a'
+          全ての行に番号を付けます．
+
+     `t'
+          (デフォルトでボディに対し)空でない行だけ，番号を付けます．
+
+     `n'
+          (デフォルトでヘッダやフッタに対し)番号を付けません．
+
+     `pREGEXP'
+          REGEXPに一致したものを含む行だけ番号を付けます．
+
+
+`-d CD'
+`--section-delimiter=CD'
+     セクションデリミタ文字をCDにセットします．デフォルトは`\:'です．Cの
+     み与えられた場合，2番目の`:'はそのままです．(シェルが拡張する`\'や
+     他のメタ文字を，引用符やバックスラッシュの追加で保護することを，忘
+     れないでください．)
+
+`-f STYLE'
+`--footer-numbering=STYLE'
+     `--body-numbering'に似ています．
+
+`-h STYLE'
+`--header-numbering=STYLE'
+     `--body-numbering'に似ています．
+
+`-i NUMBER'
+`--page-increment=NUMBER'
+     行番号をNUMBERづつ(デフォルトは1)増加します．
+
+`-l NUMBER'
+`--join-blank-lines=NUMBER'
+     NUMBER(デフォルトは1)連続した空行を，番号付けに対し1つの論理行だと
+     考え，最後のもののみに番号付けします．NUMBERより少ない行の連続した
+     空行があるところでは番号付けをしません．空行は，スペースやタグを含
+     め，文字を含まないものです．
+
+`-n FORMAT'
+`--number-format=FORMAT'
+     行の番号付けの書式を選択します(デフォルトは`rn'です)．
+
+     `ln'
+          左寄せで，先頭の0を置きません．
+
+     `rn'
+          右寄せで，先頭の0を置きません．
+
+     `rz'
+          右寄せで，先頭の0を置きます．
+
+`-p'
+`--no-renumber'
+     論理ページの最初で，行番号をリセットしません．
+
+`-s STRING'
+`--number-separator=STRING'
+     出力で，STRINGを使って(デフォルトはTAB文字)テキスト行と行番号を分け
+     ます．
+
+`-v NUMBER'
+`--starting-line-number=NUMBER'
+     それぞれの論理ページの行番号の初期値を，NUMBER(デフォルトは1)にセッ
+     トします．
+
+`-w NUMBER'
+`--number-width=NUMBER'
+     行番号に，NUMBER文字使います(デフォルトは6)．
+
+
+
+
+
+File: textutils-ja.info, Node: od invocation, Prev: nl invocation, Up: Output of entire files
+
+`od': 8進やその他の書式でファイルを書き出す
+===========================================
+
+
+`od'は，それぞれのFILE(`-'は標準入力を意味します)か，与えられない場合は
+標準入力の，明瞭な表現を書き込みます．概要です．
+
+     od [OPTION]... [FILE]...
+     od -C [FILE] [[+]OFFSET [[+]LABEL]]
+
+それぞれの出力行は，入力オフセットと，それに続くファイルデータのグループ
+から成り立ちます．デフォルトで，`od'は8進数でオフセットを出力し，それぞ
+れのファイルのデータグループは，1つの8進数で出力された，入力の2バイトで
+す．
+
+プログラムは以下のオプションを受け入れます．*Note Common options::,も参
+照してください．
+
+
+`-A RADIX'
+`--address-radix=RADIX'
+     出力するファイルオフセットの基数を選択します．RADIXは，以下の1つが
+     使えます．
+
+     `d'
+          10進数．
+
+     `o'
+          8進数．
+
+     `x'
+          16進数．
+
+     `n'
+          なし(出力オフセットを出力しません)．
+
+     デフォルトは8進数です．
+
+`-j BYTES'
+`--skip-bytes=BYTES'
+     書式化と書き出しの前に，入力バイトのBYTESスキップします．BYTESが
+     `0x'や`0X'で始まる場合，16進数と解釈されます．それ以外で，`0'で始ま
+     る場合は8進数．それ以外では10進数です．`b' の追加はBYTESを512倍し，
+     `k'は1024倍，そして`m'は1048576 倍です．
+
+`-N BYTES'
+`--read-bytes=BYTES'
+     入力のBYTESバイトを最大で出力します．`bytes'に対する接頭辞と接尾子
+     は，`-j'に対するものと同じように解釈されます．
+
+`-s [N]'
+`--strings[=N]'
+     通常の出力の代わりに，"文字列定数"のみを出力します．少なくともN(デ
+     フォルトは3)個の連続したASCIIグラフィック文字で，それにはnull(ゼロ)
+     バイトが続きます．
+
+`-t TYPE'
+`--format=TYPE'
+     ファイルデータの出力書式を選択します．TYPEは，以下の形式を示す文字
+     の1つ以上の文字列です．単一のTYPE文字列に，1つ以上の形式を示す文字
+     を含めたり，1回以上このオプションを使用した場合，`od'は，それぞれの
+     指定したデータ形式を用いて，それぞれの出力行のコピーを，指定した順
+     番で書き出します．
+
+     あらゆる形式指定の終りに"z"を加えることで，形式指定で生成された出力
+     行に，印刷可能な文字に存在するASCII文字の表示を加えます．
+
+     `a'
+          指名された文字，
+     `c'
+          ASCII文字，またはバックスラッシュエスケープ，
+     `d'
+          符号付き10進数，
+     `f'
+          浮動小数点，
+     `o'
+          8進数，
+     `u'
+          符号無し10進数，
+     `x'
+          16進数．
+
+     形式`a'は，スペースに対し`sp'，改行に対し`nl'，そしてnull(ゼロ)バイ
+     トに対し`nul' のようなものを出力します．形式`c' は，それぞれ` '，
+     `\n'，そして`\0'を出力します．
+
+     `a'と`c'以外の形式に対し，それぞれの数字の解釈に使用するバイト数を，
+     以下の10進数の整数を伴う形式を示す文字で与えられたデータ形式で指定
+     することができます．また，以下の文字の1つを伴う以下の形式を示す文字
+     で，C コンパイラ組込みのデータ形式を指定することもできます．整数
+     (`d'，`o'，`u'，`x')に対しては以下のようになります．
+
+     `C'
+          char,
+     `S'
+          short,
+     `I'
+          int,
+     `L'
+          long.
+
+     浮動小数点(`f')に対しては以下のようになります．
+
+     F
+          float,
+     D
+          double,
+     L
+          long double.
+
+`-v'
+`--output-duplicates'
+     同一の連続した行を出力します．デフォルトで，2行以上連続した出力行が
+     同一のとき，`od'は，最初の行のみ出力し，それ以下の行には，省略を示
+     すためアスタリスクを置くだけです．
+
+`-w[N]'
+`--width[=N]'
+     出力行毎に，`n'入力バイトをダンプします．それは，出力形式で指定した
+     ものに関連するサイズの公倍数の倍数にする必要があります．Nが偶数の場
+     合，デフォルトは32です．オプションが全く指定されていない場合，デフォ
+     ルトは16です．
+
+次のいくつかのオプションは，古いpre-POSIX書式の指定オプションを，対応す
+るPOSIX書式のスペックにマップします．GNU `od'は，古い形式と新しい形式の
+オプションのあらゆる組合せを受け入れます．書式指定オプションは蓄積されま
+す．
+
+
+`-a'
+     指名された文字として出力します．`-ta'と同じです．
+
+`-b'
+     8進数のバイトとして出力します．`-toC'と同じです．
+
+`-c'
+     ASCII文字，またはバックスラッシュエスケープとして出力します．`-tc'
+     と同じです．
+
+`-d'
+     符号無しの10進数のshortとして出力します．`-tu2'と同じです．
+
+`-f'
+     浮動小数点として出力します．`-tfF'と同じです．
+
+`-h'
+     16進数のshortとして出力します．`-tx2'と同じです．
+
+`-i'
+     10進数のshortとして出力します．`-td2'と同じです．
+
+`-l'
+     10進数のlongとして出力します．`-td4'と同じです．
+
+`-o'
+     8進数のshortとして出力します．`-to2'と同じです．
+
+`-x'
+     16進数のshortとして出力します．`-tx2'と同じです．
+
+`-C'
+`--traditional'
+     古い`od'が受け入れる，pre-POSIXのオプション引数が無いものと認識しま
+     す．以下の構文です．
+
+          od --traditional [FILE] [[+]OFFSET[.][b] [[+]LABEL[.][b]]]
+
+     これは，最大1ファイルと，オプション引数で指定しているオフセットと疑
+     似スタートアドレス，LABELを指定するために使用されるはずです．デフォ
+     ルトで，OFFSETは，書式化と書き出しの前にスキップする入力バイトの量
+     が，8進数で指定されていると解釈されます．オプションで10進数の点を後
+     置すると，OFFSETの解釈は強制的に10進数とします．10進数が指定されて
+     おらず，オフセットが`0x'や`0X'で始まる場合，それは16進数として解釈
+     されます．`b'の後置がある場合，スキップされるバイト数はOFFSETの512 
+     倍になります．LABEL引数は，OFFSETのように解釈されますが，それは初期
+     の疑似アドレスを指定します．疑似アドレスは，通常のアドレスに続くカッ
+     コ内に表示されます．
+
+
+
+
+File: textutils-ja.info, Node: Formatting file contents, Next: Output of parts of files, Prev: Output of entire files, Up: Top
+
+ファイルの内容の書式化
+**********************
+
+
+これらのコマンドは，ファイルの内容を再書式化します．
+
+* Menu:
+
+* fmt invocation::              Reformat paragraph text.
+* pr invocation::               Paginate or columnate files for printing.
+* fold invocation::             Wrap input lines to fit in specified width.
+
+
+
+
+File: textutils-ja.info, Node: fmt invocation, Next: pr invocation, Prev: Formatting file contents, Up: Formatting file contents
+
+`fmt': 段落のテキストを再書式化する．
+=====================================
+
+
+`fmt'は，与えられた(最大)文字数(デフォルトは75)の出力行を生成するため，
+行を補充し繋げます．概要です．
+
+     fmt [OPTION]... [FILE]...
+
+`fmt'は，指定されたFILE引数(または，与えられない場合は標準入力)からファ
+イルを読み込み，標準出力に書き出します．
+
+デフォルトで，空白行，単語間のスペース，そして字下げは出力で維持されます．
+異なる字下げのある連続した入力行は連結されません．タブは入力で展開され，
+出力に差し込まれます．
+
+`fmt'は，文の終りの改行しようとし，文の最初の単語の後や，文の最後の単語
+の前での改行を避けようとします．"文の切れ目"は段落の終り，または，あらゆ
+る`.?!'で終る単語に，2つのスペースか行の終りが続くものと定義されていて，
+あらゆるカッコや引用符の内部は無視されます．TeXのように，`fmt'は，行の分
+割を選択する前に"段落"全体を読み込みます．アルゴリズムは"Breaking
+Paragraphs Into Lines(段落を行に区切る)"の変種です(Donald E. Knuth and
+Michael F. Plass, `Software--Practice and Experience', 11 (1981),
+1119--1184)．
+
+プログラムは以下のオプションを受け入れます．*Note Common options::,も参
+照してください．
+
+
+`-c'
+`--crown-margin'
+     "Crown margin"モード: 段落の最初の2行の字下げを保存し，それに続くそ
+     れぞれの行の左の余白を，2行目の余白に揃えます．
+
+`-t'
+`--tagged-paragraph'
+     "Tagged paragraph"モード: crown marginモードに似ていますが，段落の
+     最初の行の字下が2行目の字下げと同じ場合，最初の行は1行の段落として
+     扱われます．
+
+`-s'
+`--split-only'
+     行の分割のみです．短い行を長い形式に連結しません．これはコードのサ
+     ンプル行と，その他の"書式化された"テキストを，醜く結合されることを
+     妨げます．
+
+`-u'
+`--uniform-spacing'
+     スペースを統一します．単語の間のスペースを1つのスペースに，そして文
+     の間のスペースを2つのスペースに減らします．
+
+`-WIDTH'
+`-w WIDTH'
+`--width=WIDTH'
+     出力ファイルをWIDTH文字(デフォルトは75)まで補充します．`fmt' は最初
+     に，これより7%短い行にし，行の長さのバランスのための空間を与えよう
+     とします．
+
+`-p PREFIX'
+`--prefix=PREFIX'
+     PREFIX (空白で始めることも可能です)で始まる行のみ，書式化を適用しま
+     す．prefixと前置されたあらゆる空白は，書式化のため取り除かれ，それ
+     ぞれの出力行に再び取り付けられます．1つの使用方法は，ある種のプログ
+     ラムのコメントの書式化で，コードは変化されないままになります．
+
+
+
+
+File: textutils-ja.info, Node: pr invocation, Next: fold invocation, Prev: fmt invocation, Up: Formatting file contents
+
+`pr': 印刷のためのファイルのページ化とコラム化
+==============================================
+
+
+`pr'は，それぞれのFILE (`-'は標準入力を意味します)，または，与えられない
+場合は標準入力を，複数列の書式で，ページ化された任意の出力で，標準出力に
+書き出します．オプションで，全てのFILEを結合し，1 列毎に，並列に全てを出
+力します．概要です．
+
+     pr [OPTION]... [FILE]...
+
+デフォルトで，5行のヘッダがそれぞれのページに出力されます．日付，ファイ
+ル名，そしてページ番号がある行があり，後の2行は空白行です．また，5行の空
+白行を持つフッタも出力します．`-F'オプションで，3行のヘッダを出力します．
+2行の空白行は削除され，フッタは使用されません．両方の場合でのデフォルト
+のPAGE_LENGTHは，66行です．テキスト行のデフォルト数は56 (`-F'が無い場合)
+から63 (`-F'がある場合)まで変化します．ヘッダのテキスト行は，`yyyy-mm-dd
+HH:MM string Page nnnn'という形式で，PAGE_WIDTHまで使用します．文字列は，
+ヘッダ文字列をセンタリングしたものになります．
+
+入力でのフォームフィードは，出力で改ページとなります．複数のフォームフィー
+ドは空のページを生成します．
+
+列は同じ幅で，オプションの文字列(デフォルトは`space')で分けられています．
+複数列の出力では，`-J'オプションを使用していない場合，行は常にPAGE_WIDTH
+(デフォルトで72)で切り詰められます．単一列での出力は，デフォルトでは切り
+詰められません．その場合，行を切り詰めるため`-W' オプションを使用してく
+ださい．
+
+   Including version 1.22i:
+
+いくつかの小さなLETTER OPTIONS (`-s'，`-w')は，より良いPOSIX遵守のオブジェ
+クトにより再定義されています．それ以外の場合でのいくつかの出力は，他の
+UNIXに適合されました．下位互換性の侵害は受け入れられました．
+
+いくつかのNEW CAPITAL LETTERオプション(`-J'，`-S'，`-W')は，小文字のオプ
+ションの予期せぬインターフェースを取り消すため，導入されました．`-N'オプ
+ションと2番目の引数`+FIRST_PAGE'のLAST_PAGEは，より多くの柔軟性を提供し
+ます．入力ファイルのフォームフィード設定の詳細な取扱は，`-T'オプションを
+要求します．
+
+大文字のオプションは，小文字のものより優勢です．
+
+いくつかのオプション引数(`-s'，`-S'，`-e'，`-i'，`-n'と比較して)は，
+(POSIX使用で既に述べられた)オプション文字の前置から分かれている引数とし
+て指定できません．
+
+プログラムは以下のオプションを受け入れます．*Note Common options::,も参
+照してください．
+
+
+`+FIRST_PAGE[:LAST_PAGE]'
+`--pages=FIRST_PAGE[:LAST_PAGE]'
+     ページFIRST_PAGEから出力を開始し，LAST_PAGEで停止します．
+     `:LAST_PAGE'が無い場合は，ファイルの終りを暗示します．飛ばされたペー
+     ジ数を見積もる間，入力ファイルのそれぞれのフォームフィードは，結果
+     として新しいページになります．`+FIRST_PAGE'がある場合と無い場合のペー
+     ジの数え方は同じです．デフォルトで，入力ファイルの最初のページでカ
+     ウントを開始します(最初のページは出力されません)．行の番号付けは，
+     `-N'オプションで変更できます．
+
+`-COLUMN'
+`--columns=COLUMN'
+     それぞれ単一ファイルで，COLUMN列(デフォルトで1)の出力を生成し，`-a'
+     が使用されない場合は，列を下へ出力します．列の幅は，COLUMNが増加す
+     るに従い，自動的に減少します．PAGE_WIDTHを増加させるため，`-W/-w'を
+     使用していない場合も同様です．このオプションは，いくつかの行を切り
+     詰めるかも知れません．それぞれのページの列の行の数は平均されます．
+     オプション`-e'と`-i'は，複数のテキスト列の出力のためのものです．
+     `-J'をともに用いた場合，列の整列と行の切り詰めは停止します．十分な
+     長さの行は，フリーフィールド書式に組み込まれ，`-S'オプションはフィー
+     ルドを分けるかも知れません．`-COLUMN'は`-m'オプションとともに使用で
+     きません．
+
+`-a'
+`--across'
+     それぞれ単一FILEを用い，列を下ではなく横切って出力します．`-COLUMN'
+     オプションは，1以上のCOLUMNで与える必要があります．列にフィットさせ
+     るには余りに長い場合，それは切り詰められます．
+
+`-c'
+`--show-control-chars'
+     ハット表記で(例えば，`^G')を使用して制御文字を出力します．8進のバッ
+     クスラッシュ表記で，その他の印刷不可能な文字を表示します．デフォル
+     トで，印刷不可能な文字は変更されません．
+
+`-d'
+`--double-space'
+     ダブルスペースを出力です． (1) (*Note pr invocation-Footnotes::)
+
+`-e[IN-TABCHAR[IN-TABWIDTH]]'
+`--expand-tabs[=IN-TABCHAR[IN-TABWIDTH]]'
+     入力のTABをスペースに展開します．オプションの引数IN-TABCHAR は，入
+     力のタブ文字(デフォルトはTAB文字)です．2番目のオプション引数
+     IN-TABWIDTHは，入力タブ文字の幅(デフォルトは8)です．
+
+`-f'
+`-F'
+`--form-feed'
+     出力ページを分けるため，改行の代わりにフォームフィードを使用します．
+     デフォルトページの長さの66行は，変更されません．しかし，ページ毎の
+     テキスト行の数はデフォルトの56から63行に変更されます．
+
+`-h HEADER'
+`--header=HEADER'
+     ヘッダのファイル名をセンタリングされた文字列HEADERで置換します．左
+     側の(`*'で印が付いた)切り詰めは，ヘッダ行全体の`yyyy-mm-dd HH:MM
+     HEADER Page nnnn'がPAGE_WIDTHより大きくなった場合に発生するかも知れ
+     ません．`-h ""'は空白行のヘッダを出力します．`-h""'を使用しないでく
+     ださい．`-h'オプションと引数の間の空白は，常に不可欠です．
+
+`-i[OUT-TABCHAR[OUT-TABWIDTH]]'
+`--output-tabs[=OUT-TABCHAR[OUT-TABWIDTH]]'
+     出力上で，スペースをTABに置換します．オプション引数OUT-TABCHARは出
+     力されるタブ文字です(デフォルトはTAB文字です)．2番目のオプション引
+     数OUT-TABWIDTHは出力されるタブ文字の幅(デフォルトで8)です．
+
+`-J'
+`--join-lines'
+     十分な長さの行に統合します．列オプション`-COLUMN'，`-a
+     -COLUMN'や`-m'とともに使用されます．`-W/-w'の行の切り詰
+     めを停止します．列の整列は使用されません．`-S[STRING]'とともに使用
+     されるかもしれません．`-J'は(`-W'と`-S'とともに)，3 列オプションの
+     古い(POSIX準拠の)オプション`-w'と`-s'を解決するために導入されました．
+
+`-l PAGE_LENGTH'
+`--length=PAGE_LENGTH'
+     ページの長さを，ヘッダ[とフッタ]の行を含めて，PAGE_LENGTH行(デフォ
+     ルトで66)に設定します．PAGE_LENGTHが10以下(で`-F'が3以下)の場合，ヘッ
+     ダとフッタは取り除かれ，入力ファイルの全てのフォームフィード設定は，
+     `-T'オプションが指定されたかのように無視されます．
+
+`-m'
+`--merge'
+     全てのFILEを並行に，それぞれの列に1つに統合し出力します．列にフィッ
+     トさせるには行が長すぎる場合，それは切り詰められます．FILEの(フォー
+     ムフィード設定の)空のページは空の列を生成しますが，STRINGで印は付い
+     たままです．結果として，連続した行の番号付けと，統合されたファイル
+     全体を通じて印が付いた列になります．統合された完全に空のページは，
+     区切りも行番号もありません．デフォルトヘッダは，`yyyy-mm-dd HH:MM
+     <blanks> Page nnnn'になります．中間の空白部分を満たすため，`-h
+     HEADER' を使用できます．
+
+`-n[NUMBER-SEPARATOR[DIGITS]]'
+`--number-lines[=NUMBER-SEPARATOR[DIGITS]]'
+     DIGITS桁の行の番号付けを供給します(デフォルトのDIGITSは5です)．複数
+     列では，出力番号は，それぞれのテキスト列の最初のDIGITS列の位置や，
+     `-m'出力のそれぞれの行のみを占有します．単一列では，出力番号はそれ
+     ぞれの行に`-m'が行うように生成します．デフォルトの行のカウントの開
+     始は，入力ファイルの最初の行で始まります(`--page'オプションや`-N'オ
+     プションと比べて，最初に印刷される行ではありません)．オプション引数
+     NUMBER-SEPARATORは，以下に続くテキストと分けるために行数に後置され
+     る文字です．デフォルトの分離文字はTAB文字です．厳密な意味で，TABは
+     常に単一の列の出力としてのみ出力されます．TAB幅はTAB位置で変化し，
+     例えば，左のMARGINが`-o'オプションで指定された場合です．複数列出力
+     のプロパティは，`equal width of output columns' (POSIX指定)で与えら
+     れます．TAB幅は，最初の列の値で固定され，左のMARGINの値の違いでは変
+     更されません．それは，固定数のスペースが常にNUMBER-SEPARATOR TABの
+     位置に出力されることを意味します．タブ機能は出力位置に依存します．
+
+`-N LINE_NUMBER'
+`--first-line-number=LINE_NUMBER'
+     最初のページに出力される最初の行(ほとんどの場合，入力ファイルの最初
+     ではありません)を，数字のLINE_NUMBERで行のカウントを開始します．
+
+`-o MARGIN'
+`--indent=MARGIN'
+     それぞれの行をMARGINスペースのマージン幅(デフォルトはゼロ)で字下げ
+     します．ページ全体の幅はマージンに`-W/-w'オプションのPAGE_WIDTH設定
+     を加えたものになります．数字付の単一列の出力(`-n'オプションと比べて)
+     では限定されたオーバーフローが発生するかもしれません．
+
+`-r'
+`--no-file-warnings'
+     引数FILEが開けなかったとき，警告メッセージを出力しません．(しかし，
+     終了ステータスはゼロではありません．)
+
+`-s[CHAR]'
+`--separator[=CHAR]'
+     単一文字CHARで列を分けます．CHARのデフォルトは，`-w'と`no
+     character'がなく，`-w'がある場合，TAB文字になります．`-s'が無い場合
+     デフォルトの分離文字は`space'に設定されます．`-s[char]'は，`-w'が設
+     定されていない場合，全ての3列オプション(`-COLUMN'|`-a
+     -COLUMN'|`-m')の行の切り詰めを停止します．それは，POSIX準拠の公式な
+     ものです．
+
+`-S[STRING]'
+`--sep-string[=STRING]'
+     出力の列を分けるためSTRINGを使用します．`-S'オプションは`-s'オプショ
+     ンと異なり，`-W/-w'オプションに対し効果がありません．それは，行の切
+     り詰めや列の整列に効果がありません．`-S'が無く，`-J'がある場合，
+     `pr'は，デフォルトの出力セパレータTABを使用します．`-S'や`-J'が無い
+     場合，`pr'は`space'を使用します(`-S" "'と同じです)．STRING無しで
+     `-S'を使用することは，`-S""'と同じです．`pr'のオプションのいくつか
+     に対し，単一文字のオプション文字に，対応する引数を直後に続ける必要
+     があることに注意してください．空白を間に入れることはできません．
+     `-S/-s'はその中の1つです．`-S "STRING"'とを使用しないでください．
+     POSIXはこれを要求します．
+
+`-t'
+`--omit-header'
+     それぞれのページに，通常のヘッダ[とフッタ]を出力せず，ページの底ま
+     で補充しません(空白行またはフォームフィードを用います)．ページ構造
+     は生成されませんが，入力ファイルで設定されたフォームフィードは維持
+     されます．前もって定義されたページ化は変更されません．`-t'や`-T'は，
+     他のオプションとともに使用すると便利かもしれません．例えば，`-t
+     -e4'は，入力ファイルのTAB文字を4つのスペースに展開しますが，それ以
+     外の変更を行いません．`-t'の使用は`-h'に優先します．
+
+`-T'
+`--omit-pagination'
+     ヘッダ[とフッタ]を出力しません．更に，入力ファイルのフォームフィー
+     ド設定から全て削除します．
+
+`-v'
+`--show-nonprinting'
+     出力できない文字を，8進のバックスラッシュ表記で出力します．
+
+`-w PAGE_WIDTH'
+`--width=PAGE_WIDTH'
+     複数のテキスト列出力に対してのみ，ページ幅をPAGE_WIDTH文字数に設定
+     します(PAGE_WIDTHのデフォルトは72です)．`-s[CHAR]'は，デフォルトペー
+     ジ幅を停止し，あらゆる行は切り詰められ，列は整列されます．十分な長
+     さの行は，列オプションの設定にかかわらずマージされます．PAGE_WIDTH
+     設定が無い場合，おそらく単一列の出力になります．POSIX準拠の公式なも
+     のです．
+
+`-W PAGE_WIDTH'
+`--page_width=PAGE_WIDTH'
+     ページ幅をPAGE_WIDTH文字に設定します．それは列オプションによらず有
+     効です．`-J'が使用されない場合，テキスト行は切り詰められます．3列オ
+     プション(`-COLUMN'，`-a -COLUMN'または`-m')の1つとともに用いた場合，
+     列の整列は常に使用されます．セパレータオプションの`-S'や`-s'は，
+     `-W'オプションに効果はありません．デフォルトは72文字です．`-W
+     PAGE_WIDTH'が無く，あらゆる列オプションが無い場合，行の切り詰めは行
+     われません(下位互換を保つためと，よくある仕事に合わせるために定義さ
+     れています)．それは，`-W 72 -J'と同じです．`-W PAGE_WIDTH'に関係な
+     く，行を溢れさせるのを防ぐため，ヘッダ行は常に切り詰められます．
+
+
+
+File: textutils-ja.info  Node: pr invocation-Footnotes, Up: pr invocation
+
+(1) JMでは，行間に空行を置くとなっています．
+
+
+
+File: textutils-ja.info, Node: fold invocation, Prev: pr invocation, Up: Formatting file contents
+
+`fold': 指定された幅に合わせるため，入力行を折り曲げる
+======================================================
+
+
+`fold'は，それぞれのFILE (`-'は標準入力を意味します)や，与えられない場合
+は標準入力を，長い行を折曲げながら標準出力に書き出します．概要です．
+
+     fold [OPTION]... [FILE]...
+
+デフォルトで，`fold'は80列以上の幅の行を折曲げます．出力は必要な行数に分
+けられます．
+
+`fold'はデフォルトで画面の列を数えます．こうして，タブは1列以上に数えら
+れ，バックスペースは列のカウント数を減らし，そして，キャリッジリターンは
+列をゼロに設定します．
+
+プログラムは，以下のオプションも受け入れます．*Note Common options::,も
+参照してください．
+
+
+`-b'
+`--bytes'
+     列ではなくバイトを数え，そのため，タブ，バックスペースと，キャリッ
+     ジリターンは，他の文字同様にそれぞれ1列カウント数を上げます．
+
+`-s'
+`--spaces'
+     単語の境界で改行します．列は最後の空白の後で，最大の列の長さの前で
+     改行されます．そのような空白行を行が含まない場合，行は最大の行幅で
+     通常通り改行されます．
+
+`-w WIDTH'
+`--width=WIDTH'
+     80の代わりに，WIDTH列の最大行幅を使用します．
+
+
+
+
+File: textutils-ja.info, Node: Output of parts of files, Next: Summarizing files, Prev: Formatting file contents, Up: Top
+
+ファイルの一部の出力
+********************
+
+
+これらのコマンドは，入力の一部を出力します．
+
+* Menu:
+
+* head invocation::             Output the first part of files.
+* tail invocation::             Output the last part of files.
+* split invocation::            Split a file into fixed-size pieces.
+* csplit invocation::           Split a file into context-determined pieces.
+
+
+
+File: textutils-ja.info, Node: head invocation, Next: tail invocation, Prev: Output of parts of files, Up: Output of parts of files
+
+`head': ファイルの最初の部分を出力
+==================================
+
+
+`head'は，それぞれのFILEの最初の部分(デフォルトで10行)出力します．ファイ
+ルが与えられない場合や，`-'というFILEが与えられたときは標準入力から読み
+込みます．概要です．
+
+     head [OPTION]... [FILE]...
+     head -NUMBER [OPTION]... [FILE]...
+
+1つ以上のFILEが指定された場合，`head'は以下から成り立つ1行のヘッダを出力
+します．==> FILE NAME <== それはそれぞれのFILEに対する出力の前になります．
+
+`head'は2つのオプションの書式を受け入れます．新しいものは数字がオプショ
+ンの引数になるもの(`-q -n 1')で，古いものは数字があらゆるオプション文字
+の前にあるもの(`-1q')です．
+
+プログラムは以下のオプションを受け入れます．*Note Common options::,も参
+照してください．
+
+
+`-COUNTOPTIONS'
+     このオプションは，最初に指定された場合のみ認識されます．COUNTは10 
+     進数で，`-c'オプションで単位文字(`b'，`k'，`m')や，行数を意味する
+     `l'，そしてその他のオプション文字(`cqv')が続きます．
+
+`-c BYTES'
+`--bytes=BYTES'
+     最初の行の代わりに，最初のBYTESバイトを出力します．後置される`b'は
+     BYTESの512倍，`k'は1024倍，そして`m'は1048576 倍になります．
+
+`-n N'
+`--lines=N'
+     最初のN行を出力します．
+
+`-q'
+`--quiet'
+`--silent'
+     ファイル名のヘッダを出力しません．
+
+`-v'
+`--verbose'
+     常にファイル名のヘッダを出力します．
+
+
+
+
+File: textutils-ja.info, Node: tail invocation, Next: split invocation, Prev: head invocation, Up: Output of parts of files
+
+`tail': ファイルの最後の部分を出力
+==================================
+
+
+`tail'は，それぞれのFILEの最後の部分(デフォルトで10行)出力します．ファイ
+ルが与えられない場合や，`-'というFILEが与えられたときは標準入力から読み
+込みます．概要です．
+
+     tail [OPTION]... [FILE]...
+     tail -NUMBER [OPTION]... [FILE]...
+     tail +NUMBER [OPTION]... [FILE]...
+
+1つ以上のFILEが指定された場合，`tail'は以下から成り立つ1行のヘッダを出力
+します．==> FILE NAME <== それはそれぞれのFILEに対する出力の前になります．
+
+GNU `tail' は，あらゆる量のデータを出力できます(`tail'の他のバージョンに
+はできないものもあります)．ファイルを逆順にすることはファイルの終りを出
+力する仕事と全く異なるので，`-r'オプション(逆順に出力)もありません．BSD
+`tail' (`-r'を伴うものの1つ)は，最大でそのバッファの大きさまで，通常32k
+のファイルを逆順にすることが可能なだけです．ファイルを逆順にするより信頼
+性のある用途が広い方法は，GNU `tac'コマンドです．
+
+`tail'は2つのオプションの書式を受け入れます．新しいものは数字がオプショ
+ンの引数になるもの(`-n 1')で，古いものは数字があらゆるオプション文字の前
+にあるもの(`-1'や`+1')です．
+
+あらゆるオプション引数が，`+'で始まる数字Nの場合，`tail' は，ファイルの
+終りの代わりに，それぞれのファイルの最初からN番目の項目で出力を開始しま
+す．
+
+プログラムは以下のオプションを受け入れます．*Note Common options::,も参
+照してください．
+
+
+`-COUNT'
+`+COUNT'
+     このオプションは，最初に指定された場合のみ認識されます．COUNTは10 
+     進数で，`-c'オプションで単位文字(`b'，`k'，`m')や，行数を意味する
+     `l'，そしてその他のオプション文字(`cfqv')が続きます．
+
+`-c BYTES'
+`--bytes=BYTES'
+     最後の行の代わりに，最後のBYTESバイトを出力します．後置される`b'は
+     BYTESの512倍，`k'は1024倍，そして`m'は1048576 倍になります．
+
+`-f'
+`--follow[=HOW]'
+     おそらくファイルが増えているので，ファイルの終りで，それ以上の文字
+     を読み込むことを永久に繰り返します．このオプションは，パイプから読
+     み込まれているとき，無視されます．1ファイル以上が与えられた場合，出
+     力されてるファイルを示すため，異なるファイルから出力を得るときはい
+     つでも，`tail'はヘッダを出力します．
+
+     このオプションで，ファイルを追跡する方法を指定する方法が2つあります
+     が，その違いは，続くファイルが削除されたか名前を変更されたときのみ，
+     通知可能です．リンクが無くなった後でも，増え続けるファイルの終りの
+     追跡を続けたい場合は，`--follow=descriptor'を使用してください．これ
+     はデフォルトの動作ですが，回転(rotate)される(削除や名前の変更がなさ
+     れ，再び開かれる)ログファイルを追跡しているときは不便です．その場合，
+     他のプログラムにより削除され再作成されたかどうかを周期的に見て，再
+     び開かれる指名されたファイルを追跡するため，`--follow=name'を使用し
+     てください．
+
+     使用している方法にかかわらず，追跡しているファイルが縮まっていると
+     決定された場合，`tail'はfileが切り詰められたことを告げるメッセージ
+     を出力し，新たに決定された終端からファイルの終りを再追跡しはじめま
+     す．
+
+     ファイルが削除されたとき，`tail'の動作は，名前で続けるか記述子で続
+     けるかに依存します．名前で続けるとき，`tail'はファイルが削除された
+     ことと，その効果にメッセージを与えることが検出でき，`--retry'が指定
+     されている場合，ファイルが再び現れたかどうかを見るため，周期的な調
+     査を続けるでしょう．記述子で続けるとき，`tail'はファイルのリンクが
+     切れたり名前が変更されたことを検出せず，メッセージを発しません．ファ
+     イルは既に元の名前でアクセスできませんが，まだ増加しているかもしれ
+     ません．
+
+     オプション値の`descriptor'と`name'はオプションの長い形式でのみ指定
+     でき，`-f'では指定できません．
+
+`--retry'
+     このオプションは，名前で続けるときのみ意味があります．このオプショ
+     ンが無い場合，`tail'が，存在していない，またはそれ以外のアクセスで
+     きないファイルに遭遇したとき，それはその事実を報告し再び調査しませ
+     ん．
+
+`--sleep-interval=N'
+     繰り返しの間の待ち時間の秒数を変更します(デフォルトは1)．待っている
+     間，指定された全てのファイルは大きさが変ったかどうか調査されます．
+
+`--pid=PID'
+     名前または記述子で続ける場合，全てのFILE引数に唯一書き込んでいるプ
+     ロセスID PIDを指定できます．そして，プロセスが終了した少し後で，
+     `tail'も終了します．これは書き込んでいるものと`tail'プロセスが同じ
+     マシンで働いている場合のみ正確に働きます．例えば，ファイルにビルド
+     の出力を保存したり，ファイルが大きくなるのを見たりするため，`make' 
+     と`tail'を以下のように呼び出し，ビルドが完了したとき`tail'の処理は
+     終了します．このオプションが無い場合，`tail -f'プロセスを自分でキル
+     する必要があります．$ make >& makerr & tail --pid=$! -f makerr 使用
+     中でない，または，`tail'されるファイルに書き込んでいるプロセスに対
+     応しないPIDを指定した場合，`tail'はあらゆるFILEが増加するのを停止す
+     る前に終了する，または，実際に書き込んでいるものが終了した後，しば
+     らくしてから終了します．
+
+`--max-consecutive-size-changes=N'
+     このオプションは，名前で続けるときのみ意味があります．削除されたり，
+     名前を変更されたりした後でさえ，速いペースで増加し続けるファイルの
+     記述子で続けている`tail'の長さを制御するために使用してください．ファ
+     イルに対し，サイズ変更が連続してN検出した後で，ファイル名が，以前と
+     同じデバイス/inode番号の対で対応されているかどうか決定するため，ファ
+     イルを`open'/`fstat'します．デフォルト値は，`tail --help'の出力を参
+     照してください．
+
+`--max-unchanged-stats=N'
+     名前でファイルを`tail'しているとき，同じ大きさのままで，繰り返しが
+     連続して何度もある場合，ファイル名が，以前と同じデバイス/inode番号
+     の対で対応されているかどうか決定するため，ファイルを`open'/`fstat'
+     します．回転(rotate)されているログファイルを続けるとき，前回に回転
+     した行を`tail'が出力するときと，新しいログファイルで蓄積された行を
+     出力するときの間は，おそらく数秒になります．デフォルト値は`tail
+     --help'の出力を参照してください．このオプションは，名前で続けている
+     ときのみ意味があります．
+
+`-n N'
+`--lines=N'
+     最後のN行出力します．
+
+`-q'
+`-quiet'
+`--silent'
+     ファイル名のヘッダを出力しません．
+
+`-v'
+`--verbose'
+     常にファイル名のヘッダを出力します．
+
+
+
+
+File: textutils-ja.info, Node: split invocation, Next: csplit invocation, Prev: tail invocation, Up: Output of parts of files
+
+`split': ファイルを固定サイズの部分に分割
+=========================================
+
+
+`split'は，INPUT(INPUTが与えられなかったり，`-'の場合は標準入力)の連続し
+たセクションを含む出力ファイルを生成します．概要です．
+
+     split [OPTION] [INPUT [PREFIX]]
+
+デフォルトで，`split'はINPUTの1000行(または，最後のセクションは残り)を，
+それぞれの出力ファイルに書き込みます．
+
+出力ファイルの名前はPREFIX (デフォルトは`x')から成り立ち，`aa'，`ab'等の
+文字の集合が続き，それは，出力ファイルをファイル名の順番でソートして結合
+したものが，元の入力ファイルを生成するようにするためです．出力ファイルが
+676以上必要な場合，`split'は`zaa'，`zab'等を使用します．)
+
+このプログラムは以下のオプションも受け入れます．*Note Common options::,
+も参照してください．
+
+
+`-LINES'
+`-l LINES'
+`--lines=LINES'
+     INPUTのLINES行を，それぞれの出力ファイルに書き込みます．
+
+`-b BYTES'
+`--bytes=BYTES'
+     INPUTの最初のBYTESバイトを，それぞれの出力ファイルに書き込みます．
+     `b'の後置はBYTESの512倍，`k'は1024倍，そして`m'は1048576倍です．
+
+`-C BYTES'
+`--line-bytes=BYTES'
+     BYTESバイトを越えないINPUTの完全な行を，できるだけ多くそれぞれの出
+     力ファイルに書き込みます．BYTESバイトより長い行に対しては，行の
+     BYTESバイトより少ない部分が残るまで，それぞれの出力ファイルにBYTES
+     バイト書き込み，それから通常に続けます．BYTESは`--bytes'オプション
+     に対するものと同じ書式です．
+
+`--verbose'
+     それぞれの出力ファイルが開かれる直前に，標準エラーに状態を書き込み
+     ます．
+
+
+
+
+File: textutils-ja.info, Node: csplit invocation, Prev: split invocation, Up: Output of parts of files
+
+`csplit': ファイルを文脈で決定された部分に分割
+==============================================
+
+
+`csplit'は，INPUT (INPUTが`-'の場合は標準入力)の部分を含む，ゼロ以上の出
+力ファイルを作成します．概要です．
+
+     csplit [OPTION]... INPUT PATTERN...
+
+出力ファイルの内容は，後で詳述するPATTERN引数で決定されます．PATTERN引数
+が，入力ファイルに存在しない行を参照する場合，エラーが発生します(例えば，
+残っている行が与えられた正規表現に一致しない場合)．全てのPATTERNが一致し
+た後，あらゆる残りの入力は，1つの最後の出力ファイルにコピーされます．
+
+デフォルトで，`csplit'は，それぞれの出力ファイルが作成された後，バイト数
+を書き込みます．
+
+PATTERN引数の形式は以下の通りです．
+
+
+`N'
+     N行までの入力を含む出力ファイルを作成しますが，N行は含みません．繰
+     り返し数が続く場合，それぞれの繰り返しに対し，入力ファイルの次の
+     LINE行を含む出力ファイルも作成します．
+
+`/REGEXP/[OFFSET]'
+     REGEXPに一致するものを含む入力ファイルの次の行まで現在の行(ただし，
+     それは含まれない)を含む出力ファイルを作成します．オプションのOFFSET
+     は，`+'または`-'に正の整数が続きます．与えられた場合，一致行までの
+     入力に，OFFSET加えた，または引いた入力まで出力ファイルに書き出され，
+     その後の行は入力の次の部分になります．
+
+`%REGEXP%[OFFSET]'
+     前の形式に似ていますが，出力ファイルを作成しないので，入力ファイル
+     の部分は効率的に無視されます．
+
+`{REPEAT-COUNT}'
+     前のパターンをREPEAT-COUNT回追加して繰り返します．REPEAT-COUNTは正
+     の整数，またはアスタリスクになり，それは入力が使い果たされるのに必
+     要なだけ繰り返すことを意味します．
+
+出力ファイル名は，前置(デフォルトで`xx')とそれに続く接尾子から成り立ちま
+す．デフォルトで接尾子は2桁の10進数で，`00'から`99'まで順番に上昇します．
+あらゆる場合で，ファイル名の順番でソートされた出力ファイルを連結すると，
+元の入力ファイルを生成します．
+
+デフォルトで，`csplit'がエラーや，ハングアップ，中断，終了，または終端シ
+グナルを検出した場合，それまでに存在する作成されたあらゆる出力ファイルを
+削除します．
+
+プログラムは以下のオプションを受け入れます．*Note Common options::,も参
+照してください．
+
+
+`-f PREFIX'
+`--prefix=PREFIX'
+     出力ファイルの接尾子として，PREFIXを使用します．
+
+`-b SUFFIX'
+`--suffix=SUFFIX'
+     出力ファイル名の接尾子としてSUFFIXを使用します．このオプションが指
+     定された場合，接尾子の文字列は，正確に1つの`printf(3)'形式の変換で
+     の指定を含む必要があり，おそらく，書式指定のフラグ，フィールドの幅，
+     正確な指定，または，これら全ての修飾語を含みます．フォーマット文字
+     は，2進の整数の引数を可読なものに変換する必要があります．このため，
+     `d'，`i'，`u'，`o'，`x'，そして`X'の変換は可能です．完全なSUFFIXは，
+     順番にそれぞれの個別な出力ファイルに対し，ファイル名の接尾子を形成
+     するため，(現在の出力ファイル数とともに) `sprintf(3)'に与えられます．
+     このオプションを使用した場合，`--digits'オプションは無視されます．
+
+`-n DIGITS'
+`--digits=DIGITS'
+     デフォルトの2の代わりにDIGITS桁の長さの数字を含む出力ファイル名を使
+     用します．
+
+`-k'
+`--keep-files'
+     エラーが検出された場合でも出力ファイルを削除しません．
+
+`-z'
+`--elide-empty-files'
+     長さゼロの出力ファイルの生成を抑制します．(入力ファイルの，部分の区
+     切りがそれぞれの部分の区切りの最初の行に印を付ける場合，このオプショ
+     ンを使用しなければ，最初の出力ファイルは一般に，長さゼロのファイル
+     になります．) 出力ファイルの順番は，このオプションが指定されている
+     ときでさえ，0から開始し，常に連続して実行します．
+
+`-s'
+`-q'
+`--silent'
+`--quiet'
+     出力ファイルの大きさを出力しません．
+
+
+
+
+File: textutils-ja.info, Node: Summarizing files, Next: Operating on sorted files, Prev: Output of parts of files, Up: Top
+
+ファイルの要約
+**************
+
+
+これらのコマンドは，ファイルの内容全体を表現するいくつかの数字を生成しま
+す．
+
+* Menu:
+
+* wc invocation::               Print byte, word, and line counts.
+* sum invocation::              Print checksum and block counts.
+* cksum invocation::            Print CRC checksum and byte counts.
+* md5sum invocation::           Print or check message-digests.
+
+
+
+
+File: textutils-ja.info, Node: wc invocation, Next: sum invocation, Prev: Summarizing files, Up: Summarizing files
+
+`wc': バイト，単語，行数を出力
+==============================
+
+
+`wc'は，それぞれの与えられたFILEや，与えられなかった場合や`-'のFILEに対
+し，バイト数，空白で区切られた単語，そして改行を数えます．概要です．
+
+     wc [OPTION]... [FILE]...
+
+`wc'は，それぞれのファイルに対し，数えたものを1行出力し，ファイルが引数
+として与えられた場合，カウントに続けてファイル名を出力します．1つ以上の
+FILEが与えられた場合，`wc'は，ファイル名`total'と共に，累積カウントを最
+終行に出力します．カウントは，以下の順序で出力されます．改行，単語，バイ
+トです．デフォルトで，それぞれのカウントは，数字とファイル名の行が列にう
+まく並ぶように，右寄せで，7バイトフィールドで，それぞれのフィールドの間
+にスペースを入れて出力します．しかし，POSIXは列を分けるために，正確に1つ
+のスペースがあることを要求します．`POSIXLY_CORRECT'環境変数を設定するこ
+とで，`wc'を出力形式がPOSIXで義務化されているようにさせることができます．
+
+デフォルトで，`wc'は3つのカウントすべてを出力します．オプションで，出力
+したいカウントのみを指定することができます．オプションは，前に与えられた
+ものを元に戻すことはできません．そのため，以下のようにした場合を考えます．
+
+     wc --bytes --words
+
+これは，バイトカウントと単語のカウントの両方を出力します．
+
+`--max-line-length'オプションを用いた場合，`wc'はファイル毎の最長の行の
+長さを出力し，1つ以上のファイルがある場合，それらの長さの(合計ではなく)
+最大を出力します．
+
+プログラムは以下のオプションも受け入れます．*Note Common options::,も参
+照してください．
+
+
+`-c'
+`--bytes'
+`--chars'
+     バイトカウントのみ出力します．
+
+`-w'
+`--words'
+     単語カウントのみ出力します．
+
+`-l'
+`--lines'
+     改行カウントのみ出力します．
+
+`-L'
+`--max-line-length'
+     最長行の長さのみ出力します．
+
+
+
+
+File: textutils-ja.info, Node: sum invocation, Next: cksum invocation, Prev: wc invocation, Up: Summarizing files
+
+`sum': チェックサムとブロック数を出力
+=====================================
+
+
+`sum'は，与えられたそれぞれのFILE，または，与えられない場合や`-'のファイ
+ルが与えられた場合は標準入力の16ビットのチェックサムを計算します．概要で
+す．
+
+     sum [OPTION]... [FILE]...
+
+`sum'は，それぞれのFILEのチェックサムに続けて，ファイルのブロック数を(切
+り上げで)出力します．1つ以上のFILEが与えられた場合，ファイル名も出力され
+ます(デフォルト)．(`--sysv'オプションを指定した場合，少なくとも1つのファ
+イル引数があるときは，対応するファイル名が出力されます．)
+
+デフォルトで，GNU `sum'は，BSD `sum'と互換性のあるアルゴリズムを用いて計
+算し，ファイルサイズを1024バイトブロックの単位で出力します．
+
+プログラムは以下のオプションも受け入れます．*Note Common options::,も参
+照してください．
+
+
+`-r'
+     デフォルト(BSD互換)のアルゴリズムを使用します．このオプションは，
+     System V `sum'との互換性も含みます．`-s'を与えない限り，効果はあり
+     ません．
+
+`-s'
+`--sysv'
+     System V `sum'のデフォルトと互換のアルゴリズムを使用して，チェック
+     サムを計算し，512バイトブロックの単位でファイルサイズを出力します．
+
+
+`sum'は，互換性のために提供されています．`cksum'プログラム(次のセクショ
+ンを参照)は，新しいアプリケーションでは望ましいです．
+
+
+
+
+File: textutils-ja.info, Node: cksum invocation, Next: md5sum invocation, Prev: sum invocation, Up: Summarizing files
+
+`cksum': CRCチェックサムとバイトカウントを出力
+==============================================
+
+
+`cksum'は，与えられたそれぞれのFILE，または，与えられない場合や`-'のファ
+イルが与えられた場合は標準入力の周期的な冗長性の調査(CRC)のチェックサム
+を計算します．概要です．
+
+     cksum [OPTION]... [FILE]...
+
+`cksum'は，ファイルのバイト数と一緒に，それぞれのファイルに対し，CRCチェッ
+クサムと，引数が与えられていない場合以外はファイル名を出力します．
+
+`cksum'は，通常，信用できない手段(例えば，ネットニュース)で転送されたファ
+イルが切り詰められていないか，受信したファイルの`cksum'出力と元ファイル
+の`cksum'出力(通常は配布物で与えられます)を比較することで確認するために
+使用します．
+
+CRCアルゴリズムは，POSIX.2標準で指定されました． BSDやSystem V `sum'アル
+ゴリズムとは互換性がありません(前のセクションを参照してください)．それは
+より強固です．
+
+オプションは`--help'と`--version'だけです．*Note Common options::.
+
+
+
+File: textutils-ja.info, Node: md5sum invocation, Prev: cksum invocation, Up: Summarizing files
+
+`md5sum': メッセージダイジェストの出力と調査
+============================================
+
+
+`md5sum'は，それぞれ指定されたFILEに対し，128-bitチェックサム(または
+"fingerprint"，または"message-digest")を計算します．FILEが`-'で指定され
+たり，ファイルが与えられていない場合は，`md5sum'は標準入力のチェックサム
+を計算します．`md5sum'は，ファイルとチェックサムが一貫しているかどうか決
+定することも可能です．概要です．
+
+     md5sum [OPTION]... [FILE]...
+     md5sum [OPTION]... --check [FILE]
+
+それぞれのFILEに対し，`md5sum'は，MD5チェックサム，入力ファイルがバイナ
+リかテキストかを示すフラグ，そしてファイル名を出力します．FILEが無い，ま
+たは`-'として指定されている場合，標準入力を読み込みます．
+
+プログラムは以下のオプションも受け入れます．*Note Common options::,も参
+照してください．
+
+
+`-b'
+`--binary'
+     全ての入力ファイルをバイナリとして扱います．このオプションは，Unix
+     システムではバイナリとテキストでファイルに差が無いので効果がありま
+     せん．このオプションは，内部と外部での文字表示が異なるシステムでは
+     便利です．MS-DOSとMS-Windowsでは，これはデフォルトです．
+
+`-c'
+`--check'
+     ファイル名とチェックサム情報を，単一のFILE(または，FILEが指定されな
+     い場合は標準入力)から読み込み，それぞれの名前のファイルと対応する
+     チェックサムデータが一貫しているかどうか報告します．`md5sum'のこの
+     モードでの入力は，通常前回の出力で，`md5sum'の実行でチェックサムが
+     生成したものです．それぞれの入力の有効な行は，MD5チェックサムから成
+     り立ち，バイナリ/テキストフラグと，ファイル名です．バイナリファイル
+     は，`*'で，テキストは` '印が付きます．それぞれのそのような行に対し，
+     `md5sum'は，指名されたファイルを読み込み，そのMD5チェックサムを計算
+     します．そして，計算されたメッセージダイジェストが，ファイル名を持
+     つ行の1つと一致しない場合，ファイルはテストに失敗したことをメモされ
+     ます．それ以外の場合，ファイルは調査を通過します．デフォルトで，そ
+     れぞれの有効な行に対し，指名されたファイルが調査を通過したかどうか
+     を示す1行を，標準出力に書かれます．全ての調査の実行後，失敗があった
+     場合，警告を標準エラーに発行します．出力を抑制するために，
+     `--status'オプションを使用してください．リストアップされたファイル
+     に，開いたり読み込んだりでできないものがある場合，有効な行が関連す
+     るファイルとMD5チェックサムに一貫性が無い場合，または，有効な行が見
+     つからない場合，`md5sum'はゼロ以外のステータスで終了します．それ以
+     外の場合は，正しく終了します．
+
+`--status'
+     このオプションは，チェックサムの照合時のみ便利です．チェックサムを
+     照合するとき，デフォルトのファイルに対し1行の診断を生成せず，あらゆ
+     る失敗を要約する警告を出力しません．ファイルを開くあるいは読み込む
+     際の失敗は，標準エラーに個別の診断を喚起します．リストされたファイ
+     ルがすべて読み込み可能で，対応するMD5チェックサムと一貫している場合，
+     正しく終了します．それ以外の場合，失敗があることを示すステータスコー
+     ドで終了します．
+
+`-t'
+`--text'
+     全ての入力ファイルを，テキストファイルとして扱います．このオプショ
+     ンは`--binary'の反対です．
+
+`-w'
+`--warn'
+     チェックサムを照合するとき，不適切に書式化されたMD5チェックサム行に
+     ついて警告します．このオプションは，入力の調査で，全てではなくいく
+     つかの行が有効な場合のみ便利です．
+
+
+
+
+File: textutils-ja.info, Node: Operating on sorted files, Next: Operating on fields within a line, Prev: Summarizing files, Up: Top
+
+ソートされたファイルの処理
+**************************
+
+
+これらのコマンドは，ソートされたファイルで働く(あるいはそれを生成する)コ
+マンドです．
+
+* Menu:
+
+* sort invocation::             Sort text files.
+* uniq invocation::             Uniquify files.
+* comm invocation::             Compare two sorted files line by line.
+* ptx invocation::              Produce a permuted index of file contents.
+* tsort invocation::            Topological sort.
+
+
+
+
+File: textutils-ja.info, Node: sort invocation, Next: uniq invocation, Prev: Operating on sorted files, Up: Operating on sorted files
+
+`sort': テキストファイルをソート
+================================
+
+
+`sort'は，与えられたファイル，または与えられない場合や，`-'のFILEからの
+全ての行を，ソート，統合，または比較します．デフォルトで，`sort'は結果を
+標準出力に書き出します．概要です．
+
+     sort [OPTION]... [FILE]...
+
+`sort'は，処理時に3つのモードがあります．ソート(デフォルト)，統合，そし
+てソートされてることの調査です．以下のオプションで処理モードを変更します．
+
+
+`-c'
+     与えられたファイルが，すでにソートされているかどうか調査します．全
+     てがソートされていない場合，エラーメッセージを出力し，1のステータス
+     で終了します．それ以外の場合は正常に終了します．
+
+`-m'
+     与えられたファイルを，グループ化してソートすることで，統合します．
+     それぞれの入力ファイルは，個別にソートされている必要があります．そ
+     れは常に，統合ではなくソートのために働きます．統合は，それが動作す
+     る場合，より速いため提供されています．
+
+
+行の対が，以下のように比較されます．キーフィールドが指定された場合，
+`sort'は，それぞれのフィールドの組を，コマンドラインで指定された順番で，
+関連する順序オプションで，差が見つかるまで，またはフィールドの残りが無く
+なるまで比較します．指定されない場合は，全てに比較に，`LC_COLLATE'ロケー
+ルで指定された，文字の対照する順番を使用します．
+
+大域的なオプション`Mbdfinr'が与えられて，キーフィールドが指定されていな
+い場合，`sort'は大域的なオプションに従い，行全体を比較します．
+
+最終的に，全てのキーが同じとき(または，順序オプションが全く指定されてい
+ない場合)，最後の手段として，`sort'は行全体を比較します．最後の手段は，
+`-r'の大域的なオプションを尊重して比較します．`-s' (stable)オプションは，
+この最後の手段では利用できず，それは，全てのフィールドの比較が同じ行は，
+元の相対的な順序のままにするためです．フィールド，または，大域的なオプショ
+ンが指定されない場合，`-s'は効果がありません．
+
+GNU `sort' は，(全てのGNUユーティリティで指定されるように)入力行の長さの
+制限や，行で許可されるバイト数の限界がありません．更に，入力ファイルの最
+終バイトが改行でない場合，GNU `sort'は，黙ってそれを供給します．行の後ろ
+の改行は，比較の目的では行の一部です．例えば，ASCIIロケールでオプション
+を用いない場合，ASCIIの対照の順序では，タブは改行の前にあるので，タブで
+始まる行は空の行の前に来ます．
+
+あらゆるエラーで，`sort'は`2'のステータスで終了します．
+
+環境変数`TMPDIR'が設定されている場合，`sort'は，その変数を`/tmp'の代わり
+の一時ファイルのためのディレクトリとして使用します．`-T TEMPDIR'オプショ
+ンは，順序的に環境変数に優先します．
+
+以下のオプションは，出力行の順序に影響します．それらは，大域的，またはキー
+フィールドの一部として指定可能です．キーフィールドが指定されていない場合，
+大域的なオプションは行全体の比較に対して適用されます．それ以外では，大域
+的なオプションは，それ自身オプションが指定されていないキーフィールドに継
+承されます．`-b'，`-d'，`-f'，そして`-i'オプションは，`LC_CTYPE'ロケール
+に従い，文字を分類します．
+
+
+`-b'
+     それぞれの行でソートするキーを探すとき，前の空白を無視します．
+
+`-d'
+     "phone directory"の順序でソートします．ソート時に，文字，数字，そし
+     て空白以外の全ての文字は無視されます．
+
+`-f'
+     ソート時に，小文字を大文字と同じに扱い，例えば，`b'と`B'は同等にソー
+     トされます．
+
+`-g'
+     数値的なソートをし，それには，それぞれの行のプレフィクスを倍精度浮
+     動小数点の数に変換するため，標準C関数`strtod'を使用します．これで，
+     `1.0e-34'と`10e100'のような浮動小数点の数を，科学的な表記方で指定で
+     きます．オーバーフローや，アンダーフロー，変換エラーは報告しません．
+     以下の対照の順序を使用します．
+
+        * 数字で始まらない行(全て同じと考えます)．
+        * NaNs("Not a Number"値で，IEEE浮動小数点の評価)一貫しているがマ
+          シンに依存した順番．
+        * 負の無限大．
+        * 数字の順番に並んだ有限数(-0と+0は等しい)．
+        * 正の無限大．
+
+     他に選択肢が無い場合のみ，このオプションを使用してください．`-n'よ
+     りはるかに遅く，浮動小数点に変換するとき，情報を失うはずです．
+
+`-i'
+     印刷不可能な文字を無視します．
+
+`-M'
+     あらゆる量の空白と，以下に月の名前の省略が続くものから成り立つ，最
+     初の文字列は，大文字に覆われ，`JAN' < `FEB' < ... < `DEC'の順に比較
+     されます．無効な名前は，有効な名前の下になります．`LC_TIME' ロケー
+     ルは，月の綴を決定します．
+
+`-n'
+     数値的なソートです．数字でそれぞれの行を開始します．特に，オプショ
+     ンの空白，オプションの`-'記号，そして，1000で区切られたり，小数点文
+     字とゼロ以上の桁を続けることが可能な，ゼロ以上の桁から成り立ちます．
+     `LC_NUMERIC'ロケールで，小数点文字と1000区切りを指定します．
+
+     `sort -n'は，浮動小数点の数を表現する文字列を比較するため，慣習的と
+     は思われない手法を使用します．最初にそれぞれの文字列をC `double'形
+     式に変換して，それらの値を比較するのではなく，ソートは，2つの文字列
+     の小数点文字を一列に並べて，一度に文字の列を比較します．このアプロー
+     チを使う1つの利益は速度です．実際には，それは，2つの対応する文字列
+     を倍精度浮動小数点に(または，文字列を整数に)変換し，倍精度浮動小数
+     点を比較するより効率的です．更に，精度に対応する損失はありません．
+     それぞれの文字列を比較前に`double'に変換することは，ほとんどのシス
+     テムで16桁程度に精度が制限されるでしょう．
+
+     前置される`+'も，指数表記も認識されません．そのような文字列を数値的
+     に比較するために，`-g'オプションを使用してください．
+
+`-r'
+     比較の結果を逆順にし，より大きなキー値を持つ行が，出力で後ろになる
+     代わりに，より早く現われるようになります．
+
+その他のオプションは以下の通りです．
+
+`-o OUTPUT-FILE'
+     標準出力の代わりに，OUTPUT-FILEに出力を書き出します．OUTPUT-FILEが
+     入力ファイルの1つの場合，`sort'はそれを，ソート前に一時ファイルにコ
+     ピーし，OUTPUT-FILEに出力を書き出します．
+
+`-t SEPARATOR'
+     それぞれの行からソート行を検索するとき，フィールドセパレータとして，文字
+     SEPARATORを使用します．デフォルトで，フィールドは，空白でない文字
+     と空白文字の間の空の文字列で分離されます．すなわち，入力行` foo
+     bar'が与えられた場合，`sort'はそれを，フィールド` foo'と
+     ` bar'に分離します．フィールドセパレータは，フィールドの前やフィー
+     ルドの後の部分とは考えられません．
+
+`-u'
+     デフォルトの場合や`-m'オプションに対し，比較が等しい行の順序の最初
+     のみを出力します．`-c'オプションに対し，比較が等しい連続した行の対
+     が無いことを調査します．
+
+`-k POS1[,POS2]'
+     ソートフィールドを指定するための，POSIXの推薦されるオプションです．
+     フィールドは，POS1とPOS2(または，POS2が省略された場合は行末)の間の
+     行の部分から成り立つ，全てを*包括*します．フィールドと文字の位置は，
+     1から番号付けされます．そのため，2番目のフィールドをソートするため，
+     `-k 2,2'を使用してください．以下により多くの例があります．
+
+`-z'
+     入力を行のセットとして扱い，ASCII LF (Line Feed)の代わりにゼロバイ
+     ト(ASCII NUL (Null)文字)で終端します．このオプションは，任意のパス
+     名を(ラインフィード文字を含んでいても)確実に処理するため，`perl -0'
+     や，`find -print0'と`xargs -0'と組み合わせると便利です．
+
+`+POS1[-POS2]'
+     時代遅れで，ソートフィールドを指定するための伝統的なオプションです．
+     フィールドは，行のPOS1とPOS2(または，POS2が省略された場合は行末)を*
+     含まない*間から成り立ちます．フィールドと文字の位置は，0から番号付
+     けされます．以下を見てください．
+
+
+更に，GNU `sort'が正確に1つの引数で呼び出されたとき，オプション`--help'
+と`--version'は認識されます．*Note Common options::.
+
+歴史的な(BSDとSystem Vの)`sort'の実装は，いくつかのオプションの解釈で異
+なり，特に，`-b'，`-f'と`-n'です．GNU `sort'は，POSIXの動作に従い，それ
+は通常(常にではない!)System V の動作に似ています．POSIXによると，`-n'は，
+もはや`-b'を暗示しません．一貫性のため，`-M'も同様に変更されました．これ
+は，分かりにくい場合のフィールドの指定で，文字の位置の意味に影響するかも
+しれません．唯一の訂正は，明示的に`-b'を加えることです．
+
+`-k'や`+'オプションを用いたソート時のフィールド指定の位置は，`F.C'形式を
+持ち，Fは使用するフィールド数で，Cは(`+POS'に対する)フィールドの最初から，
+または，(`-POS'に対する)前のフィールドの終りからの，最初の文字数です．
+`.C'が省略された場合，フィールドの最初の文字を用います．`-b'オプションが
+指定された場合，指定したフィールドの`.C' の部分は，(`+POS'に対する)フィー
+ルドの最初の空白ではない文字から，または，(`-POS'に対する)前のフィールド
+から続く最初の空白ではない文字から数えます．
+
+ソートキーオプションは，オプション文字`Mbdfinr'を加えることが可能で，そ
+の場合，大域的な順序オプションは，特定のフィールドに使用されません．`-b'
+オプションは，指定したフィールドの`+POS'と`-POS'の部分の，一方または両方
+に独立に適用され，大域的なオプションを継承する場合，両方に適用されます．
+キーは複数のフィールドに跨ることができます．
+
+ここに，様々なオプションの組合せを紹介する例があります．その中で，ソート
+キーを指定するためのPOSIX `-k'オプションが，時代遅れの`+POS1-POS2'構文の
+代わりに使用されています．
+
+
+   * 下降的な(逆順の)数の順序でソートします．
+
+          sort -nr
+
+     アルファベット順に，最初と2番目のフィールドを除いてソートします．こ
+     れは，フィールド3から始まり，それぞれの行の終りまで続く文字で構成さ
+     れた，単一のキーを使用します．
+
+          sort -k3
+
+   * 2番目のフィールドを数値的にソートし，フィールド5の3番目と4番目の文
+     字のアルファベットでソートすることで，対等なものを解決します．フィー
+     ルド分離に`:'を使用します．
+
+          sort -t : -k 2,2n -k 5.3,5.4
+
+     `-k 2,2'の代わりに`-k 2'と書いた場合，`sort'は2番目のフィールドで始
+     まり，行の終りまで続く全ての文字を，主要な*数値*キーとして使用する
+     ことに注意してください．アプリケーションのほとんど大多数に対し，数
+     値として1フィールド以上に跨って扱うキーは，期待したものではないでしょ
+     う．
+
+     また，`n'の修飾は，最初のキーに対し，フィールドの終りを指定するもの
+     に適用されることに注意してください．それは，`-k 2n,2'や`-k 2n,2n'を
+     指定することと同じです．全ての修飾は，`b'が関連する*フィールド*に適
+     用されることを期待し，修飾文字がフィールドの最初と/または，キー指定
+     のフィールドの終りに適用されるかどうかに依存しません．
+
+   * 5番目のフィールドでパスワードファイルをソートし，あらゆる前置される
+     空白を無視します．フィールド5が等しい値の行を，フィールド3のユーザ
+     IDでソートします．
+
+          sort -t : -k 5b,5 -k 3,3n /etc/passwd
+
+     代わりに，大域的な数値の修飾`-n'を使用します．
+
+          sort -t : -n -k 5b,5 -k 3,3 /etc/passwd
+
+   * 大文字小文字を識別するタグファイルを生成します．
+          find src -type f -print0 | sort -t / -z -f | xargs -0 etags --append
+
+     この場合，`-print0'，`-z'と`-0'の使用は，Line Feed 文字を含むパス名
+     がソート処理で分かれないようにします．
+
+     最後に，前後の空白を無視するため，`b'修飾を最初のキーに対しフィール
+     ドの終りの指定に適用できます．
+
+          sort -t : -n -k 5b,5b -k 3,3 /etc/passwd
+
+     または，大域的な`-b'修飾を`-n'の代わりに使用し，2番目のキー指定に
+     `n'を明示します．
+
+          sort -t : -b -k 5,5 -k 3,3n /etc/passwd
+
+
+
+
+
+
+File: textutils-ja.info, Node: uniq invocation, Next: comm invocation, Prev: sort invocation, Up: Operating on sorted files
+
+`uniq': ファイルのユニーク化
+============================
+
+
+`uniq'は与えられたファイル，または与えられない場合や`-'のINPUT名に対し，
+ユニークな行を書き出します．概要です．
+
+     uniq [OPTION]... [INPUT [OUTPUT]]
+
+デフォルトで，`uniq'はソートされたファイルのユニークな行を出力し，すなわ
+ち，一意に識別可能な行以外を全て削除します．オプションで，そうする代わり
+に，1度しか現われない行を表示したり，1度以上現われる行を表示したりできま
+す．
+
+入力ファイルはソートされている必要があります．入力がソートされていない場
+合，おそらく`sort -u'を使用したいと思います．
+
+OUTPUTファイルが無い場合，`uniq'は標準出力に書き出します．
+
+このプログラムは，以下のオプションも受け入れます．*Note Common
+options::, も参照してください．
+
+
+`-N'
+`-f N'
+`--skip-fields=N'
+     ユニークさを調査する前に，それぞれの行のNフィールドスキップします．
+     フィールドは，少なくとも1対上のスペースやタブで区切られた，非スペー
+     ス，非タブ文字の並びです．
+
+`+N'
+`-s N'
+`--skip-chars=N'
+     ユニークさの調査の前に，N文字スキップします．フィールドと文字のスキッ
+     プオプションを両方とも使用した場合，フィールドが最初にスキップされ
+     ます．
+
+`-c'
+`--count'
+     それぞれの行で同じものが発生した回数を出力します．
+
+`-i'
+`--ignore-case'
+     行の比較時に大文字小文字の違いを無視します．
+
+`-d'
+`--repeated'
+     重複する行のみを出力します．
+
+`-D'
+`--all-repeated'
+     全ての重複する行で，重複する行のみを出力します．このオプションは，
+     主に他のオプションと組み合わせると便利で，例えば，大文字小文字を無
+     視したり，選択したフィールドのみを比較する場合です．これは，GNUの拡
+     張です．
+
+`-u'
+`--unique'
+     ユニークな行のみ出力します．
+
+`-w N'
+`--check-chars=N'
+     (指定されたあらゆるフィールドと文字をスキップした後) それぞれの行の
+     N文字比較します．デフォルトで，行の残りが比較されます．
+
+
+
+
+
+File: textutils-ja.info, Node: comm invocation, Next: tsort invocation, Prev: uniq invocation, Up: Operating on sorted files
+
+`comm': 2つのソートされた行と行の比較
+=====================================
+
+
+`comm'は，2つの入力ファイルの共通の行とユニークな行を標準出力に書き出し
+ます．`-'のファイル名は標準有力を意味します．概要です．
+
+     comm [OPTION]... FILE1 FILE2
+
+`comm'を使用する前に，`LC_COLLATE'で指定された対照表の順に入力ファイルを
+ソートする必要があり，後置される改行が重要です．入力ファイルが改行文字で
+終らない場合，改行は暗黙に付加されます．オプションを用いない`sort'コマン
+ドは，`comm'の入力に適したファイルを常に出力します．
+
+オプションが無い場合，`comm'は3列の出力を生成します．列の1はFILE1のユニー
+クな行を含み，列の2はFILE2のユニークな行を含み，列の3は両方のファイルに
+共通な列を含みます．これ無は単一のTAB文字で分けられます．
+
+オプションの`-1'，`-2'と，`-3'は，対応する列の出力を抑制します．*Note
+Common options::,も参照してください．
+
+他の比較ユーティリティと異なり，`comm'は比較の結果に依存しない終了ステー
+タスがあります．上記の通常の比較で，`comm'はゼロのコードで終了します．エ
+ラーがあった場合，ゼロでないステータスで終了します．
+
+
+
+File: textutils-ja.info, Node: tsort invocation, Next: ptx invocation, Prev: comm invocation, Up: Operating on sorted files
+
+`tsort': 位相幾何学的なソート
+=============================
+
+
+`tsort'は，位相幾何学的なソートを，与えられたファイルや，入力ファイルが
+与えられない場合や`-'のファイルに対しては標準入力で実行します．概要です．
+
+     tsort [OPTION] [FILE]
+
+`tsort'は，その入力を文字列の組として読み込み，空白で分離し，それは不完
+全な順序で示されています．出力は，与えられた不完全な順序に対応する完全な
+順序です．
+
+例えば以下のようにします．
+
+     tsort <<EOF
+     a b c
+     d
+     e f
+     b c d e
+     EOF
+
+これは以下の出力を生成します．
+
+     a
+     b
+     c
+     d
+     e
+     f
+
+`tsort'は入力で円を検出し，出現した最初の円を標準エラーに書き出します．
+
+与えられた不完全な順序が，一般に唯一の完全な順序でないことに注意してくだ
+さい．
+
+オプションは，`--help'と`--version'のみです．*Note Common options::.
+
+
+

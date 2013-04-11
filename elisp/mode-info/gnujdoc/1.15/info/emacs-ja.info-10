@@ -1,0 +1,1831 @@
+Info file: emacs-ja.info,    -*-Text-*-
+produced by `texinfo-format-buffer'
+from file `emacs-ja.texi'
+using `texinfmt.el' version 2.38 of 3 July 1998.
+
+
+Emacs 20.6版対応に改訂した`GNU Emacs Manual' 13版です。
+
+INFO-DIR-SECTION Editors
+START-INFO-DIR-ENTRY
+* Emacs: (emacs-ja).	The extensible self-documenting text editor.
+END-INFO-DIR-ENTRY
+
+
+Published by the Free Software Foundation 59 Temple Place, Suite 330
+Boston, MA 02111-1307 USA
+
+Copyright (C) 1985, 1986, 1987, 1993, 1994, 1995, 1996, 1997, 1998, 1999
+Free Software Foundation, Inc.
+
+Permission is granted to make and distribute verbatim copies of this
+manual provided the copyright notice and this permission notice are
+preserved on all copies.
+
+Permission is granted to copy and distribute modified versions of this
+manual under the conditions for verbatim copying, provided also that the
+sections entitled "The GNU Manifesto", "Distribution" and "GNU General
+Public License" are included exactly as in the original, and provided
+that the entire resulting derived work is distributed under the terms of
+a permission notice identical to this one.
+
+Permission is granted to copy and distribute translations of this manual
+into another language, under the above conditions for modified versions,
+except that the sections entitled "The GNU Manifesto", "Distribution"
+and "GNU General Public License" may be included in a translation
+approved by the Free Software Foundation instead of in the original
+English.
+
+
+
+
+
+File: emacs-ja.info, Node: Expanding Abbrevs, Next: Editing Abbrevs, Prev: Defining Abbrevs, Up: Abbrevs
+
+略語展開の制御
+==============
+
+ポイントの直前に略語があるときに白文字や区切り文字（SPC、コンマなど）を
+打鍵すると、略語はつねに展開されます。より正確には、英単語の構成文字以外
+のどんな文字でも略語展開は起こり、英単語の構成文字の任意の組み合わせを略
+語に使用できます。略語の通常の使い方は、略語を入力してから区切り文字を入
+力して展開を行わせるという方法です。
+
+略語展開では大文字小文字を保存します。したがって、`foo'は`find outer
+otter'に、`Foo'は`Find outer otter'に展開されます。また、変数
+`abbrev-all-caps'に応じて、`FOO'は（変数の値が`nil'以外のときは）`FIND
+OUTER OTTER'、あるいは、`Find Outer Otter'に展開されます
+
+以下は略語展開を制御するために使うコマンドです。
+
+`M-''
+     これまで入力した部分をこれから入力する略語から分離する。
+`C-x a e'
+     ポイントの直前の略語を展開する（`expand-abbrev'）。このコマンドは略
+     語（abbrev）モードがオンでなくても働く。
+`M-x expand-region-abbrevs'
+     リージョン中のいくつかの、あるいはすべての略語を展開する。
+
+接頭辞が付いた略語を展開したい場合もあるでしょう。略語`cnst'は
+`construction'に展開されるとして、`reconstruction'と入力するためにこの略
+語を使いたいとします。`recnst'と打鍵してもだめです。というのは、`recnst'
+は定義済みの略語ではないからです。ではどうすればよいかというと、接頭辞
+`re'と略語`cnst'のあいだでコマンド`M-'' （`abbrev-prefix-mark'）を使うの
+です。まず`re'と打ち込みます。続いて`M-''と打鍵します。するとバッファに
+ハイフン（`-'）が挿入され、切れ目が入ったことを示します。それから略語
+`cnst'を入力します。バッファには`re-cnst'と入っています。ここで単語構成
+文字以外の文字を打ち込めば、略語`cnst'が`construction'に展開されます。展
+開時には`M-''が挿入したハイフン（`-'）は削除されます。結果は、望みどおり
+の`reconstruction'です。
+
+もし、略語を展開しないでそのまま残しておきたい場合には、`C-q'に続けて区
+切り文字を入れます。つまり、`foo C-q ,'とすると、バッファには`foo,'のま
+ま残ります。
+
+まちがって略語を展開してしまった場合には、`C-_'（*Note Undo::）と打鍵す
+れば、展開をアンドゥし略語に戻せます。このとき略語展開を引き起こした区切
+り文字も削除されます。略語を展開せずに区切り文字とともに入力したいならば、
+区切り文字を`C-q'でクォートして挿入します。区切り文字を削除せずに直前に
+展開したものを略語に戻すには、コマンド`M-x unexpand-abbrev'を使うことも
+できます。
+
+`M-x expand-region-abbrevs' は、リージョン全体にわたって定義済みの略語を
+探し、みつかったそれぞれについてそれを展開するかを聞いてきます。このコマ
+ンドは、略語（abbrev）モードをオンにし忘れて略語を用いたテキストを入力し
+てしまったときに便利です。あるいは、特別な略語定義一式を用いて一度に全体
+を置き換えるときにも便利です。このコマンドは略語（abbrev）モードがオンで
+なくても使えます。
+
+略語を展開するときには、フック`pre-abbrev-expand-hook' （*Note Hooks::）
+が実行されます。
+
+
+
+File: emacs-ja.info, Node: Editing Abbrevs, Next: Saving Abbrevs, Prev: Expanding Abbrevs, Up: Abbrevs
+
+略語の表示と編集
+================
+
+`M-x list-abbrevs'
+     すべての略語定義を表示する。
+`M-x edit-abbrevs'
+     略語の一覧を編集する。定義を追加、変更、削除できる。
+
+`M-x list-abbrevs'の出力はつぎのようになります。
+
+     (lisp-mode-abbrev-table)
+     "dk"	       0    "define-key"
+     (global-abbrev-table)
+     "dfn"	       0    "definition"
+
+（空行には意味はない。また、いくつかのモードの略語表は省略した。）
+
+括弧で括られた名前から成る行は、特定モードの略語表のヘッダです。
+`global-abbrev-table'には、グローバルな略語定義が入っています。また、メ
+ジャーモード名からとったそれ以外の名前の略語表には、モードに固有な略語が
+入っています。
+
+各略語表では、空でない各行が1つの略語を定義します。行の先頭の単語は略語
+です。つぎに続く数字はこの略語を展開した回数です。Emacsは、略語が実際に
+どれだけ使われているか数えていて、あまり使わない定義を削除できるようにし
+ています。行の最後の文字列が展開形です。
+
+`M-x edit-abbrevs'により、Emacsバッファ内の略語一覧を編集することで略語
+定義の追加、変更、削除を行えます。一覧の形式は上で述べたものと同じです。
+このバッファは`*Abbrevs*'と呼ばれ、略語編集（edit-abbrevs）モードになっ
+ています。このバッファで`C-c C-c'と打鍵すると、バッファで指定したように
+略語定義が登録され、バッファにない略語定義は削除されます。
+
+コマンド`edit-abbrevs'は実際には`list-abbrevs'と同ですが、前者はバッファ
+`*Abbrevs*'を選択するのに対し、後者はバッファを別のウィンドウに表示する
+だけです。
+
+
+
+File: emacs-ja.info, Node: Saving Abbrevs, Next: Dynamic Abbrevs, Prev: Editing Abbrevs, Up: Abbrevs
+
+略語の保存
+==========
+
+以下のコマンドは、編集セッション間で略語定義を保存するためのものです。
+
+`M-x write-abbrev-file RET FILE RET'
+     ファイルFILEにすべての略語定義を書き出す。
+`M-x read-abbrev-file RET FILE RET'
+     ファイルFILEから略語定義を読み込み、その指定どおりに定義する。
+`M-x quietly-read-abbrev-file RET FILE RET'
+     上と同様だが、処理経過を表示しない。
+`M-x define-abbrevs'
+     カレントバッファ内の定義で略語を定義する。
+`M-x insert-abbrevs'
+     すべての略語とその展開形をカレントバッファに挿入する。
+
+`M-x write-abbrev-file'は、ミニバッファからファイル名を読み取り、そのファ
+イルにすべての略語定義情報を書き出します。このコマンドは、以後のセッショ
+ンで使うために略語定義を保存するために使います。ファイルに保存されるテキ
+ストは一連のLisp式であり、これらの式を実行すると、現状と同じ略語が定義さ
+れます。
+
+`M-x read-abbrev-file'は、ミニバッファからファイル名を読み取り、そのファ
+イルを読み込んでファイルの内容に従って略語を定義します。`M-x
+quietly-read-abbrev-file'も同じですが、現在何が進行しているかをエコー領
+域に表示しません。このコマンドは、`.emacs'ファイルで使うことに主眼があり
+ます。どちらのコマンドも、空の引数を指定すると変数`abbrev-file-name'に指
+定したファイル名を使います。この変数のデフォルトは`"~/.abbrev_defs"'です。
+
+Emacsは、略語定義を変更してあると自動的に略語定義を保存するかどうか、
+（`C-x s'や`C-x C-c'などで）すべてのファイルを保存するかどうか問い合わせ
+るときに同時に聞いてきます。この機能は、変数`save-abbrevs'の値を`nil'に
+すると禁止できます。
+
+コマンド`M-x insert-abbrevs'と`M-x define-abbrevs'は、上で述べたコマンド
+と同様ですが、Emacsバッファ内のテキストに作用します。`M-x
+insert-abbrevs'は、カレントバッファのポイントの直前にすべての略語定義を
+記述したテキストを挿入します。`M-x define-abbrevs'は、カレントバッファ全
+体を解析し、その内容に従って略語を定義します。
+
+
+
+File: emacs-ja.info, Node: Dynamic Abbrevs, Next: Dabbrev Customization, Prev: Saving Abbrevs, Up: Abbrevs
+
+動的略語展開
+============
+
+これまでに述べてきた略語の機能は、テキストを挿入するときに自動的に働きま
+すが、すべての略語を陽に登録しておく必要があります。一方、"動的略語"
+（dynamic abbrevs）は、バッファの内容に基づいて略語の展開形を自動的に決
+定することができます。ただし、陽に指示したときだけ、動的略語展開を行いま
+す。
+
+`M-/'
+     バッファのポイントの直前の単語を"動的略語"（dynamic abbrev）として、
+     その略語で始まる単語をバッファ内から探索し展開する
+     （`dabbrev-expand'）。
+
+`C-M-/'
+     ポイントの直前の単語を動的略語として補完する（`dabbrev-completion'）。
+
+たとえば、バッファ内に`does this follow 'があるときに`f o M-/'と打鍵する
+と、バッファ内で`fo'で始まる近くにある単語が`follow'なので`follow'が挿入
+されます。`M-/'に数引数を指定すると、ポイントから先頭に向かって探して、2 
+番目のもの、3番目のものというように異なる展開形に展開できます。`M-/'を繰
+り返すことにより、次々にさらに先頭へ向かって探して別の候補に展開します。
+ポイントよりまえのすべてのテキストを探し終えた場合には、ポイントよりうし
+ろのテキストを探します。変数`dabbrev-limit'が`nil'以外 (1) (*Note
+Dynamic Abbrevs-Footnotes::) ならば、バッファ内のどの範囲まで展開候補を
+探すかを指定します。
+
+カレントバッファを探し終ると、変数`dabbrev-check-all-buffers'を`nil'に設
+定していない限り、`M-/'は他のバッファも探します。
+
+`C-u - M-/'のように`M-/'に負の数引数を指定すると、まずポイントのうしろか
+ら展開候補を探し、つぎにポイントのまえから展開候補を探します。`M-/'を繰
+り返して別の展開候補を探す場合には、引数を指定しません。これにより、ポイ
+ントよりうしろのすべての展開候補を試してから、つぎにポイントよりまえのす
+べての展開候補を試せます。
+
+動的略語を展開したあとでは、展開形のもともとの場所でつぎに続く単語（群）
+をコピーすることができます。コピーしたい単語ごとに単に`SPC M-/'と打鍵し
+ます。単語のあいだの空白や句読点も単語とともにコピーされます。
+
+コマンド`C-M-/'（`dabbrev-completion'）は、動的略語の補完を行います。展
+開候補を1つずつ試すかわりに、すべての候補を全部探してそれらに共通するテ
+キストを挿入します。それらに共通部分がなければ、`C-M-/'は候補一覧を表示
+するので普通の方法でその中から1つ選びます。*Note Completion::。
+
+動的略語展開は略語（abbrev）モードと完全に独立しています。`M-/'による単
+語の展開は、略語（abbrev）モードで定義済みかどうかとは完全に独立していま
+す。
+
+
+File: emacs-ja.info  Node: Dynamic Abbrevs-Footnotes, Up: Dynamic Abbrevs
+
+(1) 【訳注】文字数を指定する。
+
+
+
+File: emacs-ja.info, Node: Dabbrev Customization, Prev: Dynamic Abbrevs, Up: Abbrevs
+
+動的略語のカスタマイズ方法
+==========================
+
+通常、動的略語展開では大文字小文字を区別しないで候補を探します。つまり、
+展開候補と略語の大文字小文字が一致する必要はありません。
+
+この機能は変数`dabbrev-case-fold-search'で制御できます。値が`t'のときは、
+候補を探すときに大文字小文字を区別しません。値が`nil'のときは、候補と略
+語の大文字小文字が一致する必要があります。変数`dabbrev-case-fold-search'
+の値は、デフォルトでは真である`case-fold-search'です。したがって、変数
+`case-fold-search'が展開候補を探すときの大文字小文字の区別を制御します。
+
+通常、動的略語展開は*打ち込んだ略語の*大文字小文字のパターンを保存します。
+つまり、略語の大文字小文字のパターンに合うように展開形の大文字小文字を変
+換します。
+
+変数`dabbrev-case-replace'は、略語の大文字小文字のパターンを保存するかど
+うかを制御します。値が`t'のときは、たいていの場合、パターンを保存します。
+`nil'のときは、つねに展開形をそのままコピーします。
+`dabbrev-case-replace'の値は、デフォルトでは真である`case-replace'です。
+したがって、変数`case-replace'が展開形をそのままコピーするかどうかを制御
+します。
+
+しかしながら、展開形の大文字小文字のパターンが複雑であるとき、略語の始め
+から終りまでがそのパターンに一致する場合、これらの変数に関わらず展開形を
+そのままコピーします。たとえば、バッファに`variableWithSillyCasePattern'
+とあって`v a M-/'と打鍵すると、大文字小文字のパターンを含め展開形をその
+ままコピーします。
+
+変数`dabbrev-abbrev-char-regexp'が`nil'以外の場合、動的展開においてどん
+な文字を単語構成文字とみなすかを制御します。これに指定する正規表現は1文
+字のみに一致するものである必要があり、2文字以上に一致してはいけません。
+同じ正規表現は、どの文字が展開形を構成するかも指定します。値として`nil'
+を指定すると特別な意味があり、略語は単語の構成文字だけから成り、展開形は
+単語と記号文字から成るという意味になります。
+
+シェルスクリプトやmakefileなどでは、変数名には接頭辞`$'があったりなかっ
+たりします。これらのテキスト用のメジャーモードでは、変数
+`dabbrev-abbrev-skip-leading-regexp'を設定して余分な接頭辞を扱えるように
+動的展開をカスタマイズできます。この変数には、動的略語展開で無視すべき余
+分な接頭辞に一致する正規表現を指定します。
+
+
+File: emacs-ja.info, Node: Picture, Next: Sending Mail, Prev: Abbrevs, Up: Top
+
+絵の編集
+********
+
+テキスト文字で書いた絵（たとえば、プログラムのコメントとしてレジスタを
+フィールドに分割した絵）を編集するには、コマンド`M-x edit-picture'を使っ
+てピクチャー（picture）モードに入ります。
+
+ピクチャー（picture）モードでは、"1/4平面"モデル（quarter-plane）に基づ
+いて編集を行います。つまり、右側と下側に無限に続く領域にテキスト文字が散
+在するのです。このモデルでは行末は存在しません。行中で空白でない文字が最
+後に現れる場所がわかるだけです。
+
+もちろん、Emacsはつねにテキストを文字の列としてとらえ、実際には行に終り
+があります。しかし、ピクチャー（picture）モードでは、よく使われるコマン
+ドの大部分を1/4平面モデルに従って動作するように置き換えています。空白を
+挿入したりタブを空白に置き換えることで、そのようにします。
+
+Emacsの基本的な編集コマンドの大部分は、ピクチャー（picture）モードでは
+1/4平面モデルにおいて本質的には同じ動作をするように再定義されています。
+さらに、ピクチャー（picture）モードでは、`C-c'で始まるキー列を絵の編集用
+の特別なコマンドとして定義します。
+
+これらのキーの1つである`C-c C-c'は非常に重要です。絵が、普通は別のメジャー
+モードで編集される大きなファイルの一部であることがしばしばあります。`M-x
+edit-picture'は直前のメジャーモードを記録しておき、あとで`C-c C-c'コマン
+ド（`picture-mode-exit'）でそのモードに戻れるようにします。また、数引数
+を指定しなければ、`C-c C-c'は行末の空白を削除します。
+
+ピクチャー（picture）モードのすべての特別なコマンドは、（`picture'ライブ
+ラリがロードされていれば）他のモードでも使えますが、ピクチャー（picture）
+モード以外ではキーにバインドされていません。以下では『1桁』移動などと説
+明しますが、ピクチャー（picture）モードのすべてのコマンドは、それに対応
+する通常のコマンドと同じように数引数を扱えます。
+
+ピクチャー（picture）モードに入るときにフック`picture-mode-hook'を実行し
+ます（*Note Hooks::）。
+
+* Menu:
+
+* Basic Picture::         Basic concepts and simple commands of Picture Mode.
+* Insert in Picture::     Controlling direction of cursor motion
+                            after "self-inserting" characters.
+* Tabs in Picture::       Various features for tab stops and indentation.
+* Rectangles in Picture:: Clearing and superimposing rectangles.
+
+
+
+File: emacs-ja.info, Node: Basic Picture, Next: Insert in Picture, Prev: Picture, Up: Picture
+
+ピクチャーモードの基本編集
+==========================
+
+
+ピクチャー（picture）モードでも、ほとんどのキーは通常と同じ動作をします
+が、1/4平面流の動作です。たとえば、`C-f'は、`picture-forward-column'を実
+行するように再定義してあります。このコマンドはポイントを1桁右に動かし、
+必要なら空白を挿入して、行末がないかのようにふるまいます。`C-b'は、
+`picture-backward-column'を実行するように再定義してあります。このコマン
+ドはポイントを1桁左に動かし、必要に応じてタブを複数の空白に変換します。
+`C-n'と`C-p'は、それぞれ`picture-move-down'と`picture-move-up'を実行する
+ように再定義してあります。これらのコマンドは、必要に応じて空白を挿入した
+りタブを変換して、ポイントが同じ桁位置に留まるように移動します。`C-e'は
+`picture-end-of-line'を実行します。このコマンドは、行の最後の白文字以外
+の文字の直後に移動します。画面モデルは行頭には影響しないので、`C-a'を変
+更する必要はありません。
+
+テキストの挿入は、上書き（overwrite）モードを用いて1/4平面モデルに対応さ
+せてあります（*Note Minor Modes::）。自己挿入文字は、既存のテキストを右
+側へ押しやるのではなく、既存のテキストを桁ごとに置き換えます。RETは
+`picture-newline'を実行します。このコマンドは、つぎの行の先頭に移動し、
+その行が新たなテキストで置き換わるようにします。
+
+ピクチャー（picture）モードでは、テキストの削除やキルのかわりに消去しま
+す。DEL（`picture-backward-clear-column'）は、直前の文字を削除するのでは
+なく空白で置き換え、また、ポイントを1つまえに戻します。`C-d'
+（`picture-clear-column'）は直後の1つ以上の文字を空白で置き換えますが、
+ポイントは動かしません。（文字を空白で置き換えて、かつ、ポイントを先へ進
+めるには、SPCを使う。）`C-k'（`picture-clear-line'）は行の内容を実際にキ
+ルしますが、バッファから改行を削除しません。
+
+実際に挿入を行うには、特別なコマンドを使う必要があります。`C-o'
+（`picture-open-line'）は、現在行のつぎに空行を作りますが、行を分割しま
+せん。`C-M-o'（`split-line'）はピクチャー（picture）モードでも意味がある
+ので変更してありません。`C-j'（`picture-duplicate-line'）は現在行の下に
+現在行と同じ内容の行を挿入します。
+
+ピクチャー（picture）モードで実際に削除を行うには、`C-w'か（他のモードで
+の`C-d'と同じ`delete-char'に定義されている）`C-c C-d'、あるいは、絵の矩
+形領域コマンドの1つを使います（*Note Rectangles in Picture::）。
+
+
+
+File: emacs-ja.info, Node: Insert in Picture, Next: Tabs in Picture, Prev: Basic Picture, Up: Picture
+
+挿入後のポイント移動制御
+========================
+
+ピクチャー（picture）モードでは『自己挿入』文字は上書きしてポイントを動
+かしますから、ポイントをどのように動かすかについて本質的な制限はありませ
+ん。通常ポイントは右に動きますが、『自己挿入』文字のあとで上下左右斜めの
+8方向のいずれの方向へ移動するか指定できます。これは、バッファに直線を引
+くときに役立ちます。
+
+`C-c <'
+     挿入後、左へ移動（`picture-movement-left'）。
+`C-c >'
+     挿入後、右へ移動（`picture-movement-right'）。
+`C-c ^'
+     挿入後、上へ移動（`picture-movement-up'）。
+`C-c .'
+     挿入後、下へ移動（`picture-movement-down'）。
+`C-c `'
+     挿入後、左上（『北西』）へ移動（`picture-movement-nw'）。
+`C-c ''
+     挿入後、右上（『北東』）へ移動（`picture-movement-ne'）。
+`C-c /'
+     挿入後、左下（『南西』）へ移動（`picture-movement-sw'）。
+`C-c \'
+     挿入後、右下（『南東』）へ移動（`picture-movement-se'）。
+
+2つの移動コマンドは、現在指定されている挿入後の移動方向に基づいて動作し
+ます。コマンド`C-c C-f'（`picture-motion'）は、現在指定されている『挿入』
+後の移動方向と同じ方向へ移動しますが、`C-c C-b'
+（`picture-motion-reverse'）は反対方向へ移動します。
+
+
+
+File: emacs-ja.info, Node: Tabs in Picture, Next: Rectangles in Picture, Prev: Insert in Picture, Up: Picture
+
+ピクチャーモードのタブ
+======================
+
+ピクチャー（picture）モードにはタブ相当の動作が2種類あります。文脈に基づ
+くタブを行うには`M-TAB' （`picture-tab-search'）を使います。引数を指定し
+ないと、先行する空行でない行において白文字に続く『興味ある』つぎの文字の
+下方に移動します。ここで『つぎ』とは『開始位置より水平位置が1より大きい』
+という意味です。`C-u M-TAB'のように引数を指定すると、現在行において『興
+味ある』文字に移動します。`M-TAB'はテキストを変更せずにポイントを移動す
+るだけです。『興味ある』文字は、変数`picture-tab-chars'で定義されますが、
+文字集合を定義する必要があります。この変数の構文は正規表現で使われる
+`[...]'の構文に似ていますが、`['と`]'で囲みません。この変数のデフォルト
+値は`"!-~"'です。
+
+TABそれ自身は、`picture-tab'を実行します。このコマンドは、現在のタブストッ
+プの設定に基づいて動作します。これは他のモードの`tab-to-tab-stop'に相当
+します。通常これはポイントを動かすだけですが、数引数を指定すると移動先ま
+でのテキストをクリアします。
+
+文脈に基づくタブとタブストップに基づくタブは、コマンド`C-c TAB'
+（`picture-set-tab-stops'）で結び付けることができます。このコマンドは、
+現在行において`M-TAB'が重要と考える位置にタブストップを設定します。TABと
+ともにこのコマンドを使えば、文脈に基づくタブと同じ効果を得られます。しか
+し、`M-TAB'で十分ならばそのほうが便利でしょう。
+
+本当のタブ文字を絵に使わないように抑制したほうが便利な場合があります。た
+とえば、`C-x TAB'で絵をめちゃくちゃにしてしまうことを防止できます。タブ
+文字の使用を抑制するには、変数`indent-tabs-mode'に`nil'を設定します。
+*Note Just Spaces::。
+
+
+
+File: emacs-ja.info, Node: Rectangles in Picture, Prev: Tabs in Picture, Up: Picture
+
+ピクチャーモードの矩形領域コマンド
+==================================
+
+ピクチャー（picture）モードでは、1/4平面モデルに適合するように、テキスト
+の矩形領域に作用するコマンドを定義します。標準的な矩形領域コマンドも役立
+つでしょう（*Note Rectangles::）。
+
+`C-c C-k'
+     矩形領域を空白でクリアする（`picture-clear-rectangle'）。数引数を指
+     定するとテキストを削除する。
+`C-c C-w R'
+     同様だが、まず矩形領域の内容をレジスタRに保存する
+     （`picture-clear-rectangle-to-register'）。
+`C-c C-y'
+     ポイント位置を左上隅として最後にキルした矩形領域をバッファに上書き
+     する（`picture-yank-rectangle'）。数引数を指定すると挿入する。
+`C-c C-x R'
+     同様だが、レジスタRの矩形領域を使う
+     （`picture-yank-rectangle-from-register'）。
+
+絵の矩形領域コマンド、`C-c C-k'（`picture-clear-rectangle'）と`C-c C-w'
+（`picture-clear-rectangle-to-register'）は、標準の矩形領域コマンドが矩
+形領域を削除するのに対しクリアする点で異なります。これは、ピクチャー
+（picture）モードでの`C-d'の意味の変更方法に類似したものです。
+
+しかし、ピクチャー（picture）モードでも矩形領域の削除は便利なので、数引
+数を与えるとこれらのコマンドは矩形領域を削除します。引数を指定してもしな
+くても`C-c C-k'は`C-c C-y'のために矩形領域を（レジスタに）保存します。
+
+ピクチャー（picture）モードのヤンクコマンドは標準のそれとは、挿入のかわ
+りに上書きする点で異なります。これはピクチャー（picture）モードでのテキ
+ストの挿入が他のモードでのそれと異なっているのと同じです。`C-c C-y'
+（`picture-yank-rectangle'）は、もっとも最近にキルした矩形領域を（上書き
+で）挿入しますが、`C-c C-x'（`picture-yank-rectangle-from-register'）は
+同様のことを指定されたレジスタ内の矩形領域で行います。
+
+
+File: emacs-ja.info, Node: Sending Mail, Next: Rmail, Prev: Picture, Up: Top
+
+メイルの送信
+************
+
+Emacsでメッセージを送信するには、まずコマンド（`C-x m'）を打って`*mail*'
+バッファを選択して初期化します。続いて、このバッファでテキストとヘッダを
+編集し、最後に別のコマンド（`C-c C-s'か`C-c C-c'）を打ってメッセージを送
+信します。
+
+`C-x m'
+     送信メッセージを作成する（`compose-mail'）。
+`C-x 4 m'
+     同様だが、別のウィンドウにメッセージを表示する
+     （`compose-mail-other-window'）。
+`C-x 5 m'
+     同様だが、新たにフレームを作る（`compose-mail-other-frame'）。
+`C-c C-s'
+     メイル（mail）モードでは、メッセージを送信する（`mail-send'）。
+`C-c C-c'
+     メッセージを送信しメイルバッファを閉じる（`mail-send-and-exit'）。
+
+コマンド`C-x m'（`compose-mail'）は、`*mail*'という名前のバッファを選択
+し、そのバッファ内に送信するメッセージの雛型を作ります。`C-x 4 m'
+（`compose-mail-other-window'）は、別のウィンドウで`*mail*'バッファを選
+択し、直前のカレントバッファは見えるようにしておきます。`C-x 5 m'
+（`compose-mail-other-frame'）は、新たにフレームを作って`*mail*'バッファ
+を選択します。
+
+メイル作成バッファはEmacsの普通のバッファなので、メイルを書いている途中
+で別のバッファに切り替えてあとで戻ってくる（あるいは戻らない）ことができ
+ます。メッセージを書きかけのまま送信していないのに再度`C-x m'コマンドを
+使うと、Emacsは古いメッセージを消してよいかどうか聞いてきます。`n'と答え
+ると、書きかけの古い内容の`*mail*'バッファが選択されるので、古いメッセー
+ジを書き終えて送信できます。`C-u C-x m'でもこのようにできます。メッセー
+ジを送信すると`*mail*'バッファは『変更なし』と印が付けられ、つぎに`C-x
+m'を使っても確認を求めないようにします。
+
+`*mail*'バッファに書きかけのメッセージを残したまま別のメッセージを送信し
+たい場合には、`M-x rename-uniquely'を使って`*mail*'バッファを別の名前に
+変更してください（*Note Misc Buffer::）。そして、`C-x m'コマンドや他のコ
+マンドで新しい`*mail*'バッファを作ります。こうすれば個々のメイルバッファ
+を独立に編集できます。
+
+* Menu:
+
+* Format: Mail Format.	     Format of the mail being composed.
+* Headers: Mail Headers.     Details of permitted mail header fields.
+* Aliases: Mail Aliases.     Abbreviating and grouping mail addresses.
+* Mode: Mail Mode.	     Special commands for editing mail being composed.
+* Spook: Distracting NSA.    How to distract the NSA's attention.
+* Mail Methods::             Using alternative mail-composition methods.
+
+
+
+File: emacs-ja.info, Node: Mail Format, Next: Mail Headers, Up: Sending Mail
+
+メイルバッファの形式
+====================
+
+メッセージにはテキスト、つまり、本文以外にも、誰が、いつ、誰に、なぜ送っ
+たかなどを示す"ヘッダフィールド"があります。`Date'（日付）や`Sender'（送
+り手）などのヘッダフィールドは、メッセージを送信するときに自動的に作成さ
+れます。受け手（宛先）などの他のヘッダフィールドは、メッセージがきちんと
+送信されるようにあなた自身が指定する必要があります。
+
+メイル（mail）モードには、ヘッダフィールドを編集するためのコマンド群があ
+り、一部のヘッダフィールドはバッファ内で自動的に初期化されます。通常の編
+集コマンドを使ってヘッダフィールドに挿入したり編集したりできます。
+
+バッファ内のつぎの行は、ヘッダとテキストを分ける特別な区切り行です。
+
+     --text follows this line--
+
+この行のあとに続くものはすべてメッセージのテキストになります。このまえに
+あるものはヘッダです。実際に送信されるメッセージには、この区切り行自身は
+含まれません。区切り行として使うテキストは変数`mail-header-separator'で
+制御します。
+
+以下は、メイルバッファ内のヘッダとテキストの例です。
+
+     To: gnu@gnu.org
+     CC: lungfish@spam.org, byob@spam.org
+     Subject: The Emacs Manual
+     --Text follows this line--
+     Please ignore this message.
+
+
+
+File: emacs-ja.info, Node: Mail Headers, Next: Mail Aliases, Prev: Mail Format, Up: Sending Mail
+
+メイルヘッダフィールド
+======================
+
+メイルバッファ内のヘッダフィールドは、行頭のフィールド名で始まり、コロン
+`:'で区切られます。フィールド名（およびメイルアドレス）では、大文字小文
+字の区別はありません。コロンと省いてもよい白文字のあとにフィールドの内容
+を書きます。
+
+ヘッダフィールドには好き勝手にどんな名前でも使えますが、一般にはきちんと
+意味のある標準的なフィールド名だけを使います。以下は送信メッセージで一般
+的に使われるフィールドの一覧です。
+
+`To'
+     このフィールドには、メッセージの送付先であるメイルアドレスを書く。1
+     つより多くのアドレスを書く場合には、空白ではなくコンマで区切る。
+
+`Subject'
+     `Subject'フィールドの内容としては、メッセージが何についてのものかを
+     書く。`Subject'フィールドが有効な理由は、大部分のメイル閲覧プログラ
+     ムが、各メッセージの本文ではなく`Subject'を使ってメイル一覧を表示す
+     るため。
+
+`CC'
+     このフィールドには`To'フィールドと同様にメッセージ送付先の追加メイ
+     ルアドレスを書く。ただし、これらのアドレスにあげられた人達は、自分
+     宛てのメッセージだとは思わないように。
+
+`BCC'
+     このフィールドにはメッセージ送付先の追加アドレスを書くが、実際に送
+     付されるメッセージのヘッダにはこのフィールドは含まれない。このよう
+     にして送信したコピーを"ブラインドカーボンコピー" （blind carbon
+     copies）と呼ぶ。
+
+     すべての送信メッセージのブラインドカーボンコピーを自分自身に送るに
+     は、変数`mail-self-blind'に`t'を設定する。
+
+`FCC'
+     このフィールドには、メッセージを送信するたびにEmacsがそのコピーを追
+     加していくファイルの名前を指定する。ファイルがrmail形式であれば、
+     Emacsはメッセージをrmail形式で書き込む。それ以外の場合、Emacsはシス
+     テムメイルファイル形式で書き込む。
+
+     送信メッセージを編集するたびに毎回決まったファイル名を`FCC'フィール
+     ドに指定するには、変数`mail-archive-file-name'にそのファイル名を設
+     定する。送信メッセージから`FCC'フィールドを削除しない限り、メッセー
+     ジを送信するたびにこのファイルにメッセージが書き込まれる。
+
+`From'
+     `From'フィールドは、メイル送信時に使っているアカウントが自分のもの
+     でない場合に、送信者が本当は誰なのかを示すために用いる。返信には通
+     常このフィールドが使われるので、`From'フィールドの内容は正しいメイ
+     ルアドレスであること。自分で`From'フィールドを指定しなければ、Emacs
+     はデフォルトで変数`user-mail-address'の値を使う。
+
+`Reply-to'
+     返信を別のアドレスに送ってほしい場合にこのフィールドを使う。（rmail
+     を含む）大部分のメイル閲覧プログラムは、`From'のアドレスより
+     `Reply-to'のアドレスを優先して自動的に返信を送る。`Reply-to'フィー
+     ルドをヘッダに加えておけば、`From'のアドレスが返信時に引き起こすで
+     あろうどんな問題でも回避できる。
+
+     すべての送信メッセージの`Reply-to'フィールドに決まったアドレスを指
+     定するには、変数`mail-default-reply-to'に（文字列で）そのアドレスを
+     設定する。こうすると、`mail'は指定された`Reply-to'フィールドを付け
+     てメッセージを初期化する。メッセージを送信するまえに、必要なら、こ
+     のフィールドを削除したり変更したりできる。Emacsが動き始めたときに環
+     境変数`REPLYTO'が設定されていれば、その環境変数の値で変数
+     `mail-default-reply-to'を初期化する。
+
+`In-reply-to'
+     このフィールドは返信しようとしているメッセージについての情報を書く。
+     メイルシステムによっては、この情報を使ってメイルを互いに関連付ける。
+     rmailでメッセージに返信するときには、rmailが自動的にこのフィールド
+     を埋めるので、気にする必要はない（*Note Rmail::）。
+
+`References'
+     このフィールドには、関連する以前のメッセージのメッセージID一覧を書
+     く。rmailでメッセージに返信するときには、rmailが自動的にこのフィー
+     ルドを埋める。
+
+ヘッダフィールド、`To'、`CC'、`BCC'、`FCC'は、いくつあってもよく、しかも、
+これらの各フィールドにはコンマで区切って複数のアドレスを書けます。こうす
+れば、メッセージの送付先をいくつでも指定できます。`To'、`CC'、`BCC'フィー
+ルドでは継続行を使えます。これらのフィールドに続く白文字で始まる行は、す
+べてフィールドの一部であると見なします。以下は継続行を用いた`To'フィール
+ドの例です。
+
+     To: foo@here.net, this@there.net,
+       me@gnu.cambridge.mass.usa.earth.spiral3281
+
+メッセージを送信するときに、`From'フィールドを書いてないと、Emacsがかわっ
+てこの項目を補います。変数`mail-from-style'でその書式を（以下のように）
+制御します。
+
+`nil'
+     `king@grassland.com'のように電子メイルアドレスだけを補う。
+`parens'
+     `king@grassland.com (Elvis Parsley)'のように、電子メイルアドレスと
+     氏名を補う。
+`angles'
+     `Elvis Parsley <king@grassland.com>'のように、氏名と電子メイルアド
+     レスを補う。
+`system-default'
+     システムに`From'フィールドを埋めさせる。
+
+
+
+File: emacs-ja.info, Node: Mail Aliases, Next: Mail Mode, Prev: Mail Headers, Up: Sending Mail
+
+メイルの別名
+============
+
+`~/.mailrc'という名前のファイルで"メイルの別名" （mail alias）を定義でき
+ます。メイルの別名とは、複数のメイルアドレスやそれらのグループに付けた覚
+えやすい短い名前のことです。他の多くのメイルプログラムと同様に、`To'、
+`From'、`CC'、`BCC'、`Reply-to'のフィールドに別名が現れるとEmacsは別名を
+展開し、当該フィールドの先頭に`Resent-'を付加します。
+
+`~/.mailrc'ファイルで別名を定義するには、以下のような形式の行を書きます。
+
+     alias SHORTADDRESS FULLADDRESSES
+
+FULLADDRESSESは1つ以上のメイルアドレスであり、SHORTADDRESSをそれらのアド
+レスに展開します。複数のアドレスを書く場合は、空白で区切ります。アドレス
+に空白が含まれる場合は、アドレス全体をダブルクォート`"'で括ります。
+
+たとえば、`gnu@gnu.org'とあなたのローカルアドレスに対する別名を`maingnu'
+とするには、つぎのように書きます。
+
+     alias maingnu gnu@gnu.org local-gnu
+
+また、Emacsは`.mailrc'ファイル内の「取り込み」コマンドも認識します。つぎ
+のように書きます。
+
+     source FILENAME
+
+ファイル`~/.mailrc'は主に他のメイル閲覧プログラムが使用するものです。こ
+のファイルには、他にもさまざまなコマンドを指定できます。Emacsは、このファ
+イル内の別名定義（`alias'）と取り込みコマンド（`source'）以外はすべて無
+視します。
+
+Emacsの中だけでメイルの別名を定義する別の方法は、`define-mail-alias'コマ
+ンドを使うことです。このコマンドは、別名と完全なアドレスを順次尋ねてきま
+す。これを使えば、つぎのようにして個人の`.emacs'ファイルで別名を定義でき
+ます。
+
+     (define-mail-alias "maingnu" "gnu@gnu.org")
+
+ `define-mail-alias'は、`mail-aliases'という変数に別名を追加記録します。
+Lispのリスト操作に慣れているなら、`mail-aliases'に直接設定してもかまいま
+せん。変数`mail-alias'の初期値は`t'となっていて、Emacsは`.mailrc'から別
+名定義を読み込むという指定です。
+
+`~/.mailrc'のかわりに使う別のファイルの名前は、変数
+`mail-personal-alias-file'に設定します。
+
+ 通常、Emacsはメッセージ送信時に別名を展開します。送信に先だってみずから
+メイルアドレスを展開する必要はありませんが、メイルが実際にどこへ送信され
+るか確認したければ別名を展開することもできます。そうするには、コマンド
+`M-x expand-mail-aliases'を使います。アドレスを保持するメイルヘッダに書
+かれているすべてのメイルの別名を展開します。
+
+もし好みに合うなら、メイルの別名を打ち込んだらただちに略語展開することも
+できます（*Note Abbrevs::）。この機能を使うにはつぎのようにします。
+
+     (add-hook 'mail-setup-hook 'mail-abbrevs-setup)
+
+これを個人の`.emacs'ファイルに入れてもかまいません。*Note Hooks::。この
+機能を使う場合には、`define-mail-alias'のかわりに`define-mail-abbrev'を
+使う必要があります。前者は、このパッケージでは動作しません。メイル用略語
+パッケージでは、`mail-aliases'のかわりに変数`mail-abbrevs'を使い、さらに、
+すべての別名は小文字に変換されます。
+
+メイル用略語パッケージには、`C-c C-a' （`mail-interactive-insert-alias'）
+コマンドもあって、別名を（補完を使って）読み取り、その定義をポイント位置
+に挿入します。この機能は、Emacsが別名を通常展開しない本文や`Subject'フィー
+ルドなどを編集しているときに便利です。
+
+単語の区切り文字を挿入したあとで略語が展開されることに注意してください。
+しかし、`C-n'と`M->'を再定義して展開が行われるように設定することもできま
+す。つぎのようにします。
+
+     (add-hook 'mail-setup-hook
+               '(lambda ()
+                  (substitute-key-definition
+                    'next-line 'mail-abbrev-next-line
+                    mail-mode-map global-map)
+                  (substitute-key-definition
+                    'end-of-buffer 'mail-abbrev-end-of-buffer
+                    mail-mode-map global-map)))
+
+
+
+File: emacs-ja.info, Node: Mail Mode, Next: Distracting NSA, Prev: Mail Aliases, Up: Sending Mail
+
+メイルモード
+============
+
+メイルバッファで使われるメジャーモードはメイル（mail）モードです。テキス
+ト（text）モードに似ていますが、プレフィックス`C-c'で始まる多くの特別な
+コマンドがあります。これらのコマンドはすべてメッセージの編集や送信に関す
+るものです。さらに、メイル（mail）モードでは、文字`%'を単語の切れ目と定
+義しています。これは、単語コマンドを使ってメイルアドレスを編集するときに
+便利です。
+
+`mail'コマンドやそれに関連するコマンドが自動的に設定するバッファでは、普
+通、メイル（mail）モードを使います。しかし、ファイルを訪問しているバッファ
+をメイル（mail）モードに切り替えることもできます。これは、メッセージの草
+稿をファイルに保存してあるときなどに便利です。
+
+* Menu:
+
+* Mail Sending::        Commands to send the message.
+* Header Editing::      Commands to move to header fields and edit them.
+* Citing Mail::         Copying all or part of a message you are replying to.
+* Mail Mode Misc::      Spell checking, signatures, etc.
+
+
+
+File: emacs-ja.info, Node: Mail Sending, Next: Header Editing, Up: Mail Mode
+
+メイルの送信
+------------
+
+メイル（mail）モードには、編集したメッセージを送信するコマンドが2つあり
+ます。
+
+`C-c C-s'
+     メッセージを送信し、メイルバッファは選択したままにする（`mail-sen
+     d'）。
+`C-c C-c'
+     メッセージを送信し、別のバッファを選択する（`mail-send-and-exit'）。
+
+`C-c C-s'（`mail-send'）はメッセージを送信してメイルバッファに『変更なし』
+の印を付けます（変更フラグをクリアする）。しかし、メッセージバッファは選
+択したままですから、メッセージを修正して（新たな受け手に）再度送信できま
+す。`C-c C-c'（`mail-send-and-exit'）はメッセージを送信してから、ウィン
+ドウを削除するか別のバッファに切り替えます。メイルバッファは使い終えたの
+で、デフォルトではその選択優先度は最低になります。普通はこのコマンドでメッ
+セージを送信します。
+
+ファイルを訪問しているバッファでは、メッセージ送信後でも変更フラグをクリ
+アしません。ファイルを保存した場合にだけ変更フラグをクリアすべきだからで
+す。この結果、同一メッセージを2回送信しようとしても警告は出ません。
+
+非ASCII文字を含むメッセージを送信するときには、それらをコーディングシス
+テム（*Note Coding Systems::）で符号化する必要があります。通常、コーディ
+ングシステムは、選択した言語環境（*Note Language Environments::）によっ
+て自動的に指定されます。変数`sendmail-coding-system'を設定すると、送信メ
+イルのコーディングシステムを明示できます。
+
+このように決めたコーディングシステムが、メッセージ内の文字を扱えない場合
+には、Emacsは、可能なコーディングシステムの一覧を表示して、使用するコー
+ディングシステムを問い合わせます。
+
+
+
+File: emacs-ja.info, Node: Header Editing, Next: Citing Mail, Prev: Mail Sending, Up: Mail Mode
+
+メイルヘッダの編集
+------------------
+
+メイル（mail）モードには、特定のヘッダフィールドへ移動したりヘッダのアド
+レスを補完する特別なコマンドがあります。
+
+`C-c C-f C-t'
+     ヘッダフィールド`To'へ移動する。フィールドがなければ作成する
+     （`mail-to'）。
+`C-c C-f C-s'
+     ヘッダフィールド`Subject'へ移動する。フィールドがなければ作成する
+     （`mail-subject'）。
+`C-c C-f C-c'
+     ヘッダフィールドへ`CC'移動する。フィールドがなければ作成する
+     （`mail-cc'）。
+`C-c C-f C-b'
+     ヘッダフィールド`BCC'へ移動する。フィールドがなければ作成する
+     （`mail-bcc'）。
+`C-c C-f C-f'
+     ヘッダフィールド`FCC'へ移動する。フィールドがなければ作成する
+     （`mail-fcc'）。
+`M-TAB'
+     メイルアドレスを補完する（`mail-complete'）。
+
+ポイントを特定のヘッダフィールドに移動するコマンドは5つあって、すべてプ
+レフィックス`C-c C-f'で始まります（`C-f'は『フィールド』（fields）のf）。
+これらは上に示してあります。当該フィールドが存在しなければ、これらのコマ
+ンドはそのフィールドを作成します。これらの特定のフィールドに移動するコマ
+ンドを用意したのは、これらのフィールドを編集する可能性が高いからです。
+
+`To:'、`CC:'、`BCC:'などのメイルアドレスを含むヘッダフィールドを編集中に
+は、`M-TAB'（`mail-complete'）と打てばメイルアドレスを補完できます。完全
+な名前が決定できるならば、アドレスに対応する完全な名前を挿入します。変数
+`mail-from-style'と同様に、変数`mail-complete-style'は、完全な名前を挿入
+するのか、どのスタイルを使うのかを制御します（*Note Mail Headers::）。
+
+補完のため使う正しいメイルアドレスは、ローカルのユーザー名一覧と個人のメ
+イルの別名からとられます。正しいメイルアドレスの情報源を追加することもで
+きます。これに関するオプションを調べるには、カスタマイズバッファを使って
+ください。
+
+メッセージの本文で`M-TAB'と打つと、テキスト（text）モードと同様に
+`ispell-complete-word'を起動します。
+
+
+
+File: emacs-ja.info, Node: Citing Mail, Next: Mail Mode Misc, Prev: Header Editing, Up: Mail Mode
+
+メイルの引用
+------------
+
+メイル（mail）モードには、返信対象であるメッセージの全部や一部をヤンク、
+つまり、"引用"（cite）するためのコマンドもあります。こうしたコマンドは
+rmailコマンドを使ってメッセージを送信する場合にだけ使えます。
+
+`C-c C-y'
+     rmailで選択したメッセージをヤンクする（`mail-yank-original'）。
+`C-c C-r'
+     rmailバッファで選択したリージョンをヤンクする（`mail-yank-region'）。
+`C-c C-q'
+     別のメッセージからの引用を段落に詰め込む
+     （`mail-fill-yanked-message'）。
+
+rmailコマンドを使ってrmailメイルリーダからメイル送信を起動したときには、
+`C-c C-y'を使って返信対象のメッセージをメイルバッファに挿入できます。こ
+のコマンドは、引用メッセージの各行を空白3文字で字下げしてほとんどのヘッ
+ダフィールドを削除します。数引数は字下げする文字数を指定します。`C-u'だ
+けを指定すると、字下げをせずにヘッダフィールドも削除しません。`C-c C-y'
+は、つねにrmailバッファのカレントメッセージを使います。したがって、rmail
+で1つメッセージを選択してから`*mail*'バッファに切り替えてヤンクし、また、
+rmailに切り替えて別のメッセージを選択してというようにすれば、複数の古い
+メッセージを挿入できます。
+
+`C-c C-y'が各行の先頭に挿入する文字列は指定できます。変数
+`mail-yank-prefix'に望みの文字列を設定します。（値が`nil'だと字下げしな
+い。デフォルトはこれ。）しかし、`C-u C-c C-y'と打った場合、変数
+`mail-yank-prefix'の値に関係なく、各行の行頭には何も挿入しません。
+
+届いたメイルの一部だけをヤンクするには、rmailで目的の部分にリージョンを
+設定します。そして`*mail*'バッファに移って`C-c C-r' （`mail-yank-region'）
+と打ちます。コピーされる各行は、`mail-yank-prefix'に従って字下げされるか
+行頭に文字列が挿入されます。
+
+`C-c C-y'や`C-c C-r'を使い終ったら、`C-c C-q' 
+（`mail-fill-yanked-message'）と打てばヤンクした古いメッセージを段落に詰
+め込めます (1) (*Note Citing Mail-Footnotes::)。引用したメッセージを1つ
+の段落に詰め込むには、`M-q'を使います。詰め込み処理で行頭の文字を自動的
+に正しく扱えない場合には、詰め込み接頭辞を陽に指定して試してください。
+*Note Filling::。
+
+
+File: emacs-ja.info  Node: Citing Mail-Footnotes, Up: Citing Mail
+
+(1) 【訳注】これは欧文用のコマンドで、日本語で入力する場合にはあまり関係
+ない。
+
+
+
+File: emacs-ja.info, Node: Mail Mode Misc, Prev: Citing Mail, Up: Mail Mode
+
+その他のメイルモードコマンド
+----------------------------
+
+`C-c C-t'
+     メッセージの本文の先頭に移動する（`mail-text'）。
+`C-c C-w'
+     ファイル`~/.signature'をメッセージの本文の末尾に挿入する
+     （`mail-signature'）。
+`C-c C-i FILE RET'
+     FILEの内容を送信メッセージの末尾に挿入する（`mail-attach-file'）。
+`M-x ispell-message'
+     メッセージの本文について綴りの訂正を行う。ただし、他のメッセージか
+     らの引用部分については行わない。
+
+`C-c C-t'（`mail-text'）は、ポイントをヘッダの区切り行のあと、つまり、メッ
+セージ文の先頭に移動します。
+
+`C-c C-w'（`mail-signature'）は、あなたを識別するための決まり文句（サイ
+ン）をメッセージの末尾に追加します。このテキストは、ホームディレクトリの
+ファイル`~/.signature'から取ります。このサインを自動的に挿入するようにす
+るには、変数`mail-signature'に`t'を設定します。そうすると、メイルメッセー
+ジに自動的にファイル`~/.signature'の内容が付加されます。特定のメッセージ
+にサインを付けたくなければ、送信前にバッファ内で削除してください。
+
+変数`mail-signature'に文字列を指定することもできます。すると、送信メッセー
+ジを編集し始めると、その文字列はサインとして自動的に挿入されます。この変
+数にそれ以外のLisp式を指定すると、毎回その式が評価されその値（文字列であ
+ること）がサインになります。
+
+コマンド`M-x ispell-message'で、書きあげたメッセージの綴りを訂正できます。
+このコマンドは、引用部分については調べませんが、あなた自身が打ち込んだテ
+キストは検査します。（字下げや`mail-yank-prefix'を利用して、引用部分とあ
+なたの入力部分を区別します。）*Note Spelling::。
+
+送信メッセージにファイルを付加するには、カレントバッファにファイルを挿入
+する普通のコマンド`C-x i'を使います。しかし、専用コマンド`C-c C-i'
+（`mail-attach-file'）を使うほうがより便利なことがしばしばあります。この
+コマンドは、指定したファイルの内容をバッファの最後、サインがあればそのう
+しろに、ファイル名を含んだ区切り行を付けて挿入します。
+
+（`C-x m'が自動的に行うように）メイル（mail）モードをオンにすると、ノー
+マルフック、`text-mode-hook'と`mail-mode-hook'とが実行されます。新たな送
+信メッセージを初期化するときには、ノーマルフック`mail-setup-hook'を実行
+します。メイルヘッダに特別なフィールドを追加したりメイルバッファの外見を
+変えたいならば、これらのフックを使ってください。*Note Hooks::。
+
+これらのフックの主な違いは、どの時点で起動されるかです。`M-x mail'と打鍵
+すると、`*mail*'バッファを作成後ただちに`mail-mode-hook'が実行されます。
+続いて`mail-setup'関数がバッファにデフォルトの内容を入れます。そのあとで、
+`mail-setup-hook'が実行されます。
+
+
+
+File: emacs-ja.info, Node: Distracting NSA, Next: Mail Methods, Prev: Mail Mode, Up: Sending Mail
+
+NSAを悩ますには
+===============
+
+`M-x spook'は、ランダムに選んだキーワードから成る行を送信メッセージに付
+け加えます。破壊活動を画策していると思わせるような単語の一覧表からキーワー
+ドを選びます。
+
+この機能の思想的背景には、NSA (1) (*Note Distracting NSA-Footnotes::) は
+自分たちが関心を持つ特定のキーワードを含んだすべての電子メイルを盗聴（盗
+読？）しているのではないかという疑いがあります。（NSAは否定していますが、
+彼らなら*当然*そういい張るだろう。）多くの人々が怪しい単語をメッセージに
+付加しておけば、NSAはこうした疑わしいメイルの盗聴で非常に忙しくなり、お
+しまいにはこうした行為を止めるのではないかと考えたからです。
+
+以下は、送信メッセージを編集し始めると自動的に怪しいキーワードを付け加え
+る方法です。
+
+     (add-hook 'mail-setup-hook 'spook)
+
+これでNSAが混乱してもしなくても、少なくとも人々を楽しませることができま
+す。
+
+
+File: emacs-ja.info  Node: Distracting NSA-Footnotes, Up: Distracting NSA
+
+(1) 【訳注】NSAとはNational Security Agency （合衆国国家安全保障局）の略。
+合衆国の公益に基づいて必要により、電話やInternetなどの盗聴を行っていると
+噂されている。この部分は日本国内だけでメイルをやりとりする限りにおいては
+あまり関係はないだろう。
+
+
+
+File: emacs-ja.info, Node: Mail Methods, Prev: Distracting NSA, Up: Sending Mail
+
+メイル作成方式
+==============
+
+本章では、メイルを編集／送信するためのEmacsの通常のモード、メイル（mail）
+モードについて説明してきました。本書ではふれていませんが、MH-Eやメッセー
+ジ（message）モードを含む別のメイル編集／送信機能もEmacsにはあります。コ
+マンド、`C-x m'、`C-x 4 m'、`C-x 5 m'は、指定されたどの方式にも対応して
+います。ですから、メイルを送信するEmacsのさまざまなコマンドや機能を利用
+できます。
+
+メイル作成方式を指定するには、変数`mail-user-agent'を設定します。現時点
+で正しい設定として認められるものは、`sendmail-user-agent'、
+`mh-e-user-agent'、`message-user-agent'です。
+
+異なるメイル作成方式を選択すると、本章で述べた`*mail*'バッファやメイル
+（mail）モードについての説明は役に立ちません。異なったメイル作成方式では、
+異なった名前のバッファで異なった形式のまったく異なったコマンドを使うかも
+しれないからです。
+
+
+
+File: emacs-ja.info, Node: Rmail, Next: Dired, Prev: Sending Mail, Up: Top
+
+メイルの閲覧rmail
+*****************
+
+rmailは、受け取ったメイルを読んだり処理したりするためのEmacsのサブシステ
+ムです。rmailは、メイルメッセージをrmailファイルと呼ばれるファイルに格納
+します。rmailファイル内のメッセージを読むには、rmailモードという特別なメ
+ジャーモードで行います。このモードでは、メイルを取り扱うコマンドを実行す
+るようにほとんどのアルファベット文字を再定義しています。コマンド
+`rmail-mode'でrmailモードに切り替えます。するといつものようにフック
+`rmail-mode-hook'が実行されます。しかし、このコマンドを直接実行しないで
+ください。正しいrmailファイルを訪問しているバッファでない限り、このコマ
+ンドはまともに動きません。
+
+* Menu:
+
+* Basic: Rmail Basics.       Basic concepts of Rmail, and simple use.
+* Scroll: Rmail Scrolling.   Scrolling through a message.
+* Motion: Rmail Motion.      Moving to another message.
+* Deletion: Rmail Deletion.  Deleting and expunging messages.
+* Inbox: Rmail Inbox.        How mail gets into the Rmail file.
+* Files: Rmail Files.        Using multiple Rmail files.
+* Output: Rmail Output.	     Copying message out to files.
+* Labels: Rmail Labels.      Classifying messages by labeling them.
+* Attrs: Rmail Attributes.   Certain standard labels, called attributes.
+* Reply: Rmail Reply.        Sending replies to messages you are viewing.
+* Summary: Rmail Summary.    Summaries show brief info on many messages.
+* Sort: Rmail Sorting.       Sorting messages in Rmail.
+* Display: Rmail Display.    How Rmail displays a message; customization.
+* Editing: Rmail Editing.    Editing message text and headers in Rmail.
+* Digest: Rmail Digest.      Extracting the messages from a digest message.
+* Out of Rmail::	     Converting an Rmail file to mailbox format.
+* Rot13: Rmail Rot13.	     Reading messages encoded in the rot13 code.
+* Movemail: Movemail.        More details of fetching new mail.
+
+
+
+File: emacs-ja.info, Node: Rmail Basics, Next: Rmail Scrolling, Up: Rmail
+
+rmailの基本概念
+===============
+
+もっとも簡単なrmailの使い方では、`~/RMAIL'という1つのrmailファイルにすべ
+てのメイルを保存します。これを"主rmailファイル"（primary Rmail file）と
+いいます。コマンド`M-x rmail'は、主rmailファイルを読み込み、inbox (1)
+(*Note Rmail Basics-Footnotes::) 内の新しいメイルを併合して、最初の未読
+メッセージを表示してメイルを読み始められるようにします。変数
+`rmail-file-name'で、主rmailファイルの名前を指定します。
+
+rmailは、rmailファイルの1つのメッセージだけが見えるようにナロイングしま
+す。表示されているメッセージを"カレントメッセージ"（current message）と
+呼びます。rmailモードの特別なコマンドを使えば、カレントメッセージを削除 
+(2) (*Note Rmail Basics-Footnotes::) する、別のファイルへコピーする、返
+信を送る、別のメッセージへ移動することができます。また、複数のrmailファ
+イルを作って、それらのあいだでメッセージを移すこともできます。
+
+rmailファイル内では、一般にメッセージは受け取った順に並べられます。別の
+順序にソートすることもできます。メッセージには"メッセージ番号"（message
+numbers）として連続した整数が割り振られます。カレントメッセージの番号は、
+rmailのモード行に表示され、そのあとにファイル内の総メッセージ数も表示さ
+れます。`j'キーにメッセージ番号を指定すれば、その番号のメッセージに移動
+できます（*Note Rmail Motion::）。
+
+Emacsの習慣に従って、rmailファイルの変更はファイルを保存したときにだけ反
+映されます。`s'（`rmail-save'）で保存しますが、削除（*Note Rmail
+Deletion::）と指定されたメッセージをファイルからまず抹消します。抹消せず
+にファイルを保存するには、`C-x C-s'を使います。さらに、inboxから新着メイ
+ルを併合したあとにもrmailファイルを保存します（*Note Rmail Inbox::）。
+
+rmailを終了するには`q'（`rmail-quit'）を使います。（メッセージを）抹消し
+rmailファイルを保存してから、別のバッファに切り替えます。しかし、正しく
+「終了」する必要はありません。rmailから別のバッファへ切り替えて、そのあ
+と戻らなければ終了したことになります。（rmailコマンド`b'、`rmail-bury'が
+これを行う。）（変更したファイルにするのと同様に）rmailファイルを確実に
+保存するようにしてください。これには、`C-x s'がよいでしょう（*Note
+Saving::）。
+
+
+File: emacs-ja.info  Node: Rmail Basics-Footnotes, Up: Rmail Basics
+
+(1) 【訳注】システムが到着メイルを格納するファイルのこと。実際のファイル
+名はシステムに依存する。
+
+(2) 【訳注】あとで説明されるように、「削除」といっても実際には「削除印」
+を付けるだけ。
+
+
+
+File: emacs-ja.info, Node: Rmail Scrolling, Next: Rmail Motion, Prev: Rmail Basics, Up: Rmail
+
+メッセージをスクロールする
+==========================
+
+rmailが表示するメッセージが画面に入りきらないとき、残りの部分を読むには
+スクロールする必要があります。これには、`C-v'、`M-v'、`M-<'を使いますが、
+rmailではスクロールを頻繁に行うので、もっと簡単な操作を用意してあります。
+
+`SPC'
+     先へ進める（`scroll-up'）。
+`DEL'
+     まえへ戻す（`scroll-down'）。
+`.'
+     メッセージの先頭へ戻る（`rmail-beginning-of-message'）。
+
+メッセージを読むときもっとも多く行うことは画面単位でのスクロールなので、
+rmailでは、SPCとDELは、それぞれ、`C-v'（`scroll-up'）と`M-v'
+（`scroll-down'）の同義になっています。
+
+コマンド`.'（`rmail-beginning-of-message'）は、選択されているメッセージ
+の先頭に移動します。このコマンドは`M-<'とまったく同じというわけではあり
+ません。まず、マークを設定しません。さらに、カレントメッセージを変更して
+あるとバッファの境界を再設定します。
+
+
+
+File: emacs-ja.info, Node: Rmail Motion, Next: Rmail Deletion, Prev: Rmail Scrolling, Up: Rmail
+
+メッセージ間での移動
+====================
+
+もっとも基本的な操作は、メッセージを読むことです。rmailでこれを行うには、
+メッセージをカレントメッセージにします。メッセージは受け取った順に並んで
+いるので、通常はファイルの中を順に移動して読んでいきます。rmailに入ると、
+カレントメッセージにしたことがない最初のメッセージから始まります（つまり、
+未読を意味する`unseen'属性が付いている最初のもの。*Note Rmail
+Attributes::）。先へ進めば他の新しいメッセージを読めます。まえへ戻れば古
+いメッセージを読み直せます。
+
+`n'
+     削除されたメッセージを飛ばして、削除されていないつぎのメッセージへ
+     移動する（`rmail-next-undeleted-message'）。
+`p'
+     削除されていないまえのメッセージへ移動する
+     （`rmail-previous-undeleted-message'）。
+`M-n'
+     削除されたメッセージも含めてつぎのメッセージへ移動する
+     （`rmail-next-message'）。
+`M-p'
+     削除されたメッセージも含めてまえのメッセージへ移動する
+     （`rmail-previous-message'）。
+`j'
+     最初のメッセージへ移動する。数引数Nを指定すると、メッセージ番号Nの
+     メッセージへ移動する（`rmail-show-message'）。
+`>'
+     最後のメッセージへ移動する（`rmail-last-message'）。
+`<'
+     最初のメッセージへ移動する（`rmail-first-message'）。
+
+`M-s REGEXP RET'
+     正規表現REGEXPに一致するつぎのメッセージへ移動する（`rmail-search'）。
+
+`- M-s REGEXP RET'
+     正規表現REGEXPに一致するまえのメッセージへ移動する。
+
+`n'と`p'は、rmailでメッセージ間を移動する普通の方法です。これらのコマン
+ドは、メッセージ間を順々に移動していきますが、期待どおりに削除されたメッ
+セージは飛び越えます。コマンドの定義名は`rmail-next-undeleted-message'と
+`rmail-previous-undeleted-message'です。削除されたメッセージを飛び越した
+くない場合、たとえば、削除されたメッセージをアンデリート (1) (*Note
+Rmail Motion-Footnotes::)したいときは、（`n'や`p'の）変形である`M-n'や
+`M-p'（`rmail-next-message'、`rmail-previous-message'）を使います。これ
+らのコマンドに数引数を指定すると、反復回数とみなします。
+
+rmailでは、数字を打つだけで数引数を指定できます。始めに`C-u'を打つ必要は
+ありません。
+
+`M-s'（`rmail-search'）コマンドは、rmailにおける探索を行います。通常のイ
+ンクリメンタルサーチコマンド`C-s'もrmailで使えますが、これはカレントメッ
+セージの中だけを探索します。`M-s'コマンドの目的は、他のメッセージを探す
+ことです。正規表現（*Note Regexps::）を読み終えてから、つぎのメッセージ
+の先頭から一致するものを探し始めます。そしてみつかったメッセージを選択し
+ます。REGEXPが空だと`M-s'は最後に使った正規表現を再使用します。
+
+ファイル内で逆向きに他のメッセージを探索するには、`M-s'に負の数引数を指
+定します。rmailでは、`- M-s'と打てばよいのです。
+
+ラベルをもとにメッセージを探索することもできます。*Note Rmail Labels::。
+
+メッセージ番号を指定してメッセージへ移動するには、メッセージ番号を引数と
+して`j'（`rmail-show-message'）を使います。引数がないと`j'は最初のメッセー
+ジを選択します。`<'（`rmail-first-message'）も最初のメッセージを選択しま
+す。 `>'（`rmail-last-message'）は最後のメッセージを選択します。
+
+
+File: emacs-ja.info  Node: Rmail Motion-Footnotes, Up: Rmail Motion
+
+(1) 【訳注】メッセージに付けた削除印を消すこと。
+
+
+
+File: emacs-ja.info, Node: Rmail Deletion, Next: Rmail Inbox, Prev: Rmail Motion, Up: Rmail
+
+メッセージの削除
+================
+
+メッセージを保存しておく必要がなくなったら、そのメッセージを"削除"
+（delete）できます。「無視せよ」という意味の削除印をメッセージに付けます。
+すると、いくつかのrmailコマンドはそのメッセージが存在しないものとして扱
+います。しかし、そのメッセージはまだrmailファイルの中にあって、メッセー
+ジ番号も付いています。
+
+rmailファイルを"抹消"（expunging）すると、削除印が付いたメッセージを本当
+に消し去ります。残ったメッセージには番号を順に振り直します。抹消は、アン
+ダイジェスト（*Note Rmail Digest::）を除いて、メッセージ番号を変更する唯
+一の動作です。
+
+`d'
+     カレントメッセージを削除し、削除されていないつぎのメッセージへ移動
+     する（`rmail-delete-forward'）。
+`C-d'
+     カレントメッセージを削除し、削除されていないまえのメッセージへ移動
+     する（`rmail-delete-backward'）。
+`u'
+     カレントメッセージをアンデリートする、あるいは、削除されたまえのメッ
+     セージへ戻ってアンデリートする（`rmail-undelete-previous-message'）。
+`x'
+     rmailファイル（の削除の付いたメッセージ）を抹消する
+     （`rmail-expunge'）。
+
+rmailにはメッセージを削除するコマンドが2つあります。どちらもカレントメッ
+セージを削除し、別のメッセージを選択します。`d'（`rmail-delete-forward'）
+はすでに削除したメッセージを飛ばしてつぎのメッセージへ移動しますが、
+`C-d'（`rmail-delete-backward'）はまえのメッセージへ移動します。指定した
+方向に削除されていないメッセージがないときは、削除したばかりのメッセージ
+がカレントメッセージのままです。どちらのコマンドに対しても、数引数を指定
+すると、削除後の移動方向を反転します。
+
+rmailがメッセージを削除するときはいつでも、`rmail-delete-message-hook'に
+登録されている関数（群）を起動します。フック関数が起動されるときには、メッ
+セージに削除印が付いていますが、rmailバッファではそのメッセージはカレン
+トメッセージのままです。
+
+削除したすべてのメッセージをrmailファイルから本当に消すには`x'
+（`rmail-expunge'）と打ちます。これを実行するまえならば、"アンデリート"
+（undelete）、つまり、メッセージの削除印を消すことができます。アンデリー
+トコマンド、`u'（`rmail-undelete-previous-message'）は`d'コマンドの効果
+をほとんどの場合打ち消します。カレントメッセージが削除されていれば、カレ
+ントメッセージをアンデリートします。そうでなければ、削除されたメッセージ
+がみつかるまでまえへ戻り、そのメッセージをアンデリートします。
+
+普通は`u'で`d'をアンドゥできます。なぜなら、`d'で削除したメッセージをま
+えへ戻って探してそのメッセージを`u'がアンデリートするからです。しかし、
+`d'がメッセージを削除してから後続のすでに削除されたメッセージを飛び越す
+場合には、うまくいきません。この場合、`u'コマンドは飛び越したメッセージ
+のうちの最後のものをアンデリートします。この問題を回避する簡単な方法はあ
+りません。ですが、`u'コマンドを繰り返せば、最終的にはアンデリートしたい
+メッセージに辿り着きます。あるいは、`M-p'コマンドで目的の削除されたメッ
+セージに移動してから`u'を打ってアンデリートします。
+
+削除されたメッセージには、`deleted'という属性が付きます。その結果、カレ
+ントメッセージが削除されているとモード行に`deleted'と表示されます。メッ
+セージを削除する、あるいは、アンデリートすると、実際には、メッセージにこ
+の属性を付加する、あるいは、取り去るだけです。*Note Rmail Attributes::。
+
+
+
+File: emacs-ja.info, Node: Rmail Inbox, Next: Rmail Files, Prev: Rmail Deletion, Up: Rmail
+
+rmailファイルとinbox
+====================
+
+オペレーティングシステムは、"inbox"と呼ばれるファイルに到着したメイルを
+格納します。rmailを起動すると、`movemail'と呼ばれるCプログラムが走り、
+inboxから主rmailファイルへ新着メッセージをコピーします。ただし、主rmail
+ファイルには、以前のrmailセッションで保存したメッセージも入っています。
+実際にrmailで読むメイルはこのファイルの中にあるのです。この操作を、"新着
+メイルの取得"といいます。rmail内で`g'と打てば、いつでも新着メイルを取得
+できます。
+
+変数`rmail-primary-inbox-list'には、主rmailファイルのinboxとなるファイル
+のリストを格納します。この変数を明示的に設定しなければ、環境変数`MAIL'で
+初期化するか、あるいは、最後の手段として、デフォルトのinboxを使うことを
+意味する`nil'に設定します。デフォルトのinboxはオペレーティングシステムに
+依存して、`/var/mail/USERNAME'、`/usr/spool/mail/USERNAME'、
+`/usr/mail/USERNAME'になります。
+
+システムのデフォルトを調べるには、`C-h v rmail-primary-inbox RET'を使い
+ます。コマンド`set-rmail-inbox-list'で、任意のrmailファイルに対して使う
+inboxファイルを指定できます。*Note Rmail Files::を参照してください。
+
+rmailファイルとinboxに分ける理由は2つあります。
+
+  1. inboxのファイル形式は、オペレーティングシステムや使用するメイルソフ
+     トに依存して異なる。rmailの一部分だけが違いを知っていればよく、しか
+     も、rmail独自の形式への変換方法だけを知っていればよい。
+
+  2. メイル紛失という危険を犯さずにinboxを参照するのはたいへん厄介である。
+     というのは、メイル配送プログラムと相互排除を行う必要があるから。さ
+     らに、オペレーティングシステムごとに相互排除の手法が異なる。いった
+     んinboxからメイルを取り出し、あとは別のrmailファイルを使う方式では、
+     rmailファイルしか扱わないのでrmailの各所で相互排除する必要がなくな
+     る。
+
+rmailでは独自の内部形式（Babyl形式）を使っています。当初からUNIXやGNUシ
+ステムの普通のinbox形式で十分であると気づいていて、inbox形式を内部形式と
+して使おうと計画しています。しかし、たとえファイルの形式が同一であっても、
+rmailファイルはinboxファイルとは独立して存在し続けるでしょう。
+
+
+
+File: emacs-ja.info, Node: Rmail Files, Next: Rmail Output, Prev: Rmail Inbox, Up: Rmail
+
+複数のrmailファイルの扱い方
+===========================
+
+rmailはデフォルトでは個人の主rmailファイルを操作します。このファイルは、
+`~/RMAIL'という名前で、システムのinboxファイルから到着メイルを受け取りま
+す。しかし、別のrmailファイルを作ってそれをrmailで編集することもできます。
+これらのファイルはそれぞれ独自のinboxからメイルを受け取ったり、あるいは、
+rmailコマンドでそれらのあいだでメッセージを移せます（*Note Rmail
+Output::）。
+
+`i FILE RET'
+     FILEをEmacsに読み込み、それに対してrmailを実行する（`rmail-input'）。
+
+`M-x set-rmail-inbox-list RET FILES RET'
+     現在のrmailファイルに対してメイルを取り込むinboxファイルを指定する。
+
+`g'
+     現在のrmailファイルのinboxから新着メイルを取得する
+     （`rmail-get-new-mail'）。
+
+`C-u g FILE RET'
+     inboxファイルFILEから新着メイルを取得する。
+
+主rmailファイル以外のファイルに対してrmailを実行するには、rmailで`i'
+（`rmail-input'）コマンドを使います。このコマンドは、指定されたファイル
+をrmailモードで訪問します。rmailの外からでも`M-x rmail-input'を使えます。
+
+`i'で読み込むファイルは、 通常、正しいrmailファイルであるべきです。そう
+でなければ、rmailは既知のさまざまな形式を用いてメッセージに分解しようと
+試みます。それに成功すれば、ファイル全体をrmailファイルに変換します。存
+在しないファイル名を指定すると、`i'コマンドは新たなrmailファイル用の新し
+いバッファを初期化します。
+
+メニューからrmailファイルを選択することもできます。まず、メニューバーか
+ら項目Classifyを選びます。続いて、Classifyメニューから項目Input Rmail
+Fileを選びます。そして、望みのrmailファイルを選択します。変数
+`rmail-secondary-file-directory'と 変数`rmail-secondary-file-regexp'で、
+メニューに含めるべきファイルを指定します。最初の変数では探すべきディレク
+トリを指定し、2番目の変数ではディレクトリ中のどのファイルか（正規表現に
+一致するもの）を指定します。これらの変数は出力用のファイルを選択するとき
+にも使われます。
+
+各rmailファイルには、inboxファイル名の一覧を持たせることができます。この
+一覧は、`M-x set-rmail-inbox-list RET FILES RET'で指定します。引数には、
+コンマで区切っていくつもファイル名を書けます。引数が空でもかまいませんが、
+その場合、そのファイルにはinboxがないという指定になります。いったんinbox
+の一覧を指定すれば、新たに指定し直さない限り、rmailファイルはそれを覚え
+ています。
+
+特別な例外として、主rmailファイルにinboxファイルを指定しないと、システム
+標準のinboxを使用します。
+
+`g'（`rmail-get-new-mail'）コマンドは、指定されたinboxから現在のrmailファ
+イルにメイルを併合します。rmailファイルにinboxが指定されていなければ、
+`g'は何もしません。コマンド`M-x rmail'も、主rmailファイルに新着メイルを
+併合します。
+
+普通のinboxでないファイルからメイルを併合するには、`C-u g'のように`g'キー
+に数引数を指定します。すると、ファイル名を読み取り、そのファイルからメイ
+ルを併合します。`g'に引数を指定したときには、inboxファイルを削除したり変
+更したりしません。したがって、これは、メッセージファイルを別のメッセージ
+ファイルへ併合する一般的な方法です。
+
+
+
+File: emacs-ja.info, Node: Rmail Output, Next: Rmail Labels, Prev: Rmail Files, Up: Rmail
+
+ファイルへのメッセージのコピー
+==============================
+
+以下のコマンドで、rmailファイルから別のファイルへメッセージをコピーでき
+ます。
+
+`o FILE RET'
+     デフォルトではrmailファイル形式を用いて、カレントメッセージのコピー
+     をファイルFILEへ追加する。（`rmail-output-to-rmail-file'）。
+
+`C-o FILE RET'
+     デフォルトではシステムのinboxファイル形式を用いて、カレントメッセー
+     ジのコピーをファイルFILEへ追加する。
+
+`w FILE RET'
+     メッセージのヘッダ`Subject'からデフォルトのファイル名を作り、メッセー
+     ジの本文だけをファイルFILEに書き出す。
+
+コマンド`o'と`C-o'は、カレントメッセージを指定したファイルへコピーします。
+そのファイルは、rmailファイルでもシステムのinbox形式でもかまいません。出
+力コマンドは、ファイルの形式を確かめその形式に従ってメッセージのコピーを
+書き込みます。
+
+メッセージをUNIXのmailファイル形式のファイルにコピーする場合、これらのコ
+マンドは現在表示しているヘッダもコピーします。表示（しコピー）するヘッダ
+を指定したい場合には、あらかじめ`t'コマンドを使ってください。
+
+コマンド`o'と`C-o'は2つの点で異ります。それぞれ、独自のデフォルトのファ
+イル名を持ち、ファイルが既存でない場合に使用する形式も別です。新たにファ
+イルを作成するとき、`o'コマンドはrmail形式を使いますが、`C-o'コマンドは
+システムのinbox形式を使います。デフォルトのファイル名は、`o'では最後に
+`o'で使ったものになり、`C-o'も最後に`C-o'で使ったものです。
+
+出力ファイルが、現在Emacsバッファで訪れているrmailファイルのときには、出
+力コマンドはメッセージをバッファにコピーします。そのバッファをファイルに
+保存するのはユーザーの責任です。
+
+ときどき、ファイルの内容をそのまま本文にしたようなメッセージを受け取るこ
+ともあるでしょう。`w'（`rmail-output-body-to-file'）コマンドで、（メッセー
+ジのヘッダを除いて）本文をファイルに保存できます。こうしたメッセージでは、
+`Subject'フィールドに意図するファイル名が入れていることがままあるので、
+`w'コマンドはデフォルトの出力ファイル名に`Subject'フィールドを使います。
+しかし、ミニバッファでファイル名を読み取るので、好きなファイル名を指定で
+きます。
+
+メニューを使ってrmailファイルにメッセージを出力することもできます。まず、
+メニューバーの項目Classifyを選択し、Classifyメニューから項目Output Rmail
+File Menuを選択します。そして、望むrmailファイルを選択します。これは、
+`o'コマンドのように、カレントメッセージをそのファイルに出力します。変数
+`rmail-secondary-file-directory'と 変数`rmail-secondary-file-regexp'で、
+メニューに含めるべきファイル名を選択します。最初の変数では探すべきディレ
+クトリを指定し、2番目の変数ではディレクトリ中のどのファイルか（正規表現
+に一致するもの）を指定します。
+
+メッセージをコピーすると、もとのメッセージには`filed'属性が付きます。そ
+のメッセージがカレントメッセージになると、モード行に`filed'と表示されま
+す。メイルメッセージをそれぞれ1個だけにしておきたい場合には、変数
+`rmail-delete-after-output'に`t'を設定します。 すると、コマンド`o'と
+`C-o'は、メッセージをコピーするともとのメッセージを削除します。（必要な
+らば、もとのメッセージをアンデリートできます。）
+
+システムのinbox形式でファイルにメッセージをコピーするときには、rmailで今
+表示しているヘッダフィールドを使います。したがって、`t'コマンドを使って
+ヘッダ全体を見えるようにしてからメッセージをコピーすると、ヘッダ全体がコ
+ピーされます。*Note Rmail Display::。
+
+変数`rmail-output-file-alist'を使うと、カレントメッセージの内容に基づい
+てデフォルトの出力ファイルを賢く指定できます。値はつぎの形式の要素から成
+るリストである必要があります。
+
+     (REGEXP . NAME-EXP)
+
+カレントメッセージがREGEXPで指定されるパターンに一致すると、デフォルトの
+出力ファイル名はNAME-EXPになります。複数の要素がメッセージに一致する場合
+は、最初に一致した要素がデフォルトのファイル名になります。部分要素
+NAME-EXPは、ファイル名を指定する文字列か、より一般的には、文字列としてファ
+イル名を返すLisp式です。変数`rmail-output-file-alist'は、`o'と`C-o'の両
+方に適用されます。
+
+
+
+File: emacs-ja.info, Node: Rmail Labels, Next: Rmail Attributes, Prev: Rmail Output, Up: Rmail
+
+ラベル
+======
+
+各メッセージには分類のためにいろいろな"ラベル"（label）が付きます。各ラ
+ベルには名前があって、名前が異なれば別のラベルです。どのラベルもメッセー
+ジに付いているか付いていないかのどちらかです。少数のラベル名には標準的な
+意味があり、適切な場合にはrmailが自動的にメッセージに付けます。これらの
+特別なラベルを"属性"（attribute）と呼びます。（*Note Rmail Attributes::。）
+それ以外のすべてのラベルはユーザーだけが付けます。
+
+`a LABEL RET'
+     カレントメッセージにラベルLABELを付ける（`rmail-add-label'）。
+`k LABEL RET'
+     カレントメッセージからラベルLABELを取り去る（`rmail-kill-label'）。
+`C-M-n LABELS RET'
+     ラベル群LABELSのどれか1つを持つつぎのメッセージへ移動する
+     （`rmail-next-labeled-message'）。
+`C-M-p LABELS RET'
+     ラベル群LABELSのどれか1つを持つまえのメッセージへ移動する
+     （`rmail-previous-labeled-message'）。
+`C-M-l LABELS RET'
+     ラベル群LABELSのどれかを持つすべてのメッセージのサマリを作成する
+     （`rmail-summary-by-labels'）。
+
+コマンド`a'（`rmail-add-label'）と`k'（`rmail-kill-label'）で、カレント
+メッセージに任意のラベルを付けたり取り去ったりできます。引数が空の場合は、
+もっとも最近に付けたり取り去ったりしたものと同じラベルを意味します。
+
+分類するためのラベルをメッセージにいったん付ければ、そのラベルを使って2
+つのこと、つまり、移動とサマリ作成ができます。
+
+コマンド`C-M-n LABELS RET'（`rmail-next-labeled-message'）は、ラベル群
+LABELSのどれか1つを持つつぎのメッセージへ移動します。引数LABELSには、1つ
+のラベル名、あるいは、コンマで区切って複数のラベル名を指定します。
+`C-M-p'（`rmail-previous-labeled-message'）も同様ですが、まえのメッセー
+ジへ向かって逆向きに移動します。これらのコマンドに対する数引数は、反復回
+数になります。
+
+コマンド`C-M-l LABELS RET'（`rmail-summary-by-labels'）は、指定したラベ
+ルの集まりの中の少なくとも1つのラベルを持つようなメッセージからなるサマ
+リを表示します。引数LABELSは、1つのラベル名、あるいは、コンマで区切った
+複数のラベル名です。サマリについては、*Note Rmail Summary::。
+
+`C-M-n'、`C-M-p'、`C-M-l'に対する引数LABELSが空の場合には、これらのコマ
+ンドのどれかにもっとも最近に指定したラベルの集まりを意味します。
+
+
+
+File: emacs-ja.info, Node: Rmail Attributes, Next: Rmail Reply, Prev: Rmail Labels, Up: Rmail
+
+rmailの属性
+===========
+
+`deleted'や`filed'のようなラベルのいくつかには組み込みの意味付けがあり、
+適切なときに自動的にメッセージに付けられたり取り去られたりします。このよ
+うなラベルを"属性"（attribute）と呼びます。以下はrmailの属性の一覧です。
+
+`unseen'
+     メッセージが一度もカレントメッセージになったことがないことを意味す
+     る。inboxファイルから取り込またときにメッセージに付けられ、メッセー
+     ジがカレントメッセージになると取り去られる。rmailを起動すると、まず
+     この属性を持つ最初のメッセージが表示される。
+`deleted'
+     メッセージが削除されたことを意味する。削除コマンドが付け、アンデリー
+     トコマンドが取り去る（*Note Rmail Deletion::）。
+`filed'
+     メッセージは他のファイルへコピーされたことを意味する。ファイル出力
+     コマンドが付ける（*Note Rmail Files::）。
+`answered'
+     メッセージに返信したことを意味する。`r'（`rmail-reply'）コマンドが
+     付ける。*Note Rmail Reply::。
+`forwarded'
+     メッセージを他者に転送したことを意味する。`f'（`rmail-forward'）コ
+     マンドが付ける。*Note Rmail Reply::。
+`edited'
+     rmail内でメッセージのテキストを編集したことを意味する。*Note Rmail
+     Editing::。
+`resent'
+     メッセージを再送信したことを意味する。`M-xrmail-resend'コマンドが付
+     ける。*Note Rmail Reply::。
+
+これら以外のすべてのラベルはユーザーだけが付けたり取り去ったりするのであっ
+て、標準的な意味はまったくありません。
+
+
+
+File: emacs-ja.info, Node: Rmail Reply, Next: Rmail Summary, Prev: Rmail Attributes, Up: Rmail
+
+返事の送信
+==========
+
+rmailには、メイルの送信にメイル（mail）モードを使うコマンドがいくつかあ
+ります。メイル（mail）モードの使用方法については、rmailから使えるある種
+の機能も含めて、*Note Sending Mail::。本節では、メイル（mail）モードへ入
+るrmailに特有のコマンドを説明します。メイル送信のための通常のキー、`C-x
+m'、`C-x 4 m'、`C-x 5 m'は、rmailモードでも使え、その動作もまったく同じ
+であることに注意してください。
+
+`m'
+     メッセージを送信する（`rmail-mail'）。
+`c'
+     書き始めたメッセージの編集を再開する（`rmail-continue'）。
+`r'
+     カレントメッセージに対する返事を送信する（`rmail-reply'）。
+`f'
+     カレントメッセージを他のユーザーに転送する（`rmail-forward'）。
+`C-u f'
+     カレントメッセージを他のユーザーに再送信する（`rmail-resend'）。
+`M-m'
+     送信できずに戻ってきたメッセージを再度送信する
+     （`rmail-retry-failure'）。
+
+rmailからメッセージを送信するのは、ほとんどの場合、読んでいるメッセージ
+に返信するためでしょう。それには、`r'（`rmail-reply'）と打ちます。すると、
+`C-x 4 m'のように別のウィンドウに`*mail*'バッファが表示されますが、返事
+を出そうとするメッセージに基づいて`Subject'、`To'、`CC'、`In-reply-to'の
+ヘッダフィールドがあらかじめ埋められています。`To'フィールドにはそのメッ
+セージの送信者が書かれ、`CC'フィールドにはそのメッセージのすべての受信者
+が書かれます。
+
+変数`rmail-dont-reply-to-names'を使うと、`CC'に自動的に含まれる受信者か
+ら特定の受信者を除くことができます。この変数の値は（文字列で表した）正規
+表現である必要があります。この正規表現に一致する受信者は`CC'フィールドか
+ら除かれます。デフォルトの値は、あなた自身の名前と`info-'で始まる名前で
+す。（このような名前は、大規模なメイリングリストで全員に送信するために使
+う習慣があるから。）
+
+`CC'フィールドを完全に省いて返信したいときには、数引数を指定して返信コマ
+ンドを入力します。つまり、`C-u r'や`1 r'です。
+
+ひとたび`*mail*'バッファが初期化されれば、メイルの編集や送信は通常どおり
+です（*Note Sending Mail::）。あらかじめ用意されたヘッダフィールドが適切
+でなければ、編集してかまいません。また、メイル（mail）モードのコマンドを
+使うこともでき（*Note Mail Mode::）、`C-c C-y'コマンドでもとの返信メッセー
+ジをヤンクすることもできます。rmailバッファに切り替えてから別のメッセー
+ジを選択し、もとに戻って新しいカレントメッセージをヤンクしてもかまいませ
+ん。
+
+メッセージが相手先へ届かない場合があります。メイル配送プログラムは、通常、
+失敗したメッセージを"失敗メッセージ"に同封して発信者に送り返します。
+rmailのコマンド`M-m'（`rmail-retry-failure'）は、同じメッセージを再送す
+る準備をします。前回と同じ本文とヘッダフィールドで`*mail*'バッファを立ち
+上げます。すぐに`C-c C-c'と打つと、前回とまったく同様にメッセージを再送
+信します。あるいは、本文やヘッダを編集してから送信することもできます。変
+数`rmail-ignored-headers'（*Note Rmail Display::）と同じ形式の変数
+`rmail-retry-ignored-headers'は、再送信するときに送信に失敗したメッセー
+ジから取り除くヘッダを制御します。デフォルトでは`nil'です。
+
+rmailからメッセージを送信する別の場面は、他のユーザーにメッセージを"転送
+"（forward）することでしょう。`f'（`rmail-forward'）はこれを簡単に行える
+ようにします。つまり、カレントメッセージをテキストとして`*mail*'バッファ
+を初期化し、`Subject'も転送メッセージである旨の初期化をします。あとは、
+受信者を埋め込んで送信するだけです。メッセージを転送したとき、受信者はあ
+なた『から』メッセージを受け取りますが、内容はもとのメッセージのままです。
+
+転送されるメッセージは、2つの区切り行に挟まれています。
+また、各行は、行頭に`- 'を挿入してハイフンで始まるように
+修正されます。
+転送メッセージを受け取って、たとえばプログラムのソースコードのように
+文書以外に何か役立つようなものが含まれているときには、
+このような変更をもとに戻せたら便利です。
+これを行うには、転送メッセージを選択して
+`M-x unforward-rmail-message'と打ちます。
+このコマンドは、挿入された`- 'を削除してもとのメッセージを取り出し、
+それをrmailファイルのカレントメッセージの直後に別のメッセージとして挿入します。
+
+"再送"（resending）は転送に似ている別の手段です。異なる点は、再送はもと
+もとの送信者『から』メッセージをもう一度送ることです。また、あなたから送
+られたことを示すために`Resent-from'と`Resent-to'のヘッダフィールドが付加
+されます。rmailでメッセージを再送するには、`C-u f'を使います。（`f'は
+`rmail-forward'を実行するが、数引数を指定すると`rmail-resend'を実行する
+ようになっている。）
+
+`m'（`rmail-mail'）コマンドは、返信ではない送信メッセージを編集し始める
+のに使います。ヘッダフィールドは空のままです。このコマンドと`C-x 4 m'と
+の唯一の違いは、ちょうど`r'がするように`C-c C-y'でrmailバッファを参照で
+きるようにすることです。したがって、`m'コマンドでメッセージに返信したり
+転送したりできます。`r'や`f'でできることは何でもできます。
+
+`c'（`rmail-continue'）コマンドは、書きかけのメッセージの編集を完了した
+り、送信したメッセージを変更したりするために`*mail*'バッファの編集を再開
+します。
+
+変数`rmail-mail-new-frame'に`nil'以外の値を設定すると、メッセージの送信
+を始めるすべてのrmailコマンドは編集用に新しいフレームを作ります。メッセー
+ジを送信したり`Mail'メニューの項目`Don't Send'を使うと、このフレームは削
+除されます。
+
+メッセージを送信するためすべてのrmailコマンドは、あなたが選択したメイル
+作成方式を使います（*Note Mail Methods::）。
+
+
+
+File: emacs-ja.info, Node: Rmail Summary, Next: Rmail Sorting, Prev: Rmail Reply, Up: Rmail
+
+rmailのサマリ機能
+=================
+
+"サマリ"（summary）とは、rmailファイルにあるメイルの概要を示すために1メッ
+セージにつき1行の情報を収めたバッファです。各行には、メッセージ番号、送
+信者、ラベル、サブジェクト（`Subject'の内容）が表示されます。ほとんどす
+べてのrmailコマンドはサマリバッファでも有効で、サマリの現在行が指すメッ
+セージに適用されます。サマリバッファでポイントを動かすと、ポイントがある
+行が指すメッセージを選択します。
+
+1つのサマリバッファは、それに対応した1つのrmailファイルにしか適用されま
+せん。複数のrmailファイルを編集している場合には、それぞれに専用のサマリ
+バッファを作れます。サマリバッファの名前は、rmailバッファの名前に
+`-summary'を付け加えたものです。通常、一度に表示されるサマリバッファは1
+つだけです。
+
+* Menu:
+
+* Rmail Make Summary::	     Making various sorts of summaries.
+* Rmail Summary Edit::	     Manipulating messages from the summary.
+
+
+
+File: emacs-ja.info, Node: Rmail Make Summary, Next: Rmail Summary Edit, Up: Rmail Summary
+
+サマリの作成
+------------
+
+現在のrmailファイルのサマリを作成するコマンドを説明します。いったんrmail
+ファイルに対するサマリバッファを作っておくと、（メッセージの削除／抹消、
+新着メイルの取得などで）rmailファイルが変更されると自動的にサマリも更新
+されます。
+
+`h'
+`C-M-h'
+     すべてのメッセージのサマリを作成する（`rmail-summary'）。
+`l LABELS RET'
+`C-M-l LABELS RET'
+     指定したラベルのいずれかを含むメッセージのサマリを作成する
+     （`rmail-summary-by-labels'）。
+`C-M-r RCPTS RET'
+     指定した受信者名のいずれかを含むメッセージのサマリを作成する
+     （`rmail-summary-by-recipients'）。
+`C-M-t TOPIC RET'
+     指定した正規表現TOPICに一致するサブジェクトを持つメッセージのサマリ
+     を作成する（`rmail-summary-by-topic'）。
+
+コマンド`h'や`C-M-h'（`rmail-summary'）は、現在のrmailファイルのサマリバッ
+ファをこのファイルの全メッセージのサマリで満たします。そして、別のウィン
+ドウにサマリバッファを表示し選択します。
+
+`C-M-l LABELS RET'（`rmail-summary-by-labels'）は、ラベルLABELSのいずれ
+かを含むメッセージに対する部分的なサマリを作ります。LABELSはラベル名をコ
+ンマで区切ったものである必要があります。
+
+`C-M-r RCPTS RET'（`rmail-summary-by-recipients'）は、受信者名RCPTSのい
+ずれかを含むメッセージに対する部分的なサマリを作ります。RCPTSはメイルア
+ドレスをコンマで区切ったものである必要があります。
+
+`C-M-t TOPIC RET'（`rmail-summary-by-topic'）は、正規表現TOPICに一致する
+サブジェクトを持つメッセージに対する部分的なサマリを作成します。
+
+どのrmailファイルにも1つのサマリバッファしかないことに注意してください。
+ある種類のサマリを作成すると、それ以前のサマリは消されてしまいます。
+
+変数`rmail-summary-window-size'は、サマリウィンドウに使う行数を指定しま
+す。変数`rmail-summary-line-count-flag' は、各メッセージのサマリ行にメッ
+セージの行数を表示するかどうかを制御します。
+
+
+
+File: emacs-ja.info, Node: Rmail Summary Edit, Prev: Rmail Make Summary, Up: Rmail Summary
+
+サマリでの編集
+--------------
+
+rmailバッファ自体にできることは、rmailサマリバッファでもほとんどできます。
+実際、いったんサマリバッファを作っておけば、rmailバッファに切り替える必
+要はありません。
+
+サマリバッファ上でポイントを行から行へ移動するだけで、サマリバッファから
+rmailバッファのさまざまなメッセージを選択し表示できます。どんなEmacsコマ
+ンドを使ってポイントを移動してもかまいません。コマンドを実行し終ったとき
+にポイントがある行がどこであっても、rmailバッファのそれに対応するメッセー
+ジが選択されます。
+
+ほとんどすべてのrmailコマンドは、rmailバッファと同様にサマリバッファでも
+機能します。つまり、`d'はサマリバッファでもカレントメッセージを削除し、
+`u'はアンデリートし、`x'は抹消します。`o'と`C-o'はカレントメッセージをファ
+イルに書き込みます。`r'は返信を開始します。サマリバッファにいても、SPCと
+DELを使ってカレントメッセージをスクロールできます。
+
+メッセージのあいだを移動するrmailコマンドもサマリバッファで使えますが、
+事情が少々違っています。つまり、現在サマリが作られているメッセージのあい
+だでしか移動できません。また、rmailバッファが必ず画面に表示されるように
+します。（カーソル移動のコマンドはrmailバッファの内容を更新しますが、
+rmailバッファがウィンドウに表示されていなければ表示されません。）以下は
+これらのコマンドの一覧です。
+
+`n'
+     （削除された）「deleted」となっている行を飛び越してつぎの行に移動し、
+     そのメッセージを選択する。
+`p'
+     （削除された）「deleted」となっている行を飛び越してまえの行に移動し、
+     そのメッセージを選択する。
+`M-n'
+     つぎの行に移動し、そのメッセージを選択する。
+`M-p'
+     まえの行に移動し、そのメッセージを選択する。
+`>'
+     最後の行に移動し、そのメッセージを選択する。
+`<'
+     最初の行に移動し、そのメッセージを選択する。
+`M-s PATTERN RET'
+     カレントメッセージから始めてPATTERNに一致するメッセージを探索する。
+     みつかったメッセージを選択し、サマリバッファ内のそのメッセージに対
+     応する行にポイントを移動する。
+
+rmailバッファで、削除、アンデリート、新着メイルの取得、別のメッセージの
+選択を実行すると、サマリバッファを必ず更新します。変数
+`rmail-redisplay-summary'が`nil'以外ならば、これらのコマンドを実行すると
+サマリバッファは画面に表示されます。
+
+サマリを使い終ったら`Q'（`rmail-summary-wipe'）と打ってサマリバッファの
+ウィンドウを削除します。サマリでrmailを終了することもできます。`q'
+（`rmail-summary-quit'）はサマリウィンドウを削除し、rmailファイルを保存
+してrmailを抜け、別のバッファに切り替えます。
+
+
+

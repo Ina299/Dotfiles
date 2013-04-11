@@ -1,0 +1,1985 @@
+Info file: elisp-ja.info,    -*-Text-*-
+produced by `texinfo-format-buffer'
+from file `elisp-ja.texi'
+using `texinfmt.el' version 2.38 of 3 July 1998.
+
+
+INFO-DIR-SECTION Editors
+START-INFO-DIR-ENTRY
+* Elisp: (elisp-ja).	The Emacs Lisp Reference Manual.
+END-INFO-DIR-ENTRY
+
+
+
+Emacs Lispリファレンスマニュアル2.5版であり、Emacs 20.3版に対応します。
+
+Published by the Free Software Foundation 59 Temple Place, Suite 330
+Boston, MA 02111-1307 USA
+
+Copyright (C) 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1998 Free
+Software Foundation, Inc.
+
+Permission is granted to make and distribute verbatim copies of this
+manual provided the copyright notice and this permission notice are
+preserved on all copies.
+
+Permission is granted to copy and distribute modified versions of this
+manual under the conditions for verbatim copying, provided that the
+entire resulting derived work is distributed under the terms of a
+permission notice identical to this one.
+
+Permission is granted to copy and distribute translations of this manual
+into another language, under the above conditions for modified versions,
+except that this permission notice may be stated in a translation
+approved by the Foundation.
+
+Permission is granted to copy and distribute modified versions of this
+manual under the conditions for verbatim copying, provided also that the
+section entitled "GNU General Public License" is included exactly as in
+the original, and provided that the entire resulting derived work is
+distributed under the terms of a permission notice identical to this
+one.
+
+Permission is granted to copy and distribute translations of this manual
+into another language, under the above conditions for modified versions,
+except that the section entitled "GNU General Public License" may be
+included in a translation approved by the Free Software Foundation
+instead of in the original English.
+
+
+
+
+
+
+File: elisp-ja.info, Node: Intro Eval, Next: Forms, Prev: Evaluation, Up: Evaluation
+
+評価とは
+========
+
+Lispインタープリタ、つまり、エバリュエータは、与えられた式の値を計算する
+プログラムです。Lispで書いた関数を呼び出すと、エバリュエータは、その関数
+本体内の式を評価することで関数の値を計算します。したがって、どんなLispプ
+ログラムの実行でも、Lispインタープリタを実行することを意味します。
+
+エバリュエータによるオブジェクトの扱い方は、主にオブジェクトのデータ型に
+依存します。
+
+評価することを意図したLispオブジェクトを"式"（expression）とか"フォーム"
+（form）と呼びます。式はデータオブジェクトであり単なるテキストではないと
+いう事実は、Lisp様言語と典型的なプログラム言語との基本的な違いの1つです。
+どんなオブジェクトでも評価できますが、実用上は、数、シンボル、リスト、文
+字列を評価することが多いのです。
+
+Lisp式を読み取りその式を評価することはとても一般的なことですが、読み取り
+と評価は別々の動作であり、それぞれを別々に実行することもできます。読み取
+り自体では、なにも評価しません。Lispオブジェクトの表示表現をオブジェクト
+そのものに変換します。このオブジェクトを評価すべきフォームとするか、まっ
+たく別の目的に使うかは、`read'の呼び出し側で決まります。
+
+評価とコマンドキーの解釈を混同しないでください。エディタコマンドループは、
+有効なキーマップを用いてキーボード入力をコマンド（対話的に呼び出し可能な
+関数）に変換し、`call-interactively'を使ってコマンドを起動します。コマン
+ドがLispで書いてあれば、コマンド自体の実行には評価が関わってきますが、そ
+のことは、コマンドキーの解釈自体には含まれていません。
+
+評価は再帰的な処理です。つまり、フォームの評価では、`eval'を呼び出してそ
+のフォームの一部分を評価することもあります。たとえば、関数呼び出しの評価
+においては、まず、関数呼び出しの各引数を評価してから、関数本体の各フォー
+ムを評価します。`(car x)'の評価を考えてみましょう。まず最初に`x'を再帰的
+に評価する必要があります。その値を関数`car'の引数として渡せるようにする
+のです。
+
+関数呼び出しの評価においては、最終的に指定した関数を呼び出します。*Note
+Functions::。関数の実行そのものも、関数定義を評価する場合もあります。あ
+るいは、関数はC言語で実装されたLisp基本関数かもしれませんし、バイトコー
+ド関数かもしれません（*Note Byte Compilation::）。
+
+フォームの評価は、"環境"（environment）と呼ばれる文脈において行われます。
+環境とは、すべてのLisp変数の現在値と束縛です (1) (*Note Intro
+Eval-Footnotes::)。フォームが新たな束縛を作らずに変数を参照する場合には、
+現在の環境におけるその変数の束縛の値を使います。*Note Variables::。
+
+
+フォームを評価すると、変数（*Note Local Variables::）を束縛して、再帰的
+評価のための新たな環境を作ることがあります。これらの環境は一時的なもので、
+そのフォームの評価を完了すると消えてしまいます。フォームは恒久的な変更を
+行ってもかまいません。このような変更を"副作用"（side effects）と呼びます。
+副作用を持つフォームの例は、`(setq foo 1)'です。
+
+フォームの各種類ごとの評価の意味の詳細は、以下で説明します（*Note
+Forms::）。
+
+
+File: elisp-ja.info  Node: Intro Eval-Footnotes, Up: Intro Eval
+
+(1) 『環境』のこの定義は、プログラムの結果に影響するすべてのデータを含む
+ことは意図していない。
+
+
+
+File: elisp-ja.info, Node: Forms, Next: Quoting, Prev: Intro Eval, Up: Evaluation
+
+フォームの種類
+==============
+
+評価することを意図したLispオブジェクトを"フォーム"（form）と呼びます。
+Emacsがどのようにフォームを評価するかは、そのデータ型に依存します。Emacs
+には、評価方法が異なる3種類のフォームがあります。シンボル、リスト、およ
+び、『その他すべての型』です。本節では、3種類すべてについて1つ1つ説明し
+ます。まず、自己評価型フォームである『その他すべての型』から説明します。
+
+* Menu:
+
+* Self-Evaluating Forms::   Forms that evaluate to themselves.
+* Symbol Forms::            Symbols evaluate as variables.
+* Classifying Lists::       How to distinguish various sorts of list forms.
+* Function Indirection::    When a symbol appears as the car of a list,
+			      we find the real function via the symbol.
+* Function Forms::          Forms that call functions.
+* Macro Forms::             Forms that call macros.
+* Special Forms::           "Special forms" are idiosyncratic primitives,
+                              most of them extremely important.
+* Autoloading::             Functions set up to load files
+                              containing their real definitions.
+
+
+
+File: elisp-ja.info, Node: Self-Evaluating Forms, Next: Symbol Forms, Prev: Forms, Up: Forms
+
+自己評価型フォーム
+------------------
+
+"自己評価型フォーム"（self-evaluating form）とは、リストでもシンボルでも
+ない任意のフォームのことです。自己評価型フォームはそれ自身に評価され、評
+価結果は評価されるオブジェクトと同じものです。つまり、数25は25と評価され、
+文字列`"foo"'は文字列`"foo"'と評価されます。同様に、ベクトルを評価しても
+ベクトルの個々の要素を評価することはありません。その内容をまったく変更す
+ることなく、同じベクトルを返します。
+
+     '123               ; 評価していない数
+          => 123
+     123                ; 普通どおり評価。結果は同じ
+          => 123
+     (eval '123)        ; 『手で』評価。結果は同じ
+          => 123
+     (eval (eval '123)) ; 2回評価してもなにも変わらない
+          => 123
+
+Lispコードにおいては、数、文字、文字列、さらにベクトルでさえも、それらが
+自己評価型である事実を利用して書くのが普通です。しかし、入力構文を持たな
+い型については、このようにしません。というのは、それらをテキストとして書
+く方法がないからです。そのような型を含むLisp式を構成するには、Lispプログ
+ラムを使います。
+
+     ;; バッファオブジェクトを含む式を作る
+     (setq print-exp (list 'print (current-buffer)))
+          => (print #<buffer eval.texi>)
+     ;; それを評価する
+     (eval print-exp)
+          -| #<buffer eval.texi>
+          => #<buffer eval.texi>
+
+
+
+File: elisp-ja.info, Node: Symbol Forms, Next: Classifying Lists, Prev: Self-Evaluating Forms, Up: Forms
+
+シンボルフォーム
+----------------
+
+シンボルを評価するときには、シンボルを変数として扱います。その結果は、値
+があれば、変数の値です。（値セルが空であり）値がなければ、エラーを通知し
+ます。変数の使い方について詳しくは、*Note Variables::。
+
+つぎの例では、`setq'を使ってシンボルの値を設定します。そのあとでシンボル
+を評価すると、`setq'で保存した値を取り出せます。
+
+     (setq a 123)
+          => 123
+     (eval 'a)
+          => 123
+     a
+          => 123
+
+シンボル`nil'と`t'は特別に扱い、`nil'の値はつねに`nil'であり、`t'の値は
+つねに`t'です。これらに別の値を設定したり、別の値を束縛することはできま
+せん。したがって、`eval'はこれらを他のシンボルと同様に扱いますが、これら
+2つのシンボルは自己評価型フォームのようにふるまいます。`:'で始まる名前の
+シンボルも同じ意味で自己評価型であり、同様に、その値を変更できません。
+*Note Constant Variables::。
+
+
+
+File: elisp-ja.info, Node: Classifying Lists, Next: Function Indirection, Prev: Symbol Forms, Up: Forms
+
+リストフォームの分類
+--------------------
+
+フォームが空ではないリストならば、その最初の要素に依存して、関数呼び出し、
+マクロ呼び出し、スペシャルフォームのいずれかです。これらの3種類のフォー
+ムは、以下に説明するように、異なる方法で評価されます。リストの残りの要素
+は、関数、マクロ、スペシャルフォームの"引数"（arguments）になります。
+
+空ではないリストを評価する最初の手順は、その先頭要素を調べることです。こ
+の要素は、それだけで、空ではないリストのフォームの種類を決定し、リストの
+残りをどのように処理するかを決定します。SchemeなどのLispの一部の方言と違っ
+て、先頭要素は評価*しません*。
+
+
+
+File: elisp-ja.info, Node: Function Indirection, Next: Function Forms, Prev: Classifying Lists, Up: Forms
+
+シンボルの関数間接
+------------------
+
+リストの先頭要素がシンボルであると、評価処理ではシンボルの関数セルを調べ、
+もとのシンボルのかわりにその内容を使います。その内容が別のシンボルである
+と、"シンボルの関数間接"（symbol function indirection）と呼ばれるこの処
+理をシンボルでないものを得るまで繰り返します。シンボルの関数セルに格納さ
+れた関数名としてのシンボルの使い方について詳しくは、*Note Function
+Names::。
+
+この処理の結果、無限ループになる場合もあります。つまり、シンボルの関数セ
+ルが同じシンボルを指している場合です。あるいは、シンボルの関数セルが空の
+場合もありえます。その場合、サブルーティン`symbol-function'は、エラー
+`void-function'を通知します。いずれの場合でもなければ、最終的にはシンボ
+ルでないものを取得し、それは関数などの適切なオブジェクトであるはずです。
+
+より正確にいえば、Lisp関数（ラムダ式）、バイトコード関数、基本関数、Lisp
+マクロ、スペシャルフォーム、自動ロードオブジェクトのいずれかを取得してい
+るはずです。これらの各種類ごとに、以下の1つ1つの節で説明します。オブジェ
+クトがこれらのいずれの型でもない場合には、エラー`invalid-function'を通知
+します。
+
+つぎの例は、シンボルの関数間接の処理を図示したものです。`fset'を使ってシ
+ンボルの関数セルに設定し、`symbol-function'を使って関数セルの内容を取り
+出します（*Note Function Cells::）。具体的には、シンボル`car'を`first'の
+関数セルに格納し、シンボル`first'を`erste'の関数セルに格納します。
+
+     ;; このような関数セルのリンクを作る
+     ;;   -------------       -----        -------        -------
+     ;;  | #<subr car> | <-- | car |  <-- | first |  <-- | erste |
+     ;;   -------------       -----        -------        -------
+
+     (symbol-function 'car)
+          => #<subr car>
+     (fset 'first 'car)
+          => car
+     (fset 'erste 'first)
+          => first
+     (erste '(1 2 3))   ; `erste'が指す関数を呼び出す
+          => 1
+
+一方、つぎの例では、シンボルの関数間接を使わずに関数を呼び出します。とい
+うのは、先頭引数はLispの無名関数であって、シンボルではないからです。
+
+     ((lambda (arg) (erste arg))
+      '(1 2 3)) 
+          => 1
+
+関数を実行することは、その本体を評価することです。この過程では、`erste'
+を呼び出すときにシンボルの関数間接が関わります。
+
+組み込み関数`indirect-function'は、明示的にシンボルの関数間接を行う簡単
+な方法です。
+
+ -- Function: indirect-function FUNCTION
+     この関数は、関数としてのFUNCTIONの意味を返す。FUNCTIONがシンボルで
+     あればFUNCTIONの関数定義を探し、その値から再度繰り返す。FUNCTIONが
+     シンボルでなければFUNCTIONそのものを返す。
+
+     Lispで`indirect-function'を定義するとつぎのようになる。
+
+          (defun indirect-function (function)
+            (if (symbolp function)
+                (indirect-function (symbol-function function))
+              function))
+
+
+
+File: elisp-ja.info, Node: Function Forms, Next: Macro Forms, Prev: Function Indirection, Up: Forms
+
+関数フォームの評価
+------------------
+
+評価すべきリストの先頭要素が、Lisp関数オブジェクト、バイトコードオブジェ
+クト、基本関数オブジェクトの場合、そのリストは"関数呼び出し"（function
+call）です。たとえば、つぎは、関数`+'の呼び出しです。
+
+     (+ 1 x)
+
+関数呼び出しを評価する最初の手順は、リストの残りの要素を左から右へ順に評
+価することです。その結果は実引数の値になり、1つの値がリストの1つの要素に
+対応します。つぎの手順は、引数のリストで関数を呼び出すことで、実質的には、
+関数`apply'（*Note Calling Functions::）を使います。関数がLispで書いてあ
+れば、関数の引数変数を束縛するために引数を使います（*Note Lambda
+Expressions::）。そして、関数本体のフォーム群を順番に評価し、本体の最後
+のフォームの値が関数呼び出しの値になります。
+
+
+
+File: elisp-ja.info, Node: Macro Forms, Next: Special Forms, Prev: Function Forms, Up: Forms
+
+Lispマクロの評価
+----------------
+
+評価すべきリストの先頭要素がマクロオブジェクトの場合、そのリストは"マク
+ロ呼び出し"（macro call）です。マクロ呼び出しを評価するときは、リストの
+残りの要素を評価*しません*。そのかわりに、要素そのものをマクロの引数とし
+て使います。マクロ定義は、マクロの"展開形"（expansion）と呼ばれる置換フォー
+ムを計算し、もとのフォームのかわりに展開形を評価します。展開形は、どんな
+種類のフォームでもかまいません。自己評価型の定数、シンボル、あるいは、リ
+ストです。展開形そのものがマクロ呼び出しであると、マクロ呼び出し以外の
+フォームを得られるまで、展開形を得る処理を繰り返します。
+
+通常のマクロ呼び出しの評価は、展開形を評価することで完了します。しかし、
+マクロの展開形を必ずしもただちに評価する必要はなく、まったく評価しなくて
+もかまいません。というのは、別のプログラムもマクロ呼び出しを展開し、それ
+らは展開形を評価するものもあれば、評価しないものもあるからです。
+
+普通、引数の式は、マクロ展開の計算過程では評価せず、展開形の一部として現
+れます。そして、展開形を評価するときに引数が計算されます。
+
+たとえば、つぎのようなマクロ定義があったとします。
+
+     (defmacro cadr (x)
+       (list 'car (list 'cdr x)))
+
+`(cadr (assq 'handler list))'のような式はマクロ呼び出しであり、つぎのよ
+うな展開形になります。
+
+     (car (cdr (assq 'handler list)))
+
+引数`(assq 'handler list)'が展開形に現れていることに注意してください。
+
+Emacs Lispのマクロに関する完全な記述は、*Note Macros::。
+
+
+
+File: elisp-ja.info, Node: Special Forms, Next: Autoloading, Prev: Macro Forms, Up: Forms
+
+スペシャルフォーム
+------------------
+
+"スペシャルフォーム"（special form）は、その引数を評価しないように特別な
+印が付いた基本関数です。ほとんどのスペシャルフォームは、制御構造を定義し
+たり、変数を束縛したりします。これらはどれも関数ではできないことです。
+
+各スペシャルフォームには、どの引数は評価し、どの引数は評価せずに使うかと
+いったそれぞれに独自の規則があります。特定の引数を評価するかどうかは、他
+の引数の評価結果に依存することもあります。
+
+以下に、Emacs Lispのすべてのスペシャルフォームをアルファベット順に、参照
+箇所とともにあげておきます。
+
+`and'
+     *Note Combining Conditions::
+
+`catch'
+     *Note Catch and Throw::
+
+`cond'
+     *Note Conditionals::
+
+`condition-case'
+     *Note Handling Errors::
+
+`defconst'
+     *Note Defining Variables::
+
+`defmacro'
+     *Note Defining Macros::
+
+`defun'
+     *Note Defining Functions::
+
+`defvar'
+     *Note Defining Variables::
+
+`function'
+     *Note Anonymous Functions::
+
+`if'
+     *Note Conditionals::
+
+`interactive'
+     *Note Interactive Call::
+
+`let'
+`let*'
+     *Note Local Variables::
+
+`or'
+     *Note Combining Conditions::
+
+`prog1'
+`prog2'
+`progn'
+     *Note Sequencing::
+
+`quote'
+     *Note Quoting::
+
+`save-current-buffer'
+     *Note Current Buffer::
+
+`save-excursion'
+     *Note Excursions::
+
+`save-restriction'
+     *Note Narrowing::
+
+`save-window-excursion'
+     *Note Window Configurations::
+
+`setq'
+     *Note Setting Variables::
+
+`setq-default'
+     *Note Creating Buffer-Local::
+
+`track-mouse'
+     *Note Mouse Tracking::
+
+`unwind-protect'
+     *Note Nonlocal Exits::
+
+`while'
+     *Note Iteration::
+
+`with-output-to-temp-buffer'
+     *Note Temporary Displays::
+
+     Common Lispに関した注意：` ' GNU Emacs LispとCommon Lispのスペシャ
+     ルフォームを比較してみる。`setq'、`if'、および、`catch'は、Emacs
+     LispでもCommon Lispでもスペシャルフォームである。`defun'は、Emacs
+     Lispではスペシャルフォームであるが、Common Lispではマクロである。
+     `save-excursion'は、Emacs Lispではスペシャルフォームであるが、
+     Common Lispには存在しない。`throw'は、Common Lispでは（複数の値を返
+     す必要があるため）スペシャルフォームであるが、Emacs Lispでは（複数
+     の値はないため）関数である。
+
+
+
+File: elisp-ja.info, Node: Autoloading, Prev: Special Forms, Up: Forms
+
+自動ロード
+----------
+
+"自動ロード"（autoload）は、関数やマクロの関数定義をEmacsにまだロードし
+ていなくても、関数やマクロを呼び出せるようにする機構です。定義を収めたファ
+イルを指定します。シンボルの関数定義に自動ロードオブジェクトあるとき、そ
+のシンボルを関数として呼び出すと、指定したファイルを自動的にロードします。
+そうしてから、当該ファイルからロードした実際の定義を呼び出します。*Note
+Autoload::。
+
+
+
+File: elisp-ja.info, Node: Quoting, Next: Eval, Prev: Forms, Up: Evaluation
+
+クォート
+========
+
+スペシャルフォーム`quote'は、単一の引数を評価せずに書かれたとおりに返し
+ます。これは、自己評価型オブジェクトではない定数シンボルや定数リストをプ
+ログラム内に書く手段です。（数、文字列、ベクトルなどの自己評価型オブジェ
+クトをクォートする必要はない。）
+
+ -- Special form: quote OBJECT
+     このフォームはOBJECTを評価せずに返す。
+
+`quote'はプログラム内で頻繁に使うので、Lispには便利な入力構文が用意して
+あります。アポストロフ文字（`''）に続けた（入力構文で書いた）Lispオブジェ
+クトは、先頭要素が`quote'であり2番目の要素がそのオブジェクトであるリスト
+に展開されます。したがって、入力構文`'x'は、`(quote x)'の省略形です。
+
+`quote'を使った式の例をいくつかあげておきます。
+
+     (quote (+ 1 2))
+          => (+ 1 2)
+     (quote foo)
+          => foo
+     'foo
+          => foo
+     "foo
+          => (quote foo)
+     '(quote foo)
+          => (quote foo)
+     ['foo]
+          => [(quote foo)]
+
+他のクォートの書き方には、`function'（*Note Anonymous Functions::）があ
+ります。これは、Lispで書いた無名ラムダ式をコンパイルするようにします。ま
+た、``'（*Note Backquote::）は、リストの一部分をクォートし、他の部分は計
+算結果で置き換えるために使います。
+
+
+
+File: elisp-ja.info, Node: Eval, Prev: Quoting, Up: Evaluation
+
+評価（eval）
+============
+
+ほとんどの場合、実行中のプログラムにフォームが現れるとフォームは自動的に
+評価されます。稀なことですが、実行時に計算したフォームを評価するようにコー
+ドを書く必要があるかもしれません。たとえば、編集中のテキストからフォーム
+を読み取ったり、属性リストからフォームを取り出した場合などです。このよう
+な場合には、関数`eval'を使います。
+
+本節で説明した関数や変数は、フォームを評価したり、評価処理に制限を課した
+り、最後の戻り値を記録したりします。ファイルをロードしても評価が行われま
+す（*Note Loading::）。
+
+*注意：*` ' データ構造の中に関数を格納してそれを`funcall'や`apply'で呼び
+出すほうが、データ構造の中に式を格納してそれを評価するより、一般に明確で
+柔軟性があります。関数を使うとそれらに引数として情報を渡すことができます。
+
+ -- Function: eval FORM
+     この関数は、式を評価する基本的な関数である。FORMを現在の環境におい
+     て評価し、その結果を返す。評価処理はオブジェクトの型に依存する
+     （*Note Forms::）。
+
+     `eval'は関数なので、`eval'の呼び出しに現れる引数の式は2度評価される。
+     `eval'を呼び出すまえの準備で1回、関数`eval'自身による評価でもう1回
+     である。例を示す。
+
+          (setq foo 'bar)
+               => bar
+          (setq bar 'baz)
+               => baz
+          ;; `eval'は引数`foo'を受け取る
+          (eval 'foo)
+               => bar
+          ;; `eval'は引数`bar'を受け取る。それは`foo'の値
+          (eval foo)
+               => baz
+
+     `eval'の呼び出しの深さは、`max-lisp-eval-depth'（下記参照）に制限さ
+     れる。
+
+ -- コマンド: eval-region START END &optional STREAM READ-FUNCTION
+     この関数は、カレントバッファのSTARTとENDで指定したリージョン内のフォー
+     ム群を評価する。リージョンからフォームを読み取り、それらに対して
+     `eval'を呼び出すことをリージョンの末尾に達するまで、あるいは、処理
+     されないエラーが通知されるまで繰り返す。
+
+     STREAMが`nil'以外ならば、リージョン内の式を評価した結果の値はSTREAM
+     を使って表示する。*Note Output Streams::。
+
+     READ-FUNCTIONが`nil'以外にならば、それは関数である必要があり、
+     `read'のかわりに式を1つ1つ読むために使われる。この関数は、入力用の
+     ストリームである1つの引数で呼び出される。変数`load-read-function'
+     （*Note How Programs Do Loading::）を使ってこの関数を指定することも
+     できるが、引数READ-FUNCTIONを用いたほうが堅牢である。
+
+     `eval-region'はつねに`nil'を返す。
+
+ -- コマンド: eval-current-buffer &optional STREAM
+     これは`eval-region'と同様だが、バッファ全体に作用する。
+
+ -- Variable: max-lisp-eval-depth
+     この変数は、（エラーメッセージ`"Lisp nesting exceeds
+     max-lisp-eval-depth"'で）エラーを通知までの`eval'、`apply'、
+     `funcall'の呼び出しの最大の深さを制限する。この制限、および、これを
+     超えたときのエラーは、不正に定義された関数によってLispが無限に再帰
+     することを防止する1つの方法である。
+
+     深さ制限は、Lispコードによる明示的な呼び出しに加えて、Lisp式で書か
+     れた関数の呼び出しや関数呼び出しの引数や関数本体のフォームの再帰的
+     な評価などの内部的な`eval'、`apply'、`funcall'の呼び出しも数える。
+
+     この変数のデフォルト値は300。これに100未満の値を設定すると、指定し
+     た値に達するとLispは100に設定し直す。Lispデバッガに入ったとき、制限
+     に近い場合にはデバッガ自身が実行できることを保証するために値を増や
+     す。
+
+     `max-specpdl-size'は、入れ子の深さを制限する別の方法である。*Note
+     Local Variables::。
+
+ -- Variable: values
+     この変数の値は、バッファから式を読み取り、評価し、結果を表示する
+     Emacsの標準コマンドが行ったすべての式の戻り値のリストである。リスト
+     の順序は、最新のものが最初にくる。
+
+          (setq x 1)
+               => 1
+          (list 'A (1+ 2) auto-save-default)
+               => (A 3 t)
+          values
+               => ((A 3 t) 1 ...)
+
+     この変数は、最近評価したフォームの値を参照するのに便利である。
+     `values'そのものの値の表示は非常に長くなる可能性があるので、その値
+     を表示するのはよくない。そのかわりに、つぎのようにして特定の要素を
+     調べる。
+
+          ;; もっとも最近の評価結果を参照する
+          (nth 0 values)
+               => (A 3 t)
+          ;; こうすると、新たな要素が追加され、
+          ;;   すべての要素が1つうしろへさがる
+          (nth 1 values)
+               => (A 3 t)
+          ;; この例を実行するまえの最新のもののつぎの要素を取得する
+          (nth 3 values)
+               => 1
+
+
+
+File: elisp-ja.info, Node: Control Structures, Next: Variables, Prev: Evaluation, Up: Top
+
+制御構造
+********
+
+Lispプログラムは、式、すなわち、"フォーム"（forms、*Note Forms::）から成
+ります。フォームを"制御構造"（control structures）で囲むことで、フォーム
+の実行順序を制御します。制御構造はスペシャルフォームであり、その内側にあ
+るフォームの実行をいつ行うか、行わないか、何回行うかを制御します。
+
+もっとも単純な実行順序は逐次実行です。最初のフォームAを実行し、それから
+つぎのフォームBを実行し、といった具合です。関数の本体やLispコードのファ
+イルのトップレベルに複数のフォームを順に書くと、このようになります。つま
+り、書かれている順番にフォームを実行します。これを"テキスト上の順序"
+（textual order）と呼びます。たとえば、関数本体が2つのフォームAとBから成
+る場合、関数を評価すると、まずAを評価し、つぎにBを評価して、関数の値はB
+の値になります。
+
+明示的な制御構造により、逐次実行以外の実行順序が可能になります。
+
+Emacs Lispには数種類の制御構造があり、逐次実行の変形、条件付き実行、繰り
+返し実行、（制御された）ジャンプなどです。これらすべては、以下に説明しま
+す。組み込みの制御構造はスペシャルフォームです。というのは、それらのサブ
+フォームは必ずしも評価しませんし、逐次評価するわけでもないからです。マク
+ロを使えば、独自の制御構造の構文を定義できます（*Note Macros::）。
+
+* Menu:
+
+* Sequencing::             Evaluation in textual order.
+* Conditionals::           `if', `cond', `when', `unless'.
+* Combining Conditions::   `and', `or', `not'.
+* Iteration::              `while' loops.
+* Nonlocal Exits::         Jumping out of a sequence.
+
+
+
+File: elisp-ja.info, Node: Sequencing, Next: Conditionals, Prev: Control Structures, Up: Control Structures
+
+逐次実行
+========
+
+現れる順番にフォームを評価することは、1つのフォームから別のフォームへ制
+御を移すもっとも一般的な方法です。関数本体などのある種の文脈では、自動的
+にこのようになります。それ以外では、これを行う制御構造の構文を使う必要が
+あります。`progn'がその制御構造で、Lispのもっとも単純な制御構造です。
+
+スペシャルフォーム`progn'はつぎのような形です。
+
+     (progn A B C ...)
+
+これは、フォーム、A、B、C、…をこの順に評価します。これらのフォームを
+`progn'フォームの本体と呼びます。本体の最後のフォームの値が、`progn'全体
+の値になります。
+
+初期のころのLispでは、`progn'は、2つ以上のフォームを逐次実行しそれらの最
+後の値を使う唯一の方法でした。しかし、プログラマは、（当時は）1つのフォー
+ムしか許されていない関数の本体では、`progn'を使う必要がしばしばあること
+に気づきました。そのため、関数本体を『暗黙の`progn'』にしたのです。つま
+り、実際の`progn'の本体のように、複数のフォームを許すようにしたのです。
+多くの他の制御構造も、同様に、暗黙の`progn'です。その結果、`progn'は、か
+つてほどは多用されません。現在では、`unwind-protect'、`and'、`or'の内側
+や、`if'のTHEN部分で必要とされるのがほとんどです。
+
+ -- Special form: progn FORMS...
+     このスペシャルフォームは、FORMSのフォームすべてをテキスト上の順に評
+     価し、最後のフォームの結果を返す。
+
+          (progn (print "The first form")
+                 (print "The second form")
+                 (print "The third form"))
+               -| "The first form"
+               -| "The second form"
+               -| "The third form"
+          => "The third form"
+
+他の2つの制御構造も同様にフォームを逐次評価しますが、返す値が異なります。
+
+ -- Special form: prog1 FORM1 FORMS...
+     このスペシャルフォームは、FORM1、FORMSのフォームすべてをテキスト上
+     の順に評価し、FORM1の結果を返す。
+
+          (prog1 (print "The first form")
+                 (print "The second form")
+                 (print "The third form"))
+               -| "The first form"
+               -| "The second form"
+               -| "The third form"
+          => "The first form"
+
+     変数のリストから先頭要素を取り除き、取り除いた要素を返すにはつぎの
+     ように書く。
+
+          (prog1 (car x) (setq x (cdr x)))
+
+ -- Special form: prog2 FORM1 FORM2 FORMS...
+     このスペシャルフォームは、FORM1、FORM2、FORMSのフォームすべてをテキ
+     スト上の順に評価し、FORM2の結果を返す。
+
+          (prog2 (print "The first form")
+                 (print "The second form")
+                 (print "The third form"))
+               -| "The first form"
+               -| "The second form"
+               -| "The third form"
+          => "The second form"
+
+
+
+File: elisp-ja.info, Node: Conditionals, Next: Combining Conditions, Prev: Sequencing, Up: Control Structures
+
+条件付き実行
+============
+
+条件付き制御構造は、選択肢を選びます。Emacs Lispには、4つの条件付きフォー
+ムがあります。他の言語のものとほとんど同じ`if'、`if'の変形である`when'や
+`unless'、一般化したcase文である`cond'です。
+
+ -- Special form: if CONDITION THEN-FORM ELSE-FORMS...
+     `if'は、CONDITIONをもとにして、THEN-FORMかELSE-FORMSを選ぶ。
+     CONDITIONが`nil'以外に評価されると、THEN-FORMを評価し、その結果を返
+     す。さもなければ、ELSE-FORMSをテキスト上の順に評価し、その最後のも
+     のの値を返す。（`if'のELSE部分は、暗黙の`progn'の例である。*Note
+     Sequencing::。）
+
+     CONDITIONが値`nil'であり、かつ、ELSE-FORMSがないと、`if'は`nil'を返
+     す。
+
+     `if'がスペシャルフォームであるのは、選択しなかった分岐をけっして評
+     価しないからである。したがって、つぎの例では、`print'はけっして呼ば
+     れないため`true'は表示されない。
+
+          (if nil 
+              (print 'true) 
+            'very-false)
+          => very-false
+
+ -- Macro: when CONDITION THEN-FORMS...
+     これは`if'の変形であり、ELSE-FORMSがなく、THEN-FORMSは複数のフォー
+     ムでもよい。特に、
+
+          (when CONDITION A B C)
+
+     は、つぎとまったく等価である。
+
+          (if CONDITION (progn A B C) nil)
+
+ -- Macro: unless CONDITION FORMS...
+     これはTHEN-FORMがない`if'の変形である。
+
+          (unless CONDITION A B C)
+
+     は、つぎとまったく等価である。
+
+          (if CONDITION nil
+             A B C)
+
+ -- Special form: cond CLAUSE...
+     `cond'は任意個数の選択肢から1つを選ぶ。`cond'の各節CLAUSEはリストで
+     ある必要がある。このリストのCARがCONDITION（条件）である。残りの要
+     素は、あれば、BODY-FORMS（本体フォーム）である。つまり、各節はつぎ
+     のようになる。
+
+          (CONDITION BODY-FORMS...)
+
+     `cond'は、各節のCONDITIONを評価して、各節をテキスト上の順に試す。
+     CONDITIONの値が`nil'以外であれば、その節は『成功』する。そうすると、
+     `cond'はその節のBODY-FORMSを評価し、BODY-FORMSの最後の値が`cond'の
+     値となる。残りの節は無視する。
+
+     CONDITIONの値が`nil'であると、その節は『失敗』し、`cond'はつぎの節
+     へ移りそのCONDITIONを試す。
+
+     各CONDITIONが`nil'に評価されると、すべての節が失敗し、`cond'は`nil'
+     を返す。
+
+     節CLAUSEは、つぎの形式でもよい。
+
+          (CONDITION)
+
+     この場合、CONDITIONが`nil'以外であると、CONDITIONが`cond'フォームの
+     値になる。
+
+     以下の例には4つの節があり、`x'の値が、数、文字列、バッファ、シンボ
+     ルかどうか調べる。
+
+          (cond ((numberp x) x)
+                ((stringp x) x)
+                ((bufferp x)
+                 (setq temporary-hack x) ; 1つの節に
+                 (buffer-name x))        ; 複数個の本体フォーム
+                ((symbolp x) (symbol-value x)))
+
+     最後の節を除くそれよりまえの節がどれも成功しないときには、最後の節
+     を実行したいことがしばしばある。これを行うには、`(t BODY-FORMS)'の
+     ように最後の節のCONDITIONに`t'を使う。フォーム`t'は`t'と評価され、
+     けっして`nil'ではない。そのため、`cond'がこの節に達したときには、こ
+     の節が失敗することはない。
+
+     たとえば、つぎのとおり。
+
+          (cond ((eq a 'hack) 'foo)
+                (t "default"))
+          => "default"
+
+     この式は、`a'の値が`hack'のときには`foo'を返し、さもなければ文字列
+     `"default"'を返す`cond'である。
+
+任意の条件付き構造は、`cond'や`if'で表現できます。したがって、どちらを使
+うかは好みの問題です。たとえば、つぎのとおりです。
+
+     (if A B C)
+     ==
+     (cond (A B) (t C))
+
+
+
+File: elisp-ja.info, Node: Combining Conditions, Next: Iteration, Prev: Conditionals, Up: Control Structures
+
+条件の組み合わせ
+================
+
+本節では、`if'や`cond'とともに用いて複雑な条件を表現するためにしばしば使
+われる3つの構造を説明します。`and'や`or'の構造は、複数の条件付き構造の一
+種として単独で使うこともできます。
+
+ -- Function: not CONDITION
+     この関数は、CONDITIONが偽であるかどうか調べる。CONDITIONが`nil'であ
+     れば`t'を返し、さもなければ`nil'を返す。関数`not'は`null'と同一であ
+     るが、空リストかどうか調べる場合には、`null'を使うことを勧める。
+
+ -- Special form: and CONDITIONS...
+     スペシャルフォーム`and'は、すべてのCONDITIONSが真であるかどうか調べ
+     る。CONDITIONSを1つ1つ書かれた順に評価して調べる。
+
+     CONDITIONSのどれかが`nil'に評価されると、`and'の結果は、残りの
+     CONDITIONSに関係なく、`nil'になる。つまり、`and'はただちに完了し、
+     CONDITIONSの残りを無視する。
+
+     CONDITIONSすべてが`nil'以外であることがわかると、それらの最後の値が
+     フォーム`and'の値となる。
+
+     例を示そう。最初の条件は整数1を返し、これは`nil'ではない。同様に、2
+     番目の条件は整数2を返し、`nil'ではない。3番目の条件は`nil'なので、
+     残りの条件を評価しない。
+
+          (and (print 1) (print 2) nil (print 3))
+               -| 1
+               -| 2
+          => nil
+
+     `and'を使ったより現実的な例はつぎのとおり。
+
+          (if (and (consp foo) (eq (car foo) 'x))
+              (message "foo is a list starting with x"))
+
+     `(consp foo)'が`nil'を返すと`(car foo)'は実行されず、そのためエラー
+     を回避することに注意。
+
+     `and'は、`if'や`cond'で表現できる。たとえば、つぎのとおり。
+
+          (and ARG1 ARG2 ARG3)
+          ==
+          (if ARG1 (if ARG2 ARG3))
+          ==
+          (cond (ARG1 (cond (ARG2 ARG3))))
+
+ -- Special form: or CONDITIONS...
+     スペシャルフォーム`or'は、CONDITIONSの少なくとも1つが真であるかどう
+     か調べる。CONDITIONSを1つ1つ書かれた順に評価して調べる。
+
+     CONDITIONSのどれかが`nil'以外に評価されると、`or'の結果は`nil'以外
+     になる。そして、`or'はただちに完了し、CONDITIONSの残りを無視する。
+     戻り値は、`nil'以外に評価された値である。
+
+     CONDITIONSすべてが`nil'であることがわかると、`or'は`nil'を返す。
+
+     たとえば、つぎの式は、`x'が0か`nil'であることを調べる。
+
+          (or (eq x nil) (eq x 0))
+
+     `and'構造と同様に、`or'は`cond'で書き表せる。たとえば、つぎのとおり。
+
+          (or ARG1 ARG2 ARG3)
+          ==
+          (cond (ARG1)
+                (ARG2)
+                (ARG3))
+
+     `or'を`if'で書くこともだいたいできるが、途中で抜け出せない。
+
+          (if ARG1 ARG1
+            (if ARG2 ARG2 
+              ARG3))
+
+     これは完全には同一ではない。というのは、ARG1やARG2を2度評価するから
+     である。一方、`(or ARG1 ARG2 ARG3)'は、どの引数も一度だけ評価する。
+
+
+
+File: elisp-ja.info, Node: Iteration, Next: Nonlocal Exits, Prev: Combining Conditions, Up: Control Structures
+
+繰り返し
+========
+
+繰り返しとは、プログラムのある部分を何度も実行することです。たとえば、リ
+ストの各要素や0からNの各整数について1回ずつある計算を行いたい場合です。
+Emacs Lispでこれを行うには、スペシャルフォーム`while'を使います。
+
+ -- Special form: while CONDITION FORMS...
+     `while'は、まずCONDITIONを評価する。結果が`nil'以外であれば、FORMS
+     をテキスト上の順で評価する。そして、CONDITIONを評価し直し、その結果
+     が`nil'以外であれば、再度FORMSを評価する。この処理をCONDITIONが
+     `nil'に評価されるまで繰り返す。
+
+     繰り返し回数に制限はない。ループは、CONDITIONが`nil'に評価される、
+     エラーが発生する、`throw'によりループから抜け出す（*Note Nonlocal
+     Exits::）のいずれかが起こるまで繰り返される。
+
+     フォーム`while'の値はつねに`nil'である。
+
+          (setq num 0)
+               => 0
+          (while (< num 4)
+            (princ (format "Iteration %d." num))
+            (setq num (1+ num)))
+               -| Iteration 0.
+               -| Iteration 1.
+               -| Iteration 2.
+               -| Iteration 3.
+               => nil
+
+     終了検査のまえに各繰り返しごとに実行したいことがあれば、以下のよう
+     に、それらと終了検査を`progn'でまとめたものを`while'の第1引数にする。
+
+          (while (progn
+                   (forward-line 1)
+                   (not (looking-at "^$"))))
+
+     これは、1行先へ移動し、空行に達するまで、移動を繰り返す。この
+     `while'には本体がなく、終了検査（かつポイントを実際に動かす）だけで
+     あるという点で、風変わりである。
+
+
+
+File: elisp-ja.info, Node: Nonlocal Exits, Prev: Iteration, Up: Control Structures
+
+非ローカル脱出
+==============
+
+"非ローカル脱出"（nonlocal exit）とは、プログラムのある場所から別の離れ
+た場所へ制御を移すことです。Emacs Lispでは、エラーの結果として非ローカル
+脱出が発生します。非ローカル脱出は、明示的な制御にも使えます。非ローカル
+脱出は、脱出対象の構造で作成したすべての変数束縛を解きます。
+
+* Menu:
+
+* Catch and Throw::     Nonlocal exits for the program's own purposes.
+* Examples of Catch::   Showing how such nonlocal exits can be written.
+* Errors::              How errors are signaled and handled.
+* Cleanups::            Arranging to run a cleanup form if an error happens.
+
+
+
+File: elisp-ja.info, Node: Catch and Throw, Next: Examples of Catch, Prev: Nonlocal Exits, Up: Nonlocal Exits
+
+明示的な非ローカル脱出：` '`catch'と`throw'
+-------------------------------------------
+
+ほとんどの制御構造は、その構造内での制御の流れだけに影響します。関数
+`throw'は、通常のプログラム実行のこのような規則の例外です。つまり、要求
+に従って非ローカルな脱出を行います。（ほかにも例外はあるが、それらはエラー
+処理のためだけである。）`throw'は`catch'の内側で使い、その`catch'へ戻り
+ます。
+
+     (defun foo-outer ()
+       (catch 'foo
+         (foo-inner)))
+
+     (defun foo-inner ()
+       ...
+       (if x
+           (throw 'foo t))
+       ...)
+
+フォーム`throw'を実行すると、対応する`catch'へ制御が戻り、その`catch'は
+ただちに終了します。`throw'に続くコードは実行されません。`throw'の第2引
+数は、`catch'の戻り値として使われます。
+
+関数`throw'は、その第1引数に基づいて対応する`catch'を探します。つまり、
+`catch'の第1引数が`throw'に指定されたものに`eq'である`catch'を探します。
+そのような`catch'が複数個ある場合には、もっとも内側のものを優先します。
+したがって、上の例では、`throw'は`foo'を指定し、`foo-outer'の`catch'は同
+じシンボルを指定しているので、その`catch'を使います（ただし、これらのあ
+いだには他の一致する`catch'がないとして）。
+
+`throw'の実行により、対応する`catch'までのすべてのLispの構造を抜け出しま
+す。これには関数呼び出しも含みます。`let'や関数呼び出しなどの束縛を作る
+構造からもこのように抜け出すので、通常どおり抜け出す場合と同様に束縛を解
+きます（*Note Local Variables::）。同様に、`throw'は、`save-excursion'
+（*Note Excursions::）で保存したバッファや位置情報、`save-restriction'で
+保存したナロイング状態、`save-window-excursion'（*Note Window
+Configurations::）で保存したウィンドウの選択状態も復元します。さらに、ス
+ペシャルフォーム`unwind-protect'で設定した後始末をこのフォームから抜け出
+すときに実行します（*Note Cleanups::）。
+
+`throw'は、テキスト上で、ジャンプ先である`catch'の内側に現れる必要はあり
+ません。`throw'は、`catch'内から呼ばれた別の関数からも戻ることもできます。
+`throw'の実行が、時間的に`catch'に入ったあとで、かつ、それから抜けるまえ
+である限り、`throw'は対応する`catch'を参照できます。エディタコマンドルー
+プ（*Note Recursive Editing::）から抜ける`exit-recursive-edit'などのコマ
+ンドで`throw'を使えるのは、このような理由からです。
+
+     Common Lispに関した注意：` ' Common Lispを含むほとんどの他のLispに
+     は、非逐次的に制御を移す方法がいくつかある。たとえば、`return'、
+     `return-from'、`go'。Emacs Lispには`throw'しかない。
+
+ -- Special form: catch TAG BODY...
+     `catch'は、関数`throw'向けに戻り位置を確立する。その戻り位置は、TAG
+     によって他の戻り位置と区別される。TAGは、`nil'以外ならば任意のLisp
+     オブジェクトでよい。引数TAGは、戻り位置を確立するまえに、通常どおり
+     評価される。
+
+     戻り位置を確立してから、`catch'は、BODYのフォームをテキスト上の順に
+     評価する。エラーや非ローカル脱出なしにフォームの実行が普通に終了し
+     た場合、`catch'は、最後の本体フォームの値を返す。
+
+     BODYの内側で、TAGと同じ値を指定した`throw'が実行されると、`catch'は
+     ただちに終了する。このとき返す値は、`throw'の第2引数に指定されたも
+     のである。
+
+ -- Function: throw TAG VALUE
+     `throw'の目的は、`catch'でまえもって確立しておいた戻り位置へ復帰す
+     ることである。引数TAGは、さまざまな既存の戻り位置から選ぶために使う。
+     TAGは、`catch'で指定した値と`eq'である必要がある。TAGに複数の戻り位
+     置が一致する場合には、もっとも内側のものを使う。
+
+     引数VALUEは、対応する`catch'の戻り値として使う。
+
+     タグTAGである有効な戻り位置がなければ、`(TAG VALUE)'を伴ったエラー
+     `no-catch'を通知する。
+
+
+
+File: elisp-ja.info, Node: Examples of Catch, Next: Errors, Prev: Catch and Throw, Up: Nonlocal Exits
+
+`catch'と`throw'の例
+--------------------
+
+`catch'と`throw'の使い方の1つは、2重のループからの脱出です。（ほとんどの
+言語では、これを『go to』で行うであろう。）ここでは、IとJを0から9に変え
+ながら、`(foo I J)'を計算します。
+
+     (defun search-foo ()
+       (catch 'loop
+         (let ((i 0))
+           (while (< i 10)
+             (let ((j 0))
+               (while (< j 10)
+                 (if (foo i j)
+                     (throw 'loop (list i j)))
+                 (setq j (1+ j))))
+             (setq i (1+ i))))))
+
+`foo'がある時点で`nil'以外を返すと、ただちに止まってIとJのリストを返しま
+す。`foo'がつねに`nil'を返すと、`catch'は通常どおりに戻って、その値は
+`nil'です。というのは、`while'の結果は`nil'だからです。
+
+2つの巧妙な例をあげましょう。多少異なる2つの戻り位置が同時に存在します。
+まず、同じタグ`hack'で2つの戻り位置があります。
+
+     (defun catch2 (tag)
+       (catch tag
+         (throw 'hack 'yes)))
+     => catch2
+
+     (catch 'hack 
+       (print (catch2 'hack))
+       'no)
+     -| yes
+     => no
+
+どちらの戻り位置も`throw'に一致するタグなので、内側のもの、つまり、
+`catch2'で確立したものに戻ります。したがって、`catch2'は値`yes'で通常ど
+おり戻り、この値が表示されます。最後に、外側の`catch'の2番目の本体フォー
+ム、つまり、`'no'が評価され、外側の`catch'から戻ります。
+
+今度は、`catch2'に指定する引数を変更してみます。
+
+     (defun catch2 (tag)
+       (catch tag
+         (throw 'hack 'yes)))
+     => catch2
+
+     (catch 'hack
+       (print (catch2 'quux))
+       'no)
+     => yes
+
+ここでも2つの戻り位置がありますが、今度は外側のものだけがタグ`hack'です。
+内側のものはタグ`quux'です。したがって、`throw'により、外側の`catch'が値
+`yes'を返します。関数`print'はけっして呼ばれず、本体フォーム`'no'もけっ
+して評価されません。
+
+
+
+File: elisp-ja.info, Node: Errors, Next: Cleanups, Prev: Examples of Catch, Up: Nonlocal Exits
+
+エラー
+------
+
+Emacs Lispが、なんらかの理由で評価できないフォームを評価しようとしたとき
+には、Emacs Lispは"エラー"（error）を"通知"（signals）します。
+
+エラーが通知されると、Emacsのデフォルトの動作は、エラーメッセージを表示
+し、現在のコマンドの実行を終了します。バッファの末尾で`C-f'を打ったとき
+などのように、これはほとんどの場合、適切なことです。
+
+複雑なプログラムでは、単に終了するだけでは満足できないこともあります。た
+とえば、プログラムではデータ構造に一時的な変更を加えていたり、プログラム
+終了時には削除する必要がある一時的なバッファを作成するでしょう。そのよう
+な場合には、`unwind-protect'を使って、エラー発生時に評価される"後始末式"
+（cleanup expressions）を確立しておきます。（*Note Cleanups::。）場合に
+よっては、サブルーティンでエラーが発生しても、プログラムの実行を継続した
+いこともあるでしょう。このような場合には、`condition-case'を使って、エラー
+状態から制御を回復するための"エラーハンドラ"（error handlers）を確立して
+おきます。
+
+エラー処理を用いてプログラムのある場所から別の場所へ制御を移す、という誘
+惑には耐えてください。そのかわりに`catch'と`throw'を使いましょう。*Note
+Catch and Throw::。
+
+* Menu:
+
+* Signaling Errors::      How to report an error.
+* Processing of Errors::  What Emacs does when you report an error.
+* Handling Errors::       How you can trap errors and continue execution.
+* Error Symbols::         How errors are classified for trapping them.
+
+
+
+File: elisp-ja.info, Node: Signaling Errors, Next: Processing of Errors, Prev: Errors, Up: Errors
+
+エラーの通知方法
+................
+
+ほとんどのエラーは、他の目的で呼び出したLisp関数の内部で『自動的』に通知
+されます。整数のCARを計算しようとしたり、バッファの末尾で1文字進めようと
+したりしたときなどです。関数`error'や関数`signal'で、明示的にエラーを通
+知することもできます。
+
+ユーザーが`C-g'を打ったときに発生する中断は、エラーとは考えませんが、エ
+ラーのように扱います。
+
+ -- Function: error FORMAT-STRING &rest ARGS
+     この関数は、FORMAT-STRINGとARGSに`format'（*Note String
+     Conversion::）を適用して作ったエラーメッセージを伴ったエラーを通知
+     する。
+
+     `error'の典型的な使い方を以下に示す。
+
+          (error "That is an error -- try something else")
+               error--> That is an error -- try something else
+
+          (error "You have committed %d errors" 10)
+               error--> You have committed 10 errors
+
+     `error'は、2つの引数、エラーシンボル`error'と`format'が返す文字列を
+     含むリストで`signal'を呼び出すことで動作する。
+
+     *警告：*` ' 独自のエラーメッセージをそのまま使いたい場合に、単に
+     `(error STRING)'とは書かないこと。STRINGに`%'が含まれていると、それ
+     は書式付け指定と解釈され、予測不能な結果を招く。そのかわりに、
+     `(error "%s" STRING)'を使う。
+
+ -- Function: signal ERROR-SYMBOL DATA
+     この関数は、ERROR-SYMBOLという名前のエラーを通知する。引数DATAは、
+     エラーの状況に関連したLispオブジェクトのリストである。
+
+     引数ERROR-SYMBOLは、"エラーシンボル"（error symbol）である必要があ
+     る。つまり、属性`error-conditions'を持つシンボルであり、その属性値
+     は条件名のリストである。これにより、Emacsはエラーの異なる種類を分類
+     する。
+
+     DATAのオブジェクトの個数と重要性はERROR-SYMBOLに依存する。たとえば、
+     エラー`wrong-type-arg'では、リストには2つのオブジェクトがあるはずで、
+     予期した型を表す述語とその型に一致しなかったオブジェクトである。エ
+     ラーシンボルの説明は、*Note Error Symbols::。
+
+     ERROR-SYMBOLとDATAの両者は、任意のエラーハンドラで利用できる。
+     `condition-case'は、ローカル変数にフォーム`(ERROR-SYMBOL . DATA)'の
+     リストを束縛する（*Note Handling Errors::）。エラーが処理されないと、
+     これらの2つの値はエラーメッセージの表示に使われる。
+
+     関数`signal'はけっして戻らない（しかし、Emacsの古い版では戻る場合も
+     ある）。
+
+          (signal 'wrong-number-of-arguments '(x y))
+               error--> Wrong number of arguments: x, y
+
+          (signal 'no-such-error '("My unknown error condition"))
+               error--> peculiar error: "My unknown error condition"
+
+     Common Lispに関した注意：` ' Emacsには、Common lispの継続可能なエラー
+     の概念に相当するものはない。
+
+
+
+File: elisp-ja.info, Node: Processing of Errors, Next: Handling Errors, Prev: Signaling Errors, Up: Errors
+
+Emacsのエラー処理方法
+.....................
+
+エラーが通知されると、`signal'は、エラーに対する有効な"ハンドラ"
+（handler）を探します。ハンドラは、Lispプログラムの一部でエラーが発生し
+た場合に実行されるように指定されたLisp式の列です。エラーに対して適用可能
+なハンドラがあると、そのハンドラが実行され、ハンドラに続いて制御は復旧し
+ます。ハンドラは、そのハンドラを設定した`condition-case'の環境で実行され
+ます。`condition-case'の内側で呼び出された関数はすべて終了しているので、
+ハンドラからそれらへ戻ることはできません。
+
+エラーに適用可能なハンドラがなければ、現在のコマンドは終了し、制御はエディ
+タコマンドループへ戻ります。というのは、コマンドループには、すべての種類
+のエラーに対する暗黙のハンドラがあるからです。コマンドループのハンドラは、
+エラーシンボルと関連するデータを使ってエラーメッセージを表示します。
+
+明示的なハンドラがないエラーは、Lispデバッガを呼び出すこともあります。変
+数`debug-on-error'（*Note Error Debugging::）が`nil'以外であると、デバッ
+ガが有効になります。エラーハンドラと違って、デバッガはエラーの環境で実行
+されるので、エラー時の変数の正確な値を調べることができます。
+
+
+
+File: elisp-ja.info, Node: Handling Errors, Next: Error Symbols, Prev: Processing of Errors, Up: Errors
+
+エラーハンドラの書き方
+......................
+
+エラーを通知することの普通の効果は、実行中のコマンドを終了し、Emacsのエ
+ディタコマンドループにただちに戻ります。読者のプログラムの一部で発生した
+エラーを捕捉するようにするには、スペシャルフォーム`condition-case'を使っ
+てエラーハンドラを設定します。単純な例はつぎのようになります。
+
+     (condition-case nil
+         (delete-file filename)
+       (error nil))
+
+これはFILENAMEという名前のファイルを削除しますが、エラーが発生するとどん
+なエラーでも捕捉して`nil'を返します。
+
+`condition-case'の第2引数を"保護されたフォーム"（protected form）と呼び
+ます。（上の例では、保護されたフォームは`delete-file'の呼び出し。）この
+フォームの実行を開始するとエラーハンドラが有効になり、このフォームから戻
+るとエラーハンドラは取り除かれます。そのあいだは、つねにエラーハンドラは
+有効です。特に、このフォームから呼び出される関数の実行中、それらのサブルー
+ティンの実行中などには、エラーハンドラは有効です。これは大切なことで、厳
+密にいえば、エラーが通知されるのは、保護されたフォームから呼び出された
+（`signal'や`error'を含む）Lisp基本関数の実行中であって、保護されたフォー
+ムそのものからではないからです。
+
+保護されたフォームのうしろにある引数は、ハンドラです。各ハンドラは1つ以
+上の（シンボルである）"条件名" （condition names）を列挙し、処理するエラー
+を指定します。エラーが通知されたときのエラーシンボルも条件名のリストを定
+義します。それらに共通の条件名があるとき、エラーハンドラがエラーに適用さ
+れます。上の例では、1つのハンドラがあり、条件名は1つ、`error'を指定して
+います。この条件名はすべてのエラーを意味します。
+
+適用可能なハンドラの探索では、もっとも最近に確立されたハンドラから始めて、
+確立されたすべてのハンドラを調べます。したがって、フォーム
+`condition-case'が2つ入れ子になっていて同じ名前のハンドラを確立している
+と、内側のものが実際に処理を受け持ちます。
+
+フォーム`condition-case'でエラーが処理されるときには、`debug-on-error'で
+エラーによりデバッガを起動するように指定してあってもデバッガは実行されま
+せん。*Note Error Debugging::。`condition-case'で捕捉されるエラーをデバッ
+グしたいときには、変数`debug-on-signal'に`nil'以外の値を設定します。
+
+エラーを処理できる場合には、制御はハンドラに移ります。こうするまえに、
+Emacsは、抜け出し対象となる束縛作成構造が設定したすべての変数束縛を解き、
+抜け出し対象となるフォーム`unwind-protect' すべての後始末を実行します。
+ハンドラに制御が移ると、ハンドラの本体を実行します。
+
+ハンドラ本体の実行を完了すると、フォーム`condition-case'から戻ります。ハ
+ンドラを実行するまえに保護されたフォームから完全に抜けているので、ハンド
+ラでは、エラー発生時点から再開したり、保護されたフォームの内側で作られた
+変数束縛を調べたりすることはできません。ハンドラでできることは、後始末を
+して先へ進むことだけです。
+
+`condition-case'構造は、`insert-file-contents'の呼び出しでファイルのオー
+プンに失敗するなどの予測可能なエラーを捕捉するためにしばしば使われます。
+プログラムがユーザーから読み取った式を評価する場合のように、まったく予測
+不可能なエラーを捕捉するためにも使われます。
+
+エラー通知とエラー処理は、`throw'と`catch'に多少似ていますが、それらはまっ
+たく別の機能です。`catch'ではエラーを捕捉できませんし、エラーハンドラで
+は`throw'を処理できません（しかしながら、適切な`catch'がない`throw'を使
+うと、処理できるエラーを通知する）。
+
+ -- Special form: condition-case VAR PROTECTED-FORM HANDLERS...
+     このスペシャルフォームは、PROTECTED-FORMの実行中はエラーハンドラ
+     HANDLERSを確立する。PROTECTED-FORMがエラーなしに完了すると、その戻
+     り値がフォーム`condition-case'の値になる。この場合、
+     `condition-case'はなんの効果もない。フォーム`condition-case'で違い
+     がでるのは、PROTECTED-FORMの実行中にエラーが起こった場合である。
+
+     各HANDLERSは、`(CONDITIONS BODY...)'の形式のリストである。ここで
+     CONDITIONSは、処理すべきエラーの条件名か条件名のリストである。BODY
+     は1つ以上のLisp式であり、このハンドラがエラーを処理するときに実行さ
+     れる。ハンドラの例を示す。
+
+          (error nil)
+
+          (arith-error (message "Division by zero"))
+
+          ((arith-error file-error)
+           (message
+            "Either division by zero or failure to open a file"))
+
+     生起する各エラーには、そのエラーの種類を表す"エラーシンボル"（error
+     symbol）がある。そのシンボルの属性`error-conditions'は、条件名のリ
+     ストである（*Note Error Symbols::）。Emacsは、有効なフォーム
+     `condition-case'すべてを探索し、これらの条件名を1つ以上指定したハン
+     ドラを探す。もっとも内側の一致する`condition-case'がエラーを処理す
+     る。この`condition-case'の内側では、適用可能な最初のハンドラがエラー
+     を処理する。
+
+     ハンドラの本体の実行を完了すると、`condition-case'は通常のように戻
+     り、ハンドラの本体の最後のフォームの値を全体としての値に使う。
+
+     引数VARは変数である。`condition-case'は、PROTECTED-FORMを実行すると
+     きにはこの変数を束縛せず、エラーを処理するときだけ束縛する。そのと
+     き、VARはローカルに"エラー記述" （error description）に束縛される。
+     これは、エラーの詳細を与えるリストである。エラー記述は、
+     `(ERROR-SYMBOL . DATA)'の形式である。ハンドラは、動作を決定するため
+     にこのリストを参照できる。たとえば、ファイルのオープンに失敗したエ
+     ラーであれば、DATAの第2要素、エラー記述の第3要素がファイル名である。
+
+     VARが`nil'であると、変数を束縛しなことを意味する。そうすると、ハン
+     ドラではエラーシンボルと関連するデータを使えない。
+
+ -- Function: error-message-string ERROR-DESCRIPTION
+     この関数は、指定したエラー記述に対するエラーメッセージ文字列を返す。
+     エラーに対する普通のエラーメッセージを表示して、エラーを処理したい
+     場合に便利である。
+
+ゼロ除算の結果であるエラーを処理する`condition-case'の使用例を示します。
+ハンドラはエラーメッセージを（ベルを鳴らさずに）表示して、大きな数を返し
+ます。
+
+     (defun safe-divide (dividend divisor)
+       (condition-case err                
+           ;; 保護されたフォーム
+           (/ dividend divisor)              
+         ;; ハンドラ
+         (arith-error                        ; 条件
+          ;; このエラーに対する普通のメッセージを表示する
+          (message "%s" (error-message-string err))
+          1000000)))
+     => safe-divide
+
+     (safe-divide 5 0)
+          -| Arithmetic error: (arith-error)
+     => 1000000
+
+ハンドラは条件名`arith-error'を指定しているので、ゼロ除算エラーだけを処
+理します。少なくともこの`condition-case'では他の種類のエラーは処理しませ
+ん。したがって、つぎのようになります
+
+     (safe-divide nil 3)
+          error--> Wrong type argument: number-or-marker-p, nil
+
+以下は、`error'で通知されるエラーも含めて、すべての種類のエラーを捕捉す
+る`condition-case'です。
+
+     (setq baz 34)
+          => 34
+
+     (condition-case err
+         (if (eq baz 35)
+             t
+           ;; これは関数`error'の呼び出し
+           (error "Rats!  The variable %s was %s, not 35" 'baz baz))
+       ;; これはハンドラ。フォームではない
+       (error (princ (format "The error was: %s" err)) 
+              2))
+     -| The error was: (error "Rats!  The variable baz was 34, not 35")
+     => 2
+
+
+
+File: elisp-ja.info, Node: Error Symbols, Prev: Handling Errors, Up: Errors
+
+エラーシンボルと条件名
+......................
+
+エラーを通知するときには、読者が意図するエラーの種類を指定する"エラーシ
+ンボル"（error symbol）を指定します。各エラーには、それを分類する一意な
+名前があります。これは、Emacs Lisp言語で定義されたエラーを細分類したもの
+です。
+
+これらの細分類は、"エラー条件"（error conditions）と呼ばれるより大きなク
+ラスの階層にまとめられています。エラー条件は、"条件名"（condition names）
+で識別します。もっとも細かい分類は、エラーシンボルそのものです。各エラー
+シンボルは条件名でもあります。より大きなクラスを表す条件名`error'もあり
+ます。これはすべての種類のエラーを表します。したがって、各エラーには、1
+つ以上の条件名があります。つまり、`error'、`error'とは別のエラーシンボル、
+あるいは、その中間の分類に属するものです。
+
+あるシンボルがエラーシンボルであるためには、そのシンボルには、条件名のリ
+ストを与える属性`error-conditions'があることが必要です。このリストは、そ
+のエラーが属するエラー条件を定義します。（エラーシンボルそのものと、シン
+ボル`error'は、つねにこのリストの要素であること。）したがって、条件名の
+階層は、エラーシンボルの属性`error-conditions'で定義されます。
+
+`error-conditions'リストに加えて、エラーシンボルには、属性
+`error-message'も必要です。この属性の値は、そのエラーが処理されないとき
+に表示される文字列です。属性`error-message'があるのに、それが文字列でな
+ければ、エラーメッセージ`peculiar error'を使います。
+
+以下に、新たなエラーシンボル`new-error'の定義方法を示します。
+
+     (put 'new-error
+          'error-conditions
+          '(error my-own-errors new-error))       
+     => (error my-own-errors new-error)
+     (put 'new-error 'error-message "A new error")
+     => "A new error"
+
+このエラーには、3つの条件名があります。もっとも細かい分類である
+`new-error'、それより大きな分類とであると考えている`my-own-error'、もっ
+とも大きな分類である`error'です。
+
+エラー文字列は大文字で始めるべきですが、ピリオドで終えません。これは、
+Emacsの他の慣習と整合をとるためです。
+ 
+普通、Emacs自身が`new-error'を通知することはありえません。つぎのように、
+読者のコードで明示的に`signal'（*Note Signaling Errors::）を呼んだときだ
+けです。
+
+     (signal 'new-error '(x y))
+          error--> A new error: x, y
+
+このエラーは、3つの条件名のどれでも処理できます。つぎの例は、`new-error'
+とクラス`my-own-errors'の任意の他のエラーを処理します。
+
+     (condition-case foo
+         (bar nil t)
+       (my-own-errors nil))
+
+エラーを分類する重要な方法は、それらの条件名によることです。つまり、エラー
+に一致するハンドラを探すために条件名を使います。エラーシンボルは、意図し
+たエラーメッセージと条件名のリストを指定する簡便な方法を提供するだけです。
+`signal'に、1つのエラーシンボルではなく、条件名のリストを指定するのでは
+わずらわしいでしょう。
+
+一方、条件名なしにエラーシンボルだけを使うのでは、`condition-case'の能力
+をいちじるしく損ないます。条件名があることで、エラーハンドラを書くときに
+さまざまなレベルに一般化してエラーを分類できるのです。エラーシンボルだけ
+を使ったのでは、最細分類以外のレベルを削除してしまうことになります。
+
+すべての標準エラー名とそれらの条件名については、*Note Standard Errors::。
+
+
+
+File: elisp-ja.info, Node: Cleanups, Prev: Errors, Up: Nonlocal Exits
+
+非ローカル脱出時の後始末
+------------------------
+
+`unwind-protect'構造は、データ構造を一時的に整合性のない状態にするときに
+は本質的です。この構造により、エラーや非ローカル脱出が起こったときに、デー
+タの整合性を回復できます。
+
+ -- Special form: unwind-protect BODY CLEANUP-FORMS...
+     `unwind-protect'は、BODYからどのように制御が離れた場合にも
+     CLEANUP-FORMSの実行を保証して、BODYを実行する。BODYは通常どおり完了
+     するか、`throw'を実行して`unwind-protect'から脱出するか、エラーを引
+     き起こす。いずれの場合でも、CLEANUP-FORMSは評価される。
+
+     フォームBODYが正常に終了すると、`unwind-protect'は、CLEANUP-FORMSを
+     評価したあとに、フォームBODYの最後の値を返す。フォームBODYが完了し
+     なかった場合、`unwind-protect'は普通の意味での値は返さない。
+
+     `unwind-protect'が保護するのはBODYだけである。CLEANUP-FORMSそのもの
+     のどれかが（`throw'やエラーで）非ローカル脱出を行うと、
+     `unwind-protect'は、CLEANUP-FORMSの残りを評価することを保証*しない*。
+     CLEANUP-FORMSのどれかが失敗するとトラブルになる危険性がある場合には、
+     CLEANUP-FORMSを別の`unwind-protect'で保護する。
+
+     フォーム`unwind-protect'の現在の入れ子の個数は、ローカル変数束縛の
+     個数とともに数えられ、`max-specpdl-size'に制限されている（*Note
+     Local Variables::）。
+
+たとえば、表示しないバッファを一時的に作成し、終了前に確実にそれを消去し
+たいとしましょう。
+
+     (save-excursion
+       (let ((buffer (get-buffer-create " *temp*")))
+         (set-buffer buffer)
+         (unwind-protect
+             BODY
+           (kill-buffer buffer))))
+
+変数`buffer'を使わずに`(kill-buffer (current-buffer))'と書くだけで十分だ
+と考えるかもしれません。しかし、別のバッファに切り替えたあとでBODYでエラー
+が発生した場合には、上の方法はより安全です。（あるいは、BODYの周りに別の
+`save-excursion'を書いて、一時バッファを消去するときに、それがカレントバッ
+ファになることを保証する。）
+
+Emacsには、上のようなコードに展開される`with-temp-buffer'という標準マク
+ロがあります（*Note Current Buffer::）。本書で定義しているマクロのいくつ
+かでは、このように`unwind-protect'を使っています。
+
+ファイル`ftp.el'から持ってきた実際の例を示しましょう。リモートの計算機へ
+の接続を確立するプロセス（*Note Processes::）を作ります。関数`ftp-login'
+は、その関数の作成者が予想できないほどの数多くの問題に対してとても敏感で
+すから、失敗したときにプロセスを消去することを保証するフォームで保護しま
+す。さもないと、Emacsは、無用なサブプロセスで満たされてしまいます。
+
+     (let ((win nil))
+       (unwind-protect
+           (progn
+             (setq process (ftp-setup-buffer host file))
+             (if (setq win (ftp-login process host user password))
+                 (message "Logged in")
+               (error "Ftp login failed")))
+         (or win (and process (delete-process process)))))
+
+この例には、小さなバグが1つあります。ユーザーが`C-g'を打って中断しようと
+して、かつ、関数`ftp-setup-buffer'の終了後に変数`process'を設定するまえ
+に実際に中断が行われると、プロセスは消去されません。このバグを直す簡単な
+方法はありませんが、少なくとも、ほとんど起こりえません。
+
+
+File: elisp-ja.info, Node: Variables, Next: Functions, Prev: Control Structures, Up: Top
+
+変数
+****
+
+"変数"（variable）は、プログラムにおいて値を表すために使う名前です。ほと
+んどすべてのプログラム言語には、ある種の変数があります。Lispプログラムの
+テキストでは、シンボルの構文を使って変数を書きます。
+
+ほとんどのプログラム言語と違って、Lispでは、プログラムはLispオブジェクト
+で表現し、テキスト表現は副次的なものです。変数として使うLispオブジェクト
+はシンボルです。シンボル名が変数名であり、変数の値はシンボルの値セルに格
+納されています。変数としてのシンボルの使い方は、関数名としての使い方とは
+独立しています。*Note Symbol Components::。
+
+Lispプログラムを構成するLispオブジェクト群は、プログラムのテキスト表現を
+決定します。つまり、Lispオブジェクト群に対する単なる入力構文です。これは、
+たとえば、Lispプログラムのテキスト表現では、変数を表現するシンボルの入力
+構文で変数を書く理由です。
+
+* Menu:
+
+* Global Variables::      Variable values that exist permanently, everywhere.
+* Constant Variables::    Certain "variables" have values that never change.
+* Local Variables::       Variable values that exist only temporarily.
+* Void Variables::        Symbols that lack values.
+* Defining Variables::    A definition says a symbol is used as a variable.
+* Tips for Defining::     How to avoid bad results from quitting
+                            within the code to initialize a variable.
+* Accessing Variables::   Examining values of variables whose names
+                            are known only at run time.
+* Setting Variables::     Storing new values in variables.
+* Variable Scoping::      How Lisp chooses among local and global values.
+* Buffer-Local Variables::  Variable values in effect only in one buffer.
+* Frame-Local Variables::   Variable values in effect only in one frame.
+* Future Local Variables::  New kinds of local values we might add some day.
+
+
+
+File: elisp-ja.info, Node: Global Variables, Next: Constant Variables, Prev: Variables, Up: Variables
+
+グローバル変数
+==============
+
+変数を使うもっとも簡単な方法は、"グローバルに"（globally、大局的に）使う
+ことです。つまり、どんなときにも変数にはたった1つの値だけがあり、（少な
+くともここでは）Lispシステム全体にその値が有効になります。新たな値を設定
+するまで、その値が有効であり続けます。新たな値で古い値を置き換えると、変
+数には古い値の痕跡はなにも残りません。
+
+シンボルの値は`setq'で指定します。たとえば、
+
+     (setq x '(a b))
+
+は、変数`x'に値`(a b)'を与えます。`setq'は、最初の引数、つまり、変数の名
+前を評価せず、新しい値である第2引数を評価することに注意してください。
+
+変数にいったん値を与えれば、式としてシンボルそのものを使うことによりその
+値を参照できます。つまり、つぎのとおりです。
+
+     x => (a b)
+
+ただし、上に示したフォーム`setq'を実行してあると仮定します。
+
+同じ変数に値を設定し直すと、新しい値で古い値を置き換えます。
+
+     x
+          => (a b)
+     (setq x 4)
+          => 4
+     x
+          => 4
+
+
+
+File: elisp-ja.info, Node: Constant Variables, Next: Local Variables, Prev: Global Variables, Up: Variables
+
+変更不可能な変数
+================
+
+Emacs Lispには、通常それ自身に評価されるある種のシンボルがあります。`:'
+で始まる名前の任意の変数、および、`nil'と`t'です。これらのシンボルを再束
+縛することはできず、それらの値を変更することもできません。`nil'や`t'を設
+定しようとしたり束縛しようとすると、エラー`setting-constant'を通知します。
+`:'で始まる名前のシンボルに関してもそうですが、そのようなシンボルにそれ
+自身を設定することはできます。
+
+     nil == 'nil
+          => nil
+     (setq nil 500)
+     error--> Attempt to set constant symbol: nil
+
+ -- Variable: keyword-symbols-constant-flag
+     この変数が`nil'であると、`:'で始まる名前の変数を望みの値に設定した
+     り束縛したりできる。これは、そのようなことを行う古いLispプログラム
+     の実行を可能にするためである。
+
+
+
+File: elisp-ja.info, Node: Local Variables, Next: Void Variables, Prev: Constant Variables, Up: Variables
+
+ローカル変数
+============
+
+グローバル変数は、明示的に新しい値で置き換えない限り存続する値を持ちます。
+一時的にしか存在しない変数値、つまり、プログラムのある部分を完了するまで
+のみ存在する変数値を作れると便利なことがあります。このような値を"ローカ
+ル"（local、局所的）と呼び、そのように使われる変数を"ローカル変数"
+（local variables）と呼びます。
+
+たとえば、関数を呼び出したとき、その引数変数は、関数を抜けるまで存続する
+新たなローカルな値を受け取ります。スペシャルフォーム`let'は、指定した変
+数の新たなローカル値を明示的に確立します。これらはフォーム`let'を抜ける
+まで存続します。
+
+ローカル値を確立すると、変数の以前の値（あるいは値がないこと）を保存しま
+す。ローカル値の存続期間が終了すると、以前の値を復元します。この期間は、
+以前の値を"隠して"（shadowed）いて以前の値は"見えません"。グローバル値で
+もローカル値でも隠せます（*Note Scope::）。
+
+変数がローカルなときに（`setq'などで）その変数を設定すると、ローカル値を
+置き換えます。隠されているグローバル値や以前のローカル値を変更しません。
+このふるまいをモデル化するために、変数のローカル値に加えて変数の"ローカ
+ル束縛"（local binding）を考えます。
+
+ローカル束縛とは、ローカル値を保持する概念的な場所です。関数や`let'など
+のスペシャルフォームに入るたびにローカル束縛を作成します。関数やフォーム
+`let'から抜けるとローカル束縛を削除します。ローカル束縛が存続する限り、
+変数の値はそこに保持されています。ローカル束縛が存在するときに`setq'や
+`set'を使うと、ローカル束縛の中に別の値を格納します。新たな束縛を作るの
+ではありません。
+
+グローバル値を保持する概念的な場所を"グローバル束縛"（global binding）と
+もいいます。
+
+変数には一度に複数のローカル束縛がありえます（たとえば、同じ変数を束縛す
+る入れ子になったフォーム`let'があるとき）。そのような場合、既存のもっと
+も最近に作成されたローカル束縛が、変数の"現在の束縛"（current binding）
+です。（この規則を"動的スコープ"（dynamic scoping）と呼びます。*Note
+Variable Scoping::）ローカル束縛がまったくなければ、変数のグローバル束縛
+が現在の束縛です。現在の束縛のことを強調して"既存の最ローカル束縛"と呼ぶ
+こともあります。シンボルの通常の評価では、その現在の束縛の値を返します。
+
+スペシャルフォーム`let'や`let*'は、ローカル束縛を作るためにあります。
+
+ -- Special form: let (BINDINGS...) FORMS...
+     このスペシャルフォームは、BINDINGSに従って変数を束縛し、FORMSのすべ
+     てをテキスト上の順に評価する。`let'フォームは、FORMSの最後のフォー
+     ムの値を返す。
+
+     BINDINGSのおのおのは、(i)シンボルであるか、
+     (ii)フォーム`(SYMBOL VALUE-FORM)'のリストである。
+     前者は、シンボルに`nil'を束縛する。
+     後者は、SYMBOLにVALUE-FORMの評価結果を束縛する。
+     VALUE-FORMを省略すると`nil'を使う。
+
+     BINDINGSのVALUE-FORM群すべてを現れる順に評価して*から*、シンボルに
+     それらの値を束縛する。例をつぎに示す。`Z'は、`Y'の古い値2に束縛され、
+     `Y'の新しい値1ではない。
+
+          (setq Y 2)
+               => 2
+          (let ((Y 1) 
+                (Z Y))
+            (list Y Z))
+               => (1 2)
+
+ -- Special form: let* (BINDINGS...) FORMS...
+     このスペシャルフォームは`let'に似ているが、変数のローカル値を計算し
+     終えた直後にその変数を束縛し、つぎの変数のローカル値の計算に進む。
+     したがって、BINDINGS内の式では、この`let*'フォーム内でまえにあるシ
+     ンボルを参照できる。つぎの例を上の`let'の例と比較してほしい。
+
+          (setq Y 2)
+               => 2
+          (let* ((Y 1)
+                 (Z Y))    ; 設定し終えたばかりの`Y'の値を使う
+            (list Y Z))
+               => (1 1)
+
+以下にローカル束縛を作成するその他の機能の完全な一覧をあげておきます。
+
+   * 関数呼び出し（*Note Functions::）。
+
+   * マクロ呼び出し（*Note Macros::）。
+
+   * `condition-case'（*Note Errors::）。
+
+変数は、バッファローカルな束縛（*Note Buffer-Local Variables::やフレーム
+ローカルな束縛（*Note Frame-Local Variables::）を持つことができます。少
+数の変数は、端末にローカルな束縛（*Note Multiple Displays::）を持つこと
+もできます。この種の束縛は普通のローカル束縛と同じように働きますが、これ
+らはEmacsの『どの部分』にいるかに依存したローカル化であり、時間的なロー
+カル化ではありません。
+
+ -- Variable: max-specpdl-size
+     この変数は、（`"Variable binding depth exceeds max-specpdl-size"'を
+     伴った）エラーを通知するまでに許される、ローカル変数束縛と
+     `unwind-protect'による後始末（*Note Nonlocal Exits::）の全体の個数
+     の制限を定義する。
+
+     この制限、および、これを超えたときのエラーは、不正に定義された関数
+     によってLispが無限に再帰することを防止する1つの方法である。
+
+     デフォルト値は600である。Lispデバッガに入ったとき、制限に近い場合に
+     はデバッガ自身が実行できることを保証するために値を増やす。
+
+
+
+File: elisp-ja.info, Node: Void Variables, Next: Defining Variables, Prev: Local Variables, Up: Variables
+
+変数が『空』であるとき
+======================
+
+シンボルにグローバル変数としての値を一度も与えていないとき、そのシンボル
+のグローバル値は"空"（void）であるといいます。いいかえれば、シンボルの値
+セルにはどんなLispオブジェクトも入っていません。シンボルを評価しようとす
+ると、値ではなくエラー`void-variable'を得ます。
+
+`nil'という値は空とは異なることに注意してください。シンボル`nil'はLispオ
+ブジェクトであり、他のオブジェクトと同様に変数の値になりえます。それは*
+値*なのです。空な変数はいかなる値も持たないのです。
+
+変数に値を与えたあとでは、`makunbound'を使って再度その変数を空にできます。
+
+ -- Function: makunbound SYMBOL
+     この関数は、SYMBOLの現在の変数束縛を空にする。これ以降に変数として
+     このシンボルの値を使おうとすると、再度設定していない限り、エラー
+     `void-variable'を通知する。
+
+     `makunbound'はSYMBOLを返す。
+
+          (makunbound 'x)      ; 変数`x'のグローバル値を空にする
+               => x
+          x
+          error--> Symbol's value as variable is void: x
+
+     SYMBOLがローカルに束縛されていると、`makunbound'は既存の最ローカル
+     束縛に作用する。ローカル束縛を作成するすべての構文は変数に値を与え
+     るため、これはシンボルのローカル束縛を空にする唯一の方法である。こ
+     の場面では、空の状態は、束縛が存在する限り存続する。束縛を作成した
+     構造から抜け出して束縛が削除されると、通常どおりそれ以前のローカル
+     束縛かグローバル束縛が有効になり、その束縛が空でなければ変数は空で
+     はない。
+
+          (setq x 1)               ; グローバル束縛に値を入れる
+               => 1
+          (let ((x 2))             ; ローカルに束縛する
+            (makunbound 'x)        ; ローカル束縛を空にする
+            x)
+          error--> Symbol's value as variable is void: x
+          x                        ; グローバル束縛は変更されていない
+               => 1
+
+          (let ((x 2))             ; ローカルに束縛する
+            (let ((x 3))           ; もう一度
+              (makunbound 'x)      ; もっとも内側のローカル束縛を空にする
+              x))                  ; 参照するが、それは空
+          error--> Symbol's value as variable is void: x
+
+          (let ((x 2))
+            (let ((x 3))
+              (makunbound 'x))     ; 内側の束縛を空にし、それを削除する
+            x)                     ; 外側の`let'の束縛が見える
+               => 2
+
+`makunbound'で空にした変数は、一度も値を受け取ったことがなく、そのために
+空である変数と区別できません。
+
+変数が現在、空であるかどうかは関数`boundp'を使って調べられます。
+
+ -- Function: boundp VARIABLE
+     `boundp'は、（シンボル）VARIABLEが空でなければ、より正確にいえば、
+     現在の束縛が空でなければ`t'を返す。さもなければ`nil'を返す。
+
+          (boundp 'abracadabra)          ; 空で始める
+               => nil
+          (let ((abracadabra 5))         ; ローカルに束縛する
+            (boundp 'abracadabra))
+               => t
+          (boundp 'abracadabra)          ; グローバルにはまだ空である
+               => nil
+          (setq abracadabra 5)           ; グローバルに空でなくする
+               => 5
+          (boundp 'abracadabra)
+               => t
+
+
+
+File: elisp-ja.info, Node: Defining Variables, Next: Tips for Defining, Prev: Void Variables, Up: Variables
+
+グローバル変数を定義する
+========================
+
+スペシャルフォーム`defconst'や`defvar'の"変数定義"を使って、シンボルをグ
+ローバル変数として使う意図を表明できます。
+
+Emacs Lispでは、定義には3つの目的があります。まず、コードを読む人向けに、
+特定のシンボルを（変数として）特定目的に使う*意図*があることを知らせます。
+第2に、Lispシステムに対しては、値と説明文字列を提供してこれらのことを伝
+えます。第3に、プログラム内の関数や変数のデータベースを作成する`etags'や
+`make-docfile'などのユーティリティに情報を提供します。
+
+`defconst'と`defvar'の違いは、主に好みの問題であり、値が変更されるかどう
+かを人に伝えます。Emacs Lispは、`defconst'や`defvar'の宣言に基づいて変数
+の使い方を制限することはしません。しかしながら、初期化に関しては違いがあ
+ります。`defconst'は無条件に変数を初期化しますが、`defvar'は変数が空であ
+る場合にのみ初期化します。
+
+
+ -- Special form: defvar SYMBOL [VALUE [DOC-STRING]]
+     このスペシャルフォームは、SYMBOLを変数として定義し、初期値や説明文
+     字列を設定する。この定義は、コードを読む人向けに、値を設定したり変
+     更する変数としてSYMBOLを使うことを伝える。SYMBOLは評価されないこと
+     に注意。定義するシンボルは、`defvar'に明示的に現れる必要がある。
+
+     SYMBOLの値が空でありVALUEを指定してあると、`defvar'はVALUEを評価し、
+     その結果をSYMBOLに設定する。しかし、SYMBOLにすでに値があれば（つま
+     り、空でなければ）、VALUEをまったく評価せず、SYMBOLの値も変更しない。
+     VALUEを省略した場合、SYMBOLの値をいっさい変更しない。
+
+     SYMBOLにカレントバッファでバッファローカルな束縛がある場合には、
+     `defvar'はデフォルト値に作用する。それは、バッファには独立であり、
+     現在の（バッファローカルな）束縛ではない。`defvar'は、デフォルト値
+     が空の場合にデフォルト値を設定する。*Note Buffer-Local Variables::。
+
+     emacs-lispモードにおいて`C-M-x'（`eval-defun'）でトップレベルのフォー
+     ム`defvar'を評価すると、`eval-defun'の特別な機能により、変数の値が
+     空かどうかを調べずに無条件に変数に設定する。
+
+     DOC-STRINGがあれば、それは変数の説明文を指定する。（説明文を指定で
+     きるのは、変数定義の主な利点の1つである。）説明文はシンボルの属性
+     `variable-documentation'に格納する。Emacsのヘルプ関数（*Note
+     Documentation::）は、この属性を調べる。
+
+     DOC-STRINGの最初の文字が`*'であると、この変数をユーザーオプションと
+     考えることを意味する。これにより、ユーザーはコマンド`set-variable'
+     や`edit-options'を使って簡単に変数を設定できる。しかしながら、ユー
+     ザーオプションの変数には、`defvar'ではなく`defcustom'を使ったほうが
+     よく、そうすればカスタマイズ情報を指定できる。*Note Customization::。
+
+     いくつか例をあげる。つぎのフォームは`foo'を定義するが初期化はしない。
+
+          (defvar foo)
+               => foo
+
+     つぎの例は、`bar'の値を`23'に初期化し、説明文字列を与える。
+
+          (defvar bar 23
+            "The normal weight of a bar.")
+               => bar
+
+     つぎの例は、`bar'の説明文字列を変更し、この変数をユーザーオプション
+     にする。しかし、`bar'にはすでに値が設定してあるので、その値は変更し
+     ない。（さらに`(1+ nil)'は評価するとエラーになるが、評価されないの
+     でエラーはない。）
+
+          (defvar bar (1+ nil)
+            "*The normal weight of a bar.")
+               => bar
+          bar
+               => 23
+
+     つぎの例は、スペシャルフォーム`defvar'に等価な式である。
+
+          (defvar SYMBOL VALUE DOC-STRING)
+          ==
+          (progn
+            (if (not (boundp 'SYMBOL))
+                (setq SYMBOL VALUE))
+            (if 'DOC-STRING
+              (put 'SYMBOL 'variable-documentation 'DOC-STRING))
+            'SYMBOL)
+
+     フォーム`defvar'はSYMBOLを返すが、通常このフォームはファイルのトッ
+     プレベルで使われ、そこでは値は関係ない。
+
+ -- Special form: defconst SYMBOL [VALUE [DOC-STRING]]
+     このスペシャルフォームは、SYMBOLを変数として定義し初期化する。この
+     定義は、コードを読む人向けに、SYMBOLはこれ以降標準のグローバル値を
+     持ち、ユーザーや他のプログラムが変更すべきでないことを伝える。
+     SYMBOLは評価されないことに注意。定義するシンボルは、`defconst'に明
+     示的に現れる必要がある。
+
+     `defconst'は、VALUEがあればつねにVALUEを評価し、その結果をSYMBOLに
+     設定する。SYMBOLにカレントバッファのバッファローカルな束縛がある場
+     合には、`defconst'はデフォルト値を設定し、バッファローカルな値にで
+     はない。（しかし、`defconst'で定義するシンボルには、バッファローカ
+     ルな束縛を作るべきではない。）
+
+     つぎの例では、`pi'は、（インディアナ州立法府はいうにおよばず）だれ
+     も変更すべきではないと考えられる定数である。しかし、2番目のフォーム
+     からわかるように、これは単に助言でしかない。
+
+          (defconst pi 3.1415 "Pi to five places.")
+               => pi
+          (setq pi 3)
+               => pi
+          pi
+               => 3
+
+ -- Function: user-variable-p VARIABLE
+     この関数は、VARIABLEがユーザーオプション、つまり、カスタマイズのた
+     めにユーザーが設定することを意図した変数であると、`t'を返し、さもな
+     ければ`nil'を返す。（ユーザーオプション向け以外の変数は、Lispプログ
+     ラムの内部目的用にあり、それらについてユーザーが知る必要はない。）
+
+     ユーザーオプション変数は、属性`variable-documentation'の最初の文字
+     で他の変数と区別される。その属性が存在して文字列であり、最初の文字
+     が`*'であれば、その変数はユーザーオプションである。
+
+ユーザーオプション変数に属性`variable-interactive'があると、コマンド
+`set-variable'はその属性値を使って、変数の新しい値の読み取りを制御します。
+この属性値は、`interactive'の引数（*Note Using Interactive::）のように使
+われます。しかしながら、この機能は`defcustom'（*Note Customization::）に
+よりほとんど廃れています。
+
+*警告：*` ' 変数にローカル束縛があるときにスペシャルフォーム`defconst'や
+`defvar'を使うと、ローカル束縛の値を変更し、グローバル束縛は変更しない。
+これは望む効果ではない。これを防ぐには、これらのスペシャルフォームはファ
+イルのトップレベルで使う。そうすれば、普通は有効なローカル束縛はない。さ
+らに、変数のローカル束縛を作るまえに、確実にファイルをロードしておく。
+
+
+

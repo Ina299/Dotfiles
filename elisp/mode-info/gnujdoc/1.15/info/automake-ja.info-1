@@ -1,0 +1,1966 @@
+Info file: automake-ja.info,    -*-Text-*-
+produced by `texinfo-format-buffer'
+from file `automake-ja.texi'
+using `texinfmt.el' version 2.38 of 3 July 1998.
+
+
+
+
+INFO-DIR-SECTION GNU programming tools
+START-INFO-DIR-ENTRY
+* automake(ja): (automake-ja).		Making Makefile.in's
+END-INFO-DIR-ENTRY
+
+
+INFO-DIR-SECTION Individual utilities
+START-INFO-DIR-ENTRY
+* aclocal(ja): (automake-ja)Invoking aclocal.          Generating aclocal.m4
+END-INFO-DIR-ENTRY
+
+
+このファイルでGNU automake 1.7を説明します．
+
+Copyright 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002 Free Software
+Foundation, Inc.
+
+Permission is granted to make and distribute verbatim copies of this
+manual provided the copyright notice and this permission notice are
+preserved on all copies.
+
+Permission is granted to copy and distribute modified versions of this
+manual under the conditions for verbatim copying, provided that the
+entire resulting derived work is distributed under the terms of a
+permission notice identical to this one.
+
+Permission is granted to copy and distribute translations of this manual
+into another language, under the above conditions for modified versions,
+except that this permission notice may be stated in a translation
+approved by the Foundation.
+
+
+
+
+
+
+
+
+File: automake-ja.info, Node: Top, Next: Introduction, Prev: (dir), Up: (dir)
+
+GNU Automake
+************
+
+このファイルでは，GNU Automakeパッケージを説明します．Automakeはテンプレー
+トファイルからGNU標準に準拠したMakefileを作成するプログラムです．このエ
+ディションは，バージョン 1.7を説明します．
+
+* Menu:
+
+* Introduction::                Automake's purpose
+* Generalities::                General ideas
+* Examples::                    Some example packages
+* Invoking Automake::           Creating a Makefile.in
+* configure::                   Scanning configure.ac or configure.in
+* Top level::                   The top-level Makefile.am
+* Alternative::                 An alternative approach to subdirectories
+* Rebuilding::                  Automatic rebuilding of Makefile
+* Programs::                    Building programs and libraries
+* Other objects::               Other derived objects
+* Other GNU Tools::             Other GNU Tools
+* Documentation::               Building documentation
+* Install::                     What gets installed
+* Clean::                       What gets cleaned
+* Dist::                        What goes in a distribution
+* Tests::                       Support for test suites
+* Options::                     Changing Automake's behavior
+* Miscellaneous::               Miscellaneous rules
+* Include::                     Including extra files in an Automake template.
+* Conditionals::                Conditionals
+* Gnits::                       The effect of `--gnu' and `--gnits'
+* Cygnus::                      The effect of `--cygnus'
+* Extending::                   Extending Automake
+* Distributing::                Distributing the Makefile.in
+* API versioning::              About compatibility between Automake versions
+* Macro and Variable Index::
+* General Index::
+
+
+
+
+
+File: automake-ja.info, Node: Introduction, Next: Generalities, Prev: Top, Up: Top
+
+はじめに
+********
+
+Automakeは，`Makefile.am'と呼ばれるファイルから，`Makefile.in' を自動的
+に生成するツールです．それぞれの`Makefile.am'は，基本的には一連の`make' 
+変数の定義 (1) (*Note Introduction-Footnotes::)になっていて，規則が時折
+投入されています．生成された`Makefile.in'はGNU Makefileの標準に従います．
+
+
+GNU Makefile Standards Documentは(*Note Makefile Conventions:
+(standards)Makefile Conventions.)，長くて複雑で変更の原因にもなります．
+Automakeの目的は，個別のGNU管理者の背中からMakefle管理の負担を取り除く
+(そしてAutomake管理者に任せる)ことです．
+
+一般的なAutomakeの入力ファイルは，単純な一連の変数定義です．それぞれのファ
+イルは，`Makefile.in'を作成するために処理されます．通常，プロジェクト内
+のディレクトリごとに，一つの`Makefile.am'を配置します．
+
+
+Automakeは，ある方法でプロジェクトに制限を与えます．例えばプロジェクトで
+Autoconf(*Note Introduction: (autoconf)Top.)の使用を仮定すると，
+`configure.in'の内容には，ある制限が発生します (2) (*Note
+Introduction-Footnotes::)．
+
+
+Automakeでは，`Makefile.in'を生成するために`perl'が必要になります．しか
+し，Automakeで作成された配布物は完全にGNUの標準に従っていて，ビルドする
+ために`perl'は不要です．
+
+
+bug-automake@gnu.org宛にAutomakeの提案とバグレポートをメールしてください．
+
+
+
+File: automake-ja.info  Node: Introduction-Footnotes, Up: Introduction
+
+(1) これらの変数は，Makeの用語では"makeのマクロ(make macros)"とも呼
+ばれていますが，このマニュアルでは，"マクロ(macro)"はAutoconfのマク
+ロの予約語になっています．
+
+(2) Autoconf 2.50 は，`configure.in'ではなく`configure.ac'を推
+奨しています．このドキュメントの残りの部分では，`configure.ac'の使
+用が広まっていないので，`configure.in'について説明していますが，
+Automakeは`configure.ac'もサポートしています．
+
+
+
+File: automake-ja.info, Node: Generalities, Next: Examples, Prev: Introduction, Up: Top
+
+一般的な考え
+************
+
+以下のセクションで，Automakeが動作する方法を理解することに役立つ，基本的
+な考えをいくつか述べます．
+
+* Menu:
+
+* General Operation::           General operation of Automake
+* Strictness::                  Standards conformance checking
+* Uniform::                     The Uniform Naming Scheme
+* Canonicalization::            How derived variables are named
+* User Variables::              Variables reserved for the user
+* Auxiliary Programs::          Programs automake might require
+
+
+
+
+File: automake-ja.info, Node: General Operation, Next: Strictness, Prev: Generalities, Up: Generalities
+
+一般的な操作
+============
+
+Automakeは`Makefile.am'を読み込み，`Makefile.in'を生成する仕事をします．
+`Makefile.am'で定義されている変数とターゲットで，Automake は更に特殊なコー
+ドを生成します．例えば，`bin_PROGRAMS'変数定義で，生成されるプログラムを
+コンパイルしてリンクするターゲットを生成します．
+
+
+`Makefile.am'の変数定義とターゲットは，そのまま生成されたファイルにコピー
+されます．これにより，生成される`Makefile.in'に任意のコードを加えること
+が可能になります．例えばAutomakeの配布物には，Automake管理者がソースコン
+トロールシステムから配布物を作成するときに使用する，非標準的な`cvs-dist'
+ターゲットが含まれています．
+
+
+ほとんどのGNU makeの拡張は，Automakeが理解しないことに注意してください．
+`Makefile.am'でこのような拡張を使用すると，エラーが生じたり紛らわしい動
+作をしたりします．
+
+特別な例外として，GNU makeの追加オペレータの`+='はサポートされています．
+このオペレータは，その右辺の引数を左辺で指定された変数に追加します．
+Automakeはそのオペレータを通常の`='オペレータに変換します．このため`+='
+は，あらゆるmakeプログラムでうまく動作します．
+
+Automakeは賢い方法で，ターゲットと変数定義に隣接しているグループ化された
+コメントの保持を試みます．
+
+
+一般に，`Makefile.am'で定義されているターゲットは，`automake' によって自
+動的に生成されるターゲットに似た名前を持つものに優先します．これをサポー
+トしてはいるのですが，一般的に，生成される規則は非常に特殊なこともあるの
+で，それを利用することは避けたほうがよいでしょう．
+
+
+同様に，`Makefile.am'で定義されている変数や`configure.in'で`AC_SUBST'さ
+れているものも，`automake'が通常作成するあらゆる変数定義より優先されます．
+この機能は，ターゲット定義の優先より役に立つことが多いでしょう．
+`automake'で生成されたマクロの多くは，内部で使用することだけを考慮に入れ
+ていて，それらマクロ名が将来のリリースで変更される可能性があることに注意
+しておいてください．
+
+
+変数定義を調査しているとき，Automakeは定義で参照されている変数を再帰的に
+調査します．例えば，以下の断片的な`foo_SOURCES'の内容をAutomake が調査し
+ている状況を考えます．
+
+     xs = a.c b.c
+     foo_SOURCES = c.c $(xs)
+
+それは，ファイル`a.c'，`b.c'，そして`c.c'を`foo_SOURCES'の内容として使用
+します．
+
+
+Automakeでは，出力ファイルにコピー*されない*コメントの形式も利用可能です．
+Automakeは`##'で始まる(スペースの前置は可能です)すべての行を完全に無視し
+ます．
+
+読み込まれる`Makefile.am'の最初の行に，以下の行を書くのはいつものことで
+す．
+
+
+     ## Process this file with automake to produce Makefile.in
+
+
+
+
+
+
+File: automake-ja.info, Node: Strictness, Next: Uniform, Prev: General Operation, Up: Generalities
+
+厳密さ
+======
+
+
+Automakeは，GNUパッケージの管理者が使用することを目的としていますが，使
+用したいけれども，すべてのGNU規約を使用したいわけではない人たちをも受け
+入れる努力をしています．
+
+
+このため，Automakeは三つの"厳密さ"のレベルをサポートします -- 厳密さとは，
+Automakeに調査させる標準への適合度を示すものです．
+
+有効な厳密さのレベルは以下のとおりです．
+
+`foreign'
+     Automakeは，適切な処理のため絶対に必要なものだけを調査します．例え
+     ば，GNUの標準は`NEWS'ファイルが存在することを必要としますが，このモー
+     ドで必要ではありません．この名前(foreign)は，本来はGNUプログラムの
+     ためにAutomakeを使用して欲しいのでこのように名付けられています．こ
+     れらの緩い規則は標準的な操作様式ではありません．
+
+`gnu'
+     Automakeは，パッケージがGNUの標準に準拠しているかどうか --可 能な限り 
+     --- 調査します．これはデフォルトです．
+
+`gnits'
+     Automakeは，まだ書かれていない"Gnits standards"に準拠しているかどう
+     かを調査します．これらはGNUの標準に基づいていますが，より詳しく記述
+     されています．Gnits standardsの貢献者でない場合，Gnits standardsが
+     実際に発表されるときまで(発表されることはないかもしれませんが)，こ
+     のオプションの使用を避けるよう推奨します．
+
+厳密さのレベルの正確な意味についての詳細は，*Note Gnits::を参照してくだ
+さい．
+
+Automakeには，厳密さ似にていますが異なる扱いを受ける，特殊な"cygnus"モー
+ドもあります．このモードは，"Cygnus"形式のツリー(例えば，GCCツリー)に配
+置するパッケージで役に立ちます．このモードの詳細は，*Note Cygnus::を参照
+してください．
+
+
+
+
+File: automake-ja.info, Node: Uniform, Next: Canonicalization, Prev: Strictness, Up: Generalities
+
+一様な命名法
+============
+
+
+Automake変数は，一般に以下の"一様な命名法(uniform naming scheme)"に従っ
+ていて，それは，プログラム(とその他の派生されるオブジェクト)のビルド方法
+と，それらのインストール方法の決定を容易にします．この手法は，
+`configure'時にビルドするものを決定することもサポートしています．
+
+
+`make'時にビルドするオブジェクトを決定するため，特定の変数を使用します．
+変数の名前は，いくつかのピースをお互いに連結したものからできています．
+
+ビルドするものをautomakeに伝える部品は，一般に"プライマリ"と呼ばれていま
+す．例えば，プライマリの`PROGRAMS'は，コンパイルされリンクされるプログラ
+ムのリストを保持しています．
+
+
+
+ビルドしたオブジェクトをインストールする場所を決定するため，異なる名前の
+組が使用されます．これらの名前はプライマリに前置されていて，それはインス
+トールするディレクトリとして使用される標準的なディレクトリを示しています．
+標準的なディレクトリ名はGNUの標準で与えられています(*Note Directory
+Variables: (standards)Directory Variables.)．Automakeは，`pkglibdir'，
+`pkgincludedir'，そして`pkgdatadir'を用いて，このリストを拡張します．こ
+れらは非`pkg'のバージョンと同じですが，`@PACKAGE@'が付加されます．例えば，
+`pkglibdir'は`$(libdir)/@PACKAGE@'として定義されます．
+
+
+それぞれのプライマリに対して，`EXTRA_'をプライマリ名に前置して命名された
+追加の変数があります．この変数は，ビルドされたりされなかったりする可能性
+のあるオブジェクトのリストで使用され，それは，`configure'が決定したもの
+に依存します．Automakeは，すべての状況で動作する`Makefile.in'を生成する
+ために，ビルドされる可能性のあるオブジェクト全体のリストをあらかじめ知っ
+ておく必要があるので，この変数が必要になります．
+
+
+例えば，`cpio'はconfigure時にビルドするプログラムを決定します．`bindir'
+にインストールされるプログラムもあれば，`sbindir'にインストールされるも
+のもあります．
+
+     EXTRA_PROGRAMS = mt rmt
+     bin_PROGRAMS = cpio pax
+     sbin_PROGRAMS = @MORE_PROGRAMS@
+
+接頭辞がないプライマリを変数として定義すること，例えば`PROGRAMS'はエラー
+になります．
+
+一般的な`dir'接尾辞は，変数名を作るときには捨てられることに注意して下さ
+い．このため，`bindir_PROGRAMS'ではなく，`bin_PROGRAMS'と書きます．
+
+すべての種類のオブジェクトが，すべてのディレクトリにインストールされるわ
+けではありません．Automakeはエラーを見つけたとき，フラグを付けようとしま
+す．Automakeはディレクトリ名での明らかなスペルミスも診断します．
+
+
+標準ディレクトリは--Automakeによって強化されてはいますが--十分でない場合
+もあります．特に，前もって定義されているディレクトリのサブディレクトリに
+オブジェクトをインストールすると役に立つこともあります．このため，
+Automakeはインストール可能なディレクトリのリストを拡張することを可能にし
+ます．与えられている接頭辞(例えば`zar')は，同じ名前の変数に`dir'を付加し
+た変数(例えば`zardir')が定義されている場合に有効です．
+
+
+例えば，Automakeの一部としてHTMLがサポートされるまで，以下のようにして生
+のHTMLドキュメンテトをインストール可能でしょう．
+
+     htmldir = $(prefix)/html
+     html_DATA = automake.html
+
+
+特別な接頭辞`noinst'は，該当するオブジェクトはビルドすべきですが決してイ
+ンストールされるべきではないことを示します．これは，パッケージ残りのビル
+ドで必要なオブジェクト，例えば，スタティックライブラリ(*Note A
+Library::)や，補助的なスクリプトに対して有効です．
+
+
+特別な接頭辞`check'は，該当するオブジェクトが`make check'コマンドが実行
+されるまでビルドされないことを示します．これらのオブジェクトはインストー
+ルもされません．
+
+現在のプライマリ名は，`PROGRAMS'，`LIBRARIES'，`LISP'，`PYTHON'，`JAVA'，
+`SCRIPTS'，`DATA'，`HEADERS'，`MANS'，そして`TEXINFOS'です．
+
+`automake'の動作の他の側面を制御する，追加の接頭辞が可能なプライマリもあ
+ります．現在定義されている接頭辞は，`dist_'，`nodist_'，そして`nobase_'
+です．これらの接頭辞は後で説明します(*Note Program and Library
+Variables::)．
+
+
+
+
+File: automake-ja.info, Node: Canonicalization, Next: User Variables, Prev: Uniform, Up: Generalities
+
+派生される変数と命名法
+======================
+
+
+Makefileの変数名は，管理者が提供するいくつかのテキストから派生することも
+あります．例えば，`_PROGRAMS'にリストアップされているプログラム名は，
+`_SOURCES'変数の名前にも再び書き込まれます．このような状況では，プログラ
+ム名とそれに類似したものがMakefileの変数命名規則に従う必要が無いように，
+Automakeはテキストを標準に従うものにします．名前の中の文字，数字，アット
+マーク(@)，そしてアンダースコア以外のすべての文字は，変数で参照されると
+きにアンダースコアに変換されます．
+
+例えば，プログラムを`sniff-glue'と命名する場合，派生する変数名は，
+`sniff-glue_SOURCES'ではなく`sniff_glue_SOURCES'になります．同様に，
+`libmumble++.a'と命名されるライブラリのソースは，`libmumble___a_SOURCES'
+変数にリストアップすべきです．
+
+変数名の内部でAutoconfの置換を使用する際にできるだけ明瞭にするため，アッ
+トマーク(strudel)が追加されています．
+
+
+
+
+File: automake-ja.info, Node: User Variables, Next: Auxiliary Programs, Prev: Canonicalization, Up: Generalities
+
+ユーザに対して予約されている変数
+================================
+
+
+`Makefile'変数には，"user"が使用するためにGNU Coding Standardsで予約され
+ているものもあります -- それはパッケージを構築する人のためです．例えば，
+`CFLAGS'はそのような変数の一つです．
+
+パッケージ開発者は，明らかに仕事を簡単にするために，`CFLAGS'のようなユー
+ザ変数の設定を試みるときもあります -- 彼らはすべてのターゲットに二番目の
+変数を導入する必要はありません．
+
+しかし，パッケージ自身でユーザ変数を設定すべきではなく，特に，パッケージ
+の適切なコンパイルに要求されるスイッチを含めるべきではありません．これら
+の変数はパッケージの構築者に対して説明されているので，人々は，ビルド時に
+これらの変数に優先させることが可能だと期待しています．
+
+この問題を解決するため，automakeはそれぞれのユーザフラグ変数に対し，
+automake特有の隠れた変数を導入しています．(隠れた変数は，`CC'のような変
+数に対しては導入されておらず，それは意味が無いためです．)隠れた変数は，
+ユーザ変数名に`AM_'を前置して命名されています．例えば，`YFLAGS'に対する
+隠れた変数は，`AM_YFLAGS'になります．
+
+
+
+
+File: automake-ja.info, Node: Auxiliary Programs, Prev: User Variables, Up: Generalities
+
+automakeが必要とする可能性があるプログラム
+==========================================
+
+
+生成された`Makefile'が適切に動作するように，automakeが補助的なプログラム
+を必要とすることもあります．それらは数がかなり多いのですが，ここにリスト
+アップします．
+
+`ansi2knr.c'
+`ansi2knr.1'
+     これらの二つのファイルは，自動的なde-ANSI-ficationのサポートで使用
+     されます(*Note ANSI::)．
+
+`compile'
+     これは，`-c'と`-o'の両方を同時に受け入れることができないコンパイラ
+     に対するラッパーです．それは実際に要求されたときだけ使用されます．
+     そのようなコンパイラは滅多にありません．
+
+`config.guess'
+`config.sub'
+     これらのプログラムは，与えられているビルド，ホスト，またはターゲッ
+     トアーキテクチャといった，三つの標準的なものを調べます．これらのプ
+     ログラムは，新しいアーキテクチャのサポートや新しいカーネルでの変更
+     で検査の失敗を修正するために定期的に更新されています．これらのファ
+     イルの最新バージョンを`ftp://ftp.gnu.org/gnu/config/'から取得して，
+     リリース物を作成する前に確かめてください．
+
+`depcomp'
+     要求された出力だけでなく，自動的な依存性の追跡機能で使用されている
+     依存情報も生成するために，このプログラムはコンパイラの実行方法を理
+     解します．
+
+`elisp-comp'
+     このプログラムは，Emacs Lispコードをバイトコンパイルするために使用
+     されます．
+
+`install-sh'
+     これは，`install'プログラムの代わりのもので，`install'の利用や使用
+     が不可能なプラットフォームで動作します．
+
+`mdate-sh'
+     このスクリプトは，`version.texi'ファイルを生成します．それはファイ
+     ルを調査し，それに関する日付の情報を出力します．
+
+`missing'
+     これは，通常管理者だけが必要とするいくつかのプログラムのラッパーで
+     す．該当のプログラムが存在しない場合，`missing'は情報を伝える警告を
+     出力し，ビルドを継続することが可能になるように修正を試みます．
+
+`mkinstalldirs'
+     これは，`mkdir -p'に移植性が無い問題を解決します．
+
+`py-compile'
+     これは，Pythonスクリプトをバイトコンパイルするために使用されます．
+
+`texinfo.tex'
+     プログラムではなく，パッケージにTexinfoソースファイルがあるとき，こ
+     のファイルは，`make dvi'，`make ps'，そして`make pdf'を動作させるた
+     めに必要になります．
+
+`ylwrap'
+     このプログラムは，`lex'と`yacc'のラッパーで，例えば，複数の`yacc'の
+     インスタンスを単一のディレクトリで，並行して呼び出すことが可能であ
+     ることを確かめます．
+
+
+
+
+
+File: automake-ja.info, Node: Examples, Next: Invoking Automake, Prev: Generalities, Up: Top
+
+いくつかのパッケージの例
+************************
+
+* Menu:
+
+* Complete::                    A simple example, start to finish
+* Hello::                       A classic program
+* true::                        Building true and false
+
+
+
+
+File: automake-ja.info, Node: Complete, Next: Hello, Prev: Examples, Up: Examples
+
+簡単なサンプル例の最初から最後まで
+==================================
+
+
+さて，渦から渦まで頭を浮かせる(?)プログラムの`zardoz'を，たった今書き終
+えたと仮定しましょう．移植性のフレームワークを提供するためにAutoconf を
+使用していましたが，`Makefile.in'は特別に作成しました．それらを堅牢にし
+たいのでAutomakeに切替えてみましょう．
+
+
+第一歩は`automake'が必要とするコマンドを含めるため，`configure.in'の更新
+を開始しましょう．こうする方法は，`AC_INIT'の直後に`AM_INIT_AUTOMAKE'の
+呼び出しを加えることです．
+
+     AC_INIT(zardoz, 1.0)
+     AM_INIT_AUTOMAKE
+     ...
+
+プログラムには，(例えば，`gettext'を使用していないし，共有ライブラリもビ
+ルドしないし)複雑な要因が全くないので，この部分はおしまいです．なんて簡
+単なんでしょう！
+
+
+さて`configure'を再生成する必要があります．しかしこうするためには，
+使用している新しいマクロを見つける方法を`autoconf'に伝える必要があ
+ります．こうするための最も簡単な方法は，`aclocal.m4'を生成する
+`aclocal'プログラムを使用することです．しかしちょっと待って下さい
+...プログラムに対してちょっとマクロを書く必要があり，既に
+`aclocal.m4'があるかもしれません．`aclocal'プログラムでは，マクロを
+`acinclude.m4'に書いておく必要があるので，単純に名前を変更して以下のよう
+に実行します．
+
+     mv aclocal.m4 acinclude.m4
+     aclocal
+     autoconf
+
+
+さて`zardoz'に対する`Makefile.am'を書く時間がやってきました．`zardoz'は
+ユーザプログラムなので，他のユーザプログラムがインストールされる場所にイ
+ンストールしたいと思います．`bindir'です．さらに，`zardoz'にはTexinfoド
+キュメントもあります．`configure.in'スクリプトでは`AC_REPLACE_FUNCS'を使
+用するので，`@LIBOBJS@'をリンクする必要があります．そのため以下のように
+書いたほうが良いでしょう．
+
+     bin_PROGRAMS = zardoz
+     zardoz_SOURCES = main.c head.c float.c vortex9.c gun.c
+     zardoz_LDADD = @LIBOBJS@
+
+     info_TEXINFOS = zardoz.texi
+
+さて，`Makefile.in'を生成するために`automake --add-missing'を実行して，
+必要な補助ファイルを入手して，おしまいです！
+
+
+
+
+File: automake-ja.info, Node: Hello, Next: true, Prev: Complete, Up: Examples
+
+古典的なプログラム
+==================
+
+
+GNU hello (ftp://prep.ai.mit.edu/pub/gnu/hello-1.3.tar.gz)は，古典的単純
+さと融通性で有名です．このセクションでは，AutomakeをGNU Helloパッケージ
+に使用する方法を示します．以下の例は，GNU Helloの最近のベータバージョン
+からのものですが，著作権のコメント全体と同様に，管理者専用のすべてのコー
+ドが取り除かれています．
+
+もちろん，GNU Helloは伝統的な二行より幾分長くなっています．GNU Helloは国
+際化されていて，オプション処理をして，そしてマニュアルとテストスイートも
+あります．
+
+
+GNU Helloの`configure.in'は以下のようになっています (1) (*Note
+Hello-Footnotes::)．
+
+     dnl Process this file with autoconf to produce a configure script.
+     AC_INIT(src/hello.c)
+     AM_INIT_AUTOMAKE(hello, 1.3.11)
+     AM_CONFIG_HEADER(config.h)
+
+     dnl Set of available languages.
+     ALL_LINGUAS="de fr es ko nl no pl pt sl sv"
+
+     dnl Checks for programs.
+     AC_PROG_CC
+     AC_ISC_POSIX
+
+     dnl Checks for libraries.
+
+     dnl Checks for header files.
+     AC_STDC_HEADERS
+     AC_HAVE_HEADERS(string.h fcntl.h sys/file.h sys/param.h)
+
+     dnl Checks for library functions.
+     AC_FUNC_ALLOCA
+
+     dnl Check for st_blksize in struct stat
+     AC_ST_BLKSIZE
+
+     dnl internationalization macros
+     AM_GNU_GETTEXT
+     AC_OUTPUT([Makefile doc/Makefile intl/Makefile po/Makefile.in \
+                src/Makefile tests/Makefile tests/hello],
+        [chmod +x tests/hello])
+
+`AM_'マクロは，Automake(あるいはGettextライブラリ)によって提供されていま
+す．残りは標準的なAutoconfマクロです．
+
+
+トップレベルの`Makefile.am'は以下のようになっています．
+
+     EXTRA_DIST = BUGS ChangeLog.O
+     SUBDIRS = doc intl po src tests
+
+御覧のように，ここでの仕事はすべてサブディレクトリで実際に実行されます．
+
+`po'と`intl'ディレクトリは，`gettextize'を使用することで自動的に生成され
+ます．それらについてはここで述べません．
+
+
+`doc/Makefile.am'は以下のようになっています．
+
+     info_TEXINFOS = hello.texi
+     hello_TEXINFOS = gpl.texi
+
+これで，GNU Helloマニュアルをビルドして，インストールして，そして配布す
+るには十分です．
+
+
+`tests/Makefile.am'は以下のようになっています．
+
+     TESTS = hello
+     EXTRA_DIST = hello.in testdata
+
+`hello'スクリプトは，`configure'により生成され，それはテストケースのみで
+生成されます．`make check'でこのテストを実行します．
+
+
+最後は`src／Makefile.am'で，実際にすべての仕事が行なわれる場所です (2)
+(*Note Hello-Footnotes::)．
+
+     bin_PROGRAMS = hello
+     hello_SOURCES = hello.c version.c getopt.c getopt1.c getopt.h system.h
+     hello_LDADD = @INTLLIBS@ @ALLOCA@
+     localedir = $(datadir)/locale
+     INCLUDES = -I../intl -DLOCALEDIR=\"$(localedir)\"
+
+
+
+File: automake-ja.info  Node: Hello-Footnotes, Up: Hello
+
+(1) 訳注：この例は古いので参考にしないでください．
+
+(2) 訳注：ここの例も良くないみたいです．
+
+
+
+File: automake-ja.info, Node: true, Prev: Hello, Up: Examples
+
+trueとfalseのビルド
+===================
+
+
+以下にもう一つの，トリッキーな例があります．それは同じソースファイル
+(`true.c')から二つのプログラム(`true'と`false')を生成する方法を示します．
+難しい部分は，それぞれの`true.c'のコンパイルで，異なる`cpp'フラグが必要
+になるということです．
+
+     bin_PROGRAMS = true false
+     false_SOURCES =
+     false_LDADD = false.o
+
+     true.o: true.c
+             $(COMPILE) -DEXIT_CODE=0 -c true.c
+
+     false.o: true.c
+             $(COMPILE) -DEXIT_CODE=1 -o false.o -c true.c
+
+`true_SOURCES'の定義が無いことに注意してください．Automake は，ソースファ
+イル名`true.c'が存在すると暗黙に仮定し，`true.o'にコンパイルし，`true'に
+リンクする規則を定義します．上記の`Makefile.am'で提供されている`true.o:
+true.c'の規則は，Automakeが生成する`true.o'をビルドするための規則に優先
+します．
+
+`false_SOURCES'は空で定義されています -- その方法では，暗黙の値で置換さ
+れません．`false'のソースでリストアップしていないので，プログラムをリン
+クする方法をAutomakeに伝える必要があります．これが`false_LDADD'行の目的
+です．`false_DEPENDENCIES'変数は`false'ターゲットの依存性を保持していて，
+`false_LDADD'の内容からAutomakeが自動的に生成されます．
+
+上記の規則は，コンパイラが`-c'と`-o'の両方を受け入れない場合は動作しませ
+ん．これを簡単に修正するため，(並行した`make'の問題を避けるために)偽の依
+存性を導入します．
+
+     true.o: true.c false.o
+             $(COMPILE) -DEXIT_CODE=0 -c true.c
+
+     false.o: true.c
+             $(COMPILE) -DEXIT_CODE=1 -c true.c && mv true.o false.o
+
+また，これらの明示的な規則は，de-ANSI-ficationが使用される場合は動作しま
+せん(*Note ANSI::)．de-ANSI-ficationをサポートするためには，もう少し多く
+の仕事が必要です．
+
+     true._o: true._c false.o
+             $(COMPILE) -DEXIT_CODE=0 -c true.c
+
+     false._o: true._c
+             $(COMPILE) -DEXIT_CODE=1 -c true.c && mv true._o false.o
+
+分かってくるにしたがって，同じ作業を行なうため，よりいっそう簡単な方法も
+あります．上記のテクニックには，マニュアルの例として残しておくには十分役
+に立つものもあります．しかし，`true'と`false'を現実的にビルドする場合は，
+以下のように，おそらくプログラムごとにコンパイルのフラグを使用することで
+しょう．
+
+     bin_PROGRAMS = false true
+
+     false_SOURCES = true.c
+     false_CPPFLAGS = -DEXIT_CODE=1
+
+     true_SOURCES = true.c
+     true_CPPFLAGS = -DEXIT_CODE=0
+
+この状況では，Automakeによって，`true.c'は異なるフラグで二度コンパイルさ
+れることになります．de-ANSI-ficationは自動的に動作します．この例では，オ
+ブジェクトファイルの名前はautomakeが選択します．それは`false-true.o'と
+`true-true.o'になるでしょう．(オブジェクトファイルの名前が問題となること
+は滅多にありません．)
+
+
+
+
+File: automake-ja.info, Node: Invoking Automake, Next: configure, Prev: Examples, Up: Top
+
+`Makefile.in'の生成
+*******************
+
+
+パッケージに対するすべての`Makefile.in'を作成するため，`automake'プログ
+ラムをトップレベルのディレクトリで，引数なしで実行してください．
+`automake'は，(`configure.in'をスキャンながら *Note configure::)，自動的
+にそれぞれ適切な`Makefile.am'を見つけ，対応する`Makefile.in'を生成します．
+`automake'では，パッケージを構成するものへの視野がかなり単純になっている
+ことに注意してください．それは，一つのパッケージにはトップディレクトリに
+ただ一つ`configure.in' があることを想定しています．パッケージに複数の
+`configure.in'がある場合，`configure.in'があるそれぞれのディレクトリで
+`automake' を実行する必要があります．(代わりの方法として，パッケージツリー
+を巡回して，適切な場所で`automake'を実行することが可能な，Autoconfの
+`autoreconf'をあてにしてもかまいません．)
+
+オプションとして`automake'に引数を与えることが可能です．`.am' が引数に後
+置され，その結果が入力ファイルの名前として使用されます．この機能は，一般
+的に，時代遅れの`Makefile.in'を自動的にリビルドするためだけに使用します．
+いくつかのサブディレクトリで`Makefile.in'を再生成するために使用している
+場合でも，プロジェクトのトップディレクトリで`automake'を実行する必要があ
+ることに注意してください．これは，`automake'は`configure.in'をスキャンす
+る必要があるため，そして，`automake'が状況によってその動作を変更するため，
+`Makefile.in' がサブディレクトリに存在するという知識を使用するためです．
+
+Automakeは，`configure.in'をスキャンするためと，その依存性(`aclocal.m4')
+のため，`autoconf'を実行するので，`autoconf'は`PATH'に存在する必要があり
+ます．`AUTOCONF'変数が環境変数にある場合，`autoconf'の代わりにそれを使用
+し，これで特定のバージョンのAutoconfを選択することが可能になります．とこ
+ろで，この段落を誤解しないでください．Automakeは`configure.in'を*スキャ
+ン*するために`autoconf'を実行するのであって，`configure'をビルドするわけ
+ではありません．この目的に対しては`autoconf'を自分で実行する必要がありま
+す．
+
+
+`automake'は以下のオプションを受け入れます．
+
+
+`-a'
+`--add-missing'
+     Automakeには，特定の共通ファイルが存在することを要求する状況もあり
+     ます．例えば，`configure.in'で`AC_CANONICAL_HOST'を実行する場合，
+     `config.guess'が必要です．Automakeはこれらのファイルのいくつかと一
+     緒に配布されています(*Note Auxiliary Programs::)．このオプションは，
+     可能であれば，足りないものを自動的にパッケージに加えます．一般的に，
+     Automake が足りないファイルがあることを告げる場合，このオプションを
+     使用してみてください．デフォルトでAutomakeは，足りないファイルを指
+     し示すシンボリックリンクの作成を試みます．これは`--copy'で変更可能
+     です．
+
+`--libdir=DIR'
+     Automakeのデータファイルを，インストールされたディレクトリではなく
+     DIRで探します．これは通常，デバッグで使用されます．
+
+`-c'
+`--copy'
+     `--add-missing'と一緒に使用するとき，インストールされるファイルをコ
+     ピーします．デフォルトではシンボリックリンクを作成します．
+
+`--cygnus'
+     GNUやGnitsの規則の代わりに，Cygnusの規則に従う`Makefile.in'を生成し
+     ます．詳細は，*Note Cygnus::を参照してください．
+
+`-f'
+`--force-missing'
+     `--add-missing'とともに使用するとき，標準のファイルがソースツリーに
+     存在する場合でもそれらを再インストールします．これで，新しいシンボ
+     リックリンクを作成する前に，ソースツリーからファイルを削除します(ま
+     たは，`--copy'とともに使用すると，新しいファイルをコピーします)．
+
+`--foreign'
+     グローバルな厳密さを`foreign'に設定します．詳細は，*Note
+     Strictness::を参照してください．
+
+`--gnits'
+     グローバルな厳密さを`gnits'に設定します．詳細は，*Note Gnits::を参
+     照してください．
+
+`--gnu'
+     グローバルな厳密さを`gnu'に設定します．詳細は，*Note Gnits::を参照
+     してください．これはデフォルトの厳密さです．
+
+`--help'
+     コマンドラインオプションの概要を出力して終了します．
+
+`-i'
+`--ignore-deps'
+     これは，生成される`Makefile'での依存性追跡の機能を使用不可能にしま
+     す．*Note Dependencies::を参照してください．
+
+`--include-deps'
+     依存性追跡の機能を使用可能にします．この機能は，デフォルトで使用可
+     能です．このオプションは歴史的な理由でのみ提供されていて，おそらく
+     使用すべきではありません．
+
+`--no-force'
+     通常`automake'は，`configure.in'で記述されているすべての
+     `Makefile.in'を作成します．このオプションは，依存性の一つの側面を用
+     いて，時代遅れになっている`Makefile.in'だけを更新します．
+
+`-o DIR'
+`--output-dir=DIR'
+     生成された`Makefile.in'をDIRに配置します．通常，それぞれの
+     `Makefile.in'は，`Makefile.am'に対応するディレクトリに作成されます．
+     このオプションの使用は反対で，将来のリリースでは削除されるでしょう．
+
+`-v'
+`--verbose'
+     読み込まれたり作成されたりしているファイルの情報をAutomakeに出力さ
+     せます．
+
+`--version'
+     Automakeのバージョンナンバーを出力して終了します．
+
+`-W CATEGORY'
+`--warnings=CATEGORY'
+     CATEGORYに当てはまる警告を出力します．CATEGORYは以下の一つです．
+     `gnu'
+          GNU Coding Standards(*Note Top: (standards)Top.)に関連する警告
+          です．
+     `obsolete'
+          時代遅れの機能と構成物です．
+     `portability'
+          移植性の問題です(例えば，移植性が無いことが知られているMakeの
+          機能)．
+     `syntax'
+          怪しい構文，未使用の変数，入力ミスです．
+     `unsupported'
+          サポートされていない，または不完全な機能です．
+     `all'
+          すべての警告です．
+     `none'
+          すべての警告をオフにします．
+     `error'
+          警告をエラーとして処理します．
+
+     カテゴリは，その名前に`no-'を前置することでオフにすることが可能です．
+     例えば，`-Wno-syntax'は未使用の変数に関する警告を隠します．
+
+     デフォルトで出力されるカテゴリは，`syntax'と`unsupported'です．さら
+     に，`gnu'は`--gnu'と`--gnits'の厳密さで有効になります．
+
+     `portability'の警告は，現在デフォルトでは無効になっていますが，将来
+     のリリースでは，`--gnu'と`--gnits'の厳密さで有効になるでしょう．
+
+     環境変数`WARNINGS'に，カンマで分けた有効にするカテゴリのリストを含
+     めることが可能です．それは，コマンドラインスイッチの前に累積され，
+     この方法で`-Wnone'することで，`WARNINGS'で有効にしたすべての警告カ
+     テゴリを無視します．この変数は`autoconf'のような他のツールでも使用
+     されます．このため，未知のカテゴリは無視されます．
+
+
+
+
+
+File: automake-ja.info, Node: configure, Next: Top level, Prev: Invoking Automake, Up: Top
+
+`configure.in'のスキャン
+************************
+
+
+Automakeは，パッケージに関する特定の情報を決定するために，パッケージの
+`configure.in'をスキャンします．必要な`autoconf'マクロもあれば，
+`configure.in'で定義する必要がある変数もあります．Automakeは，出力物を調
+整するためにも，`configure.in'からの情報を使用します．
+
+Automakeは，メンテナンスをより容易にするためのAutoconfマクロも提供してい
+ます．これらのマクロは，`aclocal'プログラムを使用して自動的に
+`aclocal.m4'に書き込むことが可能です．
+
+* Menu:
+
+* Requirements::                Configuration requirements
+* Optional::                    Other things Automake recognizes
+* Invoking aclocal::            Auto-generating aclocal.m4
+* aclocal options::             aclocal command line arguments
+* Macro search path::           Modifying aclocal's search path
+* Macros::                      Autoconf macros supplied with Automake
+* Extending aclocal::           Writing your own aclocal macros
+
+
+
+
+File: automake-ja.info, Node: Requirements, Next: Optional, Prev: configure, Up: configure
+
+コンフィグレーションの必要条件
+==============================
+
+
+Automakeが本当に必要としていることは一つで，`configure.in'でマクロ
+`AM_INIT_AUTOMAKE'を呼び出すことです．このマクロは，適切なAutomake の処
+理に必要なことをいくつか行ないます(*Note Macros::)．
+
+Automakeは必要としますが，`AM_INIT_AUTOMAKE'で実行されないマクロには，以
+下のものがあります．
+
+
+`AC_CONFIG_FILES'
+`AC_OUTPUT'
+     Automakeは，作成するファイルを決定するためにこれらを使用します
+     (*Note Creating Output Files: (autoconf)Output.)．同じ名前のファイ
+     ルが`.am'拡張子が後置されている状態で存在している場合，リストアップ
+     されているファイルは，Automakeが`Makefile'を生成するものと考慮しま
+     す．通常，`AC_CONFIG_FILES([foo/Makefile])'で，`foo/Makefile.am'が
+     存在する場合は，Automakeが`foo/Makefile.in' を生成します．
+
+     それ以外のリストアップされているファイルは扱い方が異なります．現在
+     唯一の違いは，`make distclean'で`Makefile'は削除されますが，他のファ
+     イルは`make clean'で削除されるということです．
+
+
+
+
+File: automake-ja.info, Node: Optional, Next: Invoking aclocal, Prev: Requirements, Up: configure
+
+その他のAutomakeが理解すること
+==============================
+
+
+Automakeは実行されるたびに，`configure.in'を追跡するためにAutoconf を呼
+び出します．この方法で，特定のマクロの使用を認識し，生成される
+`Makefile.in'を適切に調整します．現在認識されるマクロとそれらの効果は，
+以下のようになっています．
+
+`AC_CONFIG_HEADERS'
+     Automakeはこれらのヘッダをリビルドする規則を生成します．古いバージョ
+     ンのAutomakeは`AM_CONFIG_HEADER'の使用を要求していました(*Note
+     Macros::)．これは今日では既に事実ではありません．
+
+`AC_CONFIG_AUX_DIR'
+     Automakeは，`mkinstalldirs'のような様々なヘルパースクリプトを，この
+     マクロの呼び出しで指定されたディレクトリで探します．見つからない場
+     合は，`standard'な位置(トップソースディレクトリか，現在の
+     `Makefile.am'に対応するソースディレクトリの適切な方)で探します． 
+     *Note Finding `configure' Input: (autoconf)Input.  FIXME: give
+     complete list of things looked for in this directory
+
+`AC_CANONICAL_HOST'
+     Automakeは，`config.guess'と`config.sub'が確実に存在するようにしま
+     す．また，`Makefile'変数の`host_alias'と`host_triplet'も導入します．
+     *Note Getting the Canonical System Type: (autoconf)Canonicalizingを
+     参照してください．
+
+`AC_CANONICAL_SYSTEM'
+     これは`AC_CANONICAL_HOST'に似ていますが，`Makefile'変数の
+     `build_alias'と`target_alias'も定義します．*Note Getting the
+     Canonical System Type: (autoconf)Canonicalizing.
+
+`AC_LIBSOURCE'
+`AC_LIBSOURCES'
+`AC_LIBOBJ'
+     Automakeは，`AC_LIBSOURCE'や`AC_LIBSOURCES'でリストアップされている
+     すべてのファイルを自動的に配布します．
+
+     `AC_LIBOBJS'マクロが`AC_LIBSOURCE'を呼び出すことに注意してください．
+     そのため，Autoconfマクロが`AC_LIBOBJ([file])'を呼び出すと説明されて
+     いる場合，`file.c'はAutomakeで自動的に配布されます．これには，
+     `AC_FUNC_ALLOCA'，`AC_FUNC_MEMCMP'，`AC_REPLACE_FUNCS'等の多くのマ
+     クロが含まれます．
+
+     ところで，直接`LIBOBJS'に代入することは，既にサポートされていません．
+     この目的では常に`AC_LIBOBJ'を使用すべきです．*Note `AC_LIBOBJ'
+     vs. `LIBOBJS': (autoconf)AC_LIBOBJ vs LIBOBJS.
+
+`AC_PROG_RANLIB'
+     これは，ライブラリをビルドするパッケージの場合に必要になります．
+     *Note Particular Program Checks: (autoconf)Particular Programs.
+
+`AC_PROG_CXX'
+     これは，C++ソースが含まれる場合に必要になります．*Note Particular
+     Program Checks: (autoconf)Particular Programs.
+
+`AC_PROG_F77'
+     これは，Fortran77ソースが含まれる場合に必要になります．このマクロは
+     Autoconfのバージョン2.13以降で配布されます．*Note Particular
+     Program Checks: (autoconf)Particular Programs.
+
+`AC_F77_LIBRARY_LDFLAGS'
+     これはFortran77を含む言語が混在しているプログラムと共有ライブラリに
+     対して必要になります(*Note Mixing Fortran 77 With C and C++::)．
+     *Note Autoconf macros supplied with Automake: Macros.
+
+`AC_PROG_LIBTOOL'
+     Automakeは`libtool'に対する処理を開始します(*Note Introduction:
+     (libtool)Top.)．
+
+`AC_PROG_YACC'
+     Yaccソースファイルがある場合，このマクロを使用するか，
+     `configure.in'で変数`YACC'を定義する必要があります．前者が好まれま
+     す(*Note Particular Program Checks: (autoconf)Particular Programs.)．
+
+`AC_PROG_LEX'
+     Lexソースファイルがある場合，このマクロを使用する必要があります．
+     *Note Particular Program Checks: (autoconf)Particular Programs.
+
+`AC_SUBST'
+     最初の引数は，それぞれの生成される`Makefile.in'で，変数として自動的
+     に定義されます．*Note Setting Output Variables: (autoconf)Setting
+     Output Variables.
+
+     Autoconfマニュアルで，マクロがVARに対して`AC_SUBST'を呼び出すとか，
+     出力変数VARを定義するといった説明がある場合，VARはそれぞれの生成さ
+     れる`Makefile.in'で定義されます．例えば，`AC_PATH_XTRA'は`X_CFLAGS'
+     と`X_LIBS'を定義するので，`AC_PATH_XTRA'が呼び出されている場合，
+     `Makefile.am'でその変数と使用することが可能です．
+
+`AM_C_PROTOTYPES'
+     これは，de-ANSI-ficationを自動的に使用するときに必要です．*Note
+     ANSI::を参照してください．
+
+`AM_GNU_GETTEXT'
+     このマクロはGNU gettextを使うパッケージに対して必要になります(*Note
+     gettext::)．それはgettextとともに配布されます．Automakeがこのマクロ
+     を見つけた場合，このマクロはパッケージがgettextの必要条件のいくつか
+     を確実に満たすようにします．
+
+`AM_MAINTAINER_MODE'
+     このマクロは`configure'に`--enable-maintainer-mode'オプションを加え
+     ます．これが使用されている場合，`automake'は生成された`Makefile.in'
+     内の`maintainer-only'規則をデフォルトで停止します．このマクロは
+     `MAINTAINER_MODE'条件を定義し，自分の`Makefile.am' で使用することが
+     可能です．
+
+
+
+
+
+File: automake-ja.info, Node: Invoking aclocal, Next: aclocal options, Prev: Optional, Up: configure
+
+aclocal.m4の自動生成
+====================
+
+
+Automakeには，パッケージで使用可能な多くのAutoconfマクロがあります．状況
+によってはAutomakeが実際に必要とするものもあります．これらのマクロは
+`aclocal.m4'で定義する必要があります．さもなければ，それらは`autoconf'で
+は見つからないでしょう．
+
+`aclocal'プログラムは，`configure.in'の内容に基づいて自動的に
+`aclocal.m4'ファイルを生成します．これは，Automakeが提供するマクロを入手
+する便利な方法を提供し，それらを探し回る必要がないようになっています．ま
+た，`aclocal'のメカニズムで，他のパッケージで使用するための独自のマクロ
+を供給することが可能になります．
+
+はじめに，`aclocal'はマクロ定義を探しながら見つかったすべての`.m4'ファイ
+ルをスキャンします．それから`configure.in'をスキャンします．最初のステッ
+プで見つかったマクロの記述によって，マクロとマクロが要求するファイルを
+`aclocal.m4'に書き込みます．
+
+`acinclude.m4'の内容も，存在する場合は自動的に`aclocal.m4'に含められます．
+これは`configure'にローカルなマクロを取り入れるときに役に立ちます．
+
+`aclocal'は，スキャンしているファイルの新しい`AC_DEFUN'を賢い方法で探し
+ます．また，スキャンしているファイルのすべての文章も`aclocal.m4'に含めよ
+うとし，それには`#'と`dnl'のコメントも含まれます．`aclocal'がコメントを
+完全に無視するようにしたい場合は，コメントの最初に`##'を使用して下さい．
+
+* Menu:
+
+* aclocal options::             Options supported by aclocal
+* Macro search path::           How aclocal finds .m4 files
+
+
+
+File: automake-ja.info, Node: aclocal options, Next: Macro search path, Prev: Invoking aclocal, Up: configure
+
+aclocalのオプション
+===================
+
+
+`aclocal'は，以下のオプションを受け入れます．
+
+`--acdir=DIR'
+     インストールされたディレクトリの代わりに，DIRでマクロファイルを探し
+     ます．これは，通常デバッグで使用します．
+
+`--help'
+     コマンドラインオプションの概要を出力し，終了します．
+
+`-I DIR'
+     `.m4'ファイルを探すディレクトリのリストに，DIRディレクトリを追加し
+     ます．
+
+`--output=FILE'
+     `aclocal.m4'の代わりに，FILEに出力を書き込みます．
+
+`--print-ac-dir'
+     サードパーティーの`.m4'ファイルを見つけるために`aclocal'が検索する
+     ディレクトリの名前を出力します．このオプションが与えられているとき，
+     標準的な処理は行われません．このオプションは，パッケージがマクロファ
+     イルをインストールする場所を決定するために使用することが可能です．
+
+`--verbose'
+     調査しているファイルの名前を出力します．
+
+`--version'
+     Automakeのバージョンナンバーを出力し，終了します．
+
+
+
+File: automake-ja.info, Node: Macro search path, Next: Macros, Prev: aclocal options, Up: configure
+
+マクロ検索パス
+==============
+
+
+デフォルトで，`aclocal'は`.m4'ファイルを以下のディレクトリで，この順番に
+探します．
+
+`ACDIR-APIVERSION'
+     これは，automake自身が配布している`.m4'マクロを保持している場所です．
+     APIVERSIONは，使用しているautomakeのリリースに依存します．automake
+     1.6.xに対して，APIVERSION = `1.6'になります．
+
+`ACDIR'
+     このディレクトリは，サードパーティーの`.m4'ファイルが目的で，
+     `automake'自身がビルドされるときにコンフィグレーションされます．こ
+     れは`@datadir@/aclocal/'で，通常`${prefix}/share/aclocal/'に展開さ
+     れます．組み込みのACDIRを知るために，`--print-ac-dir'オプションを使
+     用してください．
+
+例として，automake-1.6.2が`--prefix=/usr/local'を用いてコンフィグレーショ
+ンされたと仮定します．そのとき検索パスは以下のようになります．
+
+
+     /usr/local/share/aclocal-1.6/
+     /usr/local/share/aclocal/
+
+
+(*Note aclocal options::)で説明したように，この検索パスの変更や拡張で使
+用可能なオプションもあります．
+
+
+マクロ検索パスを変更する: `--acdir'
+-----------------------------------
+
+検索パスを変更する最も明確なオプションは`--acdir=DIR'で，デフォルトのディ
+レクトリを変更し，APIVERSIONディレクトリを取り消します．例えば，
+`--acdir=/opt/private/'を指定した場合，検索パスは以下のようになります．
+
+
+     /opt/private/
+
+このオプション`--acdir'の目的は，automakeのテストスイートの内部で使用す
+ることだけです．それはエンドユーザは通常不要です．
+
+
+
+マクロ検索パスを変更する: `-I DIR'
+----------------------------------
+
+`-I'オプション(*Note aclocal options::)を使用して，あらゆる追加ディレク
+トリを指定することで，これらの検索リストに*前置します*．このため，
+`aclocal -I /foo -I /bar'は結果として以下のような検索パスになります．
+
+
+     /foo
+     /bar
+     acdir-APIVERSION
+     acdir
+
+
+Modifying the macro search path: `dirlist'
+------------------------------------------
+
+マクロ検索パスを変更する: `dirlist'
+-----------------------------------
+
+検索パスをカスタマイズするため，三番目のメカニズムがあります．`dirlist'
+ファイルがACDIRに存在する場合，そのファイルが，一行ごとに検索リストに追
+加するディレクトリリストを含んでいると仮定されます．これらのディレクトリ
+は，すべての他のディレクトリの*後に*検索されます．
+
+例えば，`ACDIR/dirlist'が以下の内容を含んでいると仮定します．
+
+     /test1
+     /test2
+
+そして，`aclocal'を`-I /foo -I /bar'オプションで呼び出したと仮定します．
+そのとき検索パスは以下のようになります．
+
+
+     /foo
+     /bar
+     acdir-APIVERSION
+     acdir
+     /test1
+     /test2
+
+`--acdir=DIR'オプションが使用されている場合，`aclocal'は`dirlist'ファイ
+ルをDIRで検索します．上記の`--acdir=/opt/private/'の例では，`aclocal'は
+`/opt/private/dirlist'を探します．しかし，繰り返しますが，`--acdir'オプ
+ションの目的は，automakeのテストスイートの内部で使用されることだけです．
+通常，`--acdir'はエンドユーザには不要です．
+
+以下のような状況で，`dirlist'は役に立ちます．`automake'のバージョン
+`1.6.2'が，`$prefix=/usr'でシステムベンダーによってインストールされてい
+ると仮定します．このためデフォルトの検索ディレクトリは以下のようになりま
+す．
+
+
+     /usr/share/aclocal-1.6/
+     /usr/share/aclocal/
+
+しかし，システムには多くのパッケージが，いつも通りに`$prefix=/usr/local'
+に手動でインストールされていると仮定します．この状況では，これらの"追加
+の"`.m4'ファイルは`/usr/local/share/aclocal'にあります．これらの"追加の
+"`.m4' ファイルを見つけるため，`/usr/bin/aclocal'を強制させる方法は，常
+に`aclocal -I /usr/local/share/aclocal'を呼び出すことです．これは不便で
+す．`dirlist'を用いると，以下のファイルを作成することができます．
+
+`/usr/share/aclocal/dirlist'
+
+その内容は以下のようになっています．
+
+`/usr/local/share/aclocal'
+
+さて，システムに影響する"デフォルト"の検索パスは以下のようになります．
+
+
+     /usr/share/aclocal-1.6/
+     /usr/share/aclocal/
+     /usr/local/share/aclocal/
+
+
+`-I'オプションは不要です．`-I'は，ローカルなシステム依存のツールのインス
+トールディレクトリを回避するのではなく，プロジェクト独自のものが必要な
+(`my-source-dir/m4/')として予約可能です．
+
+同様に，Automakeのローカルコピーをアカウント内にインストールし，
+`aclocal'でシステムの他の場所にインストールされているマクロを探したい場
+合，`dirlist'は手頃なはずです．
+
+
+
+
+File: automake-ja.info, Node: Macros, Next: Extending aclocal, Prev: Macro search path, Up: configure
+
+Automakeが提供するAutoconfマクロ
+================================
+
+Automakeは，`configure.in'で使用可能ないくつかのAutoconfマクロとともに出
+荷されています．そのうちの一つを使用するとき，`aclocal'で`aclocal.m4'に
+含められるでしょう．
+
+* Menu:
+
+* Public macros::               Macros that you can use.
+* Private macros::              Macros that you should not use.
+
+
+
+
+File: automake-ja.info, Node: Public macros, Next: Private macros, Prev: Macros, Up: Macros
+
+パブリックマクロ
+----------------
+
+`AM_CONFIG_HEADER'
+     Automakeは，コンフィグヘッダを自動的に再生成する規則を生成します．
+     この時代遅れのマクロは，現在は`AC_CONFIG_HEADERS'と同じです(*Note
+     Optional::)．
+
+`AM_ENABLE_MULTILIB'
+     これは，"multilib"ライブラリをビルドするときに使用します．最初のオ
+     プション引数は，生成される`Makefile'の名前です．デフォルトは
+     `Makefile'です．二番目のオプション引数は，ソースディレクトリのトッ
+     プを見つけるために使用します．デフォルトは空の文字列です(内部を理解
+     していない場合，通常はこれを使用しないほうが良いでしょう．) *Note
+     Multilibs::.
+
+`AM_C_PROTOTYPES'
+     関数プロトタイプをコンパイラが理解するかどうかを調査します．その場
+     合，`PROTOTYPES'を定義して，出力変数`U'と`ANSI2KNR'を空の文字列に設
+     定します．それ以外の場合，`U'を`_'に，`ANSI2KNR'を`./ansi2knr'にし
+     ます．Automakeはこれらの値を自動的なde-ANSI-ficationを実装するため
+     に使用します．
+
+`AM_HEADER_TIOCGWINSZ_NEEDS_SYS_IOCTL'
+     `TIOCGWINSZ'を使用するときに`<sys/ioctl.h>'が必要な場合，
+     `GWINSZ_IN_SYS_IOCTL'を定義します．それ以外の場合，`TIOCGWINSZ'は
+     `<termios.h>'で見つかるはずです．
+
+`AM_INIT_AUTOMAKE([OPTIONS])'
+`AM_INIT_AUTOMAKE(PACKAGE, VERSION, [NO-DEFINE])'
+     生成されたMakefileが適切な処理を行なうために必要な多くのマクロを実
+     行します．
+
+     このマクロには二つの形式があり，二番目のものは二つの引数が必要です．
+     パッケージとバージョンナンバーです．この後者の形式は，PACKAGEと
+     VERSIONがAutoconfの`AC_INIT'マクロ(それ自身も古い形式と新しい形式が
+     あります)から得ることが可能なので時代遅れです．
+
+     `configure.in'が以下の場合を考えます．AC_INIT(src/foo.c)
+     AM_INIT_AUTOMAKE(mumble, 1.5) 以下のようにして新しいものにすること
+     が可能です．
+          AC_INIT(mumble, 1.5)
+          AC_CONFIG_SRCDIR(src/foo.c)
+          AM_INIT_AUTOMAKE
+
+     `configure.in'を以前のバージョンのAutomakeから更新している場合，上
+     記の例のように，単純にパッケージバージョンの引数を，直接
+     `AM_INIT_AUTOMAKE'から`AC_INIT'へ移動することが常に正しいとは限りま
+     せん．`AC_INIT'の最初の引数はパッケージの名前(例えば`GNU Automake')
+     ですが，`AM_INIT_AUTOMAKE'に渡すために使用しているtarball の名前(例
+     えば`automake')ではありません．パッケージ名からtarball名を導き出す
+     Autoconfの規則は，ほとんどのパッケージで動作しますが全てで動作する
+     わけではないでしょう．特に，tarballの名前が全て小文字の場合，
+     `AC_INIT'の四つの引数を用いる形式を使用する必要があるでしょう
+     (Autoconfのバージョン2.52g以上からサポートされています)．
+
+     `AM_INIT_AUTOMAKE'が単一の引数で呼び出されたとき，それはスペースで
+     分けられた，ツリーの全ての`Makefile.am'に適用されるAutomakeのオプショ
+     ンのリストとして解釈されます．その影響は，それぞれのオプションを
+     `AUTOMAKE_OPTIONS'でリストアップしているかのようになります．
+
+     デフォルトでこのマクロは`PACKAGE'と`VERSION'を`AC_DEFINE' します．
+     以下のように`no-define'オプションを渡すことでこれを避けることが可能
+     です．AM_INIT_AUTOMAKE([gnits 1.5 no-define dist-bzip2]) または時代
+     遅れの形式に空の三番目に引数を渡すことで避けることが可能です．
+
+
+
+`AM_PATH_LISPDIR'
+     `emacs'プログラムを検索し，見つかった場合は，Emacsのsite-lispディレ
+     クトリへのフルパスを出力変数`lispdir'に設定します．
+
+     このテストは(GNU EmacsやXEmacsのような)Emacs Lispをサポートしている
+     バージョンの`emacs'が見つかることを想定しています．それ以外の
+     emacsenでは，このテストはハングアップします(古いバージョンの
+     MicroEmacsのように，対話モードでセットアップされているものは，終了
+     するために`C-x C-c'が必要で，emacsユーザでなければなかなか気付かな
+     いでしょう)．しかし，ほとんどの状況で，テストを終了するために`C-c'
+     を使用することが可能でしょう．問題を避けるため，環境変数で`EMACS'を
+     "no"に設定したり，(Emacs Lispをサポートしている`emacs'が確実にある
+     場合は)正しいパスを明示的に設定するために`configure'で
+     `--with-lispdir'を使用することが可能です．
+
+`AM_PROG_AS'
+     プロジェクトにアセンブラコードがあるときは，このマクロを使用して下
+     さい．これはアセンブラを選択し(デフォルトはCコンパイラ)，`CCAS'を設
+     定し，そして，必要な場合は`CCASFLAGS'も設定します．
+
+`AM_PROG_CC_C_O'
+     これは`AC_PROG_CC_C_O'に似ていますが，それはautomakeが要求する形式
+     の結果を生成します．この機能が必要なときは，`AC_PROG_CC_C_O'の代わ
+     りにこれを使用して下さい．
+
+`AM_PROG_CC_STDC'
+     CコンパイラがデフォルトでANSI Cモードでない場合，それをANSI Cモード
+     にするため，出力変数`CC'にオプションの追加を試みます．このマクロは
+     システムごとのANSI Cを選択する様々なオプションを試みます．関数プロ
+     トタイプを正しく処理する場合，コンパイラがANSI Cモードであると考え
+     ます．
+
+     このマクロを使用する場合，それを呼び出した後で，CコンパイラをANSI C
+     に適用させる設定があるかどうかを調査する必要があります．そうでない
+     場合，シェル変数の`am_cv_prog_cc_stdc'は`no'に設定されます．ANSI C
+     でソースコードを書いた場合は，`ansi2knr'オプションを使用して，非
+     ANSIfied のコピーを作成することが可能です(*Note ANSI::)．
+
+`AM_PROG_LEX'
+     `AC_PROG_LEX'に似ていますが(*Note Particular Program Checks:
+     (autoconf)Particular Programs.)，`lex'が無いシステムで`missing'スク
+     リプトを使用します．`HP-UX 10'はそのようなシステムの一つです．
+
+`AM_PROG_GCJ'
+     このマクロは，`gcj'プログラムを見つけるか，そうでなければエラーを発
+     生します．それは`GCJ'と`GCJFLAGS'を設定します．`gcj'は，GNU
+     Compiler CollectionのJavaフロントエンドです．
+
+`AM_SYS_POSIX_TERMIOS'
+     POSIX termiosヘッダと関数がシステムで利用可能かどうか調査します．そ
+     の場合，シェル変数`am_cv_sys_posix_termios'を`yes'に設定します．そ
+     うでない場合，その変数を`no'に設定します．
+
+`AM_WITH_DMALLOC'
+     dmalloc (ftp://ftp.letters.com/src/dmalloc/dmalloc.tar.gz)パッケー
+     ジに対するサポートを追加します．ユーザが`--with-demalloc'を用いてコ
+     ンフィグレーションする場合，`WITH_DMALLOC'を定義し，`LIBS'に
+     `-ldmalloc'を加えます．
+
+`AM_WITH_REGEX'
+     `configure'コマンドラインに`--with-regex'を追加します．指定された
+     (デフォルトの)場合，`regex'の正規表現ライブラリが使用され，
+     `regex.o'が`LIBOBJS'に書き込まれ，そして，`WITH_REGEX'が定義されま
+     す．`--without-regex'が与えられる場合，`rx'正規表現ライブラリが使用
+     され，`rx.o'が`LIBOBJS'に書き込まれます．
+
+
+
+
+File: automake-ja.info, Node: Private macros, Prev: Public macros, Up: Macros
+
+プライベートマクロ
+------------------
+
+以下のマクロは，直接呼び出すべきではないプライベートマクロです．それらは
+適切なときに他のパブリックマクロから呼び出されます．将来のバージョンで変
+更される可能性があるので，それらを呼び出さないでください．それらは実装の
+詳細を考察するものと考えてください．または，何も考え内容が良いかもしれま
+せん．このセクションは読み飛ばしてください！
+
+`_AM_DEPENDENCIES'
+`AM_SET_DEPDIR'
+`AM_DEP_TRACK'
+`AM_OUTPUT_DEPENDENCY_COMMANDS'
+     これらのマクロはautomakeの自動的な依存性の追跡手法を実装するために
+     使用されます．それらは，要求されたときautomakeから自動的に呼び出さ
+     れ，手動で呼び出す必然性はありません．
+
+`AM_MAKE_INCLUDE'
+     このマクロは，ユーザの`make'が`include'文を処理する方法を知るために
+     使用されます．それらは，必要なとき自動的に呼び出されます．手動で呼
+     び出す必然性はありません．
+
+`AM_PROG_INSTALL_STRIP'
+     これは，インストール時にプログラムを`strip'するために使用可能な
+     `install'のバージョンを知るために使用されます．このマクロは要求され
+     るとき自動的に含められます．
+
+`AM_SANITY_CHECK'
+     これは，ビルドディレクトリに作成されるファイルがソースディレクトリ
+     のファイルより確実に新しいことを調査します．時計の設定が正しくない
+     システムで失敗するはずです．このマクロは`AM_INIT_AUTOMAKE'から自動
+     的に実行されます．
+
+
+
+
+
+
+File: automake-ja.info, Node: Extending aclocal, Prev: Macros, Up: configure
+
+独自のaclocalマクロを書く
+=========================
+
+
+`aclocal'プログラムには，マクロ組み込みの知識が全く無いので，独自のマク
+ロでそれを拡張することは容易です．
+
+これは，他のプログラムで使用する独自のAutoconfマクロを供給したいライブラ
+リに対して主に使用されます．例えば`gettext'ライブラリは，`gettext'を使用
+しているあらゆるパッケージで使用されるように，`AM_GNU_GETTEXT'マクロを供
+給しています．ライブラリがインストールされるとき，`aclocal'で見つかるよ
+うに，このマクロをインストールします．
+
+マクロのファイルは一連の`AC_DEFUN'で行います．`aclocal'プログラムは
+`AC_REQUIRE'も理解するので，別々のファイルにそれぞれのマクロを書き込むと
+安全です．*Note Prerequisite Macros: (autoconf)Prerequisite Macros.そし
+て，*Note Macro Definitions: (autoconf)Macro Definitionsを参照してくださ
+い．
+
+マクロファイルの名前は`.m4'で終わらせすべきです．そのようなファイルは
+``aclocal --print-ac-dir`' (偶然ですが，通常は`$(datadir)/aclocal'になり
+ます)にインストールされます．
+
+
+
+
+File: automake-ja.info, Node: Top level, Next: Alternative, Prev: configure, Up: Top
+
+トップレベルの`Makefile.am'
+***************************
+
+
+サブディレクトリの再帰
+======================
+
+
+サブディレクトリがあるパッケージでは，トップレベルの`Makefile.am'でビル
+ドするサブディレクトリをAutomakeに伝える必要があります．これは`SUBDIRS'
+変数によってなされます．
+
+`SUBDIRS'変数は，さまざまな種類のビルドが行われるサブディレクトリのリス
+トを保持しています．生成されている`Makefile'内の多くのターゲット(例えば
+`all')は，ローカルと指定されたすべてのサブディレクトリの両方で実行されま
+す．`SUBDIRS'でリストアップされているディレクトリには，`Makefile.am'を含
+んでいる必要がないことに注意してください．(コンフィギュレーションの後の)
+`Makefile'だけが必要です．こうすることで，(`gettext'のような)Automakeを
+使用しないパッケージからライブラリを含めることが可能になります．
+
+サブディレクトリを使用しているパッケージでは，トップレベルの
+`Makefile.am'は非常に短いことが多くなっています．例えば，GNU Hello 配布
+物の`Makefile.am'は以下のようになっています．
+
+     EXTRA_DIST = BUGS ChangeLog.O README-alpha
+     SUBDIRS = doc intl po src tests
+
+Automakeが`make'をサブディレクトリで呼び出すとき，`MAKE'変数の値を使用し
+ます．それは，変数`AM_MAKEFLAGS'の値を`make'の呼び出しに渡します．これで，
+常に`make'に渡す必要があるフラグを`Makefile.am'で設定することが可能にな
+ります．
+
+`SUBDIRS'で記述されているディレクトリは，現在のディレクトリの直接の子ディ
+レクトリにする必要があります．例えば，`SUBDIRS'に`src/subdir'を書くこと
+はできません．代わりに，`SUBDIRS = subdir'を`src/Makefile.am'に書くべき
+です．この方法で任意の深さのパッケージ構成で，Automakeの使用が可能になり
+ます．
+
+デフォルトで，Automakeは最初の深さ(`postfix')で動作する`Makefile'を生成
+します．しかし，この順序を変更することは可能です．`SUBDIRS'に`.'を書くこ
+とでこうすることが可能です．例えば，`.'を最初に書くことで，ディレクトリ
+の`prefix'の順序になります．すべての`clean'ターゲットは，ビルドターゲッ
+トの逆の順序で実行されます．
+
+
+サブディレクトリの条件
+======================
+
+GNU `Inetutils'のように，パッケージ全体のサブセットをビルドしたいだけの
+場合，`SUBDIRS'変数を条件的に定義することがが可能です．
+
+これがどのように動作するかを説明するため，二つのディレクトリ`src/' と
+`opt/'があると仮定しましょう．`src/'は常にビルドされますが，`opt/'は
+`./configure'でビルドするかどうかを決定したいと思います．(この例では，変
+数`$want_opt'が`yes'に設定されているとき`opt/'をビルドすると仮定します．)
+
+`make'と実行することで，`src/'は常に再帰され，`opt/'もそうなるかもしれま
+せん．
+
+しかし，`make dist'では常に`src/'と`opt/'の両方を再帰すべきです．つまり，
+現在のコンフィグレーションでは不要な場合でも，`opt/'は配布されるべきです．
+これは，`opt/Makefile'は条件に依存せず作成されるべきだということを意味し
+ます． (1) (*Note Top level-Footnotes::)
+
+このようにプロジェクトを設定する方法は二つあります．Automakeの条件式
+(*Note Conditionals::)を使用したり，Autoconfの`AC_SUBST'マクロ(*Note
+Setting Output Variables: (autoconf)Setting Output Variables.)を使用した
+りすることが可能です．Automakeの条件式の使用は，より好まれる解となります．
+
+
+`AM_CONDITIONAL'を用いた条件付サブディレクトリ
+----------------------------------------------
+
+
+`configure'でそれぞれのディレクトリの`Makefile'を出力し，`opt/'をビルド
+するかどうかの条件を定義すべきです．
+
+     ...
+     AM_CONDITIONAL([COND_OPT], [test "$want_opt" = yes])
+     AC_CONFIG_FILES([Makefile src/Makefile opt/Makefile])
+     ...
+
+`SUBDIRS'は，トップレベルの`Makefile.am'で，以下のように定義することが可
+能です．
+
+     if COND_OPT
+       MAYBE_OPT = opt
+     endif
+     SUBDIRS = src $(MAYBE_OPT)
+
+御覧のように，`make'を実行することで，`src/'と，おそらく`opt/'に再帰して
+いくでしょう．
+
+見ることはできませんが，`make dist'は`make all'とは異なり，`SUBDIRS'変数
+を使用しないので，`make dist'を実行することで，`src/'と`opt/'の両方に再
+帰的に行ないます．それは`DIST_SUBDIRS'変数を使用します．
+
+この場合，Automakeは`MAYBE_OPT'が条件によっては`opt'を含むことを知ってい
+るので，`DIST_SUBDIRS = src opt'を自動的に定義します．
+
+
+
+`AC_SUBST'を用いたサブディレクトリの条件式
+------------------------------------------
+
+
+もう一つの考えは，`AC_SUBST'を使用して，`./configure'で`MAYBE_OPT'を定義
+することです．
+
+     ...
+     if test "$want_opt" = yes; then
+       MAYBE_OPT=opt
+     else
+       MAYBE_OPT=
+     fi
+     AC_SUBST([MAYBE_OPT])
+     AC_CONFIG_FILES([Makefile src/Makefile opt/Makefile])
+     ...
+
+この状況では，トップレベルの`Makefile.am'は以下のようになるでしょう．
+
+     SUBDIRS = src $(MAYBE_OPT)
+     DIST_SUBDIRS = src opt
+
+欠点は，Automakeが`MAYBE_OPT'の変数が何かを推測することが不可能なので，
+`DIST_SUBDIRS'に定義する必要があるということです．
+
+
+`DIST_SUBDIRS'が使用される方法
+------------------------------
+
+上記の例のように，`DIST_SUBDIRS'は，条件によってビルドされないままであっ
+ても，すべてのディレクトリで再帰的に必要なターゲットとして使用されます．
+
+厳密にいうと，`DIST_SUBDIRS'は`make dist'，`make distclean'，そして`make
+maintainer-clean'で使用されます．すべてのその他の再帰的なターゲットは
+`SUBDIRS'を使用します．
+
+Automakeは，すべての条件で取り得る`SUBDIRS'の値から，自動的に
+`DIST_SUBDIRS'を定義します．
+
+`SUBDIRS'が`AC_SUBST'変数を含んでいる場合，Automakeはこれらの変数の取り
+得る値を知らないので，`DIST_SUBDIRS' は正しく定義されません．この状況で
+は，`DIST_SUBDIRS'を手動で定義する必要があります．
+
+
+
+File: automake-ja.info  Node: Top level-Footnotes, Up: Top level
+
+(1) `opt/Makefile'を条件的に作成するという解を探さないでください．
+これはここにある解より扱いにくいものです．
+
+
+
+File: automake-ja.info, Node: Alternative, Next: Rebuilding, Prev: Top level, Up: Top
+
+サブディレクトリに代わるアプローチ
+**********************************
+
+Peter Millerの優れた論文をすでに読んでいる場合Recursive Make Considered
+Harmful (http://www.pcug.org.au/~millerp/rmch/recu-make-cons-harm.html)，
+サブディレクトリを使用する前のセクションは，おそらくありがたくない助言に
+なるでしょう．論文を読んでいない人のために，Millerの主題は，再帰的な
+`make'の呼び出しは，遅くてエラーを発生しやすいということです．
+
+複雑な複数のディレクトリがあるパッケージに対して，単一の`Makefile.am'だ
+けを書くことを可能にする，ディレクトリを跨るための優れたサポート (1)
+(*Note Alternative-Footnotes::)を，Automake は提供しています．
+
+
+デフォルトで，サブディレクトリで指定されているインストール可能なファイル
+は，インストールする前にそのディレクトリ名が切り取られています．例えば以
+下の例では，ヘッダファイルが`$(includedir)/stdio.h'にインストールされる
+でしょう．
+
+     include_HEADERS = inc/stdio.h
+
+
+しかし，`nobase_'を前置することで，このパスを切り取りを回避することが可
+能になります．以下の例では，ヘッダファイルは`$(includedir)/sys/types.h'
+にインストールされるでしょう．
+
+     nobase_include_HEADERS = sys/types.h
+
+
+`nobase_'は，`dist_'や`nodist_'(*Note Dist::)のいずれかと組合わせて使用
+するとき，最初に指定するべきです．例えば以下のようにします．
+
+     nobase_dist_pkgdata_DATA = images/vortex.pgm
+
+
+File: automake-ja.info  Node: Alternative-Footnotes, Up: Alternative
+
+(1) 我々は信じています．この動作は新しく，問題がある可能性があります．バ
+グレポートの情報は，*Note Introduction::.
+
+
+
+File: automake-ja.info, Node: Rebuilding, Next: Programs, Prev: Alternative, Up: Top
+
+Makefileのリビルド
+******************
+
+Automakeは，`Makefile'，`configure'，そして`Makefile.in' のようなその他
+の派生するファイルを，自動的にリビルドする規則を生成します．
+
+`configure.in'で`AM_MAINTAINER_MODE'を使用している場合，これらの自動的な
+リビルドの規則は，管理者モードでのみ利用可能になります．
+
+`.m4'ファイルを探す場所を伝えるために，`-I'のような引数を用いて`aclocal'
+実行する必要があることもあります．`make'が自動的に`aclocal'を実行すると
+きもあるので，これらの引数を指定する方法が必要になります．
+`ACLOCAL_AMFLAGS'を定義することで，こうすることが可能になります．これは，
+`aclocal'に渡す引数をそのまま保持しています．この変数は，トップレベルの
+`Makefile.am'でのみ役に立ちます．
+
+
+
+
+File: automake-ja.info, Node: Programs, Next: Other objects, Prev: Rebuilding, Up: Top
+
+プログラムとライブラリのビルド
+******************************
+
+Automakeの機能の大半は，プログラムとライブラリのビルドを容易にすることに
+費やされています．
+
+* Menu:
+
+* A Program::                   Building a program
+* A Library::                   Building a library
+* A Shared Library::            Building a Libtool library
+* Program and Library Variables::  Variables controlling program and
+                                library builds
+* LIBOBJS::                     Special handling for LIBOBJS and ALLOCA
+* Program variables::           Variables used when building a program
+* Yacc and Lex::                Yacc and Lex support
+* C++ Support::
+* Assembly Support::
+* Fortran 77 Support::
+* Java Support::
+* Support for Other Languages::
+* ANSI::                        Automatic de-ANSI-fication
+* Dependencies::                Automatic dependency tracking
+* EXEEXT::                      Support for executable extensions
+
+
+
+
+File: automake-ja.info, Node: A Program, Next: A Library, Prev: Programs, Up: Programs
+
+プログラムのビルド
+==================
+
+プログラムをビルドするために，その一部となるソースとリンクされるライブラ
+リをAutomakeに伝える必要があります．
+
+このセクションは，ソースやプログラムの条件付コンパイルもカバーしています．
+これらのコメントのほとんどは，ライブラリ(*Note A Library::)とLibtoolライ
+ブラリ(*Note A Shared Library::)に適用されます．
+
+* Menu:
+
+* Program Sources::             Defining program sources
+* Linking::                     Linking with libraries or extra objects
+* Conditional Sources::         Handling conditional sources
+* Conditional Programs::        Building program conditionally
+
+
+
+File: automake-ja.info, Node: Program Sources, Next: Linking, Prev: A Program, Up: A Program
+
+プログラムソースの定義
+----------------------
+
+
+(ライブラリやスクリプトと比較して)プログラムにビルドされるソースを含んで
+いるディレクトリには，`PROGRAMS'プライマリが使用されます．プログラムを，
+`bindir'，`sbindir'，`libexecdir'，`pkglibdir' にインストールしたり，ま
+たは全くインストールしない(`noinst')ことが可能です．`make check'に対して
+のみビルドさせることも可能で，そのときは接頭辞は`check'になります．
+
+例えば以下のようにします．
+
+     bin_PROGRAMS = hello
+
+この単純な状況では，結果として生成される`Makefile.in'に，`hello'という名
+前のプログラムを生成するコードが含まれるでしょう．
+
+それぞれのプログラムに関連して，プログラムの後に命名される補助変数もあり
+ます．これらの変数はすべてオプションで，妥当なデフォルト値を持ちます．そ
+れぞれの変数，その使用，そしてデフォルトについては以下で記述します．我々
+は，"hello"の例を終始使用します．
+
+変数`hello_SOURCES'は，実行形式にビルドされるソースファイルを指定するた
+めに使用されます．
+
+     hello_SOURCES = hello.c version.c getopt.c getopt1.c getopt.h system.h
+
+これにより，上記のそれぞれの`.c'ファイルを，対応する`.o'にコンパイルしま
+す．そして，すべては`hello'を生成するためにリンクされます．
+
+
+`hello_SOURCES'が指定されていない場合，そのデフォルトは一つのファイル
+`hello.c'になります．すなわちデフォルトとは，ベースとなる名前がプログラ
+ム自身の名前になっている，単一のCファイルをコンパイルするということです．
+(これは危険なデフォルトですが，我々は歴史的な理由で行き詰まっています．)
+
+複数のプログラムを一つのディレクトリでビルドすることが可能です．複数のプ
+ログラムで単一のソースファイルを共有することが可能で，それぞれの
+`_SOURCES'定義でリストアップする必要があります．
+
+
+`_SOURCES'定義にリストアップされているヘッダファイルは配布物に含まれます
+が，それ以外のものは無視されます．明らかではないときは，`configure'で生
+成されるヘッダファイルを`_SOURCES'変数に含めるべきではありません．このファ
+イルは配布すべきではありません．Lex(`.l')とYacc(`.y')のファイルもリスト
+アップすることが可能です．*Note Yacc and Lex::を参照して下さい．
+
+
+
+
+File: automake-ja.info, Node: Linking, Next: Conditional Sources, Prev: Program Sources, Up: A Program
+
+プログラムのリンク
+------------------
+
+`configure'で見つからないライブラリに対してリンクする必要がある場合，そ
+うするために`LDADD'を使用することが可能です．この変数は，リンクする追加
+のオブジェクトやライブラリを指定するために使用されます．それは，特定のリ
+ンカフラグを指定するには不適切で，この目的では`AM_LDFLAGS'を使用すべきで
+す．
+
+
+複数のプログラムが一つのディレクトリで構築されていても，リンク時に同じ条
+件を共有しないときもあります．この場合は，グローバルな`LDADD'に優先させ
+るため，`PROG_LDADD'変数(ここでのPROGはプログラムの名前で，それは
+`_PROGRAMS'変数にあって，通常は小文字で書かれています) を使用することが
+可能です．この変数が所定のプログラムのために存在する場合，そのプログラム
+は`LDADD'を使用してリンクされません．
+
+例えば，GNU cpioでは，`pax'，`cpio'，そして`mt'は，`libcpio.a'ライブラリ
+にリンクされます．しかし，`rmt'は同じディレクトリでビルドされますが，そ
+のようなリンクは必要ありません．また，`mt'と`rmt'は特定のアーキテクチャ
+でのみビルドされます．以下は，cpioの`src/Makefile.am'に似たものです(省略
+されています)．
+
+     bin_PROGRAMS = cpio pax @MT@
+     libexec_PROGRAMS = @RMT@
+     EXTRA_PROGRAMS = mt rmt
+
+     LDADD = ../lib/libcpio.a @INTLLIBS@
+     rmt_LDADD =
+
+     cpio_SOURCES = ...
+     pax_SOURCES = ...
+     mt_SOURCES = ...
+     rmt_SOURCES = ...
+
+
+`PROG_LDADD'でプログラム独自のリンカフラグ(`-l'，`-L'，`-dlopen'そして
+`-dlpreopen'を除く)を渡すことは不適当です．そのため，この目的に対しては
+`PROG_LDFLAGS'変数を使用してください．
+
+
+実際にはプログラムの一部でない他のターゲットに依存するプログラムを持つこ
+とが役に立つこともあります．これは`PROG_DEPENDENCIES'変数を使用すること
+で可能になります．それぞれのプログラムはこの変数の内容に依存しますが，そ
+れ以上の解釈はされません．
+
+`PROG_DEPENDENCIES'が提供されていない場合，Automakeが考えます．自動的に
+割り当てられる値は`PROG_LDADD'の内容で，ほとんどのconfigureの置換式，
+`-l'，`-L'，`-dlopen'，そして`-dlpreopen'オプションは削除されます．残っ
+ているconfigureの置換式は，`@LIBOBJS@'と`@ALLOCA@'だけです．これらは，生
+成される`PROG_DEPENDENCIES'に無効な値を与えないことが知られているので残
+されています．
+
+
+
+
+File: automake-ja.info, Node: Conditional Sources, Next: Conditional Programs, Prev: Linking, Up: A Program
+
+ソースの条件コンパイル
+----------------------
+
+`configure'の置換式(例えば，`@FOO@')を`_SOURCES' 変数に書き込むことはで
+きません．この理由を説明するのは少し難しいのですが，単純に言って動作しな
+いということで十分でしょう．これを試みた場合，Automakeはエラーを発します．
+
+幸い，同じ結果を達成するために二つの別の方法があります．一つは，
+`configure'の置換式を`_LDADD'変数で使用する方法で，もう一つは，Automake
+の条件式を使用する方法です．
+
+
+`_LDADD'の置換式を使用した条件コンパイル
+........................................
+
+
+Automakeは，すべてのファイルが全ての状況でビルドされるわけではない場合で
+も，プログラムに組み込まれる可能性があるソースファイルをすべて知っている
+必要があります．条件によってのみビルドされるファイルは，適切な`EXTRA_'変
+数でリストアップすべきです．例えば，条件によって`hello-linux.c'や
+`hello-generic.c'を`hello'に組み込む場合，`Makefile.am'に以下のものを含
+めます．
+
+     bin_PROGRAMS = hello
+     hello_SOURCES = hello-common.c
+     EXTRA_hello_SOURCES = hello-linux.c hello-generic.c
+     hello_LDADD = @HELLO_SYSTEM@
+     hello_DEPENDENCIES = @HELLO_SYSTEM@
+
+`configure.in'で`@HELLO_SYSTEM@'の置換式を設定することが可能です．
+
+     ...
+     case $host in
+       *linux*) HELLO_SYSTEM='hello-linux.$(OBJEXT)' ;;
+       *)       HELLO_SYSTEM='hello-generic.$(OBJEXT)' ;;
+     esac
+     AC_SUBST([HELLO_SYSTEM])
+     ...
+
+この場合，`HELLO_SYSTEM'は`hello-linux.o'や`hello-bsd.o' で置換され，ビ
+ルドしリンクするために`hello_DEPENDENCIES'と`hello_LDADD'に追加されます．
+
+
+Automakeの条件式を使用した条件コンパイル
+........................................
+
+条件によってソースファイルをコンパイルするためのより簡単な方法としては，
+Automakeの条件式を使用することが多くなっています．例えば，同じ`hello'の
+例をビルドするため，以下のような内容の`Makefile.am'を使用することが可能
+でしょう．
+
+     bin_PROGRAMS = hello
+     if LINUX
+     hello_SOURCES = hello-linux.c hello-common.c
+     else
+     hello_SOURCES = hello-generic.c hello-common.c
+     endif
+
+この場合，`configure.in'で`AM_CONDITIONAL'を使用して`LINUX'条件式を設定
+する必要があります(*Note Conditionals::)．
+
+Automakeは，ソースファイルの完全なリストを構成するためにそれぞれの変数の
+内容を調査するので，このような条件を使用するときは，`EXTRA_'変数を使用す
+る必要はありません．
+
+プログラムで多くのファイルを使用している場合，おそらく条件付の`+=' のほ
+うが望ましいでしょう．
+
+     bin_PROGRAMS = hello
+     hello_SOURCES = hello-common.c
+     if LINUX
+     hello_cond += hello-linux.c
+     else
+     hello_cond += hello-generic.c
+     endif
+
+
+

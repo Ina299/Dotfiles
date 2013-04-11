@@ -1,0 +1,30 @@
+-*- Text -*-
+GNU Japanese Documentation package version 0.0.
+
+
+This is the GNU Japanese Documentation package. We intend to make a
+package for Japanese documents about the GNU Project, and provide
+simple and easy installation methods for end-users.
+
+For instructions on installing the package, see the file `INSTALL'.
+
+The latest package can be obtained from our cvs server; The cvsroot
+is `:pserver:guest@openlab.ring.gr.jp:/circus/cvsroot',
+and the module name is `gnujdoc'. The password for the `guest' user
+is `guest'.
+
+If you want to get only a part of gnujdoc documents, you may get the
+top-level directory and subdiretories that you want, like this:
+
+$ cvs -d :pserver:guest@openlab.ring.gr.jp:/circus/cvsroot \
+    checkout -l gnujdoc
+$ cvs -d :pserver:guest@openlab.ring.gr.jp:/usr/local/cvsroot \
+    checkout gnujdoc/automake
+
+Please refer to the file `MANUALS' to see what manuals are included
+in the package.
+
+Bug reports for the package should be sent to the gnujdoc mailing-list
+<gnu-devels-jp@gnu.org>. If you are interested in this project, then join
+the mailing-list `gnu-devels-jp@gnu.org'. How to join the mailing-list is
+described in <URL:http://mail.gnu.org/mailman/listinfo/gnu-devels-jp>.

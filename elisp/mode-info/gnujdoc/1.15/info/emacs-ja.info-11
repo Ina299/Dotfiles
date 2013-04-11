@@ -1,0 +1,1976 @@
+Info file: emacs-ja.info,    -*-Text-*-
+produced by `texinfo-format-buffer'
+from file `emacs-ja.texi'
+using `texinfmt.el' version 2.38 of 3 July 1998.
+
+
+Emacs 20.6版対応に改訂した`GNU Emacs Manual' 13版です。
+
+INFO-DIR-SECTION Editors
+START-INFO-DIR-ENTRY
+* Emacs: (emacs-ja).	The extensible self-documenting text editor.
+END-INFO-DIR-ENTRY
+
+
+Published by the Free Software Foundation 59 Temple Place, Suite 330
+Boston, MA 02111-1307 USA
+
+Copyright (C) 1985, 1986, 1987, 1993, 1994, 1995, 1996, 1997, 1998, 1999
+Free Software Foundation, Inc.
+
+Permission is granted to make and distribute verbatim copies of this
+manual provided the copyright notice and this permission notice are
+preserved on all copies.
+
+Permission is granted to copy and distribute modified versions of this
+manual under the conditions for verbatim copying, provided also that the
+sections entitled "The GNU Manifesto", "Distribution" and "GNU General
+Public License" are included exactly as in the original, and provided
+that the entire resulting derived work is distributed under the terms of
+a permission notice identical to this one.
+
+Permission is granted to copy and distribute translations of this manual
+into another language, under the above conditions for modified versions,
+except that the sections entitled "The GNU Manifesto", "Distribution"
+and "GNU General Public License" may be included in a translation
+approved by the Free Software Foundation instead of in the original
+English.
+
+
+
+
+
+File: emacs-ja.info, Node: Rmail Sorting, Next: Rmail Display, Prev: Rmail Summary, Up: Rmail
+
+rmailファイルのソート
+=====================
+
+`M-x rmail-sort-by-date'
+     現在のrmailファイルのメッセージを日付順にソートする。
+
+`M-x rmail-sort-by-subject'
+     現在のrmailファイルのメッセージを`Subject'順にソートする。
+
+`M-x rmail-sort-by-author'
+     現在のrmailファイルのメッセージを筆者名順にソートする。
+
+`M-x rmail-sort-by-recipient'
+     現在のrmailファイルのメッセージを受け手名順にソートする。
+
+`M-x rmail-sort-by-correspondent'
+     現在のrmailファイルのメッセージを他の文通者名順にソートする。
+
+`M-x rmail-sort-by-lines'
+     現在のrmailファイルのメッセージを行数順にソートする。
+
+`M-x rmail-sort-by-keywords RET LABELS RET'
+     現在のrmailファイルのメッセージをラベル順にソートする。引数 LABELS
+     は、コンマで区切られたラベルの並びである必要がある。ラベルの順序が
+     メッセージの順序を決める。最初のラベルを持つメッセージが最初にきて、
+     2番目のラベルを持つものが2番目にくるというようになる。指定したラベ
+     ルも持たないメッセージは最後にくる。
+
+rmailのソートコマンドは、*順序を保存するソート*（stable sort）を行います。
+2つのメッセージのどちらを先にするか明確な基準がないときには、その順序関
+係は保存されます。これを用いれば、複数の基準でソートできます。たとえば、
+`rmail-sort-by-date'を使ってから`rmail-sort-by-author'を使うと、同じ筆者
+のメッセージは日付順に並びます。
+
+数引数を指定するとこれらのすべてのコマンドは逆順序に並べます。つまり、新
+しいものから古いものへ、大きなものから小さなものへ、アルファベットの逆順
+にメッセージをソートします。
+
+
+
+File: emacs-ja.info, Node: Rmail Display, Next: Rmail Editing, Prev: Rmail Sorting, Up: Rmail
+
+メッセージの表示
+================
+
+初めてメッセージを表示するとき、rmailはメッセージのヘッダを整形し直して
+から表示します。むだな表示を削るために重要でないヘッダフィールドを隠しま
+す。`t'コマンドを使うと、ヘッダ全体を表示したり再度整形することができま
+す。
+
+`t'
+     ヘッダ全体を表示するかどうかを切り替える（`rmail-toggle-header'）。
+
+ヘッダの整形では、各ヘッダフィールドの重要性に基づいてほとんどのヘッダ
+フィールドを削除することになります。変数`rmail-ignored-headers'には、こ
+のようにして隠すヘッダフィールドを指定する正規表現を記述します。ヘッダ
+フィールドの先頭部分がこの正規表現に一致するとそのフィールド全体を隠しま
+す。
+
+rmailは整形を行うまえにもとのヘッダ全体を保存します。これを見るには`t'
+（`rmail-toggle-header'）コマンドを使います。カレントメッセージの整形さ
+れたヘッダを捨て、もとのヘッダを表示します。`t'を再度実行すると、メッセー
+ジのヘッダを再度整形します。メッセージを選択し直しても再度整形します。
+
+この結果として、（*Note Rmail Editing::）整形されたヘッダを（`e'コマンド
+で）編集しても、そのあとに`t'を使うと編集したものは破棄されます（*Note
+Rmail Editing::）。一方、`t'のあとに`e'を使ってもとの（整形していない）
+ヘッダを編集すると、その変更は保存されます。
+
+`t'コマンドに数引数を付けると、正の引数ならは整形したヘッダを表示し、ゼ
+ロか負ならばヘッダ全体を表示します。
+
+複数のフォントを使えるウィンドウシステムで使用すると、rmailは特に重要な
+ある種のヘッダフィールドを強調表示します。デフォルトでは、 `From'フィー
+ルドと`Subject'フィールドです。変数`rmail-highlighted-headers'には、強調
+表示したいヘッダフィールドを指定する正規表現を記述します。ヘッダフィール
+ドの先頭部分がこの正規表現に一致するとそのフィールド全体を強調表示します。
+
+テキストの前景や背景に標準的でない色を指定すると、うまく強調表示できない
+こともあります。そのような場合には、`highlight'フェイスに別の色を指定し
+ます。`highlight'フェイスはrmail以外の強調表示にも使われるので、指定を行
+う価値があります。方法は、*Note Faces::。
+
+rmailの強調表示をすべてやめるには、変数`rmail-highlighted-headers'に
+`nil'を設定してください。
+
+
+
+File: emacs-ja.info, Node: Rmail Editing, Next: Rmail Digest, Prev: Rmail Display, Up: Rmail
+
+メッセージの編集
+================
+
+rmailモードでも通常のEmacsコマンドのほとんどを使えますが、`C-M-n'や
+`C-M-h'のように他の目的のためにrmailで再定義されたものもいくつかあります。
+しかし、rmail バッファは通常読み出し専用であり、アルファベット文字のほと
+んどもrmailコマンドとして再定義されています。メッセージのテキストを編集
+したいときには、rmailコマンド`e'を使う必要があります。
+
+`e'
+     カレントメッセージを通常のテキストとして編集する。
+
+`e'（`rmail-edit-current-message'）コマンドは、rmailモードからrmail編集
+（rmail-edit）モードに移行します。このモードは、テキスト（text）モードと
+ほとんど同じ別のメジャーモードです。モード行にこの変化が表示されます。
+
+rmail編集（rmail-edit）モードでは、文字は通常どおり挿入でき、rmailコマン
+ドは使えません。メッセージを編集し終えてrmailへ戻るには、`C-c C-c'と打ち
+ます。するとrmailモードに戻ります。あるいは、行った編集をすべて取り消し
+てrmailモードに戻るには、`C-c C-]'と打ちます。
+
+rmail編集（rmail-edit）モードに入るとき、フック`text-mode-hook'が実行さ
+れます。それからフック`rmail-edit-mode-hook' が実行されます （*Note
+Hooks::）。メッセージには属性`edited' が付けられます。さらに、メッセージ
+のヘッダ全体が表示されるので、メッセージの本文と同様にヘッダも編集できま
+す。ヘッダに対する変更も保存されます。
+
+
+
+File: emacs-ja.info, Node: Rmail Digest, Next: Out of Rmail, Prev: Rmail Editing, Up: Rmail
+
+ダイジェストメッセージ
+======================
+
+"ダイジェストメッセージ"（digest message）は、数個のメッセージをまとめて
+運ぶためのメッセージです。ダイジェストは管理人のいるメイリングリスト上で
+使われます。1日単位などの一定期間内にリスト宛に受け取ったすべてのメッセー
+ジを1つのダイジェストにまとめて加入者に送ります。合計のサイズが同じであっ
+たとしても、ダイジェストにして送るほうが個々にメッセージを送るよりコン
+ピュータの使用時間がずっと少なくてすみます。というのは、メイル送信に必要
+なメッセージあたりのネットワーク上のオーバーヘッドがとても大きいからです。
+
+ダイジェストメッセージを受け取ったならば、もっとも簡単な読み方は、それを
+"アンダイジェスト"（undigestify）して個々のメッセージに戻すことです。そ
+うすれば好きなように、個々のメッセージを読んだり削除したりできます。
+
+アンダイジェストするには、ダイジェストメッセージを選び、コマンド`M-x
+undigestify-rmail-message'を打ちます。これは、（ダイジェストメッセージ内
+の）サブメッセージを別々のrmailメッセージとして取り出し、ダイジェストの
+あとにそれらのメッセージを挿入します。ダイジェストメッセージ自体は削除さ
+れます。
+
+
+
+File: emacs-ja.info, Node: Out of Rmail, Next: Rmail Rot13, Prev: Rmail Digest, Up: Rmail
+
+rmailファイルからinbox形式への変換
+==================================
+
+コマンド `M-x unrmail'は、rmail形式のファイルを（システムのメイルボック
+ス形式としても知られる）inbox形式に変換します。こうすると、そのファイル
+を別のメイル編集ツールでも使えるようになります。2つの引数、rmailファイル
+名と変換後のファイル名を指定する必要があります。`M-x unrmail'はrmailファ
+イル自体には変更を加えません。
+
+
+
+File: emacs-ja.info, Node: Rmail Rot13, Next: Movemail, Prev: Out of Rmail, Up: Rmail
+
+rot13メッセージの読み方
+=======================
+
+特定の読者に不快を与える可能性があるメイリングリストのメッセージは、
+"rot13"と呼ばれる単純な方法で暗号化してある場合があります。この名前は、
+アルファベットを13文字分巡回させることに由来します。これは機密保持のため
+ではなく、そのような機能もありません。不快に感じるかもしれない読者がメッ
+セージの本当の本文を見ないようにするために使います。
+
+rot13暗号を使っているバッファを見るには、コマンド`M-x
+rot13-other-window'を使います。テキストを表示するときに暗号を解いて別の
+ウィンドウにカレントバッファを表示します。
+
+
+
+File: emacs-ja.info, Node: Movemail, Prev: Rmail Rot13, Up: Rmail
+
+`movemail'とPOP
+===============
+
+新着メイルを取得するとき、rmailはまずinboxファイルからrmailファイルに新
+着メイルをコピーします。それから、rmailファイルを保存します。そして、
+inboxファイルの内容を消します。こうすると、システムがクラッシュすると
+inboxとrmailファイルにメイルを重複して持つことになりますが、メイルを紛失
+することはありえません。変数`rmail-preserve-inbox'が`nil'以外ならば、
+rmailは、inboxファイルからrmailファイルに新着メイルをコピーしてからinbox
+ファイルの内容を消しません。たとえば、旅行中は携帯コンピュータでPOPを介
+してメイルを調べ、メイルをサーバーに残しておいてあとでワークステーション
+に保存するようにするには、このような設定をします。
+
+場合によっては、rmailは間接的にinboxファイルから新着メイルをコピーします。
+まず、`movemail'プログラムを実行して、inboxから`~/.newmail-INBOXNAME'と
+いう中間ファイルにメイルを移動します。それから、rmailは中間ファイルから
+新着メイルを併合してrmailファイルを保存してから中間ファイルを削除します。
+これを実行中の都合が悪いときにクラッシュすると中間ファイルが残ってしまい、
+rmailがつぎにinboxから新着メイルを取得するときにまたそのファイルを使って
+しまいます。
+
+rmailが`~/.newmail-INBOXNAME'のデータを独自形式（Babyl形式）に変換できな
+いと、同じデータでトラブルが再発しないようにファイル名を`~/RMAILOSE.N' 
+（Nは名前が一意になるような整数）に変えます。このファイルを調べて、rmail
+が解釈できなかったメッセージ（たぶん、コントロール下線の文字、8進コード
+037を使ったメッセージかもしれない）を探してそれを削除します。そうしてか
+ら、`1 g'コマンドを使って修正したファイルから新着メイルを取り込みます。
+
+inboxファイルにデータを保存するかわりに、POPと呼ばれる方法を用いてユーザー
+のinboxのデータを参照する場合もあります。`movemail'をコンパイルするとき
+にマクロ`MAIL_USE_POP'を定義してコンパイルすれば`movemail'はPOPを使って
+動きます。（Emacsをインストールするとき、`--with-pop'を指定して
+`configure'を実行すれば、このようにできる。）`movemail'はPOP3でしか動か
+ず、POPの古いバージョンでは使えません。
+
+`movemail'を適切にコンパイルしてインストールしたとすると、rmailファイル
+のinboxリストで、`po:USERNAME'の形の『ファイル名』でPOPのinboxを指定でき
+ます。`movemail'は、そのような名前に対しては、POPサーバーに対する接続を
+開きます。`MAILHOST'環境変数で、どのマシンでサーバーを探すかを指定します。
+
+POP経由でメイルを参照するにはパスワードが必要です。変数
+`rmail-pop-password'が`nil'以外のときは、これはPOPに対してを使うパスワー
+ドを指定します。あるいは、変数`rmail-pop-password-required'が`nil'以外な
+らば、rmailはユーザーにパスワードを尋ねます。
+
+`movemail'にコマンド行オプションを追加する必要があるときには、変数
+`rmail-movemail-flags'に指定したいオプションのリストを設定します。inbox
+の内容を保存するオプション`-p'を指定するためにこの変数を使わないでくださ
+い。かわりに`rmail-preserve-inbox'を使ってください。
+
+読者のサイトでインストールした`movemail'プログラムは、Kerberos認証を使う
+かもしれません。その場合、`rmail-pop-password'と
+`rmail-pop-password-required'が設定されていなければ、POPでメイルを取得す
+るときにデフォルトでKerberos認証を使います。
+
+POPサーバーによってはメッセージを逆順序に保存します。そのようなサーバー
+で受信順にメイルを読むには、`rmail-movemail-flags'にフラグ`-r'を追加して、
+ダウンロードしたメッセージを逆順にするように`movemail'に指示します。
+
+
+File: emacs-ja.info, Node: Dired, Next: Calendar/Diary, Prev: Rmail, Up: Top
+
+ディレクトリエディタdired
+*************************
+
+diredはディレクトリ一覧をバッファに作成します。場合によっては、サブディ
+レクトリの一覧も含まれます。普通のEmacsコマンドでこのバッファの中を動き
+廻ったり、特別なdiredコマンドで一覧中にあるファイルを操作できます。
+
+* Menu:
+
+* Enter: Dired Enter.         How to invoke Dired.
+* Commands: Dired Commands.   Commands in the Dired buffer.
+* Deletion: Dired Deletion.   Deleting files with Dired.
+* Flagging Many Files::       Flagging files based on their names.
+* Visit: Dired Visiting.      Other file operations through Dired.
+* Marks vs Flags::	      Flagging for deletion vs marking.
+* Operating on Files::	      How to copy, rename, print, compress, etc.
+			        either one file or several files.
+* Shell Commands in Dired::   Running a shell command on the marked files.
+* Transforming File Names::   Using patterns to rename multiple files.
+* Comparison in Dired::	      Running `diff' by way of Dired.
+* Subdirectories in Dired::   Adding subdirectories to the Dired buffer.
+* Subdirectory Motion::	      Moving across subdirectories, and up and down.
+* Hiding Subdirectories::     Making subdirectories visible or invisible.
+* Updating: Dired Updating.   Discarding lines for files of no interest.
+* Find: Dired and Find.	      Using `find' to choose the files for Dired.
+
+
+
+File: emacs-ja.info, Node: Dired Enter, Next: Dired Commands, Up: Dired
+
+diredの起動
+===========
+
+diredを起動するには、`C-x d'か`M-x dired'を使います。このコマンドは、一
+覧表示するファイルを指定するためのディレクトリ名やファイルのワイルドカー
+ドパターンをミニバッファで読み取ります。`dired'が`list-directory'と違う
+のは、バッファがdiredモードになっていて特別なdiredコマンドを使えるように
+なることです。
+
+変数`dired-listing-switches'には、ディレクトリ一覧を作成する`ls'プログラ
+ムに与えるオプションを指定します。オプション中には`-l'が必ず含まれている
+*必要*があります。`dired'コマンドに数引数を指定すると、ミニバッファでディ
+レクトリを指定するまえに`ls'のオプションを指定できます。
+
+diredバッファを現在選択しているウィンドウではなく別のウィンドウに表示し
+たい場合には、`C-x d'のかわりに`C-x 4 d'（`dired-other-window'）を使いま
+す。`C-x 5 d'（`dired-other-frame'）は別のフレームにdiredバッファを表示
+します。
+
+
+
+File: emacs-ja.info, Node: Dired Commands, Next: Dired Deletion, Prev: Dired Enter, Up: Dired
+
+diredバッファ内のコマンド
+=========================
+
+diredバッファは『読み出し専用』であり、このバッファに文字を挿入しても意
+味がないので、`d'や`x'のような通常の印字文字は特別なdiredコマンドに使わ
+れます。diredコマンドのいくつかは、diredバッファの"カレントファイル"
+（current file、つまり、現在行のファイル）に"印"（mark）や"フラグ"（flag）
+を付けます。他のコマンドは、印やフラグが付いたファイル群に作用します。
+
+Emacsの普通のカーソル移動コマンドはdiredバッファでも使えます。特殊用途の
+カーソル移動コマンドもあります。`C-n'と`C-p'は、カーソルを行の先頭ではな
+くファイル名の先頭に位置合わせするように再定義されています。
+
+さらに便利なように、diredモードではSPCと`n'は`C-n'に等価です。`p'は`C-p'
+に等価です。（diredでは行単位の移動をよく行うため、打鍵しやすくしてある。）
+DEL（上に移動してフラグを消す）は、単に上へ移動する場合には便利です。
+
+
+
+File: emacs-ja.info, Node: Dired Deletion, Next: Flagging Many Files, Prev: Dired Commands, Up: Dired
+
+diredでのファイル削除
+=====================
+
+diredの主な利用法は、ファイルに削除のフラグを付けてから、フラグの付いて
+いるファイルを（本当に）削除することです。
+
+`d'
+     このファイルに削除フラグを付ける。
+`u'
+     この行の削除フラグを消す。
+`DEL'
+     ポイントをまえの行に移し、その行の削除フラグを消す。
+`x'
+     削除フラグが付いたファイルを（本当に）削除する。
+
+ファイルに削除フラグを付けるには、そのファイルを表示している行に移動して
+`d'と打ちます。削除フラグは、行頭に表示される`D'という文字でわかります。
+このコマンドはポイントをつぎの行に進めますから、`d'コマンドを繰り返し実
+行すれば後続のファイルにもフラグを付けることができます。数引数は反復回数
+になります。
+
+即座にファイルを削除するかわりに削除フラグを付けるので、誤ってファイルを
+消してしまう危険性は低くなります。フラグを付けたファイルを抹消するように
+diredに指示するまでは、`u'やDELを使って削除フラグを消せます。`u'
+（`dired-unmark'）は、`d'と同じように動作しますが、フラグを付けるのでは
+なくフラグを消します。`DEL'（`dired-unmark-backward'）は上に移動してフラ
+グを消します。これは、数引数-1を指定した`u'と同じです。
+
+削除フラグが付いたファイルを（本当に）削除するには、`x'（`dired-expunge'）
+と打ちます。このコマンドは、削除フラグが付いたファイルの一覧を表示し、
+`yes'での確認応答を求めます。確認するとdiredはフラグが付いたファイルを削
+除し、diredバッファからそれらに対応する行を削除します。小さくなったdired
+バッファは選択されたままです。
+
+確認に`no'と答えたり、`C-g'で中断すると、ただちにdiredに戻りますが、削除
+フラグは付いたままで、ファイルを実際に削除しません。
+
+
+
+File: emacs-ja.info, Node: Flagging Many Files, Next: Dired Visiting, Prev: Dired Deletion, Up: Dired
+
+一度に多数のファイルにフラグを付ける
+====================================
+
+`#'
+     （名前が`#'で始まり`#'で終る）すべての自動保存ファイルに削除フラグ
+     を付ける。（*Note Auto Save::）。
+
+`~'
+     （名前が`~'で終る）すべてのバックアップファイルに削除フラグを付ける。
+     （*Note Backup::）。
+
+`&'
+     簡単に作成し直せるような名前のすべてのファイルに削除フラグを付ける。
+
+`. （ピリオド）'
+     余分な番号付きバックアップファイルに削除フラグを付ける。新しいバッ
+     クアップファイル数個と古いのもの数個を除いて、そのあいだのものにフ
+     ラグを付ける。
+
+`% d REGEXP RET'
+     名前が正規表現REGEXPに一致するすべてのファイルに削除フラグを付ける。
+
+`#'、`~'、`&'、`.'のコマンドは、ファイル名に基づいて数多くのファイルに削
+除フラグを付けます。これらのコマンドは本当に便利です。というのは、ファイ
+ルを実際には削除しないからです。残しておきたいファイルの削除フラグは消せ
+ばいいのです。
+
+`&'（`dired-flag-garbage-files'）は、変数`dired-garbage-files-regexp'で
+指定される正規表現に一致する名前のファイルに削除フラグを付けます。デフォ
+ルトは、TeXが生成するある種のファイルと`patch'プログラム (1) (*Note
+Flagging Many Files-Footnotes::) が生成する`.orig'と`.rej'のファイルです。
+
+`#'（`dired-flag-auto-save-files'）は、自動保存ファイルと思われる名前の
+ファイル、すなわち、名前が`#'で始まり`#'で終るものすべてに削除フラグを付
+けます。`~'（`dired-flag-backup-files'）は、バックアップファイルと思われ
+る名前のファイル、すなわち、名前が`~'で終るものすべてに削除フラグを付け
+ます。
+
+`.'（ピリオド、`dired-clean-directory'）は、バックアップファイルのいくつ
+か、つまり、古いもの数個と新しいもの数個を除くすべてに削除フラグを付けま
+す。通常、変数`dired-kept-versions' （保存するときに適用される変数
+`kept-new-versions'では*ない*）には新しい版を何個残すかを指定し、変数
+`kept-old-versions'には古い版を何個残すかを指定します。
+
+`C-u 3 .'のように正の数引数をピリオドに指定すると、変数
+`dired-kept-versions'を無視して新しい版を何個残すか指定します。負の数引
+数は変数`kept-old-versions'を無視して数引数の絶対値で古い版を何個残すか
+指定します。
+
+`% d'コマンドは、指定した正規表現（`dired-flag-files-regexp'）に一致する
+名前のファイルに削除フラグを付けます。ファイル名のうちディレクトリに無関
+係な部分についてだけ一致を調べます。`^'（先頭）や`$'（末尾）で、一致箇所
+を固定できます。サブディレクトリを隠蔽すれば、サブディレクトリを一致検査
+から除外できます（*Note Hiding Subdirectories::）。
+
+
+File: emacs-ja.info  Node: Flagging Many Files-Footnotes, Up: Flagging Many Files
+
+(1) 【訳注】数種類の形式の`diff'の出力を解釈して、テキストファイル
+を更新するためのプログラム
+
+
+
+File: emacs-ja.info, Node: Dired Visiting, Next: Marks vs Flags, Prev: Flagging Many Files, Up: Dired
+
+diredでのファイルの訪問
+=======================
+
+diredには、diredバッファに表示したファイルを訪問したり調べたりするための
+コマンドがあります。これらは現在行のファイルに作用します。そのファイルが
+実際にはディレクトリであると、これらのコマンドはそのサブディレクトリに対
+して（別のdiredバッファを作って）diredを起動します。
+
+`f'
+     `C-x C-f'と打鍵したのと同様に、現在行が表すファイルを訪問する
+     （`dired-find-file'）*Note Visiting::。
+
+`RET'
+     `f'と等価。
+
+`o'
+     `f'と同様だが、ファイルのバッファを別のウィンドウに表示する
+     （`dired-find-file-other-window'）。diredバッファは最初のウィンドウ
+     に表示されたまま残る。これは`C-x 4 C-f'でファイルを訪問するのに似て
+     いる。*Note Windows::。
+
+`C-o'
+     現在行が表すファイルを訪問して別のウィンドウに表示するが、そのウィ
+     ンドウを選択しない（`dired-display-file'）。
+
+`Mouse-2'
+     クリックした行が表すファイルを訪問する
+     （`dired-mouse-find-file-other-window'）。`o'コマンドのように、ファ
+     イルの表示には別のウィンドウを使う。
+
+`v'
+     `M-x view-file'を用いて現在行が表すファイルを閲覧する
+     （`dired-view-file'）。
+
+     ファイルを閲覧することはファイルを訪問することに似ているが、ファイ
+     ルの中で移動できることに重きを置き、ファイルの変更は許されない。
+     *Note View File: Misc File Ops.。
+
+
+
+File: emacs-ja.info, Node: Marks vs Flags, Next: Operating on Files, Prev: Dired Visiting, Up: Dired
+
+diredの印とフラグ
+=================
+
+ファイルに`D'で示される削除フラグを付けるかわりに他の文字（通常`*'）で示
+される"印"を付けることもできます。『抹消』（`x'）以外のほとんどのdiredコ
+マンドは、`*'で印付けしたファイルを扱えます。
+
+以下のコマンドは、`*'で印付けするコマンド、印を消すコマンド、印に作用す
+るコマンドです。（フラグを付けたり消したりするコマンドについては*Note
+Dired Deletion::。）
+
+`m'
+`* m'
+     カレントファイルに`*'で印を付ける（`dired-makr'）。数引数Nを指定す
+     ると、カレントファイルから始めて後続のN個のファイルに印を付ける。
+     （Nが負の場合は、上の-N個のファイルに印を付ける。）
+
+`* *'
+     実行ファイルすべてに`*'で印を付ける（`dired-mark-executables'）。数
+     引数を指定すると、これらのファイルすべての印を消す。
+
+`* @'
+     シンボリックリンクすべてに`*'で印を付ける（`dired-mark-symlinks'）。
+     数引数を指定すると、これらのファイルすべての印を消す。
+
+`* /'
+     `.'と`..'を除くすべてのディレクトリに`*'で印を付ける
+     （`dired-mark-directories'）。数引数を指定すると、これらのディレク
+     トリすべての印を消す。
+
+`* s'
+     現在のサブディレクトリ内の`.'と`..'を除くすべてのファイルに印を付け
+     る（`dired-mark-subdir-files'）。
+
+`u'
+`* u'
+     この行の印を消す（`dired-unmark'）。
+
+`DEL'
+`* DEL'
+     ポイントをまえの行へ動かし、その行の印を消す
+     （`dired-unmark-backward'）。
+
+`* !'
+     diredバッファのすべてのファイルの印を消す
+     （`dired-unmark-all-files-no-query'）。
+
+`* ? MARKCHAR'
+     指定した文字MARKCHARの印すべてを消す（`dired-unmark-all-files'）。
+     引数は1文字。RETで入力を終えてはならない。
+
+     数引数を指定すると、このコマンドは印の付いたファイルごとに印を消す
+     かどうか聞いてくる。`y'は消すの意味、`n'は消さないの意味。`!'で答え
+     ると残りのファイルすべてについて問い合わせずに印を消す。
+
+`* C-n'
+     印が付いているつぎのファイルへ進む（`dired-next-marked-file'）。ファ
+     イルに『印』が付いているとは、なんらかの印があること。
+
+`* C-p'
+     印が付いているまえのファイルへ戻る（`dired-prev-marked-file'）
+
+`* t'
+     すべての印を切り替える（`dired-do-toggle'）。つまり、`*'で印が付い
+     ているファイルの印を消し、印が付いていなかったファイルすべてに`*'で
+     印を付ける。`*'以外で印が付いたファイル群は影響されない。
+
+`* c OLD NEW'
+     文字OLDの印を文字NEWの印に置き換える（`dired-change-marks'）。この
+     コマンドは、`*'や`D'以外の文字で印を付けるための主要な手段。引数は
+     それぞれ1文字。RETで入力を終えてはならない。
+
+     このコマンドではほとんどどんな文字でも印として使えるため、ファイル
+     をいろいろに分類できる。OLDが空白（` '）であると、コマンドは印が付
+     いていないすべてのファイルに作用する。NEWが空白であると、コマンドは
+     作用するファイルの印を消す。
+
+     下の例はこのコマンドの能力を例示するものであり、印のないファイルす
+     べてに`D'フラグを付け、`D'フラグが付いているものすべてからはフラグ
+     を消します。
+
+          * c D t  * c SPC D  * c t SPC
+
+     ここでは、`t'で印を付けたファイルはないものと仮定します。
+
+`% m REGEXP RET'
+`* % REGEXP RET'
+     正規表現REGEXPに一致する名前のファイルすべてに（`*'で）印を付ける
+     （`dired-mark-files-regexp'）。このコマンドは`% d'に似ているが、削
+     除フラグ`D'のかわりに`*'でファイルに印を付ける。*Note Flagging Many
+     Files::。
+
+     ファイル名のうちディレクトリに無関係な部分だけで一致を検査する。`^'
+     （先頭）や`$'（末尾）で、一致箇所を固定できる。サブディレクトリを一
+     致検査から除外するには、サブディレクトリを隠蔽する。
+
+`% g REGEXP RET'
+     ファイルの*内容*が正規表現REGEXPに一致するすべてのファイルに（`*'で）
+     印を付ける（`dired-mark-files-containing-regexp'）。このコマンドは
+     `% m'に似ているが、ファイル名ではなくその内容で探す。
+
+`C-_'
+     印の追加や削除などのdiredバッファに対する変更をアンドゥする
+     （`dired-undo'）
+
+
+
+File: emacs-ja.info, Node: Operating on Files, Next: Shell Commands in Dired, Prev: Marks vs Flags, Up: Dired
+
+ファイルの操作
+==============
+
+本節では、ファイルを操作する基本的なdiredコマンドについて説明します。コ
+マンドはすべて大文字であり、実行前に、引数を読み取ったり確認を求めるため
+にミニバッファを使います。これらすべてのコマンドには、操作対象となるファ
+イルを指定する方法がいくつかあります。
+
+   * コマンドに数引数Nを与えると、カレントファイルから始めて後続のN個の
+     ファイルを操作する。（Nが負の場合には、現在行から上の-N個のファイル
+     を操作する。）
+
+   * さもなければ、ファイルに`*'で印が付いていれば、コマンドは印が付いて
+     いるすべてのファイルを操作する。
+
+   * さもなければ、コマンドはカレントファイルのみを操作する。
+
+以下は、上のように操作対象を選ぶファイル操作コマンドの一覧です。（`!'や
+`%'などの他のdiredコマンドも、操作対象とするファイルを決定するのに上の方
+法を用いる。）
+
+`C NEW RET'
+     指定したファイルをコピーする（`dired-do-copy'）。引数NEWはコピー先
+     のディレクトリか、（1つのファイルをコピーする場合は）新しい名前。
+
+     変数`dired-copy-preserve-time'が`nil'以外の場合には、このコマンドで
+     コピーしたファイルの更新時間はもとのファイルと同じになる。
+
+`D'
+     指定したファイルを削除する（`dired-do-delete'）。本節の他のコマンド
+     と同様に、このコマンドは*印付け*されたファイル、あるいは、後続のN個
+     のファイルに作用する。対照的に、`x'（`dired-expunge'）は、"フラグ"
+     が付いたファイルを削除する。
+
+`R NEW RET'
+     指定したファイルの名前を変更する（`dired-do-rename'）。引数NEWは移
+     動先のディレクトリか、（1つのファイルの名前を変える場合には）新しい
+     名前。
+
+     diredは、名前を変更したファイルに対応するバッファの訪問先のファイル
+     名を自動的に変更するので、新しい名前が反映される。
+
+`H NEW RET'
+     指定したファイルにハードリンクを張る（`dired-do-hardlink'）。引数
+     NEWはリンクを置くディレクトリか、（1つのリンクを張る場合には）リン
+     クに与える名前。
+
+`S NEW RET'
+     指定したファイルにシンボリックリンクを張る（`dired-do-symlink'）。
+     引数NEWはリンクを置くディレクトリか、（1つのリンクを張る場合には）
+     リンクに与える名前。
+
+`M MODESPEC RET'
+     指定したファイルのモード（いわゆるパーミッションビット）を変更する
+     （`dired-do-chmod'）。このコマンドは`chmod'プログラムを使うので、
+     MODSPECには`chmod'が扱える任意の引数を指定できる。
+
+`G NEWGROUP RET'
+     指定したファイルのグループをNEWGROUPに変更する（`dired-do-chgrp'）。
+
+`O NEWOWNER RET'
+     指定したファイルの所有者をNEWOWNERに変更する（`dired-do-chown'）。
+     （ほとんどのシステムでは、スーパーユーザーだけがこれを実行できる。）
+
+     変数`dired-chown-program'で、実際の操作を行うために使用するプログラ
+     ムの名前を指定する。（システムによっては、`chown'を置く場所が異な
+     る。）
+
+`P COMMAND RET'
+     指定したファイルを印刷する（`dired-do-print'）。ファイルを印刷する
+     コマンドを指定する必要があるが、（`lpr-buffer'が使うのと同じ）変数
+     `lpr-command'と`lpr-switches'とから推定した適切なものがミニバッファ
+     に示される。
+
+`Z'
+     指定したファイルを圧縮する（`dired-do-compress'）。ファイルがすでに
+     圧縮済みと思われるときは展開する。
+
+`L'
+     指定したEmacs Lispのファイルをロードする（`dired-do-load'）。*Note
+     Lisp Libraries::。
+
+`B'
+     指定したEmacs Lispのファイルをバイトコンパイルする
+     （`dired-do-byte-compile'）。*Note バイトコンパイル: (elisp)Byte
+     Compilation.。
+
+`A REGEXP RET'
+     指定したファイル群に対して正規表現REGEXPに一致するものを探す
+     （`dired-do-search'）。
+
+     このコマンドは`tags-search'の変形。最初にみつかったところで探索は終
+     る。探索を再開してつぎに一致するものを探すには、`M-,'を使う。*Note
+     Tags Search::。
+
+`Q FROM RET TO RET'
+     指定したファイル群のそれぞれについて、`query-replace-regexp'（問い
+     合わせながら正規表現を置換する）を実行し、FROM（正規表現）に一致す
+     る部分をTOに置換する（`dired-do-query-replace'）。
+
+     このコマンドは`tags-search'の変形。置換のループを抜けたあとに、探索
+     を再開してさらに置換を行うには、`M-,'を使う。*Note Tags Search::。
+
+`+'は特別なファイル操作コマンドです（`dired-create-directory'）。このコ
+マンドは、ディレクトリ名を読み取り、それが既存でなければ新たに作成します。
+
+
+
+File: emacs-ja.info, Node: Shell Commands in Dired, Next: Transforming File Names, Prev: Operating on Files, Up: Dired
+
+diredでのシェルコマンド
+=======================
+
+diredコマンドの`!'（`dired-do-shell-command'）は、ミニバッファからシェル
+コマンドを読み取り、指定したファイルすべてについてそのシェルコマンドを実
+行します。diredコマンドの普通の方法で操作対象のファイルを指定できます
+（*Note Operating on Files::）。複数ファイルにシェルコマンドを適用する方
+法は2通りあります。
+
+   * シェルコマンド中に`*'を使うと、指定したファイル名のリストで`*'を置
+     き換えてコマンドを一度だけ実行する。リスト内でファイルが現れる順番
+     はdiredバッファに表示されている順。
+
+     したがって、`! tar cf foo.tar * RET'は`tar'を実行し、指定した一連の
+     ファイルを`foo.tar'というtarファイルにまとめる。
+
+   * コマンド文字列に`*'が含まれていない場合には、コマンド文字列の最後に
+     それぞれのファイル名を付け加えて*各ファイルごと*にコマンドを1回ずつ
+     実行する。
+
+     たとえば、`! uudecode RET'は、各ファイルに対して`uudecode'コマンド
+     を実行する。
+
+各ファイルごとにコマンドを1回実行したいが、コマンドの最後ではなく途中に
+ファイル名を指定したい場合にはどうするのでしょう？` ' あるいは、もっと複
+雑にファイル名を指定したい場合にはどうするのでしょう？` ' それにはシェル
+のループを使います。下の例では、指定した各ファイルに対して`uuencode'を実
+行しますが、その出力は対応する`.uu'というファイルに格納します。
+
+     for file in *; do uuencode $file $file >$file.uu; done
+
+シェルコマンドの作業ディレクトリは、diredバッファのトップディレクトリで
+す。
+
+`!'コマンドは、実行後に新たにできたファイルや変更されたファイルを表示す
+るためにdiredバッファを更新することはしません。これはシェルコマンドを実
+際には理解しておらず、シェルコマンドがどのファイルを変更するのかわからな
+いからです。diredバッファを更新するには`g'コマンドを使います（*Note
+Dired Updating::）。
+
+
+
+File: emacs-ja.info, Node: Transforming File Names, Next: Comparison in Dired, Prev: Shell Commands in Dired, Up: Dired
+
+diredでのファイル名の変換
+=========================
+
+ここにあげるコマンドはファイル名を組織的に変更します。
+
+`% u'
+     選択したファイルの名前を大文字に変える（`dired-upcase'）。古いファ
+     イル名が`Foo'と`bar'だった場合、新しいファイル名は`FOO'と`BAR'にな
+     る。
+
+`% l'
+     選択したファイルの名前を小文字に変える（`dired-downcase'）。古いファ
+     イル名が`Foo'と`bar'だった場合、新しいファイル名は`foo'と`bar'にな
+     る。
+
+`% R FROM RET TO RET'
+`% C FROM RET TO RET'
+`% H FROM RET TO RET'
+`% S FROM RET TO RET'
+     これらの4つのコマンドは、それぞれ、ファイル名を変更する、コピーする、
+     ハードリンクを張る、シンボリックリンクを張る。これらのコマンドは、
+     いずれも、古いファイル名から正規表現の置換で新しいファイル名を決定
+     する。
+
+正規表現の置換を用いる4つのコマンドは、実質的には、diredバッファにおいて
+一連の選択したファイルの名前を探索して置換を行います。これらは引数を2つ
+読み取ります。正規表現FROMと置換パターンTOです。
+
+これらのコマンドは、正規表現FROMに一致する各『古い』ファイル名の一致した
+部分をTOで置換します。`replace-regexp'（*Note Regexp Replace::）のように、
+TOの中では`\&'や`\DIGIT'を用いて古いファイル名に一致したパターン全体やそ
+の一部を参照できます。ファイル名の2箇所以上の部分に正規表現が一致する場
+合には、最初の一致部分が置換されます。
+
+たとえば、`% R ^.*$ RET x-\& RET'は、選択されたファイルの名前の先頭にx-
+を付け加える形で名前を変えます。逆に、各ファイルの名前の先頭の`x-'を取り
+去ることもできて、1つの方法は、`% R ^x-\(.*\)$ RET \1 RET'です。あるいは、
+`% R ^x- RET RET'でもできます。（ファイル名全体に一致するようにするには
+`^'と`$'を使う。）
+
+通常、置換処理ではファイル名のディレクトリ部分は考慮しません。ディレクト
+リ内のファイルの名前だけを操作します。数引数0を指定すると、置換はディレ
+クトリ名を含んだ絶対ファイル名に作用します。
+
+一連のファイルを操作対象に選ぶときに、それらを操作するときに使うのと同じ
+REGEXP（正規表現）を使いたい場合があるでしょう。これを行うには、`% m
+REGEXP RET'でまず一連のファイルに印を付けてから、それらを操作するコマン
+ドにも同じ正規表現を使います。これを簡単に行えるように、`%'の付いたコマ
+ンドは、`%'付きコマンドいずれかに最近指定した正規表現をデフォルトで使い
+ます。
+
+
+
+File: emacs-ja.info, Node: Comparison in Dired, Next: Subdirectories in Dired, Prev: Transforming File Names, Up: Dired
+
+diredでのファイルの比較
+=======================
+
+diredには、指定したファイルを`diff'で比較するコマンドが2つあります。
+
+`='
+     `diff'プログラム（`dired-diff'）を用いて、（ポイントがある箇所の）
+     カレントファイルを（マークがある箇所の）他のファイルと比較する。マー
+     クがある箇所のファイルが`diff'の第1引数で、ポイントがある箇所のファ
+     イルが第2引数になる。
+
+`M-='
+     カレントファイルとその最新のバックアップファイルとを比較する
+     （`dired-backup-diff'）。カレントファイルがバックアップファイルその
+     ものであるときは、バックアップファイルのバックアップファイルとの比
+     較を行う。このようにして、任意の版のバックアップファイルとの比較を
+     行える。
+
+     バックアップファイルは`diff'の第1引数になる。
+
+
+
+File: emacs-ja.info, Node: Subdirectories in Dired, Next: Subdirectory Motion, Prev: Comparison in Dired, Up: Dired
+
+diredのサブディレクトリ
+=======================
+
+通常、diredバッファは1つのディレクトリだけを表示します。しかし、そのサブ
+ディレクトリ群を一緒に表示させることもできます。
+
+1つのdiredバッファ内に複数のディレクトリを表示させるもっとも簡単な方法は、
+`ls'を実行するときにオプション`-lR'を指定することです。（diredを実行する
+ときに数引数を指定すると、これらのオプションをミニバッファで指定できる。）
+これにより、すべてのレベルのすべてのサブディレクトリを表示した再帰的なディ
+レクトリ一覧を作れます。
+
+しかし、一般には、すべてのサブディレクトリでは多すぎます。普通は、特定の
+サブディレクトリだけを含めたいでしょう。それには、`i'コマンドを使います。
+
+`i'
+     指定したサブディレクトリの内容をバッファの終りに追加する。
+
+ディレクトリであるファイルを表す行で、`i'（`dired-maybe-insert-subdir'）
+コマンドを使います。指定したサブディレクトリの内容を同じdiredバッファに
+挿入し、その箇所へ移動します。挿入されたサブディレクトリの内容は、`ls
+-lR'の出力と同様に、diredバッファのトップレベルのディレクトリのあとに続
+きます。
+
+すでにサブディレクトリの内容がバッファにある場合には、`i'コマンドはその
+表示箇所に移動するだけです。
+
+どちらの場合においても、`i'は移動するまえにEmacsのマークを設定するので、
+`C-u C-SPC'でバッファ内のもとの箇所（そのサブディレクトリを表す行）へ戻
+れます。
+
+サブディレクトリの内容を更新するには、`l'（`dired-do-redisplay'）コマン
+ドを使います。サブディレクトリを削除するには`k'を使います。*Note Dired
+Updating::。
+
+
+
+File: emacs-ja.info, Node: Subdirectory Motion, Next: Hiding Subdirectories, Prev: Subdirectories in Dired, Up: Dired
+
+サブディレクトリへの移動
+========================
+
+diredバッファにサブディレクトリが表示されている場合、コマンド`C-x ['と
+`C-x ]'でディレクトリ単位に移動できます。
+
+以下のコマンドは、1つのdiredバッファ内でディレクトリ木構造を上下に移動す
+るコマンドです。これらはすべて"ディレクトリのヘッダ行" （directory
+header lines）、つまり、ディレクトリの内容を表示する部分の先頭にあるディ
+レクトリ名を示す行に移動します。
+
+`C-M-n'
+     レベルに関係なくつぎのサブディレクトリのヘッダ行へ進む
+     （`dired-next-subdir'）。
+
+`C-M-p'
+     レベルに関係なくまえのサブディレクトリのヘッダ行へ戻る
+     （`dired-prev-subdir'）。
+
+`C-M-u'
+     親ディレクトリのディレクトリヘッダ行へ移動する（`dired-tree-up'）。
+
+`C-M-d'
+     ディレクトリ木構造を1つ降りて最初のサブディレクトリのヘッダ行へ移動
+     する（`dired-tree-down'）。
+
+`<'
+     まえのディレクトリファイルの表示行へ戻る（`dired-prev-dirline'）。
+     これらの行は、親ディレクトリにおいてファイルとしてディレクトリを表
+     す行。
+
+`>'
+     つぎのディレクトリファイルの表示行へ進む（`dired-next-dirline'）。
+
+
+
+File: emacs-ja.info, Node: Hiding Subdirectories, Next: Dired Updating, Prev: Subdirectory Motion, Up: Dired
+
+サブディレクトリの隠蔽
+======================
+
+サブディレクトリの"隠蔽"（hide）とは、選択的表示（*Note Selective
+Display::）を用いてヘッダ行以外を見えなくすることです。
+
+`$'
+     ポイント位置にあるサブディレクトリを隠蔽、あるいは、再表示して、ポ
+     イントをつぎのサブディレクトリへ移動する（`dired-hide-subdir'）。数
+     引数は反復回数。
+
+`M-$'
+     diredバッファ中のすべてのサブディレクトリを隠蔽し、サブディレクトリ
+     のヘッダ行だけを残す（`dired-hide-all'）。あるいは、隠蔽されている
+     サブディレクトリがある場合には、すべてのサブディレクトリを再表示す
+     る。このコマンドを使うと、深いディレクトリ木構造の概形を調べたり、
+     遠く離れたサブディレクトリへ素早く移動できる。
+
+通常のdiredコマンドは、隠蔽されたサブディレクトリ内のファイルについてまっ
+たく考慮しません。たとえば、印を付けたファイルに作用するコマンドは、隠蔽
+されたディレクトリ内に印を付けたファイルがあったとしてもそれらを無視しま
+す。したがって、サブディレクトリを一時的に隠蔽すれば、印を消さなくてもサ
+ブディレクトリを操作対象から外せます。
+
+サブディレクトリを隠蔽するコマンドはトグルとして働きます。つまり、表示さ
+れていれば隠蔽し、隠蔽されていれば表示します。
+
+
+
+File: emacs-ja.info, Node: Dired Updating, Next: Dired and Find, Prev: Hiding Subdirectories, Up: Dired
+
+diredバッファの更新
+===================
+
+本節では、（diredとは無関係に）外部でのディレクトリやファイルの変更を
+diredバッファに反映させるコマンド、および、diredバッファの一部を削除する
+コマンドを説明します。
+
+`g'
+     diredバッファの全内容を更新する（`revert-buffer'）。
+
+`l'
+     指定したファイルを更新する（`dired-do-redisplay'）。
+
+`k'
+     指定したファイルの*表示行*を削除する。ファイルではなく、単に表示行
+     だけを消す（`dired-do-kill-lines'）。
+
+`s'
+     アルファベット順の表示と日付／時間順の表示を切り替える
+     （`dired-sort-toggle-or-edit'）。
+
+`C-u s SWITCHES RET'
+     オプションSWITCHESを`dired-listing-switches'として用いてdiredバッファ
+     を更新する。
+
+`g'（`revert-buffer'）コマンドを実行すると、表示されているファイルやディ
+レクトリの変更に基づいてdiredバッファを更新します。このコマンドは消され
+たファイルに対するものを除いてすべての印やフラグを保存します。隠蔽された
+サブディレクトリも更新されますが、隠蔽されたままです。
+
+いくつかのファイルだけを更新する場合には、`l'（`dired-do-redisplay'）と
+打ちます。このコマンドは、後続のN個のファイル、印を付けたファイルがあれ
+ばそれらのファイル、カレントファイルのいずれかに作用します。それらを更新
+するとは、それらのファイルの現状をファイルシステムから取得し、それを正し
+く反映するようにバッファを更新します。
+
+`l'をサブディレクトリのヘッダ行で実行すると、対応するサブディレクトリの
+内容を更新します。
+
+指定した*ファイルの表示行*を削除する、つまり、ファイルそのものではなく行
+だけを削除するには`k'（`dired-do-kill-lines'）と打ちます。数引数Nを指定
+すると、このコマンドは、後続のN個のファイルに作用します。さもなければ、
+印を付けたファイルに作用します。
+
+削除するファイルの表示行がディレクトリだった場合には、そのディレクトリの
+内容もバッファから削除されます。サブディレクトリのヘッダ行で`C-u k'と打っ
+ても、diredバッファからサブディレクトリの内容を削除できます。
+
+`g'コマンドは、このようにして削除した表示行を画面に呼び戻すことができま
+すが、サブディレクトリに関してはできません。各サブディレクトリを再度挿入
+するには`i'を使う必要があります。
+
+diredバッファ内のファイルは、通常、ファイル名のアルファベット順に並んで
+います。diredは日付／時間順に並べ替えることもできます。diredコマンド`s'
+（`dired-sort-toggle-or-edit'）は、これら2つのソート方法を切り替えます。
+diredバッファのモード行には、アルファベット順と日付／時間順のどちらで現
+在表示しているかが示されます。
+
+`C-u s SWITCHES RET'で、変数`dired-listing-switches'に新しい値を設定でき
+ます。
+
+
+
+File: emacs-ja.info, Node: Dired and Find, Prev: Dired Updating, Up: Dired
+
+diredと`find'プログラム
+=======================
+
+`find'プログラムを使ってファイルを選べば、diredバッファ上に表示する一連
+のファイルをもっと柔軟に選択できます。
+
+ワイルドカードに一致する名前のファイルを探索するには`M-x
+find-name-dired'を使います。このコマンドは、2つの引数DIRECTORYとPATTERN
+を読み取り、DIRECTORYにあるすべてのファイル、あるいは、そのサブディレク
+トリ下にあるPATTERNに一致する名前のファイルを選択します。
+
+このようにして選択されたファイルはdiredバッファに表示され、このバッファ
+ではもとのdiredコマンドを使えます。
+
+ファイル名ではなくファイルの内容で調べたい場合には、`M-x
+find-grep-dired'を使います。このコマンドはミニバッファから2つの引数
+DIRECTORYとREGEXPを読み取ります。DIRECTORYにあるすべてのファイル、あるい
+は、REGEXPに一致するものを含む一連のサブディレクトリを選択します。このコ
+マンドは、プログラム`find'と`grep'を実行して動作します。*Note
+Compilation::の`M-x grep-find'も参照してください。Emacsの正規表現ではな
+く`grep'の正規表現を書くことを忘れないでください。
+
+このような一連のコマンドの中でもっとも一般的なコマンドは`M-x find-dired'
+で、`find'が検査に用いる任意の条件を指定できます。このコマンドはミニバッ
+ファから2つの引数DIRECTORYとFIND-ARGSを読み取ります。検査すべき条件を指
+示するFIND-ARGSを渡して、DIRECTORYにおいて`find'を実行します。このコマン
+ドを使うには、`find'の使い方を知っている必要があります。
+
+これらのコマンドが出力する表示形式は変数`find-ls-option'で制御されます。
+デフォルトは、`ls'に使うオプションとして`-ld'を指定します。出力形式が壊
+れて見える場合には、この変数の値を変更する必要があるかもしれません。
+
+
+File: emacs-ja.info, Node: Calendar/Diary, Next: Gnus, Prev: Dired, Up: Top
+
+暦と日誌
+********
+
+Emacsには、過去や将来の予定を記録する日誌の機能を持つカレンダー機能があ
+ります。カレンダーに入るには`M-x calendar'と打ちます。すると、今月を中央
+月として3か月分のカレンダーが表示され、ポイントは今日の日付に置かれます。
+`C-u M-x calendar'のように数引数を指定すると、3か月分のカレンダーの中央
+に表示する月と年を聞いてきます。カレンダーは専用のバッファを使い、そのメ
+ジャーモードはカレンダー（calendar）モードです。
+
+カレンダー内で`Mouse-2'をクリックすると、その日付で使用できる機能のメニュー
+が表示されます。`C-Mouse-3'をクリックすると、特定の日付に関わらずに使え
+る機能のメニューが表示されます。カレンダーから抜けるには`q'と打ちます。
+カレンダーと日誌のカスタマイズに関しては、*Note カレンダーと日誌のカスタ
+マイズ: (elisp)Calendar。
+
+* Menu:
+
+* Calendar Motion::     Moving through the calendar; selecting a date.
+* Scroll Calendar::     Bringing earlier or later months onto the screen.
+* Counting Days::       How many days are there between two dates?
+* General Calendar::    Exiting or recomputing the calendar.
+* LaTeX Calendar::      Print a calendar using LaTeX.
+* Holidays::            Displaying dates of holidays.
+* Sunrise/Sunset::      Displaying local times of sunrise and sunset.
+* Lunar Phases::        Displaying phases of the moon.
+* Other Calendars::     Converting dates to other calendar systems.
+* Diary::               Displaying events from your diary.
+* Appointments::	Reminders when it's time to do something.
+* Daylight Savings::    How to specify when daylight savings time is active.
+
+
+
+File: emacs-ja.info, Node: Calendar Motion, Next: Scroll Calendar, Up: Calendar/Diary
+
+カレンダー内の移動
+==================
+
+カレンダー（calendar）モードでは、日、週、月、年といった論理的単位で移動
+します。始めに表示された3か月の外に移動すると、カレンダーは自動的に『ス
+クロール』して指定された日付の箇所が表示されるようにします。ある日付へ移
+動すると、祝祭日の名称や日誌記録を見たり、その日付を別の暦に変換したりで
+きます。カレンダーを単にスクロールすれば、大きな時間単位での移動に便利で
+す。
+
+* Menu:
+
+* Calendar Unit Motion::      Moving by days, weeks, months, and years.
+* Move to Beginning or End::  Moving to start/end of weeks, months, and years.
+* Specified Dates::           Moving to the current date or another
+                                specific date.
+
+
+
+File: emacs-ja.info, Node: Calendar Unit Motion, Next: Move to Beginning or End, Up: Calendar Motion
+
+日／週／月／年単位の移動
+------------------------
+
+カレンダー内を移動するコマンドはテキスト内を移動するコマンドに対比できま
+す。日、週、月、年を単位として前後に移動できます。
+
+`C-f'
+     1日後にポイントを進める（`calendar-forward-day'）。
+`C-b'
+     1日前にポイントを戻す（`calendar-backward-day'）。
+`C-n'
+     1週間後にポイントを進める（`calendar-forward-week'）。
+`C-p'
+     1週間前にポイントを戻す（`calendar-backward-week'）。
+`M-}'
+     1か月後にポイントを進める（`calendar-forward-month'）。
+`M-{'
+     1か月前にポイントを戻す（`calendar-backward-month'）。
+`C-x ]'
+     1年後にポイントを進める（`calendar-forward-year'）。
+`C-x ['
+     1年前にポイントを戻す（`calendar-backward-year'）。
+
+日や週を単位とした移動は、Emacsの通常の文字単位や行単位の移動の類推です。
+`C-n'は通常はつぎの行の同じ桁に移動しますが、カレンダー（calendar）モー
+ドではつぎの週の同じ曜日に移動します。また、`C-p'はまえの週の同じ曜日に
+移動します。
+
+矢印キーは他のモードと同様に、それぞれ、`C-f'、`C-b'、`C-n'、`C-p'に等価
+です。
+
+月単位や年単位の移動コマンドは週単位の移動と同じように働きますが、
+より大きな単位での移動です。
+月単位の移動コマンド`M-}'と`M-{'は、それぞれ、
+翌月、前月に移動します。
+年単位の移動コマンド`C-x ]'と`C-x ['は、
+それぞれ、1年後、1年前に移動します。
+
+これらのコマンドを簡単に覚えるには、それぞれ、月と年を段落とページに対比
+させることです。しかし、コマンド自体は同じではありません。Emacsの通常の
+段落移動コマンドは段落の先頭か末尾に移動しますが、月単位や年単位の移動コ
+マンドは1か月分や1年分で移動しますから、月や年の区切りを普通は飛び越しま
+す。
+
+これらのコマンドはすべて数引数を反復回数として扱います。簡単のために、カ
+レンダー（calendar）モードではMeta修飾なしでも数字とマイナス記号で数引数
+を指定できます。たとえば、`100 C-f'は100日後の日付にポイントを進めます。
+
+
+
+File: emacs-ja.info, Node: Move to Beginning or End, Next: Specified Dates, Prev: Calendar Unit Motion, Up: Calendar Motion
+
+週／月／年の始めと終り
+----------------------
+
+週（または、月、年）というのは、単に1日1日が集まったものではありません。
+週（月、年）は特定の日で始まると考えます。そこで、カレンダー（calendar）
+モードには、週、月、年の始めや終りに移動するコマンドがあります。
+
+`C-a'
+     週の始めにポイントを移動する（`calendar-beginning-of-week'）。
+`C-e'
+     週の終りにポイントを移動する（`calendar-end-of-week'）。
+`M-a'
+     月の始めにポイントを移動する（`calendar-beginning-of-month'）。
+`M-e'
+     月の終りにポイントを移動する（`calendar-end-of-month'）。
+`M-<'
+     年の始めにポイントを移動する（`calendar-beginning-of-year'）。
+`M->'
+     年の終りにポイントを移動する（`calendar-end-of-year'）。
+
+これらのコマンドは数引数を反復回数と扱い、何週、何か月、何年だけ前後に移
+動するのかを指定します。
+
+デフォルトでは、週は日曜から始まります。月曜から始めるには、変数
+`calendar-week-start-day'に1を設定します。 (1) (*Note Move to Beginning
+or End-Footnotes::)
+
+
+File: emacs-ja.info  Node: Move to Beginning or End-Footnotes, Up: Move to Beginning or End
+
+(1) 【訳注】この変数はどの曜日を週の始めにするかを示しており、5を設定す
+ると金曜日から始まる。
+
+
+
+File: emacs-ja.info, Node: Specified Dates, Prev: Move to Beginning or End, Up: Calendar Motion
+
+特定の日付
+----------
+
+カレンダー（calendar）モードには、さまざまな方法で指定した特定の日付へ移
+動するコマンドがあります。
+
+`g d'
+     指定した日付へポイントを移動する（`calendar-goto-date'）。
+`o'
+     指定した月をカレンダーの中央月にする（`calendar-other-month'）。
+`.'
+     ポイントを今日の日付に移動する（`calendar-goto-today'）。
+
+`g d'（`calendar-goto-date'）は、年、月、日を読み取ってその日付に移動し
+ます。カレンダーには西暦紀元がすべて含まれているため、西暦年を略さずに打
+つ必要があります。つまり、`90'ではなく`1990'です。
+
+`o'（`calendar-other-month'）は、月と年を読み取って、その月を中央月とし
+て3か月分のカレンダーを表示します。
+
+`.'（`calendar-goto-today'）で、今日の日付に戻ることができます。
+
+
+
+File: emacs-ja.info, Node: Scroll Calendar, Next: Counting Days, Prev: Calendar Motion, Up: Calendar/Diary
+
+カレンダーのスクロール
+======================
+
+見えている範囲を越えて移動するとカレンダーは自動的にスクロールします。手
+動でスクロールすることもできます。カレンダーを表示しているウィンドウでは、
+長い長い紙に月を印刷したものの一部が見えているのだと考えてください。カレ
+ンダーをスクロールするとは、新しい月が見えるようにこの紙を動かすことに相
+当します。
+
+`C-x <'
+     カレンダーを1か月後にスクロールする（`scroll-calendar-left'）。
+`C-x >'
+     カレンダーを1か月前にスクロールする（`scroll-calendar-right'）。
+`C-v'
+`NEXT'
+     カレンダーを3か月後にスクロールする
+     （`scroll-calendar-left-three-months'）。
+`M-v'
+`PRIOR'
+     カレンダーを3か月前にスクロールする
+     （`scroll-calendar-right-three-months'）。
+
+カレンダーをスクロールするもっとも基本的なコマンドは、一度に1か月分スク
+ロールします。つまり、コマンドの実行前後の表示を比べると、2か月分重複し
+ています。`C-x <'はカレンダーを1か月分左にスクロールします。つまり、時間
+的に1か月後を表示します。`C-x >'コマンドはカレンダーを右にスクロールし、
+時間的に1か月前に戻します。
+
+コマンド`C-v'と`M-v'は、カレンダーを『1画面分』、つまり、3か月分スクロー
+ルします。これは、通常のモードでのこれらのコマンドと意味的に同じになって
+います。`C-v'は将来の日付を見えるようにし、`M-v'は過去の日付を見えるよう
+にします。これらのコマンドは数引数を反復回数として扱います。たとえば、
+`C-u'は後続のコマンドを4回反復するので、`C-u C-v'と打てば1年分先へカレン
+ダーをスクロールし、`C-u M-v'と打てば1年分前へカレンダーをスクロールしま
+す。
+
+ファンクションキーNEXTとPRIORは、他のモードと同様に、それぞれ、`C-v'と
+`M-v'に等価です。
+
+
+
+File: emacs-ja.info, Node: Counting Days, Next: General Calendar, Prev: Scroll Calendar, Up: Calendar/Diary
+
+日数計算
+========
+
+`M-='
+     カレントリージョン内の日数を表示する（`calendar-count-days-region'）。
+
+リージョン内の日数を調べるには、`M-='（`calendar-count-days-region'）と
+打ちます。このコマンドで表示される日数は、マークとポイントで指定した両日
+を*含んだ*日数です。
+
+
+
+File: emacs-ja.info, Node: General Calendar, Next: LaTeX Calendar, Prev: Counting Days, Up: Calendar/Diary
+
+その他のカレンダーコマンド
+==========================
+
+`p d'
+     通年日（1年のうちの何日目の日か）を表示する
+     （`calendar-print-day-of-year'）。
+`C-c C-l'
+     カレンダーを表示しているウィンドウを再表示する（`redraw-calendar'）。
+`SPC'
+     別のウィンドウをスクロールする（`scroll-other-window'）。
+`q'
+     カレンダーから抜ける（`exit-calendar'）。
+
+年始から数えた日数、あるいは、1年の残り日数を表示するには、`p d'
+（`calendar-print-day-of-year'）コマンドを打ちます。すると、上の2つの日
+数をエコー領域に表示します。年始からの日数には指定した日が含まれます。ま
+た、残りの日数には指定した日は含まれません。
+
+カレンダーのウィンドウのテキストが壊れた場合には、`C-c C-l'
+（`redraw-calendar'）と打って再表示させます。（カレンダー（calendar）モー
+ド以外の編集用コマンドを使った場合に限り、表示がおかしくなる。）
+
+カレンダー（calendar）モードでは、SPC（`scroll-other-window'）を使って別
+のウィンドウをスクロールできます。このコマンドは、別のウィンドウに祝祭日
+や日誌記録の一覧を表示しているときに便利です。
+
+カレンダーから抜けるには、`q'（`exit-calendar'）と打ちます。このコマンド
+はカレンダーに関係したすべてのバッファを閉じ、別のバッファを選択します。
+（カレンダー関連のウィンドウ専用のフレームであった場合には、カレンダーを
+終了するとそのフレームをアイコン化する。）
+
+
+
+File: emacs-ja.info, Node: LaTeX Calendar, Next: Holidays, Prev: General Calendar, Up: Calendar/Diary
+
+LaTeXカレンダー
+===============
+
+カレンダーLaTeXコマンドは、カレンダーを印刷するLaTeXコードのバッファに作
+成します。使用するコマンドに依存して、ポイント位置の日、週、月、年のいず
+れかを含んだカレンダーを印刷できます。
+
+`t m'
+     1か月分のカレンダーを生成する（`cal-tex-cursor-month'）。
+`t M'
+     横づかいで1か月分のカレンダーを生成する
+     （`cal-tex-cursor-month-landscape'）。
+`t d'
+     1日分のカレンダーを生成する（`cal-tex-cursor-day'）。
+`t w 1'
+     1週間分の1ページのカレンダーを生成する（`cal-tex-cursor-week'）。
+`t w 2'
+     1週間分の2ページのカレンダーを生成する（`cal-tex-cursor-week2'）。
+`t w 3'
+     1週間分のISOスタイルのカレンダーを生成する
+     （`cal-tex-cursor-week-iso'）。
+`t w 4'
+     月曜から始まる1週間分のカレンダーを生成する
+     （`cal-tex-cursor-week-monday'）。
+`t f w'
+     ファイロファックス（システム手帳）スタイルの見開き2週間分のカレンダー
+     を生成する（`cal-tex-cursor-filofax-2week'）。
+`t f W'
+     ファイロファックス（システム手帳）スタイルの見開き1週間分のカレンダー
+     を生成する（`cal-tex-cursor-filofax-week'）。
+`t y'
+     1年分のカレンダーを生成する（`cal-tex-cursor-year'）。
+`t Y'
+     横づかいで1年分のカレンダーを生成する
+     （`cal-tex-cursor-year-landscape'）。
+`t f y'
+     ファイロファックス（システム手帳）スタイルの1年分のカレンダーを生成
+     する（`cal-tex-cursor-filofax-year'）。
+
+これらのコマンドのいくつかは、横づかい（つまり、『ランドスケープ』）のカ
+レンダーを印刷し、横長になります。いくつかのコマンドでは、ファイロファッ
+クス（システム手帳）サイズ（3.75インチ×6.75インチ、約95.25mm×171.45mm）
+を使います。これらのコマンドはすべて、印刷する日数、週数、月数、年数を数
+引数で指定できます（つねに選択した日から始まる）。
+
+変数`cal-tex-holidays'が`nil'以外（デフォルト）ならば、印刷されるカレン
+ダーには`calendar-holidays'の祝祭日が表示されます。変数`cal-tex-diary'が
+`nil'以外（デフォルトは`nil'）ならば、日誌記録も一緒に印刷されます（週間
+および月間カレンダーの場合だけ）。
+
+
+
+File: emacs-ja.info, Node: Holidays, Next: Sunrise/Sunset, Prev: LaTeX Calendar, Up: Calendar/Diary
+
+祝祭日
+======
+
+Emacsのカレンダーはすべての祝祭日を把握しており、それらをカレンダーに表
+示できます。
+
+`h'
+     選択された日付の祝祭日を表示する（`calendar-cursor-holidays'）。
+`Mouse-2 Holidays'
+     マウスでクリックした日付の祝祭日を表示する。
+`x'
+     カレンダーウィンドウの祝祭日に印を付ける（`mark-calendar-holidays'）。
+`u'
+     カレンダーウィンドウの印を消す（`calendar-unmark'）。
+`a'
+     表示中の3か月分のカレンダーのすべての祝祭日を別のウィンドウに表示す
+     る（`list-calendar-holidays'）。
+`M-x holidays'
+     今日を中心とした3か月間のすべての祝祭日を別のウィンドウに表示する。
+`M-x list-holidays'
+     指定した範囲の年の祝祭日を別のウィンドウに表示する。
+
+カレンダー上のある日付が祝祭日かどうかを知るには、その日付にポイントを動
+かし`h'コマンドを使います。あるいは、その日付を`Mouse-2'でクリックし、立
+ち上がったメニューから`Holidays'を選択します。いずれの方法でも、その日付
+に関する祝祭日情報が、エコー領域に収まればエコー領域に、あるいは、別のウィ
+ンドウに表示されます。
+
+カレンダーに表示されている期間内にどれだけの祝祭日があるかを知るには、
+`x'コマンドを使います。祝祭日である日を異なるフェイスで（複数のフェイス
+を使えなければ、日付のあとに`*'を付けて）表示します。このコマンドは、画
+面に見えている期間だけでなく、スクロールすると見えてくる期間にも適用され
+ます。印を消してもとの状態に戻るには`u'コマンドを使いますが、日誌の印も
+同時に消えます。（*Note Diary::）。
+
+より詳しい情報を得るには、`a'コマンドを使います。これは、現在の3か月間に
+含まれるすべての祝祭日の一覧を別のバッファに表示します。カレンダーのウィ
+ンドウでSPCを使うと、その一覧をスクロールできます。
+
+コマンド`M-x holidays'は、今月を中央月として前後1か月に含まれる祝祭日の
+一覧を表示します。カレンダーウィンドウがなくてもこのコマンドを使えます。
+別の月を中央月とした祝祭日の一覧が必要な場合は、`C-u M-x holidays'を使い
+ます。（中央月の）月と年を聞いてきます。
+
+Emacsが知っている祝祭日は、アメリカ合衆国の祝祭日、キリスト教の祝祭日、
+ユダヤ教の祝祭日、イスラム教の祝祭日、夏至、冬至、春分、秋分です。
+
+コマンド`M-x list-holidays'は、指定した数年間の祝祭日の一覧を表示します。
+始めの年と終りの年を聞いてくるので、すべての祝祭日、ある特定の種類の祝祭
+日を選べます。カレンダーウィンドウがなくてもこのコマンドを使えます。
+
+Emacsが祝祭日を決定するために用いる暦は、歴史的な事実に基づくものではな
+く、*現在用いている*ものです。たとえば、歴史的には夏時間 (1) (*Note
+Holidays-Footnotes::) （daylight savings time）を始める時期や施行するか
+どうかは、年ごとにばらばらでした。現在の合衆国の法律では4月の最初の日曜
+から始めると定めています。合衆国の夏時間を適用するかどうかをEmacsは現在
+の定義に基づいて決定しますので、昔の年代については誤りである場合もありま
+す。
+
+
+File: emacs-ja.info  Node: Holidays-Footnotes, Up: Holidays
+
+(1) 【訳注】主に高緯度地域で夏期に時計を進める習慣。日本でも戦後すぐに一
+度使われた。現在、省エネルギーなどを名目に再導入が検討されているようだ
+が…。
+
+
+
+File: emacs-ja.info, Node: Sunrise/Sunset, Next: Lunar Phases, Prev: Holidays, Up: Calendar/Diary
+
+日出入時刻
+==========
+
+カレンダーの特別なコマンドで、任意の日付の日出入時刻を2分以内の精度で調
+べられます。
+
+`S'
+     選択した日付の日出入時刻を表示する（`calendar-sunrise-sunset'）。
+`Mouse-2 Sunrise/Sunset'
+     クリックした日付の日出入時刻を表示する。
+`M-x sunrise-sunset'
+     今日の日出入時刻を表示する。
+`C-u M-x sunrise-sunset'
+     指定した日付の日出入時刻を表示する
+
+カレンダー内で*地方時*（local times）で日出入時刻を表示するには、目的の
+日付にポイントを移動してから`S'と打ちます。あるいは、目的の日付を
+`Mouse-2'でクリックするとメニューが立ち上がるのでその中から
+`Sunrise/Sunset'を選びます。カレンダーの外からでも、今日や指定した日付の
+日出入時刻を`M-x sunrise-sunset'コマンドで調べられます。今日以外の日付を
+指定するには、`C-u M-x sunrise-sunset'コマンドを使います。すると、年月日
+を聞いてきます。
+
+`C-u C-u M-x sunrise-sunset'で、任意の場所の任意の日付の日出入時刻を表示
+できます。経度、緯度、協定世界時 (1) (*Note Sunrise/Sunset-Footnotes::) 
+からの分単位のずれ、日付の指定を聞いてきます。すると、その場所でのその日
+付の日出入時刻が表示されます。
+
+日出入時刻は、地球上の場所に依存しますので、これらのコマンドを使うまえに
+Emacsに現在いる場所の緯度／経度と土地の名前を教えなければなりません。こ
+れにはつぎのようにします。
+
+     (setq calendar-latitude 40.1)
+     (setq calendar-longitude -88.2)
+     (setq calendar-location-name "Urbana, IL")
+
+変数`calendar-latitude'と`calendar-longitude'の値には、小数点以下1桁まで
+指定します。
+
+タイムゾーンは、地方時で表した日出入時刻に影響します。通常、Emacsはオペ
+レーティングシステムからタイムゾーンを取得しますが、それがまちがっている
+場合（あるいは、オペレーティングシステムがその情報を与えない場合）には、
+自分で設定する必要があります。つぎは設定例です。
+
+     (setq calendar-time-zone -360)
+     (setq calendar-standard-time-zone-name "CST")
+     (setq calendar-daylight-time-zone-name "CDT")
+
+`calendar-time-zone'の値は、協定世界時（グリニッジ標準時）と地方標準時と
+の差を分単位で表したものです。`calendar-standard-time-zone-name'と
+`calendar-daylight-time-zone-name'は、現在いる場所のタイムゾーンの省略名
+称です。Emacsは*夏時間を補正して*日出入時刻を表示します。夏時間をどのよ
+うに決定するかは、*Note Daylight Savings::。
+
+ユーザーとしては、個人の`.emacs'ファイルでカレンダーの位置関連の変数に普
+段いる場所の値を設定すると便利でしょう。あるいは、Emacsをマシンにインス
+トールするときに、そのマシンの大部分のユーザー用に典型的な場所に関する情
+報を`default.el'ファイルに設定してもかまいません。*Note Init File::。
+
+
+File: emacs-ja.info  Node: Sunrise/Sunset-Footnotes, Up: Sunrise/Sunset
+
+(1) 【訳注】グリニッジ標準時と呼称していたものに相当。
+
+
+
+File: emacs-ja.info, Node: Lunar Phases, Next: Other Calendars, Prev: Sunrise/Sunset, Up: Calendar/Diary
+
+朔弦望（新月、上弦、満月、下弦）
+================================
+
+以下のコマンドは、朔弦望（新月、上弦、満月、下弦）の日付と時刻を表示しま
+す。これらの機能は、『朔弦望に依存する』問題をデバッグするときに重宝しま
+す。
+
+`M'
+     表示してある3か月間の朔弦望の日付／時刻の一覧を表示する
+     （`calendar-phases-of-moon'）。
+`M-x phases-of-moon'
+     今日を中央にした3か月間の朔弦望の日付／時刻の一覧を表示する。
+
+カレンダー内で`M'コマンドを使うと、現在の3か月間の朔弦望の日付／時刻を別
+のバッファに表示します。一覧内の日付／時刻は数分以内の精度です。
+
+カレンダーの外からでも、`M-x phases-of-moon'コマンドを使って、今月を中央
+月として前後1か月の朔弦望の日付／時刻を表示できます。別の期間に関して調
+べるには`C-u M-x phases-of-moon'を使います。すると、月と年を聞いてきます。
+
+朔弦望の日付／時刻は（必要ならば夏時間を補正して）地方時で与えられます。
+しかし、変数`calendar-time-zone'が設定されていなければ、協定世界時（グリ
+ニッジ標準時）が使われます。*Note Daylight Savings::。
+
+
+
+File: emacs-ja.info, Node: Other Calendars, Next: Diary, Prev: Lunar Phases, Up: Calendar/Diary
+
+他の暦との相互変換
+==================
+
+Emacsのカレンダーは*つねに* グレゴリオ暦（Gregorian calendar）で表示しま
+す。この暦は『新暦』とも呼ばれ、今日では世界の大部分で使われています。し
+かし、この暦は16世紀以前には存在せず、18世紀になるまでは普及していません
+でした。ユリウス暦（Julian calendar）に置き替って世界的に受け入れられた
+のは20世紀初頭になってからです。Emacsのカレンダーは西暦1年1月以降の任意
+のカレンダーを表示できますが、グレゴリオ暦が存在しなかった時代に関しても
+グレゴリオ暦に基づいた暦を表示します。
+
+Emacsは他の暦を表示することはできませんが、指定した日付と他の暦の日付と
+を相互に変換できます。
+
+* Menu:
+
+* Calendar Systems::	   The calendars Emacs understands
+			     (aside from Gregorian).
+* To Other Calendar::	   Converting the selected date to various calendars.
+* From Other Calendar::	   Moving to a date specified in another calendar.
+* Mayan Calendar::	   Moving to a date specified in a Mayan calendar.
+
+
+
+File: emacs-ja.info, Node: Calendar Systems, Next: To Other Calendar, Up: Other Calendars
+
+参照可能な暦
+------------
+
+ISO商用暦はヨーロッパで広く使われています。
+
+ユリウス暦は、ジュリアス・シーザー（ユリウス・カエサル、Julius Caesar）
+に因んで命名されたもので、中世から19世紀にかけてヨーロッパ中で使われてい
+ました。
+
+天文学者は、ユリウス暦紀元前4713年1月1日月曜の正午からの経過日数を使いま
+す。この経過日数を*ユリウス日*（Julian day number）とか*天文通算日*
+（Astronomical day number）と呼びます。
+
+ヘブライ暦は昔からユダヤ教で使われてきました。Emacsのカレンダープログラ
+ムは、ユダヤの祝祭日がどの日付かを決定するのにヘブライ暦を使います。ヘブ
+ライ暦では1日は日没から始まり日没で終ります。 (1) (*Note Calendar
+Systems-Footnotes::)
+
+イスラム暦は多くのイスラム教の国々で使われています。Emacsはイスラム暦を
+用いてイスラム教の祝祭日を決定します。イスラムの世界ではカレンダーについ
+ての世界的な取り決めが存在しません。Emacsは広く受け入れられているものを
+使用していますが、イスラム教の祝祭日の正確な日付は、計算によってではなく
+宗教上の権威筋の布告によってしばしば決定されます。そのため、実際の日付と
+Emacsが計算した日付には少々違いがあります。イスラム暦の1日は日没から始ま
+り日没で終ります。
+
+フランス革命暦は、1789年の大革命以降にジャコバン党によって作成されました。
+より永続的で自然に準じて年周期を捉えることを目的に、度量衡に類似した合理
+的な尺度ということで1週間を10日にしています。フランス政府は、この暦を
+1805年の終りに公式に放棄しました。
+
+中央アメリカのマヤでは、3種類の別だが重複している暦の体系、*ロングカウン
+ト*（long count）、*ゾルキン*（tzolkin）、*ハアブ*（haab）を使っていまし
+た。Emacsはこれらの3つの暦をすべて知っています。専門家はマヤ暦とわれわれ
+の暦が正確にはどのように関連しているか議論している最中です。Emacsは、グッ
+ドマン・マーチンス・トンプソンの関連付けを用いて計算します。
+
+コプト教徒は古代エジプト太陽暦に基づく暦を使っています。この暦は、おのお
+の30日からなる12個の月と、それに続く余分の5日間で構成されます。4年に一度、
+余分の5日間に閏日（1日間）を付け加えて6日間とします。エチオピア暦は構造
+的にはコプト暦と同一ですが、コプト暦とは異なった年数と月の名前を用いてい
+ます。
+
+ペルシア人はオマール・カイヤーム（Omar Khayyam） (2) (*Note Calendar
+Systems-Footnotes::)が作った暦に基づいた太陽暦を使っています。この暦は、
+12個の月から成り、最初の6個の月は31日、つぎの5個の月は30日、最後の1個の
+月は平年は29日で閏年には30日となります。閏年は4年か5年に一度入る複雑なパ
+ターンで起こります。
+
+中国暦は、朔望月を太陽年に埋め込んだ複雑なものです。年は60を単位として一
+周し、平年は12個の月ですが、閏年は13個の月です。各月は29日か30日です。年、
+平月、日は、10の天の主節 (3) (*Note Calendar Systems-Footnotes::)と12の
+地の副節 (4) (*Note Calendar Systems-Footnotes::) に従って名付けられ、60 
+を周期として巡回します。 (5) (*Note Calendar Systems-Footnotes::)
+
+
+File: emacs-ja.info  Node: Calendar Systems-Footnotes, Up: Calendar Systems
+
+(1) 【訳注】蛇足ですが、クリスマスは本来ユダヤ教の祝祭日で、12月24日の日
+没から始まる。これがクリスマスイブを祝う本当の理由。
+
+(2) 【訳注】ペルシアの数学者・天文学者・詩人
+
+(3) 【訳注】十干。五行（木、火、土、金、水）に兄、弟を付け加えた甲（きの
+え）、乙（きのと）、丙（ひのえ）、丁（ひのと）、戊（つちのえ）、己（つち
+のと）、庚（かのえ）、辛（かのと）、壬（みずのえ）、癸（みずのと）からな
+る。
+
+(4) 【訳注】十二支。子（ね）、丑（うし）、寅（とら）、卯（う）、辰（た
+つ）、巳（み）、午（うま）、未（ひつじ）、申（さる）、酉（とり）、戌（い
+ぬ）、亥（い）からなる。
+
+(5) 【訳注】甲子（きのえね）、乙丑、丙寅、…、癸亥（みずのとい）までの60
+通り（12と10の最小公倍数）になる。辛亥革命の辛亥、壬申の乱の壬申などは年
+を表している。
+
+
+
+File: emacs-ja.info, Node: To Other Calendar, Next: From Other Calendar, Prev: Calendar Systems, Up: Other Calendars
+
+他の暦への変換
+--------------
+
+以下のコマンドは選択した日（ポイントがある日）を他の暦で表示します。
+
+`Mouse-2  Other Calendars'
+     クリックした日が、他のさまざまな暦ではどうなるかを表示する。
+`p c'
+     選択した日をISO商用暦の日付で表示する（`calendar-print-iso-date'）。
+`p j'
+     選択した日をユリウス暦の日付で表示する
+     （`calendar-print-julian-date'）。
+`p a'
+     選択した日を天文通算日（ユリウス日）で表示する
+     （`calendar-print-astro-day-number'）。
+`p h'
+     選択した日をヘブライ暦の日付で表示する
+     （`calendar-print-hebrew-date'）。
+`p i'
+     選択した日をイスラム暦の日付で表示する
+     （`calendar-print-islamic-date'）。
+`p f'
+     選択した日をフランス革命暦の日付で表示する
+     （`calendar-print-french-date'）。
+`p C'
+     選択した日を中国暦の日付で表示する（`calendar-print-chinese-date'）。
+`p k'
+     選択した日をコプト暦の日付で表示する（`calendar-print-coptic-date'）。
+`p e'
+     選択した日をエチオピア暦の日付で表示する
+     （`calendar-print-ethiopic-date'）。
+`p p'
+     選択した日をペルシア暦の日付で表示する
+     （`calendar-print-persian-date'）。
+`p m'
+     選択した日をマヤ暦の日付で表示する（`calendar-print-mayan-date'）。
+
+XウィンドウシステムでEmacsを使っている場合には、ある日付を他の暦での日付
+に変換するいちばん簡単な方法は、その日付を`Mouse-2'でクリックし、立ち上
+がったメニューから`Other Calendars'を選びます。対応する日付をEmacsが知っ
+ているすべての暦でメニューに表示します。（このメニューは単なる表示用なの
+で、項目を選んでも何も起こらない。）
+
+グレゴリオ暦の目的の日付にポイントを動かして適切なキーを打ちます。`p'は
+printの意味で、Emacsはその日を指定された暦でエコー領域に表示します。
+
+
+
+File: emacs-ja.info, Node: From Other Calendar, Next: Mayan Calendar, Prev: To Other Calendar, Up: Other Calendars
+
+他の暦からの変換
+----------------
+
+Emacsが扱える暦で日付を指定して、カレンダーの対応する日に移動できます。
+本節では、マヤ暦を除く暦でこれを行うコマンドを説明します。マヤ暦について
+は、これに続く節を参照してください。
+
+`g c'
+     ISO商用暦で指定した日付に移動する（`calendar-goto-iso-date'）。
+`g j'
+     ユリウス暦で指定した日付に移動する（`calendar-goto-julian-date'）。
+`g a'
+     天文通算日（ユリウス日）で指定した日付に移動する
+     （`calendar-goto-astro-day-number'）。
+`g h'
+     ヘブライ暦で指定した日付に移動する（`calendar-goto-hebrew-date'）。
+`g i'
+     イスラム暦で指定した日付に移動する（`calendar-goto-islamic-date'）。
+`g f'
+     フランス革命暦で指定した日付に移動する（`calendar-goto-french-dat
+     e'）。
+`g C'
+     中国暦で指定した日付に移動する（`calendar-goto-chinese-date'）。
+`g p'
+     ペルシア暦で指定した日付に移動する（`calendar-goto-persian-date'）。
+`g k'
+     コプト暦で指定した日付に移動する（`calendar-goto-coptic-date'）。
+`g e'
+     エチオピア暦で指定した日付に移動する（`calendar-goto-ethiopic-dat
+     e'）。
+
+これらのコマンドは、それぞれの暦での日付を聞いてきて、それに対応するグレ
+ゴリオ暦の日付にポイントを移動します。また、エコー領域には指定した暦の日
+付を表示します。Emacsは月の名前をユーザーに聞くときに強い補完（*Note
+Completion::）を使うので、ヘブライ暦／イスラム暦／フランス革命暦などの月
+の名前の綴りを気にする必要はないでしょう。
+
+ヘブライ暦で問題となるのが追悼記念祭『ヤールツァイト』（yahrzeit）と呼ば
+れる命日の計算です。Emacsのカレンダーにはその計算機能があります。カレン
+ダー内にカーソルがあるときに`M-x list-yahrzeit-dates'コマンドを実行する
+と年の範囲を聞いてきます。そして、ポイントがある日付に対応した追悼記念祭
+の日付を指定した範囲の年について一覧表示します。カレンダー内にいないとき
+にこのコマンドを使うと、まず死亡年月日を聞いてから年の範囲を聞いてきます。
+そして、追悼記念祭の日付の一覧を表示します。
+
+
+
+File: emacs-ja.info, Node: Mayan Calendar, Prev: From Other Calendar, Up: Other Calendars
+
+マヤ暦からの変換
+----------------
+
+以下はマヤ暦で日付を指定する方法です。
+
+`g m l'
+     ロングカウント暦で指定した日付に移動する
+     （`calendar-goto-mayan-long-count-date'）。
+`g m n t'
+     ゾルキン暦のつぎの周期の日に進む（`calendar-next-tzolkin-date'）。
+`g m p t'
+     ゾルキン暦のまえの周期の日に戻る（`calendar-previous-tzolkin-date'）。
+`g m n h'
+     ハアブ暦のつぎの周期の日に進む（`calendar-next-haab-date'）。
+`g m p h'
+     ハアブ暦のまえの周期の日に戻る（`calendar-previous-haab-date'）。
+`g m n c'
+     マヤのカレンダーラウンドのつぎの周期の日に進む
+     （`calendar-next-calendar-round-date'）。
+`g m p c'
+     マヤのカレンダーラウンドのまえの周期の日に戻る
+     （`calendar-previous-calendar-round-date'）。
+
+これらのコマンドを理解するには、マヤ暦を理解しておく必要があります。"ロ
+ングカウント"は以下の単位に基づいて日付を計算したものです。
+
+     1キン（kin） = 1日   1ユイナル（uinal） = 20キン
+     1タン（tun） = 18ユイナル   1カタン（katun） = 20タン
+     1バクタン（baktun） = 20カタン
+
+したがって、ロングカウントの12.16.11.16.6は、12バクタン、16カタン、11タ
+ン、16ユイナル、6キンを表しています。Emacsのカレンダーはマヤ暦ロングカウ
+ント7.17.18.13.1 (1) (*Note Mayan Calendar-Footnotes::) まで遡ることがで
+きますが、それ以前は扱えません。`g m l'コマンドを使ってマヤ暦ロングカウ
+ントの日付を入力するときには、バクタン、カタン、タン、ユイナル、キンをピ
+リオドで区切ってください。
+
+マヤ暦ゾルキンは、独立した13日と20日の周期からなる260日周期です。この周
+期が永遠に繰り返されるため、Emacsには、つぎの周期へ進んだりまえの周期へ
+戻るコマンドがあります。`g m p t'と打つと、ゾルキン暦のまえの周期の日に
+戻ります。このコマンドは、ゾルキン暦の日付を聞いてきて、その日付のまえの
+周期の日にポイントを戻します。同様に、`g m n t'は、ゾルキン暦のつぎの周
+期の日に進めます。
+
+マヤ暦ハアブは365日の周期で、20日からなる18個の月と月に属さない5日間から
+なっています。ゾルキン暦の周期と同様に、この周期が永遠に繰り返されるため、
+Emacsにはつぎの周期の日へ進んだりまえの周期の日に戻るコマンドがあります。
+`g m p h'と打つと、ハアブ暦のまえの周期に日に戻ります。このコマンドは、
+ハアブ暦の日付を聞いてきて、その日付のまえの周期の日にポイントを戻します。
+同様に、`g m n h'は、ハアブ暦のつぎの周期の日に進めます。
+
+マヤではゾルキン暦とハアブ暦を組み合わせた暦も使われていました。組み合わ
+せの1周期は約52年で*カレンダーラウンド*と呼ばれます。`g m p c'と打つと、
+Emacsはハアブ暦の日付とゾルキン暦の日付を聞いてきます。そして、まえの組
+み合わせ周期の日にポイントを戻します。つぎの組み合わせ周期の日にポイント
+を進めるには`g m n c'を使います。これらのコマンドは、指定したハアブ暦／
+ゾルキン暦の日付の組み合わせが不可能であるとエラーを通知します。
+
+Emacsはマヤ暦の名前の入力では強い補完（*Note Strict Completion::）を使う
+ので、綴りを気にする必要はありません。
+
+
+File: emacs-ja.info  Node: Mayan Calendar-Footnotes, Up: Mayan Calendar
+
+(1) 【訳注】この日は西暦1年1月1日で、Emacsのカレンダーは紀元前を扱えない。
+
+
+
+File: emacs-ja.info, Node: Diary, Next: Appointments, Prev: Other Calendars, Up: Calendar/Diary
+
+日誌
+====
+
+Emacsの日誌機能は、カレンダーと連動して、1日を単位に約束やその他の予定を
+管理します。日誌機能を使うには、用事と日付を書き込んだ"日誌ファイル"
+（diary file）をまず作っておく必要があります。そうしておくと、Emacsは自
+動的にこのファイルを取り込んで、今日／数日先／指定した日付の予定を表示し
+ます。
+
+デフォルトでは、Emacsは日誌ファイルとして`~/diary'を使います。これは
+`calendar'プログラムが使うファイルと同じです。以下に`~/diary'ファイルの
+例を示します。
+
+     12/22/1988  20回目の結婚記念日！
+     &1/1.       新年おめでとう！
+     10/22       ルースの誕生日
+     * 21, *:    給料日
+     Tuesday  10時から院生たちと週間ミーティング
+              スポウイット、シェン、ビットナー、カポールと約束
+     1/13/89     13日の金曜日！！
+     &thu 4pm    ロイドとスカッシュをする
+     mar 16      親父の誕生日
+     April 15, 1989 所得税の納付期限
+     &* 15       勤務表の提出期限
+
+この例では、大部分の予定の項目に余分な空白を入れて整列してありますが、こ
+れは純粋に好みの問題です。
+
+日誌を手で作成しようとしているかもしれませんが、Emacsには、日誌の項目を
+眺めたり、追加したり、変更したりするコマンドが数多くあります。
+
+* Menu:
+
+* Diary Commands::         Viewing diary entries and associated calendar dates.
+* Format of Diary File::   Entering events in your diary.
+* Date Formats::	   Various ways you can specify dates.
+* Adding to Diary::	   Commands to create diary entries.
+* Special Diary Entries::  Anniversaries, blocks of dates, cyclic entries, etc.
+
+
+
+File: emacs-ja.info, Node: Diary Commands, Next: Format of Diary File, Up: Diary
+
+日誌項目の表示コマンド
+----------------------
+
+いったん`~/diary'ファイルを作成しておけば、カレンダーを使ってこれを眺め
+ることができます。また、カレンダー（calendar）モードの外からでも、今日の
+予定を参照できます。
+
+`d'
+     選択した日付のすべての日誌項目を表示する（`view-diary-entries'）。
+`Mouse-2 Diary'
+     クリックした日付のすべての日誌項目を表示する。
+`s'
+     日誌ファイル全体を表示する（`show-all-diary-entries'）。
+`m'
+     日誌項目が登録されているすべての日付に印を付ける
+     （`mark-diary-entries'）。
+`u'
+     カレンダーウィンドウの印を消す（`calendar-unmark'）。
+`M-x print-diary-entries'
+     現在表示している日誌項目をそのまま印刷する。
+`M-x diary'
+     今日の日付の日誌項目すべてを表示する。
+`M-x diary-mail-entries'
+     これからの予定を自分自身にメイルする。
+
+`d'で日誌項目を表示すると、別のウィンドウに選択した日付の日誌項目が表示
+されます。新しいウィンドウのモード行には、日誌項目の日付とその日付の祝祭
+日情報が表示されます。`d'に数引数を指定すると、指定した日数の期間の日誌
+項目を表示します。したがって、`2 d'は、選択した日とそのつぎの日のすべて
+の項目を表示します。
+
+ある日付の日誌項目を表示する別の方法として、日付を`Mouse-2'でクリックし、
+立ち上がったメニューから項目`Diary'を選ぶことです。
+
+日誌が記載されている日付を知るには`m'コマンドを使います。このコマンドは、
+日誌が記載されている日付を別のフェイスで（複数のフェイスを使えなければ、
+日付のあとに`+'を付けて）表示します。このコマンドは、画面に見えている期
+間だけでなく、スクロールすると見えてくる期間にも適用されます。印を消して
+もとの状態に戻るには`u'コマンドを使いますが、祝祭日の印も同時に消えます。
+（*Note Holidays::）。
+
+日誌ファイル内の数項目ではなく全体を見るには、`s'コマンドを使います。
+
+選択した日誌項目だけを表示するには、選択表示機能を用いて他の項目を隠しま
+す。
+
+画面で見ている日誌用バッファは幻でしかありません。そのため、単純にバッファ
+を印刷しても画面に表示されているようには印刷できません。画面に表示されて
+いる日誌項目を*あるがまま*に印刷するには専用のコマンド`M-x
+print-diary-entries'を使う必要があります。このコマンドはデータをプリンタ
+に直接送ります。`lpr-region'のようにカスタマイズできます（*Note
+Hardcopy::）。
+
+コマンド`M-x diary'は、現在のカレンダー表示とは関係なしに、場合によって
+は数日後までを含めて今日の日誌を表示します。変数
+`number-of-diary-entries'には何日間まで含めるか指定します。*Note カレン
+ダーと日誌のカスタマイズ: (elisp)Calendar。
+
+個人の`.emacs'ファイルに`(diary)'と書けば、Emacsを実行すると自動的に当日
+の日誌項目をウィンドウに表示します。そのウィンドウのモード行には、日付と
+祝祭日情報が表示されます。
+
+多くのユーザーは、日誌に記載した予定を電子メイルで受け取ることを好みます。
+自分自身にそのようなメイルを送るには、コマンド`M-x diary-mail-entries'を
+使います。数引数で（今日から始めて）何日間を含めるか指定します。数引数を
+指定しなければ、変数`diary-mail-days'が日数を指定します。
+
+
+
+File: emacs-ja.info, Node: Format of Diary File, Next: Date Formats, Prev: Diary Commands, Up: Diary
+
+日誌ファイル
+------------
+
+個人の日誌ファイルは、用事と日付の対応付けを記録したファイルです。日誌ファ
+イルの名前は、変数`diary-file'で指定します。デフォルトは`~/diary'です。
+`calendar'プログラムは、Emacsの日誌機能が扱う形式を部分的に扱えます。そ
+のため、`calendar'プログラムでもそれなりに日誌ファイルを眺められますが、
+正しく解釈されない項目もあるでしょう。
+
+日誌ファイルの各項目は、1つの用事を表し、1行以上の行から成ります。項目は
+つねに行頭の日付指定で始まります。項目の残りの部分は用事を説明する単なる
+テキストです。項目が1行に収まらないときには、後続行の行頭を白文字で始め
+て直前の項目の続きであることを示します。正しい日付指定で始まらない行や直
+前の項目の続きの行でないものは無視されます。
+
+カレンダーのウィンドウ内で特定の日誌項目に印を付けないようにできます。そ
+れには、項目の日付指定のまえにアンパーサンド（`&'）を付けます。これは、
+日誌ウィンドウに項目を表示するのには影響ありません。カレンダーウィンドウ
+の日付の印だけに影響します。印付けを禁止した項目は一般的な項目としては便
+利で、こうしないと印が付いた日が多くなりすぎます。
+
+項目の最初の行が日付指定や曜日だけの場合には、最初の行は日誌ウィンドウに
+表示されません。後続の行だけが表示されます。たとえば、つぎの項目は、日誌
+ウィンドウでは先頭に日付の行は表示されません。
+
+     02/11/1989
+          本日B. ビルがプリンストンに来る
+          2pm 認知研究委員会の会合
+          2:30-5:30 ローレンスビルにリズ
+          4:00pm 歯医者予約
+          7:30pm ジョージの所で夕食
+          8:00-10:00pm コンサート
+
+この流儀だと1日分の予定を表示する限りはきちんと見えるのですが、2日分以上
+の場合には混乱しかねません。
+
+ウィンドウに表示された日誌項目は編集できますが、表示されたバッファには日
+誌ファイル*全体*が含まれていて、ある部分が隠されいるのだということを忘れ
+てはなりません。たとえば、`C-f'（`forward-char'）コマンドで表示上の行末
+にポイントを置けますが、実際には隠された行の途中にいるのかもしれません。
+
+*日誌項目を編集するときには注意してください！*` ' 項目に余分な行を追加し
+たり見えている行の途中に文字を追加／削除しても問題は生じませんが、行末で
+編集すると予期しないことが起こる可能性があります。行を削除すると今は見え
+ていない後続の他の項目を削除してしまうかもしれません。日誌を編集するまえ
+には、`s'（`show-all-diary-entries'）でファイル全体を表示させるのが最良
+です。
+
+
+

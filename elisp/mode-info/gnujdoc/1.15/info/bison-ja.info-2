@@ -1,0 +1,2197 @@
+Info file: bison-ja.info,    -*-Text-*-
+produced by `texinfo-format-buffer'
+from file `bison-ja.texinfo'
+using `texinfmt.el' version 2.38 of 3 July 1998.
+
+
+
+
+
+
+
+
+
+START-INFO-DIR-ENTRY
+* bison-ja: (bison-ja). GNU Project parser generator (yacc replacement).
+END-INFO-DIR-ENTRY
+
+このファイルはBison構文解析器生成器の説明文書です。
+
+Copyright (C) 1988, 89, 90, 91, 92, 93, 95, 98, 1999 Free Software
+Foundation, Inc.
+
+Permission is granted to make and distribute verbatim copies of this
+manual provided the copyright notice and this permission notice are
+preserved on all copies.
+
+Permission is granted to copy and distribute modified versions of this
+manual under the conditions for verbatim copying, provided also that the
+sections entitled "GNU General Public License" and "Conditions for Using
+Bison" are included exactly as in the original, and provided that the
+entire resulting derived work is distributed under the terms of a
+permission notice identical to this one.
+
+Permission is granted to copy and distribute translations of this manual
+into another language, under the above conditions for modified versions,
+except that the sections entitled "GNU General Public License",
+"Conditions for Using Bison" and this permission notice may be included
+in translations approved by the Free Software Foundation instead of in
+the original English.
+
+
+
+
+
+File: bison-ja.info  Node: Multi-function Calc-Footnotes, Up: Multi-function Calc
+
+(1) 【訳注】例の`alpha = beta1 = 2.3'
+
+(2) 【訳注】例の`exp(ln(beta1))'
+
+
+
+File: bison-ja.info, Node: Mfcalc Decl, Next: Mfcalc Rules, Prev: Multi-function Calc, Up: Multi-function Calc
+
+`mfcalc'のための定義
+--------------------
+
+以下には、多機能電卓のための、CとBisonの宣言があります。
+
+     %{
+     #include <math.h>  /* cos(), sin()などの数学関数のため */
+     #include "calc.h"  /* `symrec'の定義を含む             */
+     %}
+     %union {
+     double     val;    /* 数値を返すため                   */
+     symrec  *tptr;     /* 記号表へのポインタを返すため     */
+     }
+
+     %token <val>  NUM        /* 単純な倍精度数値 */
+     %token <tptr> VAR FNCT   /* 変数と関数       */
+     %type  <val>  exp
+
+     %right '='
+     %left '-' '+'
+     %left '*' '/'
+     %left NEG     /* 否定 -- 単項の負 */
+     %right '^'    /* べき乗           */
+
+     /* 文法が続く */
+
+     %%
+
+この文法の導入部分では、Bison言語の新しい2つの機能を使っています。これら
+の機能によって、意味値がいろいろなデータ型を持てます（*Note More Than
+One Value Type: Multiple Types.）。
+
+`%union'宣言は、`YYSTYPE'の定義の代わりで、可能な型の一覧を指定します。
+ここで許される型は、（`exp'と`NUM'のための）倍精度浮動小数点型と、記号表
+の項目へのポインタです。*Note The Collection of Value Types: Union Decl。
+
+値がいろいろな型を持つことができるので、意味値を使うそれぞれの文法記号に
+対して、型を関連づける必要があります。これらの記号は`NUM'、`VAR'、`FNCT'、
+`exp'です。それらの宣言は、不等号で囲まれた（`<...>'）データ型に関する情
+報を付加されています。
+
+Bisonは、ちょうど`%token'がトークン型の宣言に使われるのと同じように、
+`%type'が非終端記号の宣言に使われるようにします。非終端記号は通常それら
+を定義する規則によって暗黙に宣言されるので、`%type'をその規則よりも先に
+使ってはいけません。しかし、`exp'は、その値の型を指定するので、明示的に
+宣言する必要があります。*Note Nonterminal Symbols: Type Decl。
+
+
+
+
+File: bison-ja.info, Node: Mfcalc Rules, Next: Mfcalc Symtab, Prev: Mfcalc Decl, Up: Multi-function Calc
+
+`mfcalc'のための文法規則
+------------------------
+
+多機能電卓のための文法規則を示します。大部分は、`calc'の文法規則からの複
+写です。`VAR'、`FUNCT'に関連する3つの規則が新しいものです。
+
+     input:   /* 空 */
+             | input line
+     ;
+
+     line:
+               '\n'
+             | exp '\n'   { printf ("\t%.10g\n", $1); }
+             | error '\n' { yyerrok;                  }
+     ;
+
+     exp:      NUM                { $$ = $1;                         }
+             | VAR                { $$ = $1->value.var;              }
+             | VAR '=' exp        { $$ = $3; $1->value.var = $3;     }
+             | FNCT '(' exp ')'   { $$ = (*($1->value.fnctptr))($3); }
+             | exp '+' exp        { $$ = $1 + $3;                    }
+             | exp '-' exp        { $$ = $1 - $3;                    }
+             | exp '*' exp        { $$ = $1 * $3;                    }
+             | exp '/' exp        { $$ = $1 / $3;                    }
+             | '-' exp  %prec NEG { $$ = -$2;                        }
+             | exp '^' exp        { $$ = pow ($1, $3);               }
+             | '(' exp ')'        { $$ = $2;                         }
+     ;
+     /* 文法の終わり */
+     %%
+
+
+
+
+File: bison-ja.info, Node: Mfcalc Symtab, Prev: Mfcalc Rules, Up: Multi-function Calc
+
+`mfcalc'の記号表
+----------------
+
+変数と関数の名前と意味を保持するために、多機能電卓は記号表を必要とします。
+これは、アクションを除く文法規則とBison宣言には影響しませんが、追加のCの
+関数がいくつか必要です。
+
+記号表は、レコードのリンクリストからなります。その定義は、後述の、ヘッダ
+ファイル`calc.h'にあります。関数と変数の両方を表に置くことができます。
+
+     /* 記号表のリンクを表すデータ型                 */
+     struct symrec
+     {
+       char *name;  /* 記号の名前                    */
+       int type;    /* 記号の種類：VARまたはFNCT     */
+       union {
+         double var;           /* VARの値            */
+         double (*fnctptr)();  /* FNCTの値           */
+       } value;
+       struct symrec *next;    /* 次の項目へのリンク */
+     };
+
+     typedef struct symrec symrec;
+
+     /* `struct symrec'のリンクである記号表          */
+     extern symrec *sym_table;
+
+     symrec *putsym ();
+     symrec *getsym ();
+
+新しい`main'関数は、記号表を初期化する関数である`init_table'を呼びます。
+`main'と`init_table'を以下に示します。
+
+     #include <stdio.h>
+
+     main ()
+     {
+       init_table ();
+       yyparse ();
+     }
+
+     yyerror (s)  /* エラーがあるとyyparseから呼び出される */
+          char *s;
+     {
+       printf ("%s\n", s);
+     }
+
+     struct init
+     {
+       char *fname;
+       double (*fnct)();
+     };
+
+     struct init arith_fncts[]
+       = {
+           "sin", sin,
+           "cos", cos,
+           "atan", atan,
+           "ln", log,
+           "exp", exp,
+           "sqrt", sqrt,
+           0, 0
+         };
+
+     /* 記号表：`struct symrec'のリスト       */
+     symrec *sym_table = (symrec *)0;
+
+     init_table ()  /* 数学関数を表に登録する */
+     {
+       int i;
+       symrec *ptr;
+       for (i = 0; arith_fncts[i].fname != 0; i++)
+         {
+           ptr = putsym (arith_fncts[i].fname, FNCT);
+           ptr->value.fnctptr = arith_fncts[i].fnct;
+         }
+     }
+
+単純に初期化リストを編集して、必要なインクルードファイルを追加するだけで、
+電卓に関数を追加できます。
+
+記号表に記号を登録して検索するために、2個の重要な関数があります。関数
+`putsym'は、登録すべきオブジェクトの名前と型（`VAR'や`FNCT'）を渡されま
+す。オブジェクトはリストの先頭にリンクされ、オブジェクトへのポインタが返
+されます。関数`getsym'は、検索すべき記号の名前を渡されます。もし見つかれ
+ば記号へのポインタが返され、見つからなければ0が返されます。
+
+     symrec *
+     putsym (sym_name,sym_type)
+          char *sym_name;
+          int sym_type;
+     {
+       symrec *ptr;
+       ptr = (symrec *) malloc (sizeof (symrec));
+       ptr->name = (char *) malloc (strlen (sym_name) + 1);
+       strcpy (ptr->name,sym_name);
+       ptr->type = sym_type;
+       ptr->value.var = 0; /* 関数の場合にも値を0にする */
+       ptr->next = (struct symrec *)sym_table;
+       sym_table = ptr;
+       return ptr;
+     }
+
+     symrec *
+     getsym (sym_name)
+          char *sym_name;
+     {
+       symrec *ptr;
+       for (ptr = sym_table; ptr != (symrec *) 0;
+            ptr = (symrec *)ptr->next)
+         if (strcmp (ptr->name,sym_name) == 0)
+           return ptr;
+       return 0;
+     }
+
+今度の関数`yylex'は、変数、数値、1文字の算術演算子を認識する必要がありま
+す。英字で始まり英数字からなる文字列は、記号表にどう書かれているかに応じ
+て、変数と関数のどちらとも認識されます。
+
+文字列は、記号表を検索するために`getsym'に渡されます。もし名前が表にあれ
+ば、その場所へのポインタと名前の型（`VAR'または`FNCT'）が、`yyparse'に返
+されます。名前がまだ表になければ、`putsym'を使って、`VAR'として登録され
+ます。そして、ポインタと型（この場合には必ず`VAR'）が`yyparse'に返されま
+す。
+
+`yylex'の中で、数値と算術演算子の扱いに関する部分は、変更する必要があり
+ません。
+
+     #include <ctype.h>
+     yylex ()
+     {
+       int c;
+
+       /* 空白を読み飛ばし、空白以外を得る         */
+       while ((c = getchar ()) == ' ' || c == '\t');
+
+       if (c == EOF)
+         return 0;
+
+       /* 数値を読む   */
+       if (c == '.' || isdigit (c))
+         {
+           ungetc (c, stdin);
+           scanf ("%lf", &yylval.val);
+           return NUM;
+         }
+
+       /* 識別子を読む */
+       if (isalpha (c))
+         {
+           symrec *s;
+           static char *symbuf = 0;
+           static int length = 0;
+           int i;
+
+           /* バッファの長さの初期値は40文字       */
+           if (length == 0)
+             length = 40, symbuf = (char *)malloc (length + 1);
+
+           i = 0;
+           do
+             {
+               /* あふれたのでバッファを大きくする */
+               if (i == length)
+                 {
+                   length *= 2;
+                   symbuf = (char *)realloc (symbuf, length + 1);
+                 }
+               /* 文字をバッファに変える           */
+               symbuf[i++] = c;
+               /* 次の文字を読む                   */
+               c = getchar ();
+             }
+           while (c != EOF && isalnum (c));
+
+           ungetc (c, stdin);
+           symbuf[i] = '\0';
+
+           s = getsym (symbuf);
+           if (s == 0)
+             s = putsym (symbuf, VAR);
+           yylval.tptr = s;
+           return s->type;
+         }
+
+       /* その他の文字は文字リテラルトークン       */
+       return c;
+     }
+
+このプログラムは、強力かつ柔軟です。新しい関数の追加は簡単です。`pi'や
+`e'のようにあらかじめ定義された変数を追加するためにプログラムを変更する
+ことは、簡単な仕事でしょう。
+
+
+
+
+File: bison-ja.info, Node: Exercises, Prev: Multi-function Calc, Up: Examples
+
+練習問題
+========
+
+  1. `math.h'にある関数のいくつかを、初期化リストに追加しなさい。
+
+  2. 定数の名前と値を記憶する別の配列を追加しなさい。そして、
+     `init_table'を変更し、定数を記号表に追加しなさい。定数に型`VAR'を与
+     えれば簡単でしょう。
+
+  3. 初期化されていない変数について、値を書き込むのではなく、値を使おう
+     とするとエラーを報告するように、プログラムを改良しなさい。
+
+
+
+
+File: bison-ja.info, Node: Grammar File, Next: Interface, Prev: Examples, Up: Top
+
+Bison文法ファイル
+*****************
+
+Bisonは、文脈自由文法の仕様を入力として受け取り、その文法の正しいインス
+タンスを認識する、C言語の関数を生成します。
+
+Bison文法ファイルの名前は、通常`.y'で終わります。
+
+* Menu:
+
+* Grammar Outline::   文法ファイルの概略.
+* Symbols::           終端記号と非終端記号.
+* Rules::             文法規則の書き方.
+* Recursion::         再帰的規則の書き方.
+* Semantics::         意味値とアクション.
+* Declarations::      全ての種類のBison宣言の説明.
+* Multiple Parsers::  一つのプログラムに一つより多くのBison構文解析器を
+                        入れる.
+
+
+
+
+File: bison-ja.info, Node: Grammar Outline, Next: Symbols, Prev: Grammar File, Up: Grammar File
+
+Bison文法の概要
+===============
+
+
+Bison文法ファイルは4つの主要な部分からなります。それらを、適切な区切り文
+字とともに示します。
+
+     %{
+     C宣言部（C DECLARATIONS）
+     %}
+
+     BISON宣言部（BISON DECLARATIONS）
+
+     %%
+     文法規則部（GRAMMAR RULES）
+     %%
+
+     追加のCプログラム部（ADDITIONAL C CODE）
+
+
+`/* ... */'で囲まれたコメントは、どの部分にも書けます。
+
+* Menu:
+
+* C Declarations::    C宣言部の構文と使用法.
+* Bison Declarations::  Bison宣言部の構文と使用法.
+* Grammar Rules::     文法規則部の構文と使用法.
+* C Code::            追加のCコード部の構文と使用法.
+
+
+
+
+File: bison-ja.info, Node: C Declarations, Next: Bison Declarations, Prev: Grammar Outline, Up: Grammar Outline
+
+C宣言部
+-------
+
+
+"C宣言部（C declarations）"には、マクロ定義と、文法定義のアクションで使
+うための関数と変数の宣言があります。これらは、`yyparse'の定義に優先する
+ように、構文解析器ファイルの最初に複写されます。ヘッダファイルから宣言を
+得るには`#include'を使います。C宣言がまったく必要ない場合は、この部分を
+囲む`%{'と`%}'を省略できます。
+
+
+
+
+File: bison-ja.info, Node: Bison Declarations, Next: Grammar Rules, Prev: C Declarations, Up: Grammar Outline
+
+Bison宣言部
+-----------
+
+"Bison宣言部（Bison declarations）"は、終端記号と非終端記号の宣言、演算
+子の優先順位の指定などを含みます。単純な例では、宣言を省略できます。
+*Note Bison Declarations: Declarations。
+
+
+
+
+File: bison-ja.info, Node: Grammar Rules, Next: C Code, Prev: Bison Declarations, Up: Grammar Outline
+
+文法規則部
+----------
+
+"文法規則部（grammar rules）"は、1つ以上のBison文法規則を含み、それ以外
+は含みません。*Note Syntax of Grammar Rules: Rules。
+
+少なくとも1つの文法規則が存在する必要があります。また、文法規則より先に
+`%%'が必要で、もしそれ以前に何も記述されていなくても、省略できません。
+
+
+
+
+File: bison-ja.info, Node: C Code, Prev: Grammar Rules, Up: Grammar Outline
+
+追加のCプログラム部
+-------------------
+
+"追加のCプログラム部（additional C code）"は、"C宣言部"が構文解析器ファ
+イルの先頭に複写されるのと同じように、構文解析器ファイルの末尾にそのまま
+複写されます。構文解析器ファイル中に置く必要があって、`yyparse'の定義よ
+りも前に置く必要のないものを、ここに置くと便利です。たとえば、`yylex'と
+`yyerror'の定義は、よくここに置かれます。*Note Parser C-Language
+Interface: Interface。
+
+もし直前の部が空ならば、文法規則と区別するための`%%'を省略できます。
+
+Bison構文解析器は、名前が`yy'で始まる多くの静的変数と、名前が`YY'で始ま
+る多くのマクロを含んでいます。本書で解説しているものを意図的に使う場合を
+除いて、そのような名前を文法ファイルの追加のCプログラム部で使うのは避け
+るべきです。
+
+
+
+
+File: bison-ja.info, Node: Symbols, Next: Rules, Prev: Grammar Outline, Up: Grammar File
+
+記号、終端と非終端
+==================
+
+Bison文法の"記号（symbols）"は、言語の文法的分類を表現します。
+
+"終端記号（terminal symbol）" （"トークン型（tokens types）"ともいいます）
+は、構文的に等価なトークンのクラスを表します。そのクラスのトークンが許さ
+れることを表すために、文法規則の中で記号を使えます。その記号は、Bison構
+文解析器の中で番号で表現され、`yylex'関数は、どのような種類のトークンが
+読み込まれたかを示すために、トークン番号を返します。これを表す記号を知っ
+ていればよく、その番号を知っている必要はありません。
+
+"非終端記号（nonterminal symbol）"は、構文的に等価なグループを表現します。
+記号名は文法規則の記述に使われます。通常、非終端記号名を小文字で書きます。
+
+記号名は、英字、先頭以外での数字、下線記号（`_'）とピリオドからなります。
+ピリオド記号（`.'）は、非終端記号の名前には使えますが、終端記号の名前に
+は使えません。
+
+文法中で終端記号を記述するには3種類の方法があります。
+
+   * "名前付きトークン型（named token type）"を、C言語における識別子と同
+     様な、識別子とともに書きます。通常、大文字で書きます。これらは
+     `%token'のようなBison宣言とともに定義する必要があります。*Note
+     Token Type Names: Token Decl。
+
+   * "文字トークン型（character token type）"、すなわち"リテラル文字トー
+     クン（literal character token）"は、C言語の文字定数と同じ構文で書か
+     れ、たとえば`'+''は文字トークン型です。意味値データ型（*Note Data
+     Types of Semantic Values: Value Type.）、結合性、優先順位（*Note
+     Operator Precedence: Precedence.）を指定する必要がなければ、文字トー
+     クン型を宣言する必要はありません。
+
+     通常、文字トークン型は、特別な文字 (1) (*Note Symbols-Footnotes::) 
+     からなるトークンを表すためだけに使います。たとえば、トークン型`'+''
+     を、トークンとしての`+'文字を表すために使います。このようにする義務
+     はありませんが、そうしないと、あなたが書いたプログラムを読む人が混
+     乱するでしょう。
+
+     C言語の文字リテラルで使われる通常のエスケープシーケンス (2) (*Note
+     Symbols-Footnotes::)を、Bisonでも使えます。しかし、`'\0''だけは
+     ASCII符号の0を表し、`yylex'がファイルの終わりを示す符号なので、文字
+     リテラルとしては使えません（*Note Calling Convention for `yylex':
+     Calling Convention.）。
+
+   * "リテラル文字列トークン（literal string token）"は、C言語における文
+     字列定数と同様に書きます。たとえば、`"<="'がリテラル文字列トークン
+     です。意味値（*Note Value Type::）、結合性、優先順位（*Note
+     Operator Precedence: Precedence.）を指定する必要がなければ、リテラ
+     ル文字列トークンを宣言する必要はありません。
+
+     `%token'宣言（*Note Token Declarations: Token Decl.）を使って、リテ
+     ラル文字列トークンを、記号名の別名として関連づけられます。そうしな
+     いと、字句解析器は、`yytname'表（*Note Calling Convention::）を使っ
+     て、リテラル文字列トークンからトークン番号を検索する必要があります。
+
+     *【警告】*`yacc'ではリテラル文字列トークンを使えません。
+
+     通常、特殊文字の列からなるトークンの表現にのみ、リテラル文字列トー
+     クンを使います。たとえば、トークンとしての`<='を表すために、トーク
+     ン型`"<="'を使うべきです。そうする義務はありませんが、そうしないと、
+     あなたが書いたプログラムを読む人が混乱するでしょう。
+
+     C言語で使えるエスケープシーケンスはすべてBisonでも使えます。リテラ
+     ル文字列トークンは、2文字以上からなります。もし、トークンが1文字な
+     らば、前述の1文字トークンを使ってください。
+
+終端記号を書く方法は、終端記号の文法的意味に関係なく、規則の中に現れる位
+置と、構文解析器関数が記号を返す方法に関係します。
+
+`yylex'が返す値は、終端記号のどれかを表し、入力の終わりでは0です。文法規
+則の中でどの方法でトークン型を書いても、`yylex'を定義する書き方は同じで
+す。1文字トークン型に対する符号は、その文字のASCII符号なので、`yylex'は
+必要な符号を生成するために同一の文字定数を使えます。名前を付けられたトー
+クン型はそれぞれ、構文解析器ファイルの中でCのマクロになるので、`yylex'は
+符号に対するマクロ名を使えます。これが、終端記号の名前にピリオド記号を使
+えない理由です。*Note Calling Convention for `yylex': Calling Convention。
+
+`yylex'が構文解析器と別のソースファイルの中に書かれる場合には、そこでトー
+クン型マクロ定義を使えるように準備する必要があります。`-d'オプションを付
+けてBisonを実行してください。すると、マクロ定義が`NAME.tab.h'というファ
+イルに書かれ、必要に応じて別のソースファイルからインクルードできます。
+*Note Invoking Bison: Invocation。
+
+記号`error'は、エラー回復用に予約された終端記号（*Note Error Recovery::）
+で、他の目的に使うべきではありません。実際に、`yylex'がこの値を返すこと
+は決してありません。
+
+
+
+File: bison-ja.info  Node: Symbols-Footnotes, Up: Symbols
+
+(1) 【訳注】英数字以外の文字。
+
+(2) 【訳注】`\'に続く表現。
+
+
+
+File: bison-ja.info, Node: Rules, Next: Recursion, Prev: Symbols, Up: Grammar File
+
+文法規則の構文
+==============
+
+Bison文法規則は、一般的に次の書式です。
+
+     RESULT: COMPONENTS...
+             ;
+
+RESULTは、この規則が記述する非終端記号で、COMPONENTSは、この規則で一緒に
+置かれるさまざまな終端および非終端記号です。例を示します。
+
+     exp:      exp '+' exp
+             ;
+
+この例では、`+'トークンを間にはさんで型`exp'の2つのグループ化が行われ、
+型`exp'のより大きなグループができます。
+
+規則の中の空白 (1) (*Note Rules-Footnotes::)は、記号を分けるだけの意味を
+持ちます。必要に応じて、余分な空白を書いてもかまいません。
+
+COMPONENTSの周辺にあるものは、規則の意味を決定するアクション（ACTION）に
+なることができます。アクションは、次のようになります。
+
+     {C STATEMENTS}
+
+通常、1つだけのアクションと、それに続くCOMPONENTSがあります。*Note
+Actions::。
+
+同一のRESULTに対する複数の規則は、別々に書くこともできますし、次の例のよ
+うに縦線記号`|'で区切ってまとめて書くことも可能です。
+
+     RESULT:   RULE1-COMPONENTS...
+             | RULE2-COMPONENTS...
+             ...
+             ;
+
+まとめて書いても、それぞれの規則は別々のものとみなされます。
+
+もし、規則中のCOMPONENTSが空ならば、RESULTが空の列にマッチできることを意
+味します。例として、カンマで区切られた0個以上の`exp'のグループを定義する
+方法を示します。
+
+     expseq:   /* 空 */
+             | expseq1
+             ;
+
+     expseq1:  exp
+             | expseq1 ',' exp
+             ;
+
+空のCOMPONENTを持つ規則には、通常`/* 空 */'という注釈を書きます。
+
+
+
+File: bison-ja.info  Node: Rules-Footnotes, Up: Rules
+
+(1) 【訳注】任意の数の空白文字、タブ符号、改行符号。
+
+
+
+File: bison-ja.info, Node: Recursion, Next: Semantics, Prev: Rules, Up: Grammar File
+
+再帰的規則
+==========
+
+RESULTである非終端記号が規則の右側にも現れる場合に、その規則は"再帰的
+（recursive）"であるといいます。Bison文法の大部分は再帰的規則を使います。
+なぜならば、任意の数の並びを定義する唯一の方法が、再帰的規則だからです。
+1つ以上のカンマで区切られた式の並びの定義を考えてみましょう。
+
+     expseq1:  exp
+             | expseq1 ',' exp
+             ;
+
+
+`expseq1'で使われている再帰は、規則の右側の中でもっとも左側にあるので、
+このような再帰を"左再帰（left recursion）"と呼びます。逆に、同じ構造を"
+右再帰（right recursion）"を使って書いてみます。
+
+     expseq1:  exp
+             | exp ',' expseq1
+             ;
+
+あらゆる並びを、左再帰を使っても、右再帰を使っても、定義できます。しかし、
+限られたスタック容量で任意の数の並びを走査できるので、つねに左再帰を使う
+べきです。右再帰では、規則が適用される前にすべての要素をスタックに積む必
+要があるので、要素の数に比例するスタック領域を消費します。詳細については、
+*Note The Bison Parser Algorithm: Algorithm。
+
+
+規則の結果が直接その右側には含まれず、右側にある非終端記号の中に含まれる
+とき、"間接（indirect）"すなわち"相互（mutual）"再帰が起きます。
+
+例を示します。
+
+     expr:     primary
+             | primary '+' primary
+             ;
+
+     primary:  constant
+             | '(' expr ')'
+             ;
+
+この例では、それぞれの規則が互いに参照しているので、2個の相互再帰が定義
+されています。
+
+
+
+
+File: bison-ja.info, Node: Semantics, Next: Declarations, Prev: Recursion, Up: Grammar File
+
+言語の意味の定義
+================
+
+言語に対する文法規則は、文法だけを決めます。意味は、各種のトークンとグルー
+プ化に対応する意味値により、各種のグループ化が認識されるときに、決定され
+ます。
+
+電卓の例では、式のそれぞれに対応する値が適切な数値なので、
+電卓は正確に計算できます。
+グループ`X + Y'に
+対応するアクションが、XとYに関する数値の和を計算します。
+
+* Menu:
+
+* Value Type::        全ての意味値に一つのデータ型を指定する.
+* Multiple Types::    複数の別のデータ型を指定する.
+* Actions::           アクションは文法規則の意味的定義.
+* Action Types::      アクションが操作するデータ型を指定する.
+* Mid-Rule Actions::  ほとんどのアクションは規則の最後に行く.
+                      これは規則の最中で、いつ、なぜ、どのように
+                        例外アクションを使用するかを指示する.
+
+
+
+
+File: bison-ja.info, Node: Value Type, Next: Multiple Types, Prev: Semantics, Up: Semantics
+
+データ型と意味値
+----------------
+
+単純なプログラムでは、言語の要素のすべての意味値に対して同じデータ型を使
+えば十分です。逆ポーランド記法と中間記法電卓の例では、そうでした（*Note
+Reverse Polish Notation Calculator: RPN Calc.）。
+
+特に指定しないと、Bisonはすべての意味値に対して`int'型を使います。他の型
+を使うには、次の例のように、マクロ`YYSTYPE'を定義します。
+
+     #define YYSTYPE double
+
+このマクロ定義は、文法ファイルのC宣言部に置く必要があります（*Note
+Outline of a Bison Grammar: Grammar Outline.）。
+
+
+
+
+File: bison-ja.info, Node: Multiple Types, Next: Actions, Prev: Value Type, Up: Semantics
+
+複数の値型
+----------
+
+多くのプログラムでは、異なる種類のトークンとグループに対して、異なるデー
+タ型が必要です。たとえば、数値定数は`int'型や`long'型を必要とし、文字列
+定数は`char *'型を必要とし、識別子は記号表の項目へのポインタを必要とする
+でしょう。
+
+同一の構文解析器内で、意味値に対して2つ以上のデータ型を使うには、次の2項
+目が必要です。
+
+   * Bison宣言の`%union'で、考えられるデータ型全体の集合を指定します
+     （*Note The Collection of Value Types: Union Decl.）。
+
+   * 終端または非終端記号のそれぞれについて、その意味値を使うために、上
+     記の型のどれか1つを選びます。トークンに対する型の指定には、Bison宣
+     言の`%token'を使います（*Note Token Type Names: Token Decl.）。グルー
+     プ化に対する型の指定には、Bison宣言の`%type'を使います（*Note
+     Nonterminal Symbols: Type Decl.）。
+
+
+
+
+File: bison-ja.info, Node: Actions, Next: Action Types, Prev: Multiple Types, Up: Semantics
+
+アクション
+----------
+
+文法規則にともなうアクションは、その規則が認識されるたびに実行されるCの
+プログラムからなります。アクションの仕事のほとんどは、関連するトークンま
+たは小さいグループから規則にしたがって構成されるグループの、意味値の計算
+です。
+
+アクションは、Cの複文のように、ブレースで囲まれたCの文からなります。アク
+ションは、規則のどの場所にも置け、その場所で実行されます。規則のほとんど
+は、規則の終わりの構成要素の並びの後に、1つだけアクションを持ちます。規
+則の途中に置かれたアクションは、手の込んだ方法で特別な目的に使われます
+（*Note Actions in Mid-Rule: Mid-Rule Actions.）。
+
+アクションの中のCで書かれたプログラムは、規則の第N番目の要素に対応する意
+味値を、`$N'という書式で参照できます。また、その規則が構成するグループの
+意味値を、`$$'という書式で参照できます。アクションが構文解析器ファイルに
+複写されるときに、Bisonは、上記の構成要素を配列要素への参照に変換します。
+
+例を示します。
+
+     exp:    ...
+             | exp '+' exp
+                 { $$ = $1 + $3; }
+
+この規則は、加算記号で結び付けられた2つの小さい`exp'グループから、1つの
+`exp'を構成します。このアクションの中で、`$1'と`$3'は、規則の右側の最初
+と3番目の記号である`exp'グループの意味値を参照します。この規則によって認
+識される加算式の値になるように、和が`$$'に代入されます。もし、`+'トーク
+ンに有用な値があるならば、それを`$2'として参照できるでしょう。
+
+
+規則に対してアクションを指定しなければ、Bisonは、
+省略時アクション`$$ = $1'を補います。
+したがって、規則の最初の記号の値が規則全体の値になります。
+もちろん、両者の型が一致する場合にのみ、省略時アクションは有効です。
+空規則に対する省略時アクションは無意味です。
+すべての空規則は、その規則の値が必要ならば、
+明示的なアクションを持つ必要があります。
+
+`$N'のNは0または負が許され、現在の規則にマッチする*前に*スタックに積まれ
+ていたトークンとグループの意味値を参照します。これは非常に危険な手法で、
+安全に使うためには、その規則が適用される文脈をあなたが完全に理解している
+必要があります。これを安全に使える例を示します。
+
+     foo:      expr bar '+' expr  { ... }
+             | expr bar '-' expr  { ... }
+             ;
+
+     bar:      /* 空 */
+             { previous_expr = $0; }
+             ;
+
+`bar'がここに書かれた方法でのみ使われるならば、`foo'の定義の中で`bar'よ
+り前の`expr'の値を`$0'が参照します。
+
+
+
+
+File: bison-ja.info, Node: Action Types, Next: Mid-Rule Actions, Prev: Actions, Up: Semantics
+
+アクション中の値のデータ型
+--------------------------
+
+すべての意味値に対して同一のデータ型を使っているのならば、`$$'と`$N'はそ
+のデータ型を持ちます。
+
+さまざまなデータ型を指定するために`%union'を使っているならば、意味値を持
+つ終端記号と非終端記号のそれぞれに対して、データ型の中から適切なものを選
+ぶように宣言する必要があります。すると、`$$'と`N'を使うたびに、規則の中
+でそれらがどの記号を参照するかに応じて、データ型が決められます。例を示し
+ます。
+
+     exp:    ...
+             | exp '+' exp
+                 { $$ = $1 + $3; }
+
+`$1'と`$3'は`exp'という種類の記号を参照するので、`$1'と`$3'は、非終端記
+号`exp'に対して宣言されたデータ型を持ちます。もし、`$2'が使われるならば、
+どのような型であれ、終端記号`+'に対して宣言されたデータ型が使われます。
+
+別の方法として、値を参照するときにそのデータ型を指定できます。そのために
+は、参照のための`$'記号の後に`<TYPE>'を挿入します。例を示します。
+
+     %union {
+       int itype;
+       double dtype;
+     }
+
+この場合に、`$<itype>1'と書けば、最初の要素を`int'型として参照でき、
+`$<dtype>1'と書けば、`double'型として参照できます。
+
+
+
+
+File: bison-ja.info, Node: Mid-Rule Actions, Prev: Action Types, Up: Semantics
+
+規則の途中のアクション
+----------------------
+
+まれに、アクションを規則の途中に置くと便利な場合があります。これらのアク
+ションは、通常の規則の終わりに置かれたアクションと同様に記述されますが、
+構文解析器が後に続く要素を認識する前に実行されます。
+
+規則の途中のアクションは、そのアクションよりも前にある要素を`$N'を使って
+参照できますが、後に続く要素はまだ構文解析されていないので参照できません。
+
+規則の途中のアクション自身は、規則の要素の1つとして数えられます。同じ規
+則の中に別のアクションが続く場合（通常は最後）に問題が起きます。`$N'に使
+う番号Nに規則の途中のアクションを数えるのを忘れないように注意してくださ
+い。
+
+規則の途中のアクションは、意味値を持てます。そのアクションは、`$$'への代
+入で値を定め、後に続くアクションの中で、`$N'で値を参照できます。アクショ
+ンに記号名を対応させる方法がないので、アクションのデータ型を宣言できませ
+ん。そこで、アクションの意味を参照するときに、`$<...>'を使ってデータ型を
+指定する必要があります。
+
+
+規則の途中のアクションでは、`$$'への代入が規則の値に関係しないので、規則
+全体の値を設定する方法はありません。規則全体の値を設定する唯一の方法は、
+規則の最後に置かれた通常のアクションです。
+
+架空のコンパイラの例を示します。ここでは、`let (VARIABLE) STATEMENT'のよ
+うな書式の`let'文を使え、STATEMENTの持続期間中に一時的にVARIABLEという名
+前の変数を作ります。これを構文解析するために、STATEMENTを解析している間、
+VARIABLEを記号表に置いておき、後で記号表から削除する必要があります。これ
+を実現する方法を示します。
+
+     stmt:   LET '(' var ')'
+                     { $<context>$ = push_context ();
+                       declare_variable ($3); }
+             stmt    { $$ = $6;
+                       pop_context ($<context>5); }
+
+`let (VARIABLE)'が認識されるとすぐに、最初のアクションが実行されます。そ
+のアクションは、現在の意味文脈、すなわち参照可能な変数の表の複製を、デー
+タ型共用体の中の`context'型で、アクションの意味値として保存します。そし
+て、`declare_variable'を呼び出して、新しい変数を記号表に追加します。最初
+のアクションが終わると、後続する`stmt'の解析が可能になります。規則の途中
+のアクションが5番目の要素であることに注意してください。したがって、
+`stmt'は6番目の要素になります。
+
+後続する文が解析されると、その意味値が`let'文全体の意味値になります。そ
+して、最初のアクションの意味値は、変数の表を元に戻すために使われます。そ
+こで、`let'文中での一時変数が表から削除され、構文解析されるプログラムの
+残りの部分では一時変数が存在しません。
+
+構文解析器は、アクションを実行する順序を決めるために、構文解析する必要が
+あるので、規則が完全に認識される前にアクションを実行することは、しばしば
+不整合を起こします。たとえば、後述の2個の規則は、規則の途中のアクション
+を持たないので、実行可能な構文解析器の中で共存できます。それは、構文解析
+器は開きブレーストークンをシフトでき、宣言があるかどうか調べるために後に
+続くものを先読みできるからです。
+
+     compound: '{' declarations statements '}'
+             | '{' statements '}'
+             ;
+
+しかし、次の例のように、規則の途中のアクションを加えると、この規則は働か
+なくなります。
+
+     compound: { prepare_for_local_variables (); }
+               '{' declarations statements '}'
+             | '{' statements '}'
+             ;
+
+ここでは、開きブレースを見つけた時点で、規則の途中のアクションを実行する
+必要があるかどうかの決定を迫られます。言い換えれば、正しく判断するための
+十分な情報なしに、ある規則か別の規則のどちらかにゆだねる必要があります。
+開きブレーストークンは、これを読んだ時点では構文解析器が何をすべきか決定
+する途中なので、"先読み（look-ahead）"トークンと呼ばれます。*Note
+Look-Ahead Tokens: Look-Ahead。
+
+次のように同一のアクションを置くことで、この問題を解決できるように思える
+かもしれません。
+
+     compound: { prepare_for_local_variables (); }
+               '{' declarations statements '}'
+             | { prepare_for_local_variables (); }
+               '{' statements '}'
+             ;
+
+しかし、Bisonには2つのアクションが同一であるかどうかわからないので、問題
+は解決しません。Bisonは、アクションの中のCで書かれたプログラムを、決して
+解釈しようとしません。
+
+C言語のように、最初のトークンによって文と宣言を区別できるような文法なら
+ば、実現可能な解決方法の1つは、次の例のように、開きブレースの後にアクショ
+ンを置くことです。
+
+     compound: '{' { prepare_for_local_variables (); }
+               declarations statements '}'
+             | '{' statements '}'
+             ;
+
+これで、続く宣言または文の最初のトークンによって、Bisonがどちらの規則を
+使うべきかわかります。
+
+別の解決方法は、サブルーチンとして働く非終端記号の内側に、アクションを埋
+め込むことです。
+
+     subroutine: /* 空 */
+               { prepare_for_local_variables (); }
+             ;
+
+
+     compound: subroutine
+               '{' declarations statements '}'
+             | subroutine
+               '{' statements '}'
+             ;
+
+これで、Bisonは`compound'に対してどちらの規則を使うべきか決めずに、
+`subroutine'に対する規則中のアクションを実行できます。任意の規則中のアク
+ションは、この方法によって、規則の最後のアクションに変換できます。実際に、
+Bisonの内部では、このようにして、規則中のアクションという機能が実現され
+ています。
+
+
+
+
+File: bison-ja.info, Node: Declarations, Next: Multiple Parsers, Prev: Semantics, Up: Grammar File
+
+Bison宣言
+=========
+
+Bison文法ファイルの"Bison宣言（Bison declarations）"部では、文法の定式化
+に使う記号を定義し、意味値のデータ型を定義します。*Note Symbols::。
+
+`'+''や`'*''のような1文字リテラルトークンを除くすべてのトークンの型名を
+宣言する必要があります。非終端記号については、その意味値に対してどのデー
+タ型を使うか指定したければ、宣言する必要があります（*Note More Than One
+Value Type: Multiple Types.）。
+
+特に指定しないと、文法ファイル中の最初の規則は、開始記号を特定します。他
+の記号を開始記号にしたければ、明示的に宣言する必要があります（*Note
+Languages and Context-Free Grammars: Language and Grammar.）。
+
+* Menu:
+
+* Token Decl::        終端記号を宣言する.
+* Precedence Decl::   優先順位と結合規則とともに終端を宣言する.
+* Union Decl::        全ての意味値の型の集合を宣言する.
+* Type Decl::         非終端記号のための型の選択を宣言する.
+* Expect Decl::       シフト/還元衝突の警告を抑制する.
+* Start Decl::        開始記号を指定する.
+* Pure Decl::         再入構文解析器を要求する.
+* Decl Summary::      全てのBison宣言の表.
+
+
+
+
+File: bison-ja.info, Node: Token Decl, Next: Precedence Decl, Prev: Declarations, Up: Declarations
+
+トークン型名
+------------
+
+トークン型名、すなわち終端記号を、基本的には次のように宣言します。
+
+     %token NAME
+
+Bisonは、これを、構文解析器の中の`#define'ディレクティブに変換します。し
+たがって、関数`yylex'が構文解析器ファイルの中にあれば、そこで名前NAMEを
+このトークン型を表すために使えます。
+
+優先順位を指定したければ、`%token'の代わりに、`%left'、`%right'、
+`%nonassoc'のどれかを使います。*Note Operator Precedence: Precedence
+Decl。
+
+トークンの名前の直後に整数値を書くことで、そのトークン型に対応する数値符
+号を明示的に指定できます。
+
+     %token NUM 300
+
+しかし、Bisonにすべてのトークン型に対する数値符号の割り当てをまかせるこ
+とがいちばんです。Bisonは、トークン型どうしやASCII文字符号と衝突が起きな
+いように、自動的に数値符号を割り当てます。
+
+スタック型が共用体である場合には、`%token'あるいは他のトークン宣言に、小
+なり記号と大なり記号で区切った型名を追加する必要があります（*Note More
+Than One Value Type: Multiple Types.）。
+
+例を示します。
+
+     %union {              /* スタックのデータ型を定義する */
+       double val;
+       symrec *tptr;
+     }
+     %token <val> NUM      /* トークン「NUM」とその型を定義する */
+
+トークン型名を宣言する`%token'宣言の末尾にリテラル文字列を書くことで、リ
+テラル文字列トークンとトークン型名を関連づけできます。
+
+     %token arrow "=>"
+
+C言語に対する文法では、次の例のように、等価なリテラル文字列トークンに名
+前を指定しています。
+
+     %token  <operator>  OR      "||"
+     %token  <operator>  LE 134  "<="
+     %left  OR  "<="
+
+リテラル文字列とトークン名を等価にすれば、それ以降の文法規則の宣言の中で、
+両者を同様に使えます。`yylex'関数は、トークン型の数値符号を得るために、
+トークン名とリテラル文字列の両方を使えます（*Note Calling Convention::）。
+
+
+
+
+File: bison-ja.info, Node: Precedence Decl, Next: Union Decl, Prev: Token Decl, Up: Declarations
+
+演算子の優先順位
+----------------
+
+トークンの宣言とトークンの優先順位および結合規則の指定をまとめて行いたい
+ならば、`%left'、`%right'、`%nonassoc'のどれかを使います。これらは、"優
+先順位宣言（precedence declarations）"と呼ばれます。演算子の優先順位の詳
+細については、*Note Operator Precedence: Precedence。
+
+優先順位宣言の構文は、`%token'を使う宣言の構文と同じです。
+
+     %left SYMBOLS...
+
+次のようにも書けます。
+
+     %left <TYPE> SYMBOLS...
+
+これらの宣言は、`%token'を使う宣言が目的とするすべての機能を持っています。
+それに加えて、次のように結合性と、すべてのSYMBOLSについての優先順位を指
+定します。
+
+   * 演算子OPの結合性は、この演算子が繰り返し使われた場合の動作を指定し
+     ます。つまり、`X OP Y OP Z'が構文解析された場合に、最初にXとYがグルー
+     プ化されるか、それともYとZがグループ化されるかを指定します。`%left'
+     は、左結合性、つまりXとYが先に結合されることを指定します。`%right'
+     は、右結合性、つまり、YとZが先に結合されることを指定します。
+     `%nonassoc'は、無結合性を指定し、その場合、`X OP Y OP Z'は構文エラー
+     とみなされます。
+
+   * 演算子の優先順位は、その演算子が他の演算子とともに使われた場合の動
+     作を指定します。同一の優先順位宣言で宣言されたすべてのトークンは、
+     同じ優先順位を持ち、その結合性にしたがって処理されます。2個のトーク
+     ンが別々の優先順位宣言で宣言されているならば、文法ファイルの中で後
+     で宣言されたほうの演算子が強い優先順位を持ちます。
+
+
+
+
+
+File: bison-ja.info, Node: Union Decl, Next: Type Decl, Prev: Precedence Decl, Up: Declarations
+
+値型の集合
+----------
+
+`%union'宣言は、意味値に対して可能なデータ型すべての集合を指定します。キー
+ワード`%union'に続いて、C言語における共用体の宣言と同様に、ブレースで囲
+んだ宣言の並びを書きます。
+
+例を示します。
+
+     %union {
+       double val;
+       symrec *tptr;
+     }
+
+これは、2つの選択可能な型`double'と`symrec *'があると、宣言しています。
+それぞれの型には、名前`val'と`tptr'が与えられています。これらの名前は、
+`%token'と`type'宣言の中で、終端記号あるいは非終端記号に対する型を選ぶた
+めに使えます（*Note Nonterminal Symbols: Type Decl.）。
+
+C言語での共用体宣言とは異なり、閉じブレースの後にセミコロンを*書いてはい
+けない*ことに注意してください。
+
+
+
+
+File: bison-ja.info, Node: Type Decl, Next: Expect Decl, Prev: Union Decl, Up: Declarations
+
+非終端記号
+----------
+
+`%union'を複数の値型を指定するために使うならば、値を持つ各非終端記号の値
+型を宣言する必要があります。そのためには、次のように`%type'宣言を使いま
+す。
+
+     %type <TYPE> NONTERMINAL...
+
+ここで、NONTERMINALは非終端記号の名前で、TYPEは`%union'で指定した名前の
+中からあなたが選んだものです（*Note The Collection of Value Types: Union
+Decl.）。同じ値型を持つ任意の数の非終端記号を、1つの`%type'宣言の中に記
+述できます。その場合、記号名を空白で区切ってください。
+
+同様に終端記号の値型の宣言も可能です。そのためには、終端記号の宣言の中で、
+同じ`<TYPE>'の書式を使います。すべてのトークン宣言で、`<TYPE>'が許可され
+ています。
+
+
+
+
+File: bison-ja.info, Node: Expect Decl, Next: Start Decl, Prev: Type Decl, Up: Declarations
+
+衝突警告の回避
+--------------
+
+文法の中に衝突（*Note Shift/Reduce Conflicts: Shift/Reduce.）があると、
+Bisonは通常警告を表示します。しかし、実際の文法のほとんどは、無害なシフ
+ト還元衝突を含み、その衝突は、予測可能な方法で回避できますが、除去は困難
+です。衝突の数が変わらないかぎり、このような衝突の警告は抑制させるべきで
+す。そのために、`%expect'宣言を使います。
+
+次のように宣言します。
+
+     %expect N
+
+ここで、Nは10進の整数です。この宣言によって、N個のシフト還元衝突があって、
+還元/還元衝突がなければ、警告が表示されません。シフト還元衝突の数がNでな
+かったり、1つでも還元/還元衝突があった場合は、通常の警告が表示されます。
+
+一般に、次のような手順で`%expect'を使います。
+
+   * `%expect'なしで文法ファイルをコンパイルします。衝突が起こる位置の詳
+     細な目録を得るために、`-v'オプションを指定します。Bisonは、衝突の数
+     も表示します。
+
+   * 衝突のそれぞれについて、Bisonの省略時の解決方法が、あなたの望みどお
+     りであるか、確かめます。もし不都合があれば、文法ファイルを書き直し
+     て、最初に戻ります。
+
+   * Bisonが表示した衝突の数Nを書き写して、`%expect'宣言を追加します。
+
+
+すると、Bisonはチェックした衝突について文句をいわなくなりますが、文法ファ
+イルを書き換えて衝突の数が変わると、再び警告を表示します。
+
+
+
+
+File: bison-ja.info, Node: Start Decl, Next: Pure Decl, Prev: Expect Decl, Up: Declarations
+
+開始記号
+--------
+
+Bisonは、文法定義部にある最初の非終端記号を、省略時の開始記号と仮定しま
+す。次のような`%start'宣言で、明示的に開始記号を指定できます。
+
+     %start SYMBOL
+
+
+
+
+File: bison-ja.info, Node: Pure Decl, Next: Decl Summary, Prev: Start Decl, Up: Declarations
+
+純粋（再入可能）構文解析器
+--------------------------
+
+"再入可能（reentrant）"プログラムとは、進路を変えないプログラム、いいか
+えれば、完全に"純粋な（pure）"（読み出し専用）コードからなるプログラムで
+す。 (1) (*Note Pure Decl-Footnotes::) 再入可能性は、非同期実行が可能な
+場合に重要です。たとえば、再入可能でないプログラムを、シグナルハンドラか
+ら呼び出すことは危険です。マルチスレッド制御システムでは、再入不能プログ
+ラムはインターロックからしか呼び出せません。
+
+通常は、Bisonは再入可能でない構文解析器を生成します。これはほとんどの使
+用に合い、YACCとの互換性も保ちます。（標準のYACCインターフェースは継続的
+に非再入可能であります。というのは、`yylex'、`yylval' や `yylloc' との通
+信に静的に確保された変数 (2) (*Note Pure Decl-Footnotes::) を使うからで
+す。
+
+代わりに、純粋な、再入可能な構文解析器を生成することができます。次のよう
+な`%pure_parser' Bison宣言は、再入可能な構文解析器を生成します。
+
+     %pure_parser
+
+この宣言によって、上記の2個の通信用変数`yylval'と`yylloc'が、`yyparse'の
+局所変数になり、`yylex'字句解析関数を呼び出す方法が変わります。詳細につ
+いては、*Note Calling Conventions for Pure Parsers: Pure Calling。
+`yyparse'の中の`yynerrs'変数も局所変数になります（*Note The Error
+Reporting Function `yyerror': Error Reporting.）。`yypase'関数自体を呼び
+出す方法は変わりません。
+
+解析器が純粋かどうかは文法規則には全く関係しません。全ての有効な文法から、
+純粋な解析器と非再入可能な解析器のどちらかを生成するこができます。
+
+
+File: bison-ja.info  Node: Pure Decl-Footnotes, Up: Pure Decl
+
+(1) 【訳注】ある手続きの終了を待たずに、その手続きを再度呼び出せることで
+もあります。
+
+(2) 【訳注】他のソースファイルから見えないとう意味ではなく、メモリ上の固
+定番地に置かれるという意味。
+
+
+
+File: bison-ja.info, Node: Decl Summary, Prev: Pure Decl, Up: Declarations
+
+Bison宣言の要約
+---------------
+
+Bison宣言の要約を示します。
+
+`%union'
+     意味値が持ちうるデータ型の集合を宣言します（*Note The Collection of
+     Value Types: Union Decl.）。
+
+`%token'
+     優先順位と結合性を指定せずに、終端記号（トークン型名）を宣言します
+     （*Note Token Type Names: Token Decl.）。
+
+`%right'
+     右結合的な終端記号（トークン型名）を宣言します（*Note Operator
+     Precedence: Precedence Decl.）。
+
+`%left'
+     左結合的な終端記号（トークン型名）を宣言します（*Note Operator
+     Precedence: Precedence Decl.）。
+
+`%nonassoc'
+     結合性がない、つまり、結合して使おうとすると構文エラーになる、終端
+     記号（トークン型名）を宣言します（*Note Operator Precedence:
+     Precedence Decl.）。
+
+`%type'
+     非終端記号に対する意味値の型を宣言します（*Note Nonterminal
+     Symbols: Type Decl.）。
+
+`%start'
+     文法の開始記号を宣言します（*Note The Start-Symbol: Start Decl.）。
+
+`%expect'
+     予想されるシフト還元衝突の数を宣言します（*Note Suppressing
+     Conflict Warnings: Expect Decl.）。
+
+`%pure_parser'
+     純粋な（再入可能な）構文解析器を生成します（*Note A Pure
+     (Reentrant) Parser: Pure Decl.）。
+
+`%no_lines'
+     構文解析器ファイルに、`#line'プリプロセッサディレクティブを生成しま
+     せん。Bisonは、通常、Cコンパイラとデバッガがエラーとあなたのソース
+     ファイル（文法ファイル）を関連づけられるように、構文解析器ファイル
+     に`#line'ディレクティブを書き込みます。`%no_lines'宣言は、エラーを
+     構文解析器ファイルの行数と関連づけ、構文解析器ファイルをそれ自身で
+     独立したソースファイルとみなすことを意味します。
+
+`%raw'
+     通常、出力ファイル`NAME.h'は、Yacc互換トークン番号を定義します。こ
+     のオプションが指定されると、代わりに、Bison内部の番号が使われます
+     （Yacc互換番号は、1文字リテラルトークンを除いて、257から始まります
+     が、Bison内部のトークン番号は常に3から始まる連番になります）。
+
+`%token_table'
+     構文解析器ファイルの中に、トークン名の表を生成します。その表の名前
+     は`yytname'で、`yytname[I]'がBison内部トークン番号Iのトークンの名前
+     です。最初の3個の要素は常に、`"$"'、`"error"'、`"$illegal"'で、この
+     後に文法ファイルで定義された記号が続きます。
+
+     表の中で、1文字リテラルトークンにはシングルクォート記号が、文字列リ
+     テラルトークンにはダブルクォート記号が含まれます。たとえば、`"'+'"'
+     は1文字リテラルトークンで、`"\"<=\""'は文字列リテラルトークンです。
+     文字列リテラルトークンのすべての文字はそのまま表に現れ、ダブルクォー
+     ト記号もエスケープされません。たとえば、トークンが3文字`*"*'からな
+     れば、`yytname'中の文字列は`"*"*"'となります（Cでは`"\"*\"*\""'と書
+     きます）。
+
+     `%token_table'を指定すると、Bisonは、マクロ`YYNTOKENS'、`YYNNTS'、
+     `YYNRULES'、`YYNSTATES'の定義も生成します。
+
+     `YYNTOKENS'
+          最大のトークン番号＋1。
+     `YYNNTS'
+          非終端記号の数。
+     `YYNRULES'
+          文法規則の数。
+     `YYNSTATES'
+          構文解析器の状態の数（*Note Parser States::）。
+
+
+
+
+File: bison-ja.info, Node: Multiple Parsers, Prev: Declarations, Up: Grammar File
+
+同一プログラム中の複数の構文解析器
+==================================
+
+Bisonを使うプログラムのほとんどは、言語を1つだけ構文解析し、したがって、
+Bison構文解析器を1つだけ含みます。しかし、1つのプログラムで2種類以上の言
+語を構文解析したいときは、どうすればよいでしょうか？　そうするためには、
+`yyparse'、`yylval' などの2重定義の衝突を防ぐ必要があります。
+
+これを容易にする方法が、オプション`-p PREFIX'の利用です（*Note Invoking
+Bison: Invocation.）。これによって、Bison構文解析器のインターフェイス関
+数と変数の名前が、`yy'で始まる代わりにPREFIXで始まります。これでそれぞれ
+の構文解析器に、衝突しないような異なる名前を与えられます。
+
+変更される名前は、`yyparse'、`yylex'、`yyerror'、`yynerrs'、`yylval'、
+`yychar'、`yydebug'で全部です。たとえば、`-p c'オプションを使えば、これ
+らの名前は、`cparse'、`clex'などに変わります。
+
+*Bisonに関連する上記以外の変数とマクロのすべての名前は変わりません。*こ
+れらは、広域ではないので、異なる構文解析器で同じ名前が使われても衝突しま
+せん。たとえば、`YYSTYPE'の名前は変わりませんが、この定義は構文解析器ご
+とに異なる方法で行われるので、問題ありません（*Note Data Types of
+Semantic Values: Value Type.）。
+
+`-p'オプションは、さらに、構文解析器ソースファイルの始めで、`yyparse'を
+`PREFIXparse'と定義するように、マクロを定義します。この結果、構文解析器
+ソースファイル全体で、ある名前を別の名前に変えます。
+
+
+
+
+File: bison-ja.info, Node: Interface, Next: Algorithm, Prev: Grammar File, Up: Top
+
+構文解析器のC言語インターフェイス
+*********************************
+
+Bison構文解析器の正体は、`yyparse'という名前のCの関数です。ここでは、
+`yyparse'とほかに使う必要がある関数の間のインターフェイスの方法を示しま
+す。
+
+構文解析器の内部では、多くの`yy'または`YY'で始まるCの識別子が使われてい
+ることに注意してください。本書で説明しているものを除いて、そのような識別
+子を文法ファイルのアクションや追加のCプログラムの中で使うと、問題が起き
+るでしょう。
+
+* Menu:
+
+* Parser Function::   `yyparse'の呼び方と、それが返すもの.
+* Lexical::           トークンを読み込む関数`yylex'を提供しなければ
+                        ならない.
+* Error Reporting::   関数`yyerror'を提供しなければならない.
+* Action Features::   アクションで使える特別な機能.
+
+
+
+
+File: bison-ja.info, Node: Parser Function, Next: Lexical, Prev: Interface, Up: Interface
+
+構文解析器関数`yyparse'
+=======================
+
+構文解析を始めるには、関数`yyparse'を呼び出します。この関数は、トークン
+を読み、アクションを実行し、最後には入力ファイルの終わりに達するか回復不
+可能な構文エラーに達して、戻ります。読み込みを打ち切って`yyparse'関数か
+ら戻るようなアクションを書くことも可能です。
+
+構文解析が成功する、つまり入力ファイルの終わりに達すると、`yyparse'から
+の戻り値が0になります。
+
+構文解析が失敗する、つまり構文エラーが発生すると、戻り値が1になります。
+
+アクションの中で、次のマクロを使って、`yyparse'からただちに戻れます。
+
+`YYACCEPT'
+     成功の印である戻り値0をともなって、ただちに戻ります。
+
+`YYABORT'
+     失敗の印である戻り値1をともなって、ただちに戻ります。
+
+
+
+
+
+File: bison-ja.info, Node: Lexical, Next: Error Reporting, Prev: Parser Function, Up: Interface
+
+字句解析器関数`yylex'
+=====================
+
+"字句解析器（lexical analyzer）"関数`yylex'は、入力からトークンを認識し、
+構文解析器に返します。Bisonはこの関数を自動的に生成しないので、`yyparse'
+から呼び出されるように`yylex'を書く必要があります。関数`yylex'は"lexical
+scanner"と呼ばれることもあります。
+
+単純なプログラムでは、よく文法ファイルの最後で`yylex'を定義します。
+`yylex'が別のソースファイルの中で定義する場合は、そこでトークン型マクロ
+定義を使えるように準備する必要があります。そのためには、`-d'オプションを
+指定してBisonを実行してください。すると、マクロ定義がヘッダファイル
+`NAME.tab.h'に書き込まれ、それを必要とするソースファイルにインクルードで
+きます。*Note Invoking Bison: Invocation。
+
+* Menu:
+
+* Calling Convention::  `yyparse'が`yylex'を呼ぶ方法.
+* Token Values::      `yylex'がどのように読み込んだトークンの
+                        意味値を返さなければならないか.
+* Token Positions::   アクションが望むときに、どのように`yylex'が
+                        テキストの位置（行数など）を返さなければならない
+                        か。
+* Pure Calling::      純粋な構文解析器で呼び出し型の習慣がどのように
+                        違うか (*Note A Pure (Reentrant) Parser: Pure Decl.).
+
+
+
+
+File: bison-ja.info, Node: Calling Convention, Next: Token Values, Prev: Lexical, Up: Lexical
+
+`yylex'を呼び出す方法
+---------------------
+
+`yylex'が返す値は、見つかったトークンの型に対する番号で、入力ファイルの
+終わりに達した場合には0を返します。
+
+トークンが文法規則の中で名前で参照される場合、構文解析器ファイルの中での
+その名前は、トークン型に対する適切な番号にCのマクロとして定義されます。
+したがって、`yylex'は型を示すためにその名前を使用できます。*Note
+Symbols::。
+
+文法規則の中でトークンが1文字リテラルとして参照される場合には、その文字
+の文字符号がトークン型に対する番号でもあります。そこで、`yylex'は、単純
+に文字符号を返します。しかし、戻り値0は入力ファイルの終わりを意味するの
+で、ヌル文字（`'\0''）の文字符号を返してはいけません。
+
+以下に例を示します。
+
+     yylex ()
+     {
+       ...
+       if (c == EOF)     /* ファイルの終わりか調べる。 */
+         return 0;
+       ...
+       if (c == '+' || c == '-')
+         return c;      /* `+' に対するトークン型が '+' であると仮定する。 */
+       ...
+       return INT;      /* トークン型を返す。 */
+       ...
+     }
+
+このようなインターフェイスは、`lex'が生成した字句解析器を、`yylex'の定義
+を変えずに使えるように設計されています。
+
+文法規則が文字列リテラルトークンを使っている場合には、`yylex'がそれに対
+するトークン型番号を使う、2つの方法があります。
+
+   * 文法が文字列リテラルトークンに対する別名として記号トークン名を定義
+     しているならば、`yylex'はその記号名を他のトークンの記号名と同様に使
+     えます。この場合、文法ファイルの中での文字列リテラルトークンの利用
+     は、`yylex'にまったく影響しません。
+
+   * `yylex'は、`yytname'表の中で、複数文字トークンを見つけられます。トー
+     クンに対する表の添え字は、そのトークン型の番号です。複数文字トーク
+     ンは`yytname'の中にダブルクォート記号で囲まれて記憶されます。トーク
+     ンに含まれる文字はエスケープされず、表の中の文字列にそのまま書き込
+     まれています。
+
+     トークンを構成する文字列が`token_buffer'に記憶されていると仮定して、
+     `yytname'からトークンを探し出すプログラムを示します。
+
+          for (i = 0; i < YYNTOKENS; i++)
+            {
+              if (yytname[i] != 0
+                  && yytname[i][0] == '"'
+                  && strncmp (yytname[i] + 1, token_buffer,
+                              strlen (token_buffer))
+                  && yytname[i][strlen (token_buffer) + 1] == '"'
+                  && yytname[i][strlen (token_buffer) + 2] == 0)
+                break;
+            }
+
+     `yytname'表は、`%token_table'宣言をした場合にのみ生成されます。
+     *Note Decl Summary::。
+
+
+
+
+
+File: bison-ja.info, Node: Token Values, Next: Token Positions, Prev: Calling Convention, Up: Lexical
+
+トークンの意味値
+----------------
+
+通常の再入可能でない構文解析器では、トークンの意味値が広域変数`yylval'に
+代入される必要があります。意味値に対してただ1つのデータ型を使っている場
+合には、`yylval'の型もそうです。したがって、たとえば、宣言を省略して型が
+`int'ならば、次のように書けます。
+
+       ...
+       yylval = value;  /* 値をBisonスタックに積む。 */
+       return INT;      /* トークン型を返す。 */
+       ...
+
+複数のデータ型を使っている場合には、`%union'宣言で作られた共用体が
+`yylval'の型になります（*Note The Collection of Value Types: Union Dec
+l.）。そこで、トークンの値を代入するには、共用体のメンバの名前を指定する
+必要があります。`%union'宣言の例を示します。
+
+     %union {
+       int intval;
+       double val;
+       symrec *tptr;
+     }
+
+すると、`yylex'の中のプログラムは次のようになります。
+
+       ...
+       yylval.intval = value; /* 値をBisonスタックに積む。 */
+       return INT;          /* トークン型を返す。 */
+       ...
+
+
+
+
+File: bison-ja.info, Node: Token Positions, Next: Pure Calling, Prev: Token Values, Up: Lexical
+
+トークンのテキスト中の位置
+--------------------------
+
+アクションの中で`@N'機能（*Note Special Features for Use in Actions:
+Action Features.）を使っている場合には、トークンとグループのテキスト中の
+位置を見失わないように、`yylex'の中で位置情報を提供する必要があります。
+関数`yyparse'は、ちょうど解析されたトークンのテキスト中の位置が、広域変
+数`yylloc'に記憶されていると仮定します。そこで、`yylex'は、`yyloc'に正し
+いデータを記憶する必要があります。変数`yylloc'は構造体で、アクションの中
+で使われる場合にのみ、メンバを初期化する必要があります。メンバは、
+`first_line'、`first_column'、`last_line'、`last_column'の4つです。この
+機能を使うと、構文解析器が著しく遅くなることに注意してください。
+
+`yylloc'のデータ型は、`YYLTYPE'という名前を持っています。
+
+
+
+
+File: bison-ja.info, Node: Pure Calling, Prev: Token Positions, Up: Lexical
+
+再入可能構文解析器を呼び出す方法
+--------------------------------
+
+純粋な、つまり再入可能な、構文解析器を生成するために、`%pure_parser'を
+Bison宣言すると、広域変数`yylval'と`yylloc'を使えなくなります（*Note A
+Pure (Reentrant) Parser: Pure Decl.）。このような構文解析器では、2つの広
+域変数の代わりに、`yylex'への引数として渡されるポインタを使います。
+`yylex'を次のように宣言し、これらのポインタを通して情報を受け渡しする必
+要があります。
+
+     yylex (lvalp, llocp)
+          YYSTYPE *lvalp;
+          YYLTYPE *llocp;
+     {
+       ...
+       *lvalp = value;  /* 値をBisonスタックに積む。  */
+       return INT;      /* トークン型を返す。 */
+       ...
+     }
+
+文法ファイルがテキスト中の位置を参照するための`@'機能を使っていない場合
+は、`YYLTYPE'は定義されません。この場合、第2引数を省略し、`yylex'は1個の
+引数をともなって呼び出されます。
+
+再入可能な構文解析器を使っている場合、再入可能な方法で構文解析器に追加の
+引数を渡す方法があります。そのためには、マクロ`YYPARSE_PARAM'を変数名と
+して定義します。すると、関数`yyparse'は、定義された名前で、型が`void *'
+の追加の引数を受け取ります。
+
+`yyparse'を呼び出すときに、オブジェクトの番地を`void *'型にキャストして
+渡します。文法のアクションは、ポインタを適切な型へのポインタへキャストし、
+逆参照して、オブジェクトの内容を参照できます。例を示します。
+
+     %{
+     struct parser_control
+     {
+       int nastiness;
+       int randomness;
+     };
+
+     #define YYPARSE_PARAM parm
+     %}
+
+次のように構文解析器を呼び出します。
+
+     struct parser_control
+     {
+       int nastiness;
+       int randomness;
+     };
+
+     ...
+
+     {
+       struct parser_control foo;
+       ...  /* `foo'に正しいデータを記憶  */
+       value = yyparse ((void *) &foo);
+       ...
+     }
+
+文法アクションの中では、データを参照するために次のような式を使います。
+
+     ((struct parser_control *) parm)->randomness
+
+`yylex'に追加の引数を渡したい場合には、`YYPARSE_PARAM'と同様に、マクロ
+`YYLEX_PARAM'を定義します。例を示します。
+
+     %{
+     struct parser_control
+     {
+       int nastiness;
+       int randomness;
+     };
+
+     #define YYPARSE_PARAM parm
+     #define YYLEX_PARAM parm
+     %}
+
+そして、`yylex'が追加の引数、`parm'の値を受け取るように、`yylex'を定義す
+る必要があります（型`YYLTYPE'のどの引数が渡されるかに応じて、引数の合計
+が2個または3個になります）。引数を正しいオブジェクト型として宣言できます。
+すなわち`void *'として宣言し、上記の番地を参照できます。
+
+`YYPARSE_PARAM'を使わずに、`%pure_parser'を使って、再入可能な構文解析器
+を生成することも可能です。その場合、引数をつけずに`yyparse'を呼び出すべ
+きです。
+
+
+
+
+File: bison-ja.info, Node: Error Reporting, Next: Action Features, Prev: Lexical, Up: Interface
+
+エラー報告関数`yyerror'
+=======================
+
+Bison構文解析器は、文法規則に適合しないトークンを読むたびに、"構文解析エ
+ラー（parse error）"すなわち"文法エラー（syntax error）"を検出します。文
+法中のアクションは、マクロ`YYERROR'を使って、明示的にエラーを示せます
+（*Note Special Features for Use in Actions: Action Features.）。
+
+Bison構文解析器は、`yyerror'という名前の関数を使って、
+エラーを報告するようになっています。
+事前に用意が必要な
+この関数は、文法エラーが発生するたびに、1個の引数をともなって、
+`yyparse'から呼び出されます。
+構文解析エラーに対して、引数の文字列は通常`"parse error"'です。
+
+Bison定義部（*Note The Bison Declarations Section: Bison Declarations.）で、
+マクロ`YYERROR_VERBOSE'を定義すると、
+`"parse error"'の代わりに、
+エラーを詳細に報告する文字列が用意されます。
+マクロ`YYERROR_VERBOSE'の定義はなんでもかまいません。
+
+構文解析器は、もう1種類のエラーであるスタックオーバーフローを検出する
+可能性があります。これは、入力がきわめて深い入れ子からなっていると
+起こることがあります。Bison構文解析器は自動的にスタックの限界を大きく拡張し
+ているので、スタックオーバーフローはめったに起きません。
+しかし、もしスタックオーバーフローが起きれば、
+`"parser stack overflow"'という
+文字列の引数をともなって、`yyerror'が呼び出されます。
+
+単純なプログラムでは、次の例のように`yyerror'を定義できます。
+
+     yyerror (s)
+          char *s;
+     {
+       fprintf (stderr, "%s\n", s);
+     }
+
+`yyerror'から戻った後、`yyparse'は、適切なエラー回復文法規則（*Note
+Error Recovery::）があれば、エラーからの回復を試みます。もし、回復が不可
+能ならば、`yyparse'は即座に1を返します。
+
+変数`yynerrs'には、それまでに出くわした文法エラーの数が記憶されています。
+通常、この変数は広域変数です。しかし、再入可能な構文解析器（*Note A Pure
+(Reentrant) Parser: Pure Decl.）を生成した場合には、アクションからのみ参
+照可能な局所変数になります。
+
+
+
+
+File: bison-ja.info, Node: Action Features, Prev: Error Reporting, Up: Interface
+
+アクション中で使える特別な機能
+==============================
+ 
+ここの表では、アクション中で有用な、Bisonの構造物、変数、マクロを示しま
+す。
+
+`$$'
+     現在の規則で作られるグループに対する意味値を保持する変数のように働
+     きます。*Note Actions::。
+
+`$N'
+     現在の規則のN番目の構成要素に対する意味値を保持する変数のように働き
+     ます。*Note Actions::。
+
+`$<TYPEALT>$'
+     `$$'に似ていますが、`%union'宣言で指定された共用体の中のTYPEALTを選
+     びます。*Note Data Types of Values in Actions: Action Types。
+
+`$<TYPEALT>N'
+     `$N'に似ていますが、`%union'宣言で指定された共用体の中のTYPEALTを選
+     びます。*Note Data Types of Values in Actions: Action Types。
+
+`YYABORT;'
+     `yyparse'からただちに戻り、失敗を示します。*Note The Parser
+     Function `yyparse': Parser Function。
+
+`YYACCEPT;'
+     `yyparse'からただちに戻り、成功を示します。*Note The Parser
+     Function `yyparse': Parser Function。
+
+`YYBACKUP (TOKEN, VALUE);'
+     トークンを逆シフトします。1個の値を還元する規則の中で、先読みトーク
+     ンがない場合にのみ、このマクロが使えます。このマクロは、トークン型
+     がTOKENで意味値がVALUEのトークンを、先読みトークンとして格納し、こ
+     の規則で還元されるはずだった値を捨てます。
+
+     先読みトークンがすでにあるような、このマクロが無効な状況でこのマク
+     ロを使うと、メッセージ`cannnot back up'をともなう文法エラーが報告さ
+     れ、通常のエラー回復が行われます。
+
+     どちらの場合も、アクションの残りの部分は実行されません。
+
+`YYEMPTY'
+     先読みトークンがない場合に、変数`yychar'に記憶されている値です。
+
+`YYERROR;'
+     ただちに文法エラーを発生させます。この文は、構文解析器がエラーを検
+     出したようにエラー回復を始めますが、`yyerror'を呼び出さず、メッセー
+     ジは表示されません。もし、エラーメッセージを表示したければ、
+     `YYERROR'文よりも先に、明示的に`yyerror'を呼び出してください。*Note
+     Error Recovery::。
+
+`YYRECOVERING'
+     このマクロの値は、字句解析器が文法エラーからの回復中ならば1、そうで
+     なければ0です。*Note Error Recovery::。
+
+`yychar'
+     現在の先読みトークンを含んでいる変数です（再入可能構文解析器では、
+     `yyparse'の局所変数です）。先読みトークンがない場合には、この変数に
+     `YYEMPTY'という値が入っています。*Note Look-Ahead Tokens:
+     Look-Ahead。
+
+`yyclearin;'
+     現在の先読みトークンを捨てます。エラー規則の中で有用です。*Note
+     Error Recovery::。
+
+`yyerrok;'
+     後に続く文法エラーに対して、エラーメッセージの生成を再開します。こ
+     れは、エラー規則で特に重要です。*Note Error Recovery::。
+
+`@N'
+     現在の規則の第N要素の、行番号と列番号を含む、配列変数のように働きま
+     す。次のようなメンバがあります。
+
+          struct {
+            int first_line, last_line;
+            int first_column, last_column;
+          };
+
+     たとえば、第3要素の開始行番号を知るには、`@3.first_line'とします。
+
+     この構造体のメンバを有効な情報にするためには、`yylex'がそれぞれのトー
+     クンに対して、情報を提供する必要があります。一部分のメンバだけが必
+     要ならば、`yylex'はそのメンバの値を設定するだけでかまいません。 (1)
+     (*Note Action Features-Footnotes::)
+
+     この機能を使うと、字句解析器が著しく遅くなります。
+
+
+
+File: bison-ja.info  Node: Action Features-Footnotes, Up: Action Features
+
+(1) 【訳注】`yylex'は、変数`yylloc'に、トークンの位置情報
+を代入します。
+
+
+
+File: bison-ja.info, Node: Algorithm, Next: Error Recovery, Prev: Interface, Up: Top
+
+Bison構文解析器のアルゴリズム
+*****************************
+
+Bison構文解析器は、トークンを読むと、トークンの意味値とともにスタックに
+積みます。このスタックを"構文解析器スタック（parser stack）"と呼びます。
+トークンをスタックに積むことを、伝統的に"シフト（shifting）"と呼びます。
+
+たとえば、中間記法電卓が、`1 + 5 *'をすでに読んでいて、`3'を受け取ったと
+仮定します。スタックには4個の要素があり、トークンそれぞれがシフトされて
+います。
+
+しかし、スタックに常に読み込まれたトークンそれぞれに対する要素があるわけ
+ではありません。最後のN個のトークンとグループが文法規則に当てはまる場合
+には、それらは規則に従って組み合わされます。これを、"還元（reduction）"
+と呼びます。スタックにあったトークンとグループは、規則の結果、つまり左側
+にある記号である、1個のグループに置き換えられます。規則のアクションの実
+行は、結果のグループの意味値を計算するので、還元の手順の1つです。
+
+たとえば、中間記法電卓の構文解析器スタックの内容は次のようになります。
+
+     1 + 5 * 3
+
+そして、入力された次のトークンが改行符号ならば、次の規則に従って、最後の
+3個の要素が15に還元されます。
+
+     expr: expr '*' expr;
+
+そして、スタックは3個の要素を持ちます。
+
+     1 + 15
+
+この時点で、別の還元が可能になり、1個の値16を得ます。そして、改行符号が
+シフトされます。
+
+構文解析器は、シフトと還元によって、入力全体を文法の開始記号である1個の
+グループに還元しようとします（*Note Languages and Context-Free Grammars:
+Language and Grammar.）。
+
+この種類の構文解析器は、ボトムアップ構文解析器として知られています。
+
+* Menu:
+
+* Look-Ahead::        構文解析器は何をするかを決めるときに一つ先のトーク
+                        ンを見る.
+* Shift/Reduce::      衝突: シフトと還元の両方が有効なとき.
+* Precedence::        演算子の優先順位は衝突を解決することで動作する.
+* Contextual Precedence::  演算子の優先順位が文脈に依存するとき.
+* Parser States::     構文解析器はスタック付きの有限状態機械.
+* Reduce/Reduce::     同じ状況に2つの規則が適用可能なとき.
+* Mystery Conflicts::  正しくないように見える還元/還元衝突.
+* Stack Overflow::    スタックが一杯になったときに何が起こるうか. それを
+                        避ける方法.
+
+
+
+
+File: bison-ja.info, Node: Look-Ahead, Next: Shift/Reduce, Prev: Algorithm, Up: Algorithm
+
+先読みトークン
+==============
+
+Bison構文解析器は、必ずしも文法規則に適合する最後のN個のトークンまたはグ
+ループが見つかるとすぐに還元を行う*わけではありません*。そのような単純な
+方法は、多くの言語の処理に適さないからです。その代わりに、還元が可能な場
+合に、構文解析器は次のトークンを「先読み」し、次に何をするべきかを決定し
+ます。
+
+トークンが読まれると、それはすぐにシフトされるのではなく、まず、"先読み
+トークン（look-ahead token）"になり、スタックには置かれません。先読みトー
+クンを残したまま、構文解析器が、スタック上のトークンまたはグループに対し
+て1個以上の還元を実行します。それ以上の還元が起こりえない場合に、先読み
+トークンはスタックにシフトされます。これは、すべての可能な還元が実行され
+たことを意味しません。先読みトークンのトークン型に応じて、いくつかの規則
+は適用を遅らされているかもしれません。
+
+先読みが必要な簡単な例を示します。下記の3個の規則は、2項加算演算子、単項
+階乗演算子（`!'）、グループのためのかっこを含みます。
+
+     expr:     term '+' expr
+             | term
+             ;
+
+     term:     '(' expr ')'
+             | term '!'
+             | NUMBER
+             ;
+
+トークン`1 + 2'が読み込まれてシフトされているときに、
+何が起きるでしょうか。もし、続くトークンが`)'ならば、
+最初の3個のトークンは`expr'の形式に還元される必要があります。
+これが、唯一有効な道です。
+なぜならば、`)'をシフトして、`term ')''という記号列も
+生成可能ですが、どの規則もそのような記号列を許していないからです。
+
+もし、続くトークンが`!'ならば、それはただちにシフトされる必要があり、
+`2 !'から`term'が還元されます。
+そうではなく、構文解析器がシフトの前に還元していれば、
+`1 + 2'が`expr'に還元されます。
+しかし、そのような還元をしようとすると`expr '!''という記号列を
+スタックに生成しようとするので、`!'をシフトするのは不可能です。
+そのような記号列は許されません。
+
+現在の先読みトークンは、変数`yychar'に記憶されています*Note Special
+Features for Use in Actions: Action Features。
+
+
+
+
+File: bison-ja.info, Node: Shift/Reduce, Next: Precedence, Prev: Look-Ahead, Up: Algorithm
+
+シフト還元衝突
+==============
+
+次の2個の規則で定められる、"if-then"と"if-then-else"文を持つ言語の構文解
+析について考えます。
+
+     if_stmt:
+               IF expr THEN stmt
+             | IF expr THEN stmt ELSE stmt
+             ;
+
+ここで、`IF'、`THEN'、`ELSE'は、キーワードトークンを表す終端記号であると
+仮定します。
+
+`ELSE'トークンが読まれて先読みトークンになったときに、入力が正しいと仮定
+して、スタックの内容はちょうど最初の規則で還元される右辺になっています。
+しかし、いずれ起こるはずの第2の規則の還元のために、`ELSE'トークンをシフ
+トすることも有効です。
+
+この、シフトと還元の両方が有効な場合を、"シフト還元衝突（shift/reduce
+conflict）"と呼びます。Bisonは、演算子優先規則宣言で特に指定されていない
+かぎり、シフトを選ぶことで衝突を解決するように設計されています。この理由
+を理解するために、別の選択肢と比較してみましょう。
+
+構文解析器は`ELSE'のシフトを選ぶので、その結果、else節はもっとも内側のif
+文に対応し、次の2つの入力は等価になります。
+
+     if x then if y then win (); else lose;
+
+     if x then do; if y then win (); else lose; end;
+
+しかし、字句解析器がシフトでなく還元を選ぶと、その結果、else節がもっとも
+外側のif文に対応し、次の2つの入力は等価になります。
+
+     if x then if y then win (); else lose;
+
+     if x then do; if y then win (); end; else lose;
+
+文法があいまいに書かれているために、衝突が起きます。つまり、入れ子になっ
+たif文について、どちらの構文解析結果も正当なのです。確立された習慣では、
+else節をもっとも内側のif文に対応させて、あいまいさを解決しています。これ
+が、Bisonが還元よりもシフトを選ぶ理由です（理想的には、あいまいでない文
+法を書くべきですが、この場合には困難です）。この問題は、Algol 60の仕様の
+中に現れたのが最初で、「ぶらさがり`else'（dangling `else'）」問題と呼ば
+れています。
+
+予測可能で正当なシフト還元衝突について、Bisonが警告を表示しないように、
+`%expect N'宣言を使えます。すると、ちょうどN個のシフト還元衝突があるかぎ
+り、警告は表示されません。*Note Suppressing Conflict Warnings: Expect
+Decl。
+
+上記の`if_stmt'の定義は、衝突をわざと発生させるために書きましたが、追加
+の規則がなければ実際には衝突が起きません。次に、実際に衝突を含む完全な
+Bison入力ファイルの例を示します。
+
+     %token IF THEN ELSE variable
+     %%
+     stmt:     expr
+             | if_stmt
+             ;
+
+     if_stmt:
+               IF expr THEN stmt
+             | IF expr THEN stmt ELSE stmt
+             ;
+
+     expr:     variable
+             ;
+
+
+
+
+File: bison-ja.info, Node: Precedence, Next: Contextual Precedence, Prev: Shift/Reduce, Up: Algorithm
+
+演算子の優先順位
+================
+
+シフト還元衝突が起きる別の可能性は、算術式の中にあります。この場合には、
+シフトの選択が望ましい解決策であるとは限りません。どのような場合にシフト
+してどのような場合に還元するべきか指定するために、演算子の優先順位につい
+てのBison宣言を使えます。
+
+* Menu:
+
+* Why Precedence::    優先順位が必要なことを示す例.
+* Using Precedence::  Bison文法で優先順位を指定する方法.
+* Precedence Examples::  前の例でこれらの機能が使われた方法.
+* How Precedence::    どのように動作するか.
+
+
+
+
+File: bison-ja.info, Node: Why Precedence, Next: Using Precedence, Prev: Precedence, Up: Precedence
+
+優先順位が必要な場合
+--------------------
+
+次のあいまいな文法の一部を見てください。
+入力`1 - 2 * 3'が2通りに構文解析されうるので、
+この文法はあいまいです。
+
+     expr:     expr '-' expr
+             | expr '*' expr
+             | expr '<' expr
+             | '(' expr ')'
+             ...
+             ;
+
+構文解析器が、`1'、`-'、`2'というトークンを
+読み込んだと仮定します。構文解析器は、減算演算子の規則に従って、
+これらのトークンを還元するべきでしょうか。
+それは、次のトークンに依存します。
+もちろん、次のトークンが`)'ならば、還元する必要があります。
+なぜならば、もしシフトすると、`- 2 )'またはそれで始まる
+記号列を還元する必要が生じ、そのような規則はないからです。
+しかし、次のトークンが`*'または`<'ならば、
+シフトと還元のどちらも可能です。
+どちらを選んでも構文解析を完了できますが、解析の結果は異なります。
+
+Bison字句解析器がどちらの処理をすべきか決めるために、
+構文解析の結果を考慮する必要があります。
+もし、次の演算子トークンOPがシフトされるならば、
+還元して差を求める可能性を許すために、
+OPは最初に還元される必要があります。
+その結果は、`1 - (2 OP 3)'となります。
+逆に、OPをシフトする前に減算を還元するならば、
+結果は`(1 - 2) OP 3'となります。
+明らかに、シフトと還元のどちらが起こるべきかの選択は、
+演算子`-'とOPの相対的な優先順位に依存します。
+`*'は先にシフトされるべきですが、`<'は違います。
+
+`1 - 2 - 5'のような例ではどうなるでしょうか。
+`(1 - 2) - 5'と処理するべきでしょうか。
+それとも、`1 - (2 - 5)'と処理するべきでしょうか。
+ほとんどの演算子については前者が適し、これを、
+"左結合性（left association）"と呼びます。
+後者の"右結合性（right association）"は、代入演算子に適します。
+左結合性か右結合性かの判断は、スタックに`1 - 2'が含まれ、
+先読みトークンが`-'である場合の、シフトか還元かの選択です。
+シフトを選ぶと、右結合的になります。
+
+
+
+
+File: bison-ja.info, Node: Using Precedence, Next: Precedence Examples, Prev: Why Precedence, Up: Precedence
+
+演算子の優先順位の指定
+----------------------
+
+演算子優先順位宣言`%left'と`%right'によって、演算子の優先順位と結合規則
+を指定できます。どちらの宣言も、優先順位と結合規則を指定したい演算子であ
+る、トークンの並びからなります。`%left'宣言はすべての演算子を左結合的に、
+`%right'宣言はすべての演算子を右結合的に宣言します。第3の選択肢は
+`%nonassoc'宣言で、これで宣言した演算子が続けて2回以上現れると、構文解析
+器が文法エラーを指摘します。
+
+異なる演算子の相対的な優先順位は、それらが宣言される順序で決まります。文
+法ファイルの中の最初の`%left'宣言または`%right'宣言で宣言された演算子が、
+もっとも低い優先順位を持ちます。後から宣言される演算子ほど、高い優先順位
+を持ちます。
+
+
+
+
+File: bison-ja.info, Node: Precedence Examples, Next: How Precedence, Prev: Using Precedence, Up: Precedence
+
+優先順位の例
+------------
+
+先ほどの例では、次のように宣言するべきでした。
+
+     %left '<'
+     %left '-'
+     %left '*'
+
+もっと複雑な例では、より多くの演算子を使うだけでなく、同じ優先順位を持つ
+演算子があります。次の例では、`'+''演算子と`'-''演算子が同じ優先順位を持
+ちます。
+
+     %left '<' '>' '=' NE LE GE
+     %left '+' '-'
+     %left '*' '/'
+
+（この例で、`NE'は「等しくない」演算子を表し、他も同様です。これらのトー
+クンは、2文字以上からなるので、1文字リテラルではなく名前で表されると仮定
+しています）
+
+
+
+
+File: bison-ja.info, Node: How Precedence, Prev: Precedence Examples, Up: Precedence
+
+優先順位が働く仕組み
+--------------------
+
+優先順位宣言の最初の働きは、宣言された終端記号への優先順位の割り当てです。
+第2の働きは、規則に含まれる最後の終端記号が優先順位を示すように、ある規
+則に優先順位を割り当てることです（規則に対して、明示的に優先順位を指定す
+ることも可能です。*Note Context-Dependent Precedence: Contextual
+Precedence）。
+
+最後に、衝突の解決は、問題になっている規則の優先順位と、先読みトークンの
+優先順位の比較によって行われます。もし、先読みトークンの優先順位が高けれ
+ば、還元されます。もし、規則の優先順位が高ければ、シフトされます。もし、
+優先順位が同じならば、その優先順位での結合規則によって決定されます。`-v'
+オプションを付けてBisonを実行し、冗長な出力ファイルを得ると、どのように
+衝突が解決されているかがわかります（*Note Invoking Bison: Invocation.）。
+
+すべての規則とトークンが優先順位を持っているとはかぎりません。もし、規則
+と先読みトークンが優先順位を持っていなければ、シフトが行われます。
+
+
+
+
+File: bison-ja.info, Node: Contextual Precedence, Next: Parser States, Prev: Precedence, Up: Algorithm
+
+文脈依存優先順位
+================
+
+しばしば、演算子の優先順位は文脈に依存します。これは、最初は奇異に感じる
+かもしれませんが、実際によく起きていることなのです。たとえば、通常、減算
+演算子（`-'）は、単項演算子としては非常に高い優先順位を持ちますが、2項演
+算子としては乗除算よりも低い優先順位を持ちます。
+
+Bisonの優先順位宣言、`%left'、`%right'、`%nonassoc'は、あるトークンに対
+して1回のみ使え、この方法では、トークンは唯一の優先順位を宣言されます。
+文脈に依存する優先順位のためには、別の方法、すなわち、`%prec'で規則を修
+飾する方法が必要になります。
+
+`%prec'修飾子は、ある規則で使われるべき終端記号の優先順位を指定して、そ
+の規則の優先順位を宣言します。その記号がその規則の中以外に現れる必要はあ
+りません。修飾子の記法は、次のようになっています。
+
+     %prec TERMINAL-SYMBOL
+
+これは、規則の構成要素の後に書かれます。これによって、通常の方法で導かれ
+る優先順位に代わって、TERMINAL-SYMBOLの優先順位を規則に割り当てます。規
+則の優先順位が変更されて、その規則が関係している衝突の解決に影響します
+（*Note Operator Precedence: Precedence.）。
+
+`%prec'がどのように単項負記号を解決するかを示します。まず、`UMINUS'とい
+う名前の終端記号に対する優先順位を宣言します。この型のトークンは存在しま
+せんが、この記号が優先順位を表現するために使われます。
+
+     ...
+     %left '+' '-'
+     %left '*'
+     %left UMINUS
+
+さて、`UNIMIS'の優先順位を、規則の中で使えます。
+
+     exp:    ...
+             | exp '-' exp
+             ...
+             | '-' exp %prec UMINUS
+
+
+
+

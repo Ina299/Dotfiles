@@ -1,0 +1,1818 @@
+Info file: libtool-ja.info,    -*-Text-*-
+produced by `texinfo-format-buffer'
+from file `libtool-ja.texi'
+using `texinfmt.el' version 2.38 of 3 July 1998.
+
+
+
+
+INFO-DIR-SECTION GNU programming tools
+START-INFO-DIR-ENTRY
+* Libtool(ja): (libtool-ja).           Generic shared library support script.
+END-INFO-DIR-ENTRY
+
+
+INFO-DIR-SECTION Individual utilities
+START-INFO-DIR-ENTRY
+* libtoolize(ja): (libtool-ja)Invoking libtoolize.     Adding libtool support.
+END-INFO-DIR-ENTRY
+
+
+This file documents GNU Libtool 1.4.2
+
+このファイルは，GNU Libtool 1.4.2を説明します．
+
+Copyright (C) 1996-2000 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.1 or
+any later version published by the Free Software Foundation; with the no
+Invariant Sections, with no Front-Cover Texts, and with no Back-Cover
+Texts.  A copy of the license is included in the section entitled "GNU
+Free Documentation License".
+
+
+
+
+
+
+File: libtool-ja.info  Node: Static-only libraries-Footnotes, Up: Static-only libraries
+
+(1) 思い切りがよくない人のためのGNU Image Manipulation Programです．
+`http://www.gimp.org/'を参照してください．
+
+
+
+File: libtool-ja.info, Node: Versioning, Next: Library tips, Prev: Integrating libtool, Up: Top
+
+ライブラリインターフェースのバージョン
+**************************************
+
+共有ライブラリで導入された発行物で，最も難しいものは，実行時の依存性の作
+成と解決です．プログラムとライブラリの依存性は，`sed'のような単一の名前
+の用語で，よく記述されます．そのため"libtoolはsedに依存する"と告げ，それ
+で十分目的を果たせます．
+
+しかし，規則的にインターフェースが変更されるとき，我々はより具体的に告げ
+る必要があります．"Gnus 5.1はEmacs 19.28以上を要求する．"ここでは，名前
+からなるインターフェースの記述と"バージョンナンバー"です．
+
+種類の説明はいくつかの目的において十分でないことすらあります．Emacs 20で
+変更された場合，Gnus 5.1を破壊するのに十分ではないでしょうか？
+
+同じ問題は，共有ライブラリでも存在します．我々は，プログラムが必要として
+いるインターフェースを提供するライブラリのみとリンクされることを，ダイナ
+ミックリンカが保証できるように，プログラムが依存する共有ライブラリを記述
+するために，公式なバージョン管理システムが必要です．
+
+* Menu:
+
+* Interfaces::                  What are library interfaces?
+* Libtool versioning::          Libtool's versioning system.
+* Updating version info::       Changing version information before releases.
+* Release numbers::             Breaking binary compatibility for aesthetics.
+
+
+
+File: libtool-ja.info, Node: Interfaces, Next: Libtool versioning, Prev: Versioning, Up: Versioning
+
+ライブラリインターフェースとは？
+================================
+
+ライブラリのインターフェースは，以下の何か(またはそれ以上)でしょう．
+
+   * グローバル変数: 名前と型
+
+   * グローバル関数: 引数の型と数，戻り値の型，関数名
+
+   * 標準入力，標準出力，標準エラー，ファイル形式
+
+   * ソケット，パイプ，プロセス間通信のプロトコル書式
+
+スタティック関数は，ライブラリのユーザが直接利用不可能なので，インター
+フェースに数えられないことに注意してください．
+
+
+
+
+File: libtool-ja.info, Node: Libtool versioning, Next: Updating version info, Prev: Interfaces, Up: Versioning
+
+libtoolのバージョン管理システム
+===============================
+
+libtoolは独自の公式のバージョン管理システムがあります．それは，あまり柔
+軟ではありませんが，強力なバージョン管理システムで，確かに最も単純です．
+
+ライブラリとは，整数で任意に表示できるインターフェースのいくつかの組をエ
+クスポートするものだと考えて下さい．プログラムがライブラリとリンクされる
+とき，これらのインターフェースのサブセットを利用するかもしれません．
+
+プログラムが使用するインターフェースのlibtoolの記述は単純です．それは，
+結果のバイナリにある最大と最小のインターフェースの番号を符号化します
+(FIRST-INTERFACE, LAST-INTERFACE)．
+
+ダイナミックリンカは，ライブラリがFIRST-INTERFACEとLAST-INTERFACEの間の*
+すべての*インターフェースの番号をサポートする場合，プログラムがライブラ
+リとリンク可能なことを保証します．
+
+libtoolの移植性の要求が，実際に必要と言うよりは厳密なので，問題を生じる
+可能性があることに注意してください．
+
+さて，`libhello'がインターフェースの5，16，17，18，と19をサポートし，
+libtoolは`libhello'を`test'にリンクするとき使用されると仮定します．
+
+libtoolは`test'に数字5と19を符号化し，ダイナミックリンカは，5と19の間の*
+すべての*インターフェースをサポートしているライブラリのみと，`test'をリ
+ンクします．そのため，ダイナミックリンカは`libhello' と`test'をリンクす
+ることを拒否するのです！
+
+この問題を排除するために，libtoolはライブラリは，連続したインターフェー
+ス番号を宣言することのみ可能としています．そのため，`libhello'は，16 か
+ら19までのインターフェースをサポートすることを宣言するのが精一杯です．そ
+して，ダイナミックリンカは，`libhello'を`test'とリンクします．
+
+そのため，libtoolライブラリバージョンは，３つの整数で宣言されます．
+
+CURRENT
+     このライブラリで実装されている，最も新しいインターフェース番号．
+
+REVISION
+     CURRENTのインターフェースの実装番号．
+
+AGE
+     このライブラリで実装されている，最新と最古のインターフェースの違い．
+     言い換えると，ライブラリは，`CURRENT - AGE'から`CURRENT'までの番号
+     の範囲で，すべてのインターフェース番号を実装しています．
+
+2つのライブラリが，個別のCURRENTとAGEを持つ場合，ダイナミックリンカは，
+より大きいREVISION番号を選択します．
+
+
+
+
+File: libtool-ja.info, Node: Updating version info, Next: Release numbers, Prev: Libtool versioning, Up: Versioning
+
+ライブラリバージョン情報の更新
+==============================
+
+libtoolのバージョン管理システムを使用したい場合，リンクモード(*Note Link
+mode::)の時に，`-version-info'フラグを使用して，libtool にバージョン情報
+を指定する必要があります．
+
+このフラグは，`CURRENT[:REVISION[:AGE]]'の形式の引数を受け入れます．そし
+て，`-version-info 3:12:1'を渡すと，CURRENTを3，REVISIONを12，そしてAGE
+を1に設定します．
+
+REVISIONやAGEが省略された場合，デフォルトは0になります．また，AGEは
+CURRENTインターフェース番号以下にする必要があることに注意してください．
+
+ライブラリバージョン情報を更新する助けとなる規則の集合は，以下のようにな
+ります．
+
+  1. バージョン情報は，それぞれのlibtoolライブラリに対し`0:0:0'で始めて
+     ください．
+
+  2. ソフトウェアの一般へのリリースの直前にのみ，バージョン情報を更新し
+     てください．より頻繁な更新は不要で，現在のインターフェース番号が速
+     くなることを保証するだけです．
+
+  3. 前回の更新から，ライブラリソースコードが完全に変更された場合，
+     REVISIONを増加してください(`C:R:A'は`C:r+1:A'となります)．
+
+  4. 前回の更新から，インターフェースが加えられた，削除された，または変
+     更された場合，CURRENTを増加し，REVISIONを0に設定してください．
+
+  5. 前回の一般へのリリースから，あるインターフェースが削除された場合，
+     AGEを0に設定してください．
+
+  6. 前回の一般へのリリースから，あるインターフェースが削除された場合，
+     AGEを0に設定してください．
+
+パッケージのリリース番号に対応するように，インターフェース番号を設定する
+試みは**決して**しないでください．これは，ライブラリバージョンの目的の誤
+解を促進する悪習にすぎません．その代わり，`-release' フラグ(*Note
+Release numbers::)を使用しますが，パッケージが他のリリースとバイナリ互換
+でないことを警告されます．
+
+
+
+
+File: libtool-ja.info, Node: Release numbers, Prev: Updating version info, Up: Versioning
+
+リリース情報の管理
+==================
+
+プログラムをライブラリにリンクしたいユーザに明確になるように，パッケージ
+リリース名を共有ライブラリに符号化したいこともよくあります．この便利さは，
+特にGNU/Linuxで使用されます．
+
+     trick$ ls /usr/lib/libbfd*
+     /usr/lib/libbfd.a	    /usr/lib/libbfd.so.2.7.0.2
+     /usr/lib/libbfd.so
+     trick$
+
+`trick'として，`/usr/lib/libbfd.so'は`libbfd.so.2.7.0.2' へのシンボリッ
+クリンクで，それは`binutils-2.7.0.2'の一部として配布されています．
+
+ライブラリインターフェースは，リリース番号のように，滅多に同時に変更され
+す，ライブラリ接尾子はすべてのプラットフォームを跨り，すべて同じではない
+ので，残念ながらこの便利さはlibtoolのライブラリバージョンの情報の考えと
+直接衝突します．
+
+そのため，両方の見方に適応するため，`-version-info'を使用したくないライ
+ブラリに対し，リリース情報を設定するにあたり，`-release'フラグを使用する
+ことができます．`libbfd'の例では，libtoolが使用する次のリリースは，
+`-release 2.9.0'でビルドされるべきで，それは，GNU/Linuxで，以下のファイ
+ルを生成します．
+
+     trick$ ls /usr/lib/libbfd*
+     /usr/lib/libbfd-2.9.0.so     /usr/lib/libbfd.a
+     /usr/lib/libbfd.so
+     trick$
+
+この場合，`/usr/lib/libbfd.so'は`libbfd-2.9.0.so'へのシンボリックリンク
+です．これは`binutils-2.9.0'を扱っているユーザにとって，バージョン情報の
+libtoolの考えに妥協することなく，明白になります．
+
+このオプションはライブラリ名を編集することに注意し，過去のライブラリリリー
+スとのバイナリ互換を壊したくない場合は使用しないでください．一般的に，パッ
+ケージの内部ライブラリや，大変頻繁に変更されるインターフェースを持つ物に
+対してのみ`-release'を使用してください．
+
+
+
+
+File: libtool-ja.info, Node: Library tips, Next: Inter-library dependencies, Prev: Versioning, Up: Top
+
+インターフェース設計に対する助言
+********************************
+
+良いライブラリインターフェースと書くことは，多くの経験とライブラリが解決
+する問題への完全な理解が必要です．
+
+良いインターフェースを設計した場合，頻繁に変更する必要がなく，ドキュメン
+トを更新し続ける必要がなく，ユーザはライブラリの使用方法を何度も学習する
+必要がありません．
+
+ここにライブラリインターフェースの設計に関するヒントの短いリストがあり，
+それは仕事上で役立つでしょう．
+
+計画前
+     エントリポイントを頻繁に削除する必要がないように，すべてのインター
+     フェースを本当に最小限にするように試みてください．
+
+インターフェースの変更を避ける
+     エントリポイントの再設計と変更を地獄のように繰り返すのが好きな人も
+     います(注意：関数の*名前変更*はエントリポイントの変更と考えられます)．
+     インターフェースを再設計する必要がある場合，ユーザが既存のコードを
+     書き換える必要がないように，互換機能を残すことを試みてください．
+
+不透明なデータ型の使用
+     ライブラリユーザがアクセスするデータ型の定義は，少ないければ少ない
+     ほど良いでしょう．可能な場合，一般的な(内部データにキャスト可能な)
+     ポインタを受け入れる関数を設計し，ライブラリユーザが直接データを操
+     作するのを許可するのではなく，アクセスする関数を提供してください．
+     そうすることで，インターフェースを変更せずに，データ構造を変更する
+     ことが自由になります．
+
+     これは，本質的にオブジェクト指向のシステムで抽象的なデータ型と継承
+     を使用するのと同じです．
+
+ヘッダファイルの使用
+     ライブラリのグローバル関数と変数のそれぞれのドキュメントをヘッダファ
+     イルに注意して書いていて，ライブラリソースファイルに含めている場合，
+     コンパイラは偶然にインターフェースの変更の有無を知らせるでしょう
+     (*Note C header files::)．
+
+可能な場所での`static'キーワード(またはその等価物)の使用
+     ライブラリが持つグローバル関数は，減らせば減らすほど，より柔軟に変
+     更できます．スタティック関数と変数は，形式を変更したいとき変更でき
+     ます...  ユーザはそれらにアクセスできず，そのためインターフェースは
+     変更されません．
+
+* Menu:
+
+* C header files::              How to write portable include files.
+
+
+
+File: libtool-ja.info, Node: C header files, Prev: Library tips, Up: Library tips
+
+Cヘッダファイルを書く
+=====================
+
+移植性の高いCヘッダファイルを書くことは難しく，それは異なる形式のコンパ
+イラで読まれる可能性があるためです．
+
+C++コンパイラ
+     C++コンパイラは，Cより強固に形式化されているため，完全なプロトタイ
+     プで宣言された関数を要求します．C関数と変数は，名前がおかしくならな
+     いように，`extern "C"'ディレクティブで宣言する必要があります．
+     libtool でC++の使用に関連したその他の問題は，*Note C++ libraries::.
+
+ANSI Cコンパイラ
+     ANSI Cコンパイラは，C++コンパイラほど厳密ではありませんが，関数のプ
+     ロトタイプは，ヘッダファイルを`#include'したときの不必要な警告を避
+     けるため，行う方が良いでしょう．
+
+非ANSI Cコンパイラ
+     Non-ANSIコンパイラは，関数がプロトタイプされている場合，エラーを報
+     告します．
+
+これらの複雑さは，上記それぞれのコンパイラを利用可能にするため，ライブラ
+リインファーフェースヘッダで，いくつかのCプリプロセッサの魔法を使用する
+必要があることを意味します．
+
+libtool配布物の`demo'サブディレクトリの`foo.h'は，安全にシステムディレク
+トリにインストール可能な，ヘッダファイルの書き方の例を提供します．
+
+そのファイルの関連する部分は，以下のようになっています．
+
+     /* BEGIN_C_DECLS should be used at the beginning of your declarations,
+        so that C++ compilers don't mangle their names.  Use END_C_DECLS at
+        the end of C declarations. */
+     #undef BEGIN_C_DECLS
+     #undef END_C_DECLS
+     #ifdef __cplusplus
+     # define BEGIN_C_DECLS extern "C" {
+     # define END_C_DECLS }
+     #else
+     # define BEGIN_C_DECLS /* empty */
+     # define END_C_DECLS /* empty */
+     #endif
+
+     /* PARAMS is a macro used to wrap function prototypes, so that
+        compilers that don't understand ANSI C prototypes still work,
+        and ANSI C compilers can issue warnings about type mismatches. */
+     #undef PARAMS
+     #if defined (__STDC__) || defined (_AIX) \
+             || (defined (__mips) && defined (_SYSTYPE_SVR4)) \
+             || defined(WIN32) || defined(__cplusplus)
+     # define PARAMS(protos) protos
+     #else
+     # define PARAMS(protos) ()
+     #endif
+
+これらのマクロは，以下のように`foo.h'で使用されます．
+
+     #ifndef FOO_H
+     #define FOO_H 1
+
+     /* The above macro definitions. */
+     #include "..."
+
+     BEGIN_C_DECLS
+
+     int foo PARAMS((void));
+     int hello PARAMS((void));
+
+     END_C_DECLS
+
+     #endif /* !FOO_H */
+
+`#ifndef FOO_H'が，`foo.h'の本体を，与えられたコンパイルで一回以上読み込
+むことを避けることに注意してください．
+
+また，`BEGIN_C_DECLS'/`END_C_DECLS'の組の外側あるものだけが，`#include'
+行にあります．厳密にいうと，それは，保護が必要なCのシンボル名ですが，ヘッ
+ダの内容の中心周辺にこれらのマクロの単一の組がある場合，ヘッダファイルは
+より管理しやすくなります．
+
+`PARAMS'，`BEGIN_C_DECLS'，そして`END_C_DECLS'のこれらの定義を独自のヘッ
+ダで使用すべきです．そして，C++，ANSI，そして非ANSIのコンパイラ (1)
+(*Note C header files-Footnotes::)で有効なヘッダファイルを作成するために，
+それらを使用することが可能となります．
+
+移植可能なコードをネイティブに書かないでください，上記のヒントに続けるこ
+とで，最も明白な問題を無くすことに役立ちますが，明らかに別の微妙な問題が
+あります．以下の問題に対処する必要があるかもしれません．
+
+   * ANSI以前のコンパイラは，一般的なポインタ型`void *'を常にサポートす
+     るわけではなく，そこでは`char *'を使用する必要があります．
+
+   * `const'，`signed'そして`signed'キーワードは，サポートされていないコ
+     ンパイラもあり，特にANSI以前のコンパイラがあげられます．
+
+   * `long double'型は，多くのコンパイラでサポートされていません．
+
+
+
+File: libtool-ja.info  Node: C header files-Footnotes, Up: C header files
+
+(1) 我々は，`__P'，`__BEGIN_DECLS'そして`__END_DECLS'の使
+用を推奨していました．アンダースコアで始まるシンボル(とプリプロセッサマ
+クロさえも)がコンパイラの使用で予約されているので，悪いアドバイスでした．
+
+
+
+File: libtool-ja.info, Node: Inter-library dependencies, Next: Dlopened modules, Prev: Library tips, Up: Top
+
+ライブラリ内部の依存
+********************
+
+定義では，すべての共有ライブラリシステムは，シンボル解決が実行時まで延期
+されるように，実行形式をライブラリに依存させる方法を提供します．
+
+"ライブラリ内部の依存性"は，他のライブラリに依存するライブラリにあります．
+例えば，libtoolライブラリ`libhello'が`cos'関数を使用する場合，それは
+`libm'に対するライブラリ内部の依存性があり，数学ライブラリが`cos'を実装
+しています．
+
+共有ライブラリシステムには，内部で一貫した方法で，この機能を提供するもの
+もあります．これらのシステムは，潜在的に無限長の依存性の連鎖を認めます．
+
+しかし，ほとんどの共有ライブラリのシステムは，単一レベルの依存のみを認め
+るという制限があります．これらのシステムでは，プログラムは共有ライブラリ
+に依存しますが，共有ライブラリは他の共有ライブラリに依存しません．
+
+あらゆる事象で，ライブラリ内部の依存性を宣言するため，libtoolは単純なメ
+カニズムを提供します．独自のライブラリに依存するすべてのライブラリ
+`libNAME'に対しライブラリを作成するとき，対応する`-lNAME'オプションをリ
+ンク行に単純に加えます．`libm'に依存する`libhello'の例をビルドしてみます．
+
+     burger$ libtool gcc -g -O -o libhello.la foo.lo hello.lo \
+                     -rpath /usr/local/lib -lm
+     burger$
+
+プログラムを`libhello'に対しリンクするとき，`-l'オプションを再び指定する
+必要はありません．必要なライブラリがすべて見つかることを保証するため，
+libtoolがそれを行います．この制約は，静的なライブラリシステムと，単純な
+動的ライブラリシステムとの互換性を保つために必要です．
+
+AIXのように，この柔軟性さえ許可されないプラットフォームもあります．共有
+ライブラリをビルドするため，それは完全に自己内蔵型である必要があり(すな
+わち，`.lo'ファイルや`-l'で指定されたライブラリでシンボルが見つかるもの
+のみを参照する)，-NO-UNDEFINEDフラグを指定する必要があります．デフォルト
+で，libtoolはこの種のプラットフォームではスタティックライブラリのみをビ
+ルドします．
+
+1.2以前のlibtoolのリリースのコードにおける，単純に考えられたライブラリ内
+部の依存性の追跡は，ライブラリを他のライブラリとリンクすることが可能なと
+きが明白でないため，それが利用ができず，複雑な異常終了が発生します．この
+概念のより複雑な実装は，リリース1.3の前に再導入されましたが，libtoolがサ
+ポートするすべてのプラットフォームに移植されませんでした．デフォルトで，
+保守的な動作は，ライブラリが他のライブラリとリンクすることを避け，プログ
+ラムがリンクされるときのみに，その内部依存性が導入されます．
+
+
+
+
+File: libtool-ja.info, Node: Dlopened modules, Next: Using libltdl, Prev: Inter-library dependencies, Up: Top
+
+dlopenモジュール
+****************
+
+"ダイナミックリンク"の議論では，その用語が２つの異なる概念を述べるときに
+使用されるので，混乱することがあります．
+
+  1. 共有ライブラリに対しプログラムをコンパイルとリンクし，それは，ダイ
+     ナミックリンカにより実行時に自動的に解決される．この処理では，ダイ
+     ナミックリンクはアプリケーション透過です．
+
+  2. アプリケーションの，`dlopen' (1) (*Note Dlopened
+     modules-Footnotes::)のような関数の呼び出しで，それは，ユーザが指定
+     したモジュールを実行時に任意にロードします．この形式のダイナミック
+     リンクは，アプリケーションで明示的に制御されます．
+
+混乱を軽減するため，このマニュアルは２番目の形式のダイナミックリンクを
+"dlopen"モジュールとして述べることにします．
+
+dlopenモジュールの主な利点は，プログラムを拡張するために，インタプリタ言
+語を使用するのではなく，コンパイルされたオブジェクトコードにアクセスする
+能力です．実際，dlopenは，言語を拡張する効果的な方法を提供するため，イン
+タプリタ言語でよく使用されます．
+
+バージョン 1.4.2の現在は，libtoolはdlopenされるモジュールのサポートを提
+供します．しかし，パッケージがそのようなサポートを行うことを，
+`configure.in'で，マクロ`AC_LIBTOOL_DLOPEN'を使用して指示した方が良いで
+しょう．このマクロが使用されない(または`AC_PROG_LIBTOOL' の*後で*使用さ
+れる)場合，libtoolはdlopenメカニズムが利用不可能と仮定し，シミュレーショ
+ンを試みます．
+
+この章ではdlopenでアクセス可能なモジュールを生成するため，dlopenアプリケー
+ション開発者がlibtoolを使用する方法を議論します．
+
+* Menu:
+
+* Building modules::            Creating dlopenable objects and libraries.
+* Dlpreopening::                Dlopening that works on static platforms.
+* Finding the dlname::          Choosing the right file to `dlopen'.
+* Dlopen issues::               Unresolved problems that need your attention.
+
+
+File: libtool-ja.info  Node: Dlopened modules-Footnotes, Up: Dlopened modules
+
+(1) HP-UXでは異なり，`shl_load'という名の関数が使用されます．
+
+
+
+File: libtool-ja.info, Node: Building modules, Next: Dlpreopening, Prev: Dlopened modules, Up: Dlopened modules
+
+dlopenのためのモジュールのビルド
+================================
+
+オペレーティングシステムには，プログラムシンボルを`dlsym'(またはその等価)
+関数を用いて動的に解決するために，特別に宣言する必要があるものもあります．
+
+libtoolは，`-export-dynamic'と`-module'リンクフラグを提供し(*Note Link
+mode::)，それはこの宣言を行います．他のモジュールやdlopenされている
+libtoolライブラリをdlopenするアプリケーションプログラムをリンクする場合，
+これらのフラグを使用する必要があります．
+
+例えば，後でアプリケーションにdlopenされる共有ライブラリ`libhello' をビ
+ルドしたい場合，他のリンクオプションに`-module'を加えます．
+
+     burger$ libtool gcc -module -o libhello.la foo.lo \
+                     hello.lo -rpath /usr/local/lib -lm
+     burger$
+
+*実行形式*からのシンボルが，dlopenしたいライブラリの未解決の参照を満足さ
+せる必要がある場合，フラグ`-export-dynamic'を使用する必要があります．
+dlopenを呼び出す実行形式をリンクするとき，`-export-dynamic' を使用してく
+ださい．
+
+     burger$ libtool gcc -export-dynamic -o hell-dlopener main.o
+     burger$
+
+
+
+
+File: libtool-ja.info, Node: Dlpreopening, Next: Finding the dlname, Prev: Building modules, Up: Dlopened modules
+
+dlopen
+======
+
+libtoolは，dlopenするlibtoolオブジェクトとlibtoolライブラリファイルに対
+し，*たとえ`dlopen'と`dlsym'関数が無いプラットフォームでも*，そのシンボ
+ルが解決できるように，特別のサポートを提供します．
+
+"laziness"の増加順にプログラムにコードをロードする，以下の別の方法を考慮
+します．
+
+  1. 参照するしないに関わらない，実行形式の一部となるオブジェクトファイ
+     ルへのリンクです．オブジェクトファイルが見つからない場合，リンカは
+     実行形式の作成を停止します．
+
+  2. 上記のオブジェクトファイルでの未定義の参照を満足させるように，リン
+     ク時に検索されるようにするための，リンカに対するスタティックライブ
+     ラリの宣言です．スタティックライブラリが見つからない場合，リンカは
+     実行形式の作成を停止します．
+
+  3. 上記のファイルでの未定義の参照を満足させるために，実行時に検索され
+     るようにするための，実行時リンクの共有ライブラリの宣言です．共有ラ
+     イブラリが見つからない場合，ダイナミックリンカは実行形式の作成を停
+     止します．
+
+  4. アプリケーション自身が解決することができるように，参照を動的解決す
+     るdlopenモジュールです．モジュールを開くときエラーが発生したり，モ
+     ジュールが見つからない場合，アプリケーションは壊れることなく回復し
+     ます．
+
+libtoolは，コンパイル時にオブジェクトファイルをプログラムにリンクし，プ
+ログラムのシンボルテーブルを表現するデータ構造を作成することで，スタティッ
+クなプラットフォームで`-dlopen'オプションをエミュレートします．
+
+この特徴を使用するため，プログラムのリンク時(*Note Link mode::)に
+`-dlopen'や`-dlpreopen'フラグを使用することで，アプリケーションでdlopen
+したいオブジェクトを宣言する必要があります．
+
+ -- Structure: struct lt_dlsymlist  const char *NAME; lt_ptr ADDRESS; 
+     NAME属性は，`"fprintf"'のような，シンボル名のNULL終端されている文字
+     列です．ADDRESS属性は，`&fprintf'のような対応するオブジェクトへの一
+     般的なポインタです．
+
+ -- Variable: const lt_dlsymlist * lt_preloaded_symbols
+     LT_SYMBOL構造体の配列で，プログラムにリンクされる，プリロードされて
+     いるすべてのシンボルを表現します．それぞれの`-dlpreloaded'ファイル
+     に対し，ファイルのNAMEを用いた要素と，`0'のADDRESSがあり，このファ
+     イルからエクスポートされるすべてのシンボルが続きます．実行形式自身
+     に対し，特別の名前@PROGRAM@が使用されます．最後の要素は，NAMEと`0'
+     のADDRESSを持ちます．
+
+ドル記号のような，ANSI Cでは有効ではない識別子を許可するコンパイラもあり
+ます．libtoolはANSI Cで有効なシンボル(最初がASCII文字またはアンダースコ
+アで，0以上のASCII文字，数字，そしてアンダースコアが続くもの)のみ認識す
+るので，非ASCIIシンボルはLT_PRELOADED_SYMBOLSに出現しません．
+
+
+
+
+File: libtool-ja.info, Node: Finding the dlname, Next: Dlopen issues, Prev: Dlpreopening, Up: Dlopened modules
+
+dlopenで正しい名前の検索
+========================
+
+`-module'を用いてライブラリがリンクされた後，dlopen可能になります．残念
+ながら ライブラリ名が変更されるため，パッケージでdlopenの正しいファイル
+を決定する必要があります．
+
+最も率直で柔軟な実装は，インストールされた`.la'ファイルを探し，以下の行
+を検索することで実行時に決定することです．
+
+     # The name that we can `dlopen'.
+     dlname='DLNAME'
+
+DLNAMEが空の場合，ライブラリはdlopenされません．それ以外では，それでライ
+ブラリのdlnameを与えます．そのため，ライブラリが
+`/usr/local/lib/libhello.la'にインストールされていて，DLNAME が
+`libhello.so.3'の場合，`/usr/local/lib/libhello.so.3'がdlopenされます．
+
+プログラムがこのアプローチを行っている場合，ライブラリが最終的にインストー
+ルされるディレクトリと同じように，`LD_LIBRARY_PATH' (1) (*Note Finding
+the dlname-Footnotes::)環境変数でリストアップされているディレクトリで検
+索します．この変数(または同等物)を検索することで，インストール前でも，プ
+ログラムがlibtoolを使用してリンクし提供されているdlopenモジュールを見つ
+けることを保証します．
+
+
+
+File: libtool-ja.info  Node: Finding the dlname-Footnotes, Up: Finding the dlname
+
+(1) AIXでの`LIBPATH'とHP-UXでの`SHLIB_PATH'です．
+
+
+
+File: libtool-ja.info, Node: Dlopen issues, Prev: Finding the dlname, Up: Dlopened modules
+
+未解決のdlopenの問題
+====================
+
+以下の問題は，libtoolのdlopenサポートを使用しても解決しません．
+
+   * dlopen関数は一般に，共有ライブラリプラットフォームでのみ利用可能で
+     す．パッケージをスタティックなプラットフォームに移植したい場合，
+     libltdl (*Note Using libltdl::)を使用する，または，代わりとなる独自
+     のdlopenダイナミックコードを開発する必要があります．最も妥当な解決
+     方法は，`dlopen'ファミリーのラッパー関数を書くことを必要とし，それ
+     は，与えられたプラットフォームでdlopenがサポートされていないまたは
+     利用不可能なときの，パッケージ特有のトリックです．
+
+   * 関数の`dlopen'ファミリーの実装には大きな違いがあります．同じ関数名
+     を用いないプラットフォーム(特にHP-UXでは`shl_load'ファミリーを用い
+     ます)さえ存在します．
+
+   * アプリケーション開発者は，`dlopen'に渡す正しいモジュール名を発見す
+     るために，カスタムの検索関数を書く必要があります．
+
+
+
+
+File: libtool-ja.info, Node: Using libltdl, Next: Other languages, Prev: Dlopened modules, Up: Top
+
+libltdlの使用
+*************
+
+libtoolは，`libltdl'と呼ばれる小さなライブラリを提供し，それは，dlopenラ
+イブラリの様々な困難をプログラマから隠すことを目指します．それは，dlopen
+の機能で必要とされるアプリケーションとともに配布可能な，ヘッダファイルと
+小さなCソースファイルから成り立ちます．`libltdl'サービスの単純な実装に対
+し，あまりに制限が多いダイナミックリンカをもつプラットフォーム上では，
+GNU DLDを要求したり，libtoolのdlpreopenメカニズムを用いてダイナミックリ
+ンクをエミュレートするだけのものもあります．
+
+libltdlは，現在以下のダイナミックリンクメカニズムをサポートします．
+
+   * `dlopen' (Solaris，Linux，そして様々なBSD)
+   * `shl_load' (HP-UX)
+   * `LoadLibrary' (Win16とWin32)
+   * `load_add_on' (BeOS)
+   * GNU DLD (スタティックライブラリに対するダイナミックリンクのエミュレー
+     ション)
+   * libtoolのdlpreopen (*Note Dlpreopening::)
+
+以下の例外で，libltdlはGNUライブラリ公有使用許諾書の条件下でライセンスさ
+れています．
+
+     GNU Lesser General Public Licenseの特別な例外として，GNU libtoolを
+     使用してビルドされるプログラムやライブラリの一部としてこのファイル
+     を配布する場合，プログラムの残りに対して使用する配布条件と同じもの
+     にして，それを含めることができます．
+
+* Menu:
+
+* Libltdl interface::           How to use libltdl in your programs.
+* Modules for libltdl::         Creating modules that can be `dlopen'ed.
+* Thread Saftey in libltdl::	Registering callbacks for multi-thread safety.
+* User defined module data::    Associating data with loaded modules.
+* Module loaders for libltdl::  Creating user defined module loaders.
+* Distributing libltdl::        How to distribute libltdl with your package.
+
+
+
+File: libtool-ja.info, Node: Libltdl interface, Next: Modules for libltdl, Prev: Using libltdl, Up: Using libltdl
+
+プログラムでのlibltdlの使用法
+=============================
+
+libltdl APIは，強力なSolarisとLinuxのdlopenインターフェースに似ていて，
+それは，非常に簡単ですが強力です．
+
+プログラムでlibltdlを使用するために，ヘッダファイル`ltdl.h'をインクルー
+ドする必要があります．
+
+     #include <ltdl.h>
+
+libltdlの前回のリリースでは，POSIX名前空間の慣習に違反していたシンボルを，
+いくつか使用していました．これらのシンボルは，現在非難され，ここで記述さ
+れるように置換されました．古い非難されているシンボル名に依存したコードが
+ある場合，`ltdl.h'をインクルードする前に`LT_NON_POSIX_NAMESPACE'を定義す
+ると，変換されたマクロが提供されます．使用するシンボルの組が何であっても，
+新しいAPIは前回のものとバイナリ互換ではないので，このバージョンのlibltdl
+を使用するため，アプリケーションを再コンパイルする必要があるでしょう．
+
+libltdlがスレッドセーフでない，すなわち，マルチスレッドアプリケーション
+は，libtoolに対しミューテックスを使用する必要があることに注意してくださ
+い．それは，GNU/Linuxのglibc 2.0の`RTLD_LAZY'を用いた`dlopen' が(デフォ
+ルトでlibtoolを使用します)，スレッドセーフではないことが報告されています
+が，この問題は，glibc 2.1でおそらく修正されるでしょ．一方，`RTLD_NOW'は，
+FreeBSD上のマルチスレッドアプリケーションで問題が生じたと報告されていま
+す．これらの問題に関する作業は，読者の演習として残っています．貢献は，きっ
+と歓迎されます．
+
+以下の型は`ltdl.h'で定義されています．
+
+ -- Type: lt_ptr
+     `lt_ptr'は，汎用ポインタです．
+
+ -- Type: lt_dlhandle
+     `lt_dlhandle'はモジュール"ハンドル"です．すべてのlt_dlopenされるモ
+     ジュールはそれに関連付けされたハンドルがあります．
+
+ -- Type: lt_dlsymlist
+     `lt_dlsymlist'はdlpreopenされるモジュールのシンボルリストです．この
+     構造体は，*Note Dlpreopening::で記述されます．
+
+libltdlは以下の関数を提供します．
+
+ -- Function: int lt_dlinit (void)
+     libltdlを初期化します．この関数は，libltdl使用する前に呼び出す必要
+     があり，複数回呼び出すことが可能です．成功したら0，それ以外ではエラー
+     の番号を返します．
+
+ -- Function: int lt_dlexit (void)
+     libltdlを終了し，すべてのモジュールを閉じます．この関数は，
+     `lt_dlinit'が正常に呼び出された回数と同じだけ呼び出されたとき，
+     libltdlを終了するだけです．成功したら0，それ以外ではエラーの番号を
+     返します．
+
+ -- Function: lt_dlhandle lt_dlopen (const char *FILENAME)
+     ファイル名FILENAMEを用いてモジュールを開き，そのハンドルを返します．
+     `lt_dlopen'は，libtoolダイナミックモジュール，プリロードされたスタ
+     ティックモジュール，プログラム自身，そしてネイティブなダイナミック
+     ライブラリを開くことが可能です．
+
+     モジュール内の未解決のシンボルは，それが依存する(まだ実装されていな
+     い)ライブラリと，前もってdlopenされたモジュールを用いて解決されます．
+     このモジュールを使用している実行形式が`-export-dynamic'フラグでリン
+     クされている場合，実行形式の大域的なシンボルもモジュール内の参照の
+     解決に使用されます．
+
+     FILENAMEが`NULL'でプログラムが`-export-dynamic'や`-dlopen self'を用
+     いてリンクされている場合，`lt_dlopen'はプログラム自身のハンドルを返
+     し，それはそのシンボルのアクセスに使用可能です．
+
+     libltdlがライブラリを見つけられず，ファイル名FILENAMEがディレクトリ
+     コンポーネントを持たない場合，それは，以下の検索パスを(以下の順番で)，
+     さらにモジュールを検索します．
+
+       1. ユーザ定義の検索パス：
+
+          この検索パスは，関数`lt_dlsetsearchpath'と`lt_dladdsearchdir' 
+          を用いたプログラムで設定可能です．
+
+       2. libltdlの検索パス：
+
+          この検索パスは，環境変数LTDL_LIBRARY_PATHの値です．
+
+       3. システムのライブラリ検索パス：
+
+          システム依存のライブラリ検索パスです(例えば，Linuxでは
+          LD_LIBRARY_PATHになります)．
+
+     それぞれの検索パスは，例えば`"/usr/lib/mypkg:/lib/foo"'のような，コ
+     ロンで分けられた絶対的なディレクトリのリストにする必要があります．
+
+     同じモジュールが複数回ロードされた場合，同じハンドルが返されます．
+     あらゆる原因で`lt_dlopen'が失敗した場合，`NULL'が返されます．
+
+ -- Function: lt_dlhandle lt_dlopenext (const char *FILENAME)
+     ファイル名に異なるファイル名の拡張子を追加を試みる以外は，
+     `lt_dlopen'と同じです．ファイル名FILENAMEを持つファイルが見つからな
+     い場合，libltdlは，以下の拡張子の追加を試みます．
+
+       1. libtoolのアーカイブ拡張子`.la'です．
+
+       2. ホストプラットフォームの本来のダイナミックライブラリに使用され
+          る拡張子で，例えば，`.so'，`.sl'等です．
+
+     この探索手法は，本来のダイナミックライブラリの命名規則を知らないプ
+     ログラムが，そのようなライブラリを，libtoolモジュールと同様に，透過
+     的に`dlopen'することを可能にするために設計されています．
+
+ -- Function: int lt_dlclose (lt_dlhandle HANDLE)
+     モジュールHANDLEの参照カウントを減らします．ゼロになったり，このモ
+     ジュールに依存する他のモジュールがない場合，モジュールはアンロード
+     されます．成功時には0を返します．
+
+ -- Function: lt_ptr lt_dlsym (lt_dlhandle HANDLE, const char *NAME)
+     モジュールHANDLE内のアドレスを返し，そこでは，ヌルで終端された文字
+     列NAMEで与えられるシンボルがロードされています．シンボルが見つから
+     ない場合は`NULL'を返します．
+
+ -- Function: const char * lt_dlerror (void)
+     libltdlのあらゆる関数から発生した最も新しいエラーを記述する，可読性
+     の高い文字列を返します．初期化からまたは最後に呼び出されてからエラー
+     が発生していない場合，`NULL'を返します．
+
+ -- Function: int lt_dlpreload (const lt_dlsymlist *PRELOADED)
+     プリロードされているモジュールPRELOADEDのリストを登録します．
+     PRELOADEDが`NULL'の場合，`lt_dlpreload_default'で設定されているリス
+     ト以外の，これまで登録されているすべてのシンボルリストが検出されま
+     す．成功時には0を返します．
+
+ -- Function: int lt_dlpreload_default (const lt_dlsymlist *PRELOADED)
+     プリロードされているモジュールリストのデフォルトをPRELOADEDに設定し，
+     それは`lt_dlpreload'で検出されません．この関数は，`lt_dlinit'を使用
+     して初期化されるためにlibltdlを要求し*ない*ことと，デフォルトでプリ
+     ロードされるモジュールを登録するためにプログラムで使用できることに
+     注意してください．この関数を直接呼び出す代わりに，ほとんどのプログ
+     ラムはマクロ`LTDL_SET_PRELOADED_SYMBOLS'を使用します．
+
+     成功時には0を返します．
+
+ -- Macro: LTDL_SET_PRELOADED_SYMBOLS()
+     プリロードされるシンボルのデフォルトリストを設定します．プリロード
+     されるlibltdlのモジュールを初期化するために，プログラムで使用した方
+     が良いでしょう．
+
+          #include <ltdl.h>
+
+          int main() {
+            /* ... */
+            LTDL_SET_PRELOADED_SYMBOLS();
+            /* ... */
+          }
+
+ -- Function: int lt_dladdsearchdir (const char *SEARCH_DIR)
+     検索ディレクトリSEARCH_DIRをユーザー定義のライブラリ検索パスに追加
+     します．成功時には0を返します．
+
+ -- Function: int lt_dlsetsearchpath (const char *SEARCH_PATH)
+     現在のユーザ定義のライブラリ検索パスをSEARCH_PATHで置換し，それはコ
+     ロンで分けられた絶対的なディレクトリのリストにする必要があります．
+     成功時には0を返します．
+
+ -- Function: const char * lt_dlgetsearchpath (void)
+     現在のユーザ定義のライブラリ検索パスを返します．
+
+ -- Function: int lt_dlmakeresident (lt_dlhandle HANDLE)
+     モジュールを`lt_dlclose'できないように印を付けます．モジュールがプ
+     ロジェクトの中心部の機能を実装している場合，削除されるとコードが壊
+     れるので，これは役に立つはずです．成功すると0を返します．
+
+     実行しているバイナリに対するHANDLEを取得するために`lt_dlopen
+     (NULL)'を使用する場合，そのハンドルは常駐しているような印が常に付き，
+     したがってうまく`lt_dlclose'することができません．
+
+ -- Function: int lt_dlisresident (lt_dlhandle HANDLE)
+     特定のモジュールが常駐しているように印が付いているかどうか調査し，その場
+     合は1を返し，それ以外では0を返します．この関数の実行中にエラーがある場合， 
+     -1 が返され，`lt_dlerror'を用いて回収されるエラーメッセージが設定さ
+     れます．
+
+ -- Variable: lt_ptr (*) (size_t SIZE) lt_dlmalloc
+ -- Variable: void (*) (lt_ptr PTR) lt_dlfree
+     これらの変数は，デフォルトで`malloc'と`free'に設定されますが，同等
+     の機能を提供する他の関数に設定可能です．しかし，
+     `lt_dlpreopen_default'やマクロ`LTDL_SET_PRELOADED_SYMBOLS'以外のあ
+     らゆるlibltdl関数の呼び出し後に，その値を編集すべきではありません．
+
+
+
+
+File: libtool-ja.info, Node: Modules for libltdl, Next: Thread Saftey in libltdl, Prev: Libltdl interface, Up: Using libltdl
+
+`dlopen'可能なモジュールの作成
+==============================
+
+libtoolモジュールは，いくつかの例外はありますが，通常のlibtoolライブラリ
+に似ています．
+
+libtoolの`-module'スイッチを用いて，モジュールとリンクする必要があり，そ
+して，dlopenをサポートしていないプラットフォームでlibtoolがdlpreopenでき
+るよう，`-dlopen modulename.la'を用いてモジュールをdlopenするために，あ
+らゆるプログラムとリンクすべきです．モジュールが，あらゆる他のライブラリ
+に依存する場合，モジュールとリンクするときや，それをdlopenするプログラム
+をリンクするとき，それらを確実に指定してください．特定のモジュールに対し
+*Note Versioning::を使用禁止にしたい場合，`-avoid-version'スイッチを用い
+てリンクすべきです．libtoolモジュールは，"lib"接頭辞が不要なことに注意し
+てください．しかし，automake 1.4やそれ以降のものは，そのようなモジュール
+のビルドが必要です．
+
+通常，その内部を知る必要なしにプログラムがdlopenできるよう，一組のモジュー
+ルは同じインターフェース提供し，すなわち同じシンボルをエクスポートします．
+すべてのエクスポートされたシンボルで，シンボルの衝突を避けるため，
+"modulename_LTX_"を前置する必要があります(`modulename'はモジュール名です)．
+内部シンボルは，例えば"_modulename_"を前置するといった，他のモジュールと
+衝突しないような方法で命名する必要があります．一回以上宣言された，同じシ
+ンボルを持つことをサポートするシステムもありますが，それは通常移植性がな
+く，そのようなモジュールをdlpreopenすることを不可能にします．libltdlは，
+シンボルの本当の名前を得るとき，自動的に接頭辞を切り取ります．さらに，非
+libtoolモジュールもdlopenできるよう，接頭辞を使用していないモジュールを
+サポートします．
+
+`foo1.c'は移植可能なlibtoolモジュールの例です．エクスポートされたシンボ
+ルは"foo1_LTX_"，内部シンボルは"_foo1_"が前置されています．コードの可読
+性を高めるため，エイリアスは最初に定義されています．
+
+     /* aliases for the exported symbols */
+     #define foo	foo1_LTX_foo
+     #define bar	foo1_LTX_bar
+
+     /* a global variable definition */
+     int bar = 1;
+
+     /* a private function */
+     int _foo1_helper() {
+       return bar;
+     }
+
+     /* an exported function */
+     int foo() {
+       return _foo1_helper();
+     }
+
+`Makefile.am'は，モジュール`foo1.la'をビルドするのに必要な規則を含んでい
+ます．
+
+     ...
+     lib_LTLIBRARIES = foo1.la
+
+     foo1_la_SOURCES = foo1.c
+     foo1_la_LDFLAGS = -module
+     ...
+
+
+
+
+File: libtool-ja.info, Node: Thread Saftey in libltdl, Next: User defined module data, Prev: Modules for libltdl, Up: Using libltdl
+
+マルチスレッド環境でのlibtldlの使用
+===================================
+
+`lt_dlmutex_register()'関数を使用し，適切なコールバック関数の定義を提供
+することで，libltdlをマルチスレッド環境で使用することが可能です．
+
+ -- Type: void lt_dlmutex_lock (void)
+     これは，ミューテックスロックが必要なlibltdlの実装コードの部分の，最
+     初に呼び出される関数のアドレスを持っている，関数のポインタ型です．
+
+     libltdlは本質的に再帰的なので，これらのコールバック関数によって使用
+     されるロックメカニズムがリエントリー可能であることは重要で，そうで
+     なければ，おかしな問題が発生します．
+
+ -- Type: void lt_dlmutex_unlock (void)
+     アンロック関数に一致する型です．
+
+ -- Type: void lt_dlmutex_seterror (const char *ERROR);
+     libltdl APIの関数の多くは，エラーを発生したクライアントを示す，特殊
+     な戻り値をとります．通常(シングルスレッドアプリケーションでは)，内
+     部から回収することができるエラーを記述する文字列は，`lt_dlerror()'
+     に保存されます．
+
+     この形式の関数は，それがマルチスレッドのコンテクストで動作するよう
+     に，ライブラリに登録される必要があります．関数は，スレッドローカル
+     ストレージに渡されるあらゆるエラーメッセージを保存すべきです．
+
+ -- Type: const char * lt_dlmutex_geterror (void)
+     スレッドローカルのストレージに，最後にエラーメッセージを保存したも
+     のに関連するコールバック関数に一致する型です．
+
+     正しく登録されたとき，クライアントに対するエラーメッセージを回収す
+     るために，全てのスレッドから`lt_dlerror())'によって，この関数は使用
+     されます．
+
+ -- Function: int lt_dlmutex_register (lt_dlmutex_lock *LOCK, lt_dlmutex_unlock *UNLOCK, lt_dlmutex_set_error *SETERROR, lt_dlmutex_geterror *GETERROR)
+     libltdlのマルチスレッドの準備で，上記のそれぞれの関数の型を登録する
+     ために，この関数を使用してください．全ての引数は，有効な`NULL'でな
+     い関数アドレスにする必要があり，また，そうでない場合は，シングルス
+     レッドオペレーションへの戻り値として，全て`NULL'にする必要がありま
+     す．
+
+
+
+
+File: libtool-ja.info, Node: User defined module data, Next: Module loaders for libltdl, Prev: Thread Saftey in libltdl, Up: Using libltdl
+
+ロードされたモジュールに関連するデータ
+======================================
+
+libltdlが管理している，それぞれのロードされたモジュールに関する内部情報
+には，ユーザが利用可能なものもあり，それは以下のような構造体の形式です．
+
+ -- Type: struct lt_dlinfo  char *FILENAME; char *NAME; int REF_COUNT; 
+     `lt_dlinfo'は，モジュールの情報を保存するために使用されます．
+     FILENAME属性は，`NULL'で終端された，実際のモジュールファイル名の文
+     字列です．モジュールがlibtoolモジュールの場合，NAMEはそのモジュール
+     名(例えば，`"dir/libfoo.la"'に対する`"libfoo"')で，それ以外では
+     `NULL'に設定されます．REF_COUNT属性は，現在ロードされている同じモ
+     ジュールの回数を記述する参照カウンタです．
+
+以下の関数は，与えられたHANDLEに対するこの構造体のlibltdlの内部のコピー
+へのポインタを返します．
+
+ -- Function: const lt_dlinfo * lt_dlgetinfo (lt_dlhandle HANDLE)
+     モジュールHANDLEに関するいくつかの情報を含む構造体の，ポインタを返
+     します．構造体の内容は編集してはなりません．失敗時には`NULL'が返り
+     ます．
+
+さらに，ロードした全てのモジュールのハンドルリストを保持する手助けをする
+ために，これらの関数で，ロードされているモジュールのlibltdlのリスト全体
+を繰り返すことが可能となります．
+
+ -- Function: int lt_dlforeach (int (*FUNC) (lt_dlhandle HANDLE, lt_ptr DATA), lt_ptr DATA)
+     ロードされているそれぞれのモジュールに対し関数FUNCを呼び出します．
+     引数のHANDLEは，ロードされているモジュールのハンドルの一つで，DATA
+     は，`lt_dlforeach'に渡すDATA引数です．FUNCがハンドルの一つに対し，
+     ゼロでない値を返すとすぐに，`lt_dlforeach'はFUNCの呼び出しを停止し，
+     直ちに１を返します．それ以外は0が返ります．
+
+ -- Function: lt_dlhandle lt_dlhandle_next (lt_dlhandle place)
+     PLACEが`NULL'の場合は，リスト内の最初のハンドルを返し，そして順番に
+     次ものを呼び出すことで，ロードされているモジュール全体を繰り返しま
+     す．PLACEが，ロードされているモジュールリスト内の最後の要素の場合，
+     この関数は`NULL'を返します．
+
+もちろん，アプリケーションの目的のために，それぞれのハンドルに関連付けす
+る必要があるデータがある場合，libltdlで管理されるリストと平行して，ロー
+ドされたモジュールハンドルの独自のリストの管理が必要になります．しかし，
+個別のモジュールハンドルを用いたアプリケーションデータに，ロードされたも
+のとして関連付けさせるために，以下のAPIの呼び出しを使用する場合には，実
+際にはそうする必要はありません．前もって保存したデータを回収するために後
+で利用するlibltdlからのユニークな呼び出しidを，最初に取得する必要があり
+ます．これで，ロードされているモジュールに対する独自のデータを個別に保存
+したい異なるライブラリが，もう一つの(ライブラリ)のデータへのインターフェー
+スなしでそれを行うことが可能となります．
+
+ -- Type: lt_dlcaller_id
+     個別のデータセットのキーを保つ，透過でない型です．
+
+ -- Function: lt_dlcaller_id lt_dlcaller_register (void)
+     モジュールデータ毎に個別のセットを，保存し回収するためのユニークな
+     キーを取得するために，これを使用してください．
+
+ -- Function: lt_ptr lt_dlcaller_set_data (lt_dlcaller_id KEY, lt_dlhandle HANDLE, lt_ptr DATA)
+     後で回収するために，KEYとHANDLEにユニークに関連付けされたデータのセッ
+     トとして，DATAを設定します．この関数は，以前に関連付けされたKEYと
+     HANDLEがある場合は，そのDATAを返します．0の結果は，前回のエラー(が
+     存在する場合)に対する診断結果が，`lt_dlerror()' で利用可能であるこ
+     とを示している可能性があります．
+
+     例えば，いくつかの関連データを正しく削除するために，以下のようにし
+     ます．
+
+              lt_ptr stale = lt_dlcaller_set_data (key, handle, 0);
+              if (stale == NULL)
+                {
+                  char *error_msg = lt_dlerror ();
+
+                  if (error_msg != NULL)
+                    {
+                      my_error_handler (error_msg);
+                      return STATUS_FAILED;
+                    }
+                }
+              else
+                {
+                  free (stale);
+                }
+
+ -- Function: lt_ptr lt_dlcaller_get_data (lt_dlcaller_id KEY, lt_dlhandle HANDLE)
+     KEYとHANDLEに関連付けされているDATAのアドレス，または，無い場合は
+     `NULL'を返します．
+
+ここまでの関数は，アプリケーションにロードされたりアンロードされたりした
+モジュールを追跡させる必要なく，オペレーションの検索と適用を実装するため
+に，`lt_dlforeach'と組み合わせることが可能です．
+
+     int
+     my_dlcaller_callback (lt_dlhandle handle, lt_ptr key_ptr)
+     {
+       struct my_module_data *my_data;
+
+       my_data = lt_dlcaller_get_data (handle, (lt_dlcaller_id) *key_ptr);
+
+       return process (my_data);
+     }
+
+     int
+     my_dlcaller_foreach (lt_dlcaller_id key)
+     {
+       lt_dlforeach (my_dlcaller_callback, (lt_ptr) &key);
+     }
+
+
+
+
+File: libtool-ja.info, Node: Module loaders for libltdl, Next: Distributing libltdl, Prev: User defined module data, Up: Using libltdl
+
+新しいモジュールローダの作成方法と登録方法
+==========================================
+
+モジュールにアクセスするためのlibltdlの方法は多いけれど，プロジェクトの
+目的に十分でないときもあります．独自のローダを書き，`lt_dlopen'が利用で
+きるように，libltdlでそれを登録することが可能です．
+
+ローダを書くことは，`lt_dlopen'，`lt_dlsym'そして`lt_dlclose'で呼び出し
+可能な，少なくとも3つの関数を書くことを必要とします．オプションで，
+`lt_dlexit'が実行されるときクリーンアップ処理を実行する終了関数と，
+`lt_dlsym'に渡されるあらゆるシンボルに前置されるシンボルの前置文字を提供
+することも可能です．これらの関数は，以下の関数のポインタ型に一致する必要
+があり，その後，それらを`lt_user_dlloader'の代わりに関連付けし，登録する
+ことが可能です．
+
+ローダの登録には，`lt_dlloader_find'が認識でき，`lt_dlloader_remove'で削
+除できるように，それに対する名前を選択することが必要です．選択した名前は
+ユニークである必要があり，libltdlの組み込みローダで既に使用しているもの
+はいけません．
+
+"dlopen"
+     存在する場合は，システムのダイナミックローダ．
+"dld"
+     libltdlがビルドされたときに`libdld'がインストールされている場合は，
+     GNU dldローダ．
+"dlpreload"
+     プリロードされているスタティックモジュールの`lt_dlopen'のためのロー
+     ダ．
+
+前置される"dl"は，libltdlの将来のバージョンで提供されるローダとして予約
+されているので，独自のローダ名に使用すべきではありません．
+
+以下の型は，`ltdl.h'で定義されています．
+
+ -- Type: lt_module
+     `lt_module'はモジュール依存のdlloaderです．ダイナミックモジュールロー
+     ダの拡張は，これらの低レベルの型を使用して通信を行ないます．
+
+ -- Type: lt_dlloader
+     `lt_dlloader'はモジュールローダの型に対するハンドルです．
+
+ -- Type: lt_dlloader_data
+     `lt_dlloader_data'はローダのインスタンスデータに対して使用されます．
+
+ -- Type: struct lt_user_dlloader const char *SYM_PREFIX; lt_module_open *MODULE_OPEN;lt_module_close *MODULE_CLOSE; lt_find_sym *FIND_SYM; lt_dlloader_exit *DLLOADER_EXIT; lt_dlloader_data DLLOADER_DATA; 
+     ダイナミックモジュールを開くために新しい方法を定義したくて，それを
+     使用した`lt_dlopen' APIがある場合，これらの構造体のインスタンスを作
+     成し，それを`lt_dlloader_add'に渡す必要があります．好みの
+     DLLOADER_DATAフィールドで渡すことが可能で，それは，関数ポインタフィー
+     ルドで指定されている，それぞれの関数への最初のパラメータの値として
+     戻ります．
+
+ -- Type: lt_module lt_module_open (lt_user_data LOADER_DATA, const char *FILENAME)
+     `lt_dlloader'モジュールローダに対するローダ関数の型です．`struct
+     lt_user_dlloader'構造体のdlloader_dataフィールドに設定される値は，
+     LOADER_DATAパラメータで，この関数に渡されます．そのような関数の実装
+     は，指名されたモジュールのロードを試み，関連する`lt_module_close'と
+     `lt_sym_find'関数のポインタに渡すのに適切な`lt_module'を返すべきで
+     す．関数が失敗した場合は`NULL'を返し，`lt_dlseterror'を用いてエラー
+     メッセージを設定すべきです．
+
+ -- Type: int lt_module_close (lt_dlloader_data LOADER_DATA, lt_module MODULE)
+     ユーザが定義したモジュールローダに対するアンローダの型です．そのよ
+     うな関数の実装は，MODULEモジュールに結び付けられたあらゆるリソース
+     の解放を試み，その後でメモリからアンロードすべきです．理由があって
+     関数が失敗した場合，`lt_dlseterror'を用いてエラーメッセージを設定し，
+     ゼロ以外を返すべきです．
+
+ -- Type: lt_ptr lt_find_sym (lt_user_data LOADER_DATA, lt_module MODULE, const char *SYMBOL)
+     ユーザが定義したモジュールローダに対する，シンボルルックアップ関数
+     の型です．そのような関数の実装は，モジュールMODULE内の指名された
+     SYMBOLのアドレスを返す，もしくは，検査が失敗した場合は，エラーメッ
+     セージを`lt_dlseterror'で設定し，`NULL'を返すべきです．
+
+ -- Type: int lt_dlloader_exit (lt_user_data LOADER_DATA)
+     ユーザが定義したモジュールローダに対する，終了関数の型です．そのよ
+     うな関数の実装は，ローダに関連するあらゆるリソースを解放すべきで，
+     それには`lt_user_dlloader'の`dlloader_data'フィールド内部にあるユー
+     ザが指定したあらゆるデータを含みます．`NULL'でない場合は，関数は
+     `lt_dlexit'と`lt_dlloader_remove'から呼び出されます．
+
+例えば，以下のようにします．
+
+     int
+     register_myloader (void)
+     {
+       lt_user_dlloader dlloader;
+
+       /* User modules are responsible for their own initialisation. */
+       if (myloader_init () != 0)
+         return MYLOADER_INIT_ERROR;
+
+       dlloader.sym_prefix    = NULL;
+       dlloader.module_open   = myloader_open;
+       dlloader.module_close  = myloader_close;
+       dlloader.find_sym      = myloader_find_sym.
+       dlloader.dlloader_exit = myloader_exit;
+       dlloader.dlloader_data = (lt_user_data)myloader_function;
+
+       /* Add my loader as the default module loader. */
+       if (lt_dlloader_add (lt_dlloader_next (NULL), &dlloader, "myloader") != 0)
+         return ERROR;
+
+       return OK;
+     }
+
+ローダに対する必要な初期化がある場合は，ローダが登録される前に手動で実行
+する必要があることに注意してください -- libltdlはユーザローダの初期化を
+扱いません．
+
+終了はlibltdlで扱われ*ます*が，`dlloader_exit'のコールバックが初期化フェー
+ズの間に要求された，あらゆるリソースを解放することを確かめることは重要で
+す．
+
+libltdlは，独自のモジュールローダを書くために，以下の関数を提供します．
+
+ -- Function: int lt_dlloader_add (lt_dlloader *PLACE, lt_user_dlloader *DLLOADER, const char *LOADER_NAME)
+     新しいモジュールローダを全てのローダリストに加え，それは，(PLACEが
+     `NULL'の場合は)最後のローダとして，それ以外ではPLACEとして渡された
+     ローダの直前に加えます．LOADER_NAMEは，新しく登録されたローダが渡さ
+     れた場合，`lt_dlloader_name'を返します，これらのLOADER_NAMEは，ユニー
+     クである必要があり，そうでない場合は，`lt_dlloader_remove'と
+     `lt_dlloader_find'は動作不可能です．成功に対し0を返します．
+
+          {
+            /* Make myloader be the last one. */
+            if (lt_dlloader_add (NULL, myloader) != 0)
+              perror (lt_dlerror ());
+          }
+
+ -- Function: int lt_dlloader_remove (const char *LOADER_NAME)
+     ユニークな名前LOADER_NAMEで識別されているローダを削除します．これが
+     成功可能となる前に，指名されたローダにより開かれている全てのモジュー
+     ルを，閉じておく必要があります．成功に対し0を返し，それ以外では，エ
+     ラーメッセージが`lt_dlerror'から取得可能です．
+
+          {
+            /* Remove myloader. */
+            if (lt_dlloader_remove ("myloader") != 0)
+              perror (lt_dlerror ());
+          }
+
+ -- Function: lt_dlloader * lt_dlloader_next (lt_dlloader *PLACE)
+     ローダモジュール全体を繰り返し，それは，PLACEが`NULL'の場合は最初の
+     ローダを返し，順番に次を呼び出すことで行います．ハンドルは，
+     `lt_dlloader_add'用です．
+
+          {
+            /* Make myloader be the first one. */
+            if (lt_dlloader_add (lt_dlloader_next (NULL), myloader) != 0)
+              return ERROR;
+          }
+
+ -- Function: lt_dlloader * lt_dlloader_find (const char *LOADER_NAME)
+     LOADER_NAME識別子に一致する最初のローダを返し，識別子が見つからない
+     場合は`NULL'を返します．
+
+     libltdl自身で使用可能な識別子は，ホストアーキテクチャがサポートして
+     いる場合は"dlopen" (1) (*Note Module loaders for
+     libltdl-Footnotes::)，"dld"，そして"dlpreload"です．
+
+          {
+            /* Add a user loader as the next module loader to be tried if
+               the standard dlopen loader were to fail when lt_dlopening. */
+            if (lt_dlloader_add (lt_dlloader_find ("dlopen"), myloader) != 0)
+              return ERROR;
+          }
+
+ -- Function: const char * lt_dlloader_name (lt_dlloader *PLACE)
+     `lt_dlloader_next'や`lt_dlloader_find'で取得される，PLACEの識別名を
+     返します．この関数が失敗する場合，`NULL'を返し，`lt_dlerror'で回収
+     するためのエラーを設定します．
+
+ -- Function: lt_user_data * lt_dlloader_data (lt_dlloader *PLACE)
+     `lt_dlloader_next'や`lt_dlloader_find'で取得される，PLACEのアドレス
+     を返します．この関数が失敗する場合，`NULL'を返し，`lt_dlerror'で回
+     収するためのエラーを設定します．
+
+
+
+ユーザモジュールローダでのエラー処理
+------------------------------------
+
+ -- Function: int lt_dladderror (const char *DIAGNOSTIC)
+     この関数で，独自のエラーメッセージを`lt_dlerror'に組み込むことが可
+     能となります．`lt_dlerror'で返すための適切な診断メッセージに渡すも
+     のと，`lt_dlseterror'で使用されるエラー識別子が返されます．
+
+     識別子の割り当てが失敗した場合，この関数は-1を返します．
+
+          int myerror = lt_dladderror ("Doh!");
+          if (myerror < 0)
+            perror (lt_dlerror ());
+
+ -- Function: int lt_dlseterror (int ERRORCODE)
+     独自のモジュールローダを書くとき，`lt_dlerror'インターフェースを通
+     じて伝搬されるようにエラーを発生させるために，この関数を使用すべき
+     です．libltdlで使用される標準エラーの全ては，`ltdl.h'で宣言されてい
+     て，そうでなければ，`lt_dladderror'を用いて独自に書き加えることが可
+     能です．
+
+          if (lt_dlseterror (LTDL_ERROR_NO_MEMORY) != 0)
+            perror (lt_dlerror ());
+
+
+
+File: libtool-ja.info  Node: Module loaders for libltdl-Footnotes, Up: Module loaders for libltdl
+
+(1) これは，モジュールをロードしているAPI に依存します -- 例え
+ば，`shl_load'と`LoadLibrary'です
+
+
+
+File: libtool-ja.info, Node: Distributing libltdl, Prev: Module loaders for libltdl, Up: Using libltdl
+
+パッケージとともにlibltdlを配布する方法
+=======================================
+
+libltdlはlibtoolとともにインストールされるのですが，libtoolやlibltdlをイ
+ンストールしていないパッケージユーザの利便性のため，パッケージの配布物に
+libltdlを含めたいと思うかもしれません．この場合，手動でパッケージに加え
+る`ltdl'オブジェクト，または，使用したいlibltdlの特色を決定する必要があ
+ります．それは，便利なライブラリやインストール可能なlibtoolライブラリで
+す．
+
+`libltdl'をッケージに加える最も簡単な方法は，ソースファイルの`ltdl.c'と
+`ltdl.h'をパッケージのソースディレクトリにコピーし，ソースの残りと一緒に
+リンクすることです．これの手助けをするため，autoconf のm4マクロが
+`ltdl.m4'で利用可能です．autoconfを実行する前に，それらが`aclocal.m4'で
+利用可能かどうかを確かめる必要があります -- automakeを使用している場合は
+`ltdl.m4'の内容を`acinclude.m4'に加え，そうでない場合は`aclocal.m4'に加
+えます．マクロを利用可能にした後，`ltdl.o'を正しくビルドするために必要な
+コンフィグレーション時の調査を実行するため，`AC_LIB_LTDL'マクロの呼び出
+しを，パッケージの`configure.in'に加える必要があります．インストールされ
+ているlibltdl やlibltdlに依存しているライブラリと，パケージのバイナリを
+リンクしようとする場合，この手法には問題があります．シンボルの二重定義の
+問題があるかもしれません．
+
+便利なライブラリの利点の一つは，インストールされていないということなので，
+libtoolを使用するという事実はユーザにとって明白ではなく，ユーザが以前に
+インストールしているlibtoolのバージョンを上書きしません．一方，(例えば，
+バグフィックスといった)理由があり，libltdlをアップグレードしたい場合，イ
+ンストールされているバージョンのlibtoolを置き換える代わりに，パッケージ
+を再コンパイルする必要があります．しかし，プログラムやライブラリが以前に
+インストールされているバージョンのlibltdlを使用しているライブラリとリン
+クする場合，リンカエラーが発生し実行時にクラッシュするかもしれません．も
+う一つの問題は，一つ以上のlibtoolライブラリへ便利なライブラリをリンクで
+きないことで，複製されたシンボルを得る可能性があるので，そのときは，これ
+らのライブラリを用いた単一のプログラムとリンクしてください．一般的に，
+libtoolを使用している他のライブラリに依存しないプログラムでは，便利なラ
+イブラリを問題なく使用可能です．libltdlのこの特徴を利用可能にするため，
+`AC_LIBLTDL_CONVENIENCE'行を`configure.in'に，`AC_PROG_LIBTOOL'の*前に*
+加えた方が良いでしょう．
+
+インストール可能なバージョンのlibltdlを選択するために，マクロ
+`AC_LIBLTDL_INSTALLABLE'の呼び出しを`configure.in'に，`AC_PROG_LIBTOOL'
+の*前に*加えた方が良いでしょう．このマクロは，libltdlが既にインストール
+されているかどうか調査し，そうでない場合，ビルドしインストールされるパッ
+ケージlibltdlを埋め込むことを要求します．しかし，バージョン調査は実行さ
+れないことに注意してください．ユーザは，コンフィグレーションスイッチ
+`--enable-ltdl-install'を使用することで，他のバージョンの存在に関係なく，
+テストを優先し，埋め込まれたlibtoolをインストールする必要があるか決定す
+ることができます．
+
+libtoolをパッケージに埋め込むため，`libtoolize'コマンドラインに`--ltdl'
+のみ加えてください．それで，パッケージのサブディレクトリ`libltdl'に
+libtoolのソースをコピーします．どちらのマクロも，`libltdl'ディレクトリの
+位置を指定する追加の引数を受け入れます．デフォルトで，どちらのマクロも
+`${top_srcdir}/libltdl'を仮定します．
+
+どのマクロを使用しても，`configure.in'は`AC_CONFIG_SUBDIRS'を使用して，
+libltdlをコンフィグレーションし，`Makefile'が，例えば，automakeのSUBDIRS
+を使用して，libtoolのディレクトリでサブmakeを開始することを確実にするの
+はあなたです．どちらのマクロも，libltdlでリンクするために使用するリンク
+フラグのシェル変数LIBLTDLと，`ltdl.h'をインクルードするプログラムをコン
+パイルするために使用するプリプロセッサフラグINCLTDLを定義します．この変
+数が`Makefile'で利用可能にすることを確実にするため`AC_SUBST'を使用したり，
+デフォルトで`AC_SUBST'される，LIBSとCPPFLAGSのような変数に加えるのはあな
+た次第です．
+
+便利なlibltdlを使用している場合，LIBLTDLは便利なlibltdlのバージョンに対
+するパス名で，INCLTDLはlibltdlを含むディレクトリが続く`-I'になり，どちら
+も`${top_builddir}/'，または，`${top_srcdir}/'で，それぞれ始まります．
+
+インストールされているlibltdlのバージョンを要求し，それが見つかった場合 
+(1) (*Note Distributing libltdl-Footnotes::)，LIBLTDLは`-lltdl' に，
+INCLTDLは空に設定されます(それは，libltdlがライブラリパスにある場合，
+`ltdl.h'がインクルードパスのどこかにあるという，暗黙の仮定です)．インス
+トール可能なlibltdlのバージョンをビルドする必要がある場合，
+`${top_builddir}/'で始まるそのパス名は，LIBLTDLに保存され，INCLTDLは便利
+なライブラリの場合と同様に設定されます．
+
+そのため，libltdlとプログラムをリンクしたいときは，それをインストールさ
+れたまたはインストール可能な便利なライブラリにし，すなわち，libtoolを使
+用して，`$(INCLTDL)'を用いてコンパイルし，`$(LIBLTDL)'を用いてリンクして
+ください．
+
+おそらく`AC_LIBTOOL_DLOPEN'も`configure.in'に，`AC_PROG_LIBTOOL'の*前に*
+加えた方が良く，そうしない場合は，libtoolはdlopenメカニズムがサポートさ
+れていないと仮定し，おそらく希望していないdlpreopenに逆戻りします．
+
+libltdlとプログラムをリンクするとき，`-static'や`-all-static' スイッチの
+使用を避けてください．dlopen関数はスタティックリンクに対して利用可能でな
+い可能性があるので，これはすべてのプラットフォームで動作するわけではあり
+ません．
+
+以下の例は，パッケージに便利なlibltdlを埋め込む方法を示します．インストー
+ル可能な形態を使用するために，`AC_LIBLTDL_CONVENIENCE'を
+`AC_LIBLTDL_INSTALLABLE'で置換してください．我々は，libltdlが`libtoolize
+--ltdl'を使用して埋め込まれていると仮定しています．
+
+configure.inは以下のようになります．
+     ...
+     dnl Enable building of the convenience library
+     dnl and set LIBLTDL accordingly
+     AC_LIBLTDL_CONVENIENCE
+     dnl Substitute INCLTDL and LIBLTDL in the Makefiles
+     AC_SUBST(INCLTDL)
+     AC_SUBST(LIBLTDL)
+     dnl Check for dlopen support
+     AC_LIBTOOL_DLOPEN
+     dnl Configure libtool
+     AC_PROG_LIBTOOL
+     dnl Configure libltdl
+     AC_CONFIG_SUBDIRS(libltdl)
+     ...
+
+Makefile.amは以下のようになります．
+     ...
+     SUBDIRS = libltdl
+
+     INCLUDES = $(INCLTDL)
+
+     myprog_LDFLAGS = -export-dynamic
+     # The quotes around -dlopen below fool automake <= 1.4 into accepting it
+     myprog_LDADD = $(LIBLTDL) "-dlopen" self "-dlopen" foo1.la
+     myprog_DEPENDENCIES = $(LIBLTDL) foo1.la
+     ...
+
+
+
+File: libtool-ja.info  Node: Distributing libltdl-Footnotes, Up: Distributing libltdl
+
+(1) たとえ，libltdlがインストールされていても，libltdlがCライブラリ以外
+のライブラリが提供するシンボルに依存する場合，
+`AC_LIBLTDL_INSTALLABLE'は検出に失敗する可能性があります．この場合，
+libltdlのビルドとインストールは不必要です．
+
+
+
+File: libtool-ja.info, Node: Other languages, Next: Troubleshooting, Prev: Using libltdl, Up: Top
+
+他の言語でlibtoolを使用する
+***************************
+
+libtoolは最初に，C言語での共有ライブラリを書くことに対するサポートを加え
+るために実装されました．しかし，時間が経ち，プログラマが好みのプログラム
+言語での共有ライブラリの便利さを自由に得られるように，libtoolは他の言語
+と統合されています．
+
+この章は，libtoolが他の言語と相互作用する方法と，Cを用いない場合に必要と
+される特記事項を記述します．
+
+* Menu:
+
+* C++ libraries::
+
+
+
+File: libtool-ja.info, Node: C++ libraries, Prev: Other languages, Up: Other languages
+
+C++に対するライブラリを書く
+===========================
+
+C++コードのライブラリを作成することは，そのオブジェクトファイルがCのもの
+と３つの点で異なっているだけので，かなり簡単な処理になります．
+
+  1. 名前をmangleするため，C++ライブラリはC++コンパイラで作成されたもの
+     だけ利用可能です．この決定は，コンストラクタ，例外処理，そしてRTTI
+     のような機能の実装との衝突からユーザを守るため，C++の設計者によって
+     なされました．
+
+  2. システムによっては，ダイナミックリンカが動的(すなわち実行時)に初期
+     化の実行するため，C++コンパイラは特別な動作を行なう必要があります．
+     これは，そのようなライブラリとリンクするため，`ld'を直接呼び出すべ
+     きではなく，その代わりにC++コンパイラを使用するべきだということを意
+     味します．
+
+  3. C++コンパイラは，いくつかの標準C++ライブラリとデフォルトでリンクし
+     ますが，libtoolは，これらのライブラリがどれかを知らないため，それに
+     対してリンクする方法を調査するため，ライブラリ内部の依存の解析さえ
+     実行できません．それゆえ，C++プログラムやライブラリとリンクするため
+     `ld'を実行すると失敗すると思われます．しかし，C++コンパイラを直接実
+     行することは，ライブラリ内部の依存に関係する問題を生じる可能性があ
+     ります．
+
+結論として，libtoolはC++ライブラリに対する一般的な使用のための準備ができ
+ていません．標準Cコンパイラでコンパイルする場合は，"初期化要素は一定では
+ない"というエラーの原因となる，あらゆるグローバルまたはスタティック変数
+の初期化を避けるべきです．
+
+この問題に関して動作する他の方法もありますが，それらはこのマニュアルの範
+囲を越えています．
+
+さらに，C++コンパイラがデフォルトでリンクするC++標準ライブラリと，リンク
+コマンドラインの明示的なリストは，コンフィグレーション時に分かった方が良
+いでしょう．たぶん将来，libtoolはこの仕事を単独で可能となるでしょう．
+
+
+
+
+File: libtool-ja.info, Node: Troubleshooting, Next: Maintaining, Prev: Other languages, Up: Top
+
+トラブルシューティング
+**********************
+
+libtoolは，現在のオペレーティングシステムで最新を保つよう変更しながら，
+コンスタントに開発されていています．libtoolがプラットフォーム上で思った
+ように動作しない場合，問題点と解決方法を決定する助けとなる，この章を読ん
+だ方が良いでしょう．
+
+* Menu:
+
+* Libtool test suite::          Libtool's self-tests.
+* Reporting bugs::              How to report problems with libtool.
+
+
+
+File: libtool-ja.info, Node: Libtool test suite, Next: Reporting bugs, Prev: Troubleshooting, Up: Troubleshooting
+
+libtoolのテストスイート
+=======================
+
+libtoolは，その能力をテストし，libtoolプログラムの明らかなバグを報告する，
+プログラムの独自のセットとともにあります．これらのテストは，libtoolの過
+去の問題と他のオペレーティングシステム内の既知の欠陥を基にして，絶えず進
+化もしています．
+
+`INSTALL'ファイルに記述されているように，libtoolのビルド後，基本的な機能
+要求に合っていることを確めるために，`make check'を実行することが可能です．
+
+* Menu:
+
+* Test descriptions::           The contents of the test suite.
+* When tests fail::             What to do when a test fails.
+
+
+
+File: libtool-ja.info, Node: Test descriptions, Next: When tests fail, Prev: Libtool test suite, Up: Libtool test suite
+
+テストスイートの記述
+--------------------
+
+テストスイートの現在のプログラムと，それらがテストするもののリストは以下
+のようになっています．
+
+
+`cdemo-conf.test'
+`cdemo-exec.test'
+`cdemo-make.test'
+`cdemo-static.test'
+`cdemo-shared.test'
+     これらのプログラムは，libtool配布物の`cdemo'サブディレクトリが，正
+     しくコンフィグレーションされ，ビルドされることを知るために調査しま
+     す．
+
+     `cdemo'サブディレクトリは，libtoolの便利なライブラリのデモンストレー
+     ションと，ビルド時にスタティックライブラリの作成を可能とするメカニ
+     ズムを含んでいて，コンポーネントが共有ライブラリであったとしても，
+     プログラムや他のライブラリと遅れてリンクされることを可能とする方法
+     です．
+
+     `cdemo-make.test'と`cdemo-exec.test'のテストは，３つの異なるlibtool
+     コンフィグレーションで，３回実行されます．`cdemo-conf.test' は，ス
+     タティックライブラリと共有ライブラリの両方をビルドするために(両方サ
+     ポートしているプラットフォームではデフォルトです)`cdemo/libtool' を
+     コンフィグレーションし，`cdemo-static.test'はスタティックライブラリ
+     のみビルドし(`--disable-shared')，そして`cdemo-shared.test' は共有
+     ライブラリのみビルドします(`--disable-static')．
+
+`demo-conf.test'
+`demo-exec.test'
+`demo-inst.test'
+`demo-make.test'
+`demo-unst.test'
+`demo-static.test'
+`demo-shared.test'
+`demo-nofast.test'
+`demo-pic.test'
+`demo-nopic.test'
+     これらのプログラムは，libtool配布物の`demo'サブディレクトリが，コン
+     フィグレーション，ビルド，インストール，そしてアンインストールが正
+     しくできることを知るために調査します．
+
+     `demo'サブディレクトリは，libtoolを使用する平凡なパッケージのデモン
+     ストレーションを含みます．テストの`demo-make.test'，
+     `demo-exec.test'，`demo-inst.test'，そして`demo-unst.test'は，４つ
+     の異なるlibtoolのコンフィグレーションの下で，４回実行されます．
+     `demo-conf.test'は，スタティックと共有の両方のライブラリをビルドす
+     るために`demo/libtool'をコンフィグレーションし，`demo-static.test'
+     は，スタティックライブラリのみビルドし(`--disable-shared')，そして
+     `demo-shared.test'は，共有ライブラリのみをビルドします
+     (`--disable-static')．`demo-nofast.test'は，高速インストールモード
+     を使用禁止にするために(`--enable-fast-install=no')，`demo/libtool'
+     をコンフィグレーションします．`demo-pic.test'は，PICコードをビルド
+     したいときは(`--with-pic')，非PICコードをビルドしたいときは
+     (`--without-pic') にするように，`demo/libtool'をコンフィグレーショ
+     ンします．
+
+`deplibs.test'
+     スタティックライブラリを共有ライブラリにリンク不可能なシステムもた
+     くさんあります．そのような場合を避けるため，libtoolは
+     `deplibs_check_method'を使用します．このテストは，libtoolの
+     `deplibs_check_method'が正しく動作するかどうか調査します．
+
+`hardcode.test'
+     共有ライブラリを持つすべてのシステムで，実行形式に対しリンクされる
+     ライブラリの位置が実行形式の内部に符号化されるはずです*Note Linking
+     executables::．このテストは，システムリンカがライブラリの位置をハー
+     ドコードし，libtool自身のリンカの動作方法の概念と一致することを保証
+     する条件を調査します．
+
+`build-relink.test'
+     変数SHLIBPATH_OVERRIDES_RUNPATHが正しく設定されているかどうか調査し
+     ます．テストが失敗し，VERBOSEが設定されている場合，それは変数を設定
+     する必要がないことを示します．
+
+`noinst-link.test'
+     libtoolが，たった今ビルドされたライブラリにリンクする方が良い時，以
+     前にインストールされているバージョンにリンクしようとしないかどうか
+     調査します．
+
+`depdemo-conf.test'
+`depdemo-exec.test'
+`depdemo-inst.test'
+`depdemo-make.test'
+`depdemo-unst.test'
+`depdemo-static.test'
+`depdemo-shared.test'
+`depdemo-nofast.test'
+     これらのプログラムは，libtool配布物の`depdemo'サブディレクトリの，
+     コンフィグレーション，ビルド，インストール，そしてアンインストール
+     を，正しく行えることを判定するための調査を行います．
+
+     `depdemo'サブディレクトリは，libtoolに依存する内部ライブラリのデモ
+     ンストレーションを含みます．このテストプログラムは，いくつかの交互
+     依存しているライブラリをリンクします．
+
+     テストの，`depdemo-make.test'，`depdemo-exec.test'，
+     `depdemo-inst.test'，そして`depdemo-unst.test'は，４つの異なる
+     libtoolのコンフィグレーションの下で，４回実行されます．
+     `depdemo-conf.test'は，スタティックと共有の両方のライブラリをビルド
+     するために，`depdemo/libtool'をコンフィグレーションし，
+     `depdemo-static.test'はスタティックライブラリのみビルドし
+     (`--disable-shared')，`depdemo-shared.test'は共有ライブラリのみビル
+     ドします(`--disable-static')．`depdemo-nofast.test'は高速インストー
+     ルモード(`--enable-fast-install=no')を利用不可能にするために，
+     `depdemo/libtool'をコンフィグレーションします．
+
+`mdemo-conf.test'
+`mdemo-exec.test'
+`mdemo-inst.test'
+`mdemo-make.test'
+`mdemo-unst.test'
+`mdemo-static.test'
+`mdemo-shared.test'
+     これらのプログラムは，libtool配布物の`mdemo'サブディレクトリが，コ
+     ンフィグレーション，ビルド，インストール，そしてアンインストールが
+     正しくできることを知るために調査します．
+
+     `mdemo'サブディレクトリは，libtoolと，システム非依存のモジュールロー
+     ドのための，dlopenラッパー`libltdl'を使用するパッケージのデモンスト
+     レーションを含みます．ライブラリ`libltdl'は，様々なプラットフォーム
+     (Linux，Solaris，HP/UX等)に対する，dlpreopenモジュールに対するサポー
+     トを含む(*Note Dlpreopening::)dlopenラッパーを提供します．
+
+     テストの`mdemo-make.test'，`mdemo-exec.test'，`mdemo-inst.test'，そ
+     して`mdemo-unst.test'は，３つの異なるlibtoolのコンフィグレーション
+     の下で，３回実行されます．`mdemo-conf.test'は，スタティックと共有の
+     両方のライブラリをビルドするために`mdemo/libtool'をコンフィグレーショ
+     ンし，`mdemo-static.test'は，スタティックライブラリのみビルドし
+     (`--disable-shared')，そして`mdemo-shared.test'は，共有ライブラリの
+     みをビルドします(`--disable-static')．
+
+`dryrun.test'
+     このテストは，libtoolの`--dry-run'モードが正しく働くかどうかを調査
+     します．
+
+`assign.test'
+     libtoolスクリプト内の割り当てられている同じ行で，停止したり，続けた
+     りしないかどうか調査します．
+
+`link.test'
+     このテストは，libtoolでないスタティックライブラリに対する直接的なリ
+     ンクが正しく動作することを保証します．
+
+`link-2.test'
+     このテストは，`.lo'で終わるファイルがプログラムファイルに直接リンク
+     されないことを確かめます．
+
+`nomode.test'
+     実際にlibtoolの助けが可能かどうか調査します．
+
+`quote.test'
+     このプログラムはlibtoolのメタ文字を引用符で囲むことを調査します．
+
+`sh.test'
+     `test'コマンドがlibtoolに忘れていないか調査します．
+
+`suffix.test'
+     他のプログラミング言語がlibtoolで使用されるとき(*Note Other
+     languages::)，ソースファイルは`.c'以外の接尾子で終わるかもしれませ
+     ん．このテストは，サポートするすべてのファイル形式に対する接尾子を
+     扱うこと可能で，接尾子が不当なときは失敗することを確認します．
+
+
+
+
+File: libtool-ja.info, Node: When tests fail, Prev: Test descriptions, Up: Libtool test suite
+
+テストが失敗するとき
+--------------------
+
+上記のそれぞれのテストは，`make check'を実行するとき出力を生成しないよう
+に設計されています．それぞれのプログラムの終了ステータスで，テストが成功
+しなかったかどうかを`Makefile'に伝えます．
+
+テストが失敗した場合，それはlibtool内のプログラムエラー，またはプログラ
+ム自身のエラーのどちらかが存在することを意味します．
+
+特定のテストを調査するために，通常のプログラムで行うように，直接実行する
+ことが可能です．テストがこの方法で呼び出されたとき，それは，問題を決定す
+るのに役に立ちそうな出力を生成します．
+
+テストプログラムに出力を生成させるもうひとつの方法は，実行前にVERBOSE環
+境変数を`yes'に設定することです．例えば，`env VERBOSE=yes make check'で
+すべてのテストが実行され，それぞれについてデバッグ情報の表示が得られます．
+
+
+
+
+File: libtool-ja.info, Node: Reporting bugs, Prev: Libtool test suite, Up: Troubleshooting
+
+バグの報告
+==========
+
+libtoolにバグを発見したと考えた場合，もう一度考えた直したほうが良いでしょ
+う．libtool管理者は，責任転嫁(または"バグを通過させる"かもしれません) で
+有名です (1) (*Note Reporting bugs-Footnotes::)．libtoolは，共有ライブラ
+リの実装で既知の欠陥を修正するために開発されたので，libtoolのバグのほと
+んどは，ある程度は，他のオペレーティングシステムのバグになります．しかし，
+libtool の管理者は，他人のバギーなオペレーティングシステムに対するサポー
+トを加えることを，確かに楽しんでいます．[Texinfoでウインクしている笑顔を
+表示する，いい方法があれば良いのですが．]
+
+libtoolの純粋なバグは，シェルスクリプトの移植性の問題，ドキュメントのエ
+ラー，そしてテストスイートの失敗(*Note Libtool test suite::)を含みます．
+
+最初に，問題と考えられる動作が，既に特徴として言及されていないことを確か
+めるために，ドキュメントとへルプ画面を調査してください．
+
+そして，バグを報告することに関するEmacsガイド(*Note Reporting Bugs:
+(emacs)Bugs.)を読んでください．リストアップされている詳細は，Emacs特有の
+ものもありますが，基本的な原則は一般的なものです．
+
+最後に，テストスイートの出力(*Note When tests fail::)，バグを再生成する
+のに必要なすべての詳細，そして，動作がバグだと考えられる理由の概要のよう
+な適切なあらゆる*事実*とともに， the libtool bug reporting address
+@email{bug-libtool@@gnu.org}にバグの報告を送ってください．サブジェクト行
+に，単語"libtool"と，同様に使用しているバージョンナンバー(それは，
+`ltconfig --version'の入力で分かります)が含まれていることを確認してくだ
+さい．
+
+
+
+File: libtool-ja.info  Node: Reporting bugs-Footnotes, Up: Reporting bugs
+
+(1) 訳注：原文では，passing the buck(責任転嫁)とpassing the bug(バグを通
+過させる)をかけています
+
+
+
+File: libtool-ja.info, Node: Maintaining, Next: Index, Prev: Troubleshooting, Up: Top
+
+libtoolの管理用メモ
+*******************
+
+この章は，libtool管理者が見つける重要な情報を含みます．新しいシステムへ
+の移植や，独自のlibtoolを書くことを考慮しない場合，役に立たないでしょう．
+
+* Menu:
+
+* New ports::                   How to port libtool to new systems.
+* Tested platforms::            When libtool was last tested.
+* Platform quirks::             Information about different library systems.
+* libtool script contents::     Configuration information that libtool uses.
+* Cheap tricks::                Making libtool maintainership easier.
+
+
+

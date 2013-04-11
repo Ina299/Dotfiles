@@ -1,0 +1,1944 @@
+Info file: gdb-ja.info,    -*-Text-*-
+produced by `texinfo-format-buffer'
+from file `gdb-ja.texinfo'
+using `texinfmt.el' version 2.38 of 3 July 1998.
+
+
+
+
+
+
+
+
+
+START-INFO-DIR-ENTRY * Gdb: (gdb).  The GNU debugger.
+END-INFO-DIR-ENTRY This file documents the GNU debugger GDB.
+
+
+This is the Seventh Edition, February 1999, of `Debugging with GDB: the
+GNU Source-Level Debugger' for GDB Version 4.18.
+
+Copyright (C) 1988-1999 Free Software Foundation, Inc.
+
+Permission is granted to make and distribute verbatim copies of this
+manual provided the copyright notice and this permission notice are
+preserved on all copies.
+
+Permission is granted to copy and distribute modified versions of this
+manual under the conditions for verbatim copying, provided also that the
+entire resulting derived work is distributed under the terms of a
+permission notice identical to this one.
+
+Permission is granted to copy and distribute translations of this manual
+into another language, under the above conditions for modified versions.
+
+
+
+
+
+File: gdb-ja.info, Node: Top, Next: Summary, Prev: (dir), Up: (dir)
+
+Debugging with  GDB
+*******************
+
+このファイルには、GNUのシンボリック・デバッガである GDBのことが説明して
+あります。
+
+ Seventh版、 February 1999、 GDBバージョン 4.18
+
+Copyright (C) 1988-1999 Free Software Foundation, Inc.
+* Menu:
+
+* Summary::                      GDBの要約
+* Sample Session::               GDBセッションのサンプル
+
+* Invocation::                   GDBの起動・終了
+* Commands::                     GDBコマンド
+* Running::                      GDB配下でのプログラムの実行
+* Stopping::                    停止と継続
+* Stack::                       スタックの検査
+* Source::                      ソース・ファイルの検査
+* Data::                        データの検査
+* Languages::                   異なる言語の使用
+
+
+* Symbols::                     シンボル・テーブルの検査
+* Altering::                    実行の変更
+* GDB Files::                    GDBファイル
+* Targets::                     デバッグ・ターゲットの指定
+* Controlling GDB::              GDBの制御
+* Sequences::                   一連のコマンドのグループ化
+* Emacs::                       GNU Emacsの中での GDBの使用
+
+* GDB Bugs::                     GDBのバグ報告
+
+* Formatting Documentation::     GDBドキュメントのフォーマットと印刷
+
+
+* Command Line Editing::        コマンドライン編集
+* Using History Interactively:: ヒストリの対話的な使用
+* Installing GDB::              GDBのインストール
+* Index::                       インデックス
+
+ -- The Detailed Node Listing ---
+
+ GDBの要約
+
+* Free Software::               フリー・ソフトウェア
+* Contributors::                GDBに貢献した人々
+
+ GDBの起動・終了
+
+* Invoking GDB::                 GDBの起動
+* Quitting GDB::                 GDBの終了
+* Shell Commands::               GDBの中でのシェル・コマンドの使用
+
+ GDBの起動
+
+* File Options::                ファイルの選択
+* Mode Options::                モードの選択
+
+ GDBコマンド
+
+* Command Syntax::               GDBに対するコマンドの指定
+* Completion::                  コマンド名の補完
+* Help::                        ヘルプの表示
+
+ GDB配下でのプログラムの実行
+
+* Compilation::                 デバッグのためのコンパイル
+* Starting::                    ユーザ・プログラムの起動
+* Arguments::                   ユーザ・プログラムの引数
+* Environment::                 ユーザ・プログラムの環境
+
+* Working Directory::           ユーザ・プログラムの作業ディレクトリ
+* Input/Output::                ユーザ・プログラムの入出力
+* Attach::                      既に実行中のプロセスのデバッグ
+* Kill Process::                子プロセスの終了
+* Process Information::         追加のプロセス情報
+
+* Threads::                     マルチスレッド・プログラムのデバッグ
+* Processes::                   マルチプロセス・プログラムのデバッグ
+
+停止と継続
+
+* Breakpoints::                 ブレイクポイント、ウォッチポイント、キャッチポイント
+* Continuing and Stepping::     実行の再開
+* Signals::                     シグナル
+* Thread Stops::                マルチスレッド・プログラムの停止と起動
+
+ブレイクポイント、ウォッチポイント、キャッチポイント
+
+* Set Breaks::                  ブレイクポイントの設定
+* Set Watchpoints::             ウォッチポイントの設定
+* Set Catchpoints::             キャッチポイントの設定
+* Delete Breaks::               ブレイクポイントの削除
+* Disabling::                   ブレイクポイントの無効化
+* Conditions::                  ブレイクポイントの成立条件
+* Break Commands::              ブレイクポイント・コマンド・リスト
+* Breakpoint Menus::            ブレイクポイント・メニュー
+
+スタックの検査
+
+* Frames::                      スタック・フレーム
+* Backtrace::                   バックトレース
+* Selection::                   フレームの選択
+* Frame Info::                  フレームに関する情報
+* Alpha/MIPS Stack::            Alpha/MIPSマシンの関数スタック
+
+ソース・ファイルの検査
+
+* List::                        ソース行の表示
+* Search::                      ソース・ファイル内の検索
+* Source Path::                 ソース・ディレクトリの指定
+* Machine Code::                ソースとマシン・コード
+
+データの検査
+
+* Expressions::                 式
+* Variables::                   プログラム変数
+* Arrays::                      人工配列
+* Output Formats::              出力フォーマット
+* Memory::                      メモリの調査
+* Auto Display::                自動表示
+* Print Settings::              表示設定
+* Value History::               値ヒストリ
+* Convenience Vars::            コンビニエンス変数
+* Registers::                   レジスタ
+* Floating Point Hardware::     浮動小数ハードウェア
+
+異なる言語の使用
+
+* Setting::                     ソース言語の切り替え
+* Show::                        言語の表示
+* Checks::                      型と範囲のチェック
+
+* Support::                     サポートされる言語
+
+ソース言語の切り替え
+
+* Filenames::                   ファイル拡張子と言語
+* Manually::                    手作業による作業言語の設定
+* Automatically::                GDBによる作業言語の推定
+
+型と範囲のチェック
+
+* Type Checking::               型チェックの概要
+* Range Checking::              範囲チェックの概要
+
+サポートされる言語
+
+* C::                           C/C++
+
+C言語サポート
+
+* C Operators::                 C演算子
+
+C言語サポート
+
+* C Operators::                 C/C++演算子
+* C Constants::                 C/C++定数
+* Cplus expressions::           C++式
+* C Defaults::                  C/C++のデフォルト設定
+* C Checks::                    C/C++の型チェックと範囲チェック
+* Debugging C::                  GDBとC
+* Debugging C plus plus::       C++用の GDB機能
+
+Modula-2
+
+* M2 Operators::                組み込み演算子
+* Built-In Func/Proc::          組み込み関数と組み込みプロシージャ
+* M2 Constants::                Modula-2定数
+* M2 Defaults::                 Modula-2デフォルト設定
+* Deviations::                  標準Modula-2との差異
+* M2 Checks::                   Modula-2の型チェックと範囲チェック
+* M2 Scope::                    スコープ演算子`::'と`.'
+* GDB/M2::                       GDBとModula-2
+
+実行の変更
+
+* Assignment::                  変数への代入
+* Jumping::                     異なるアドレスにおける処理継続
+* Signaling::                   ユーザ・プログラムへのシグナルの通知
+* Returning::                   関数からの復帰
+* Calling::                     ユーザ・プログラム関数の呼び出し
+* Patching::                    ユーザ・プログラムへのパッチ適用
+
+ GDBファイル
+
+* Files::                       ファイルを指定するコマンド
+* Symbol Errors::               シンボル・ファイル読み込み時のエラー
+
+デバッグ・ターゲットの指定
+
+* Active Targets::              アクティブ・ターゲット
+* Target Commands::             ターゲットを管理するコマンド
+* Byte Order::                  ターゲットのバイト・オーダの選択
+* Remote::                      リモート・デバッグ
+
+リモート・デバッグ
+
+* Remote Serial::                GDBリモート・シリアル・プロトコル
+
+* i960-Nindy Remote::		 GDBとリモートi960（Nindy）
+
+* UDI29K Remote::               AMD29K用のUDIプロトコル
+* EB29K Remote::		AMD29K用のEBMONプロトコル
+
+* VxWorks Remote::		 GDBとVxWorks
+
+* ST2000 Remote::                GDBとTandem ST2000
+
+* Hitachi Remote::               GDBと日立のマイクロ・プロセッサ
+
+* MIPS Remote::			 GDBとMIPSボード
+
+* Simulator::                   シミュレートされたCPUターゲット
+
+ GDBの制御
+
+* Prompt::                      プロンプト
+* Editing::                     コマンド編集
+* History::                     コマンド・ヒストリ
+* Screen Size::                 画面サイズ
+* Numbers::                     数値
+* Messages/Warnings::           オプションの警告およびメッセージ
+
+一連のコマンドのグループ化
+
+* Define::                      ユーザ定義コマンド
+* Hooks::                       ユーザ定義コマンド・フック
+* Command Files::               コマンド・ファイル
+* Output::                      制御された出力を得るためのコマンド
+
+ GDBのバグ報告
+
+* Bug Criteria::                本当にバグを見つけたのかどうかを知る方法
+* Bug Reporting::               バグの報告方法
+
+ GDBのインストール
+
+* Separate Objdir::             異なるディレクトリでの GDBのコンパイル
+* Config Names::                ホストとターゲットの名前の指定
+* Configure Options::           configureオプションの要約
+
+
+
+
+File: gdb-ja.info, Node: Summary, Next: Sample Session, Prev: Top, Up: Top
+
+ GDBの要約
+**********
+
+ GDBのようなデバッガの目的は、実行中のプログラムの内部において何が起こっ
+ているのか、あるいは、プログラムがクラッシュしたときに何をしていたのかを
+知ることができるようにすることにあります。
+
+ GDBは、実際のバグを発見できるようにするために4つのこと（さらに、これら
+を支援するために他のことも）行います。
+
+   * ユーザ・プログラムを、その動作に影響を与える可能性のある様々なこと
+     を指定して起動する
+
+   * 指定された条件が成立したときにユーザ・プログラムを停止する
+
+   * 停止したときにユーザ・プログラムが何を行っていたかを調べる
+
+   * ユーザ・プログラムの内部を変更することによって、1つのバグの影響を試
+     験的に修正して、ほかのバグについて調べる
+
+ GDBを使ってCおよびC++で記述されたプログラムをデバッグすることができます。
+詳細については、*Note C and C++: C。
+
+Modula-2とChillのサポートはまだ部分的なものです。Modula-2に関する情報に
+ついては、*Note Modula-2: Modula-2。Chillに関するドキュメントはまだあり
+ません。
+
+集合、サブ範囲（subrange）、ファイル変数、入れ子関数を使っているPascalプ
+ログラムをデバッグすることは、現時点ではできません。Pascalの構文を使って、
+式の入力、変数の値の表示、およびそれに類することを実行することを、GDBは
+サポートしていません。
+
+ GDBは、Fortranで記述されたプログラムのデバッグに使うことができます。し
+かし、Fortranの構文を使って、式の入力、変数の値の表示、およびそれに類す
+る機能を実行することは、まだサポートされていません。変数によっては、末尾
+にアンダースコアを付けて参照する必要のある場合があります。
+
+
+* Menu:
+
+* Free Software::               フリー・ソフトウェア
+* Contributors::                GDBに貢献した人々
+
+
+
+File: gdb-ja.info, Node: Free Software, Next: Contributors, Prev: Summary, Up: Summary
+
+フリー・ソフトウェア
+====================
+
+ GDBは"フリー・ソフトウェア"であり、GNU General Public License （GPL）に
+より保護されています。あなたは、GPLによって、ライセンスされたプログラム
+をコピーしたり改造したりする自由を与えられます。しかし、コピーを入手した
+人は誰でも、そのコピーとともに、そのコピーを修正する自由を手に入れますし
+（つまりソース・コードを入手することができなければならないということで
+す）、また、さらにそのコピーを配布する自由も手に入れます。通常、ソフトウェ
+ア会社は、著作権によりユーザの自由を妨げます。Free Software Foundationは
+GPLを使ってこれらの自由を保護します。
+
+基本的には、GPLは、「あなたはこれらの自由を与えられるが、これらの自由を
+ほかの誰からも奪うことはできない」と主張するライセンスです。
+
+
+
+File: gdb-ja.info, Node: Contributors, Prev: Free Software, Up: Summary
+
+GDBに貢献した人々
+=================
+
+Richard Stallmanは、GDB、および、その他の多くのGNU プログラムの最初の開
+発者です。ほかにも多くの人々がGDBの開発に貢献してきました。この節では、
+主要な貢献者を紹介したいと思います。フリー・ソフトウェアの素晴らしい点の
+1つは、誰もがそれに貢献する自由があるということです。残念ながら、ここで
+すべての人を紹介することはできません。GDB ディストリビューションに含まれ
+る`ChangeLog' というファイルにおおまかな紹介を載せてあります。
+
+バージョン2.0よりもずっと前の変更内容は、いつのまにか紛失してしまいまし
+た。
+
+     *お願い:* このセクションへの追加は大歓迎です。あなたやあなたの友人
+     （公平を期すため、あなたの敵も加えておきましょう）が不当にもこのリ
+     ストから除外されているのであれば、喜んで名前を付け加えます。
+
+彼らの多大な労働が感謝されていないと思われないように、最初に、GDBの主要
+なリリースを通じてGDBの面倒を見てきた人々に特に感謝します。その人々とは、
+Jim Blandy（リリース4.18）、Jason Molenda（リリース4.17）、Stan Shebs
+（リリース4.14）、Fred Fish（リリース4.16, 4.15, 4.13, 4.12, 4.11, 4.10,
+4.9）、Stu GrossmanとJohn Gilmore（リリース4.8, 4.7, 4.6, 4.5, 4.4）、
+John Gilmore（リリース4.3, 4.2, 4.1, 4.0, 3.9）、Jim Kingdon（リリース
+3.5, 3.4, 3.3）、Randy Smith（リリース3.2, 3.1, 3.0） です。
+
+Richard Stallmanは、様々な機会にPeter TerMaat、Chris Hanson、Richard
+Mlynarikの支援を受けながら、2.8までのリリースを担当しました。
+
+Michael Tiemannは、GDBにおけるGNU C++サポートのほとんどを開発してくれま
+した。C++のサポートについては、Per Bothnerからも重要な貢献がありました。
+James ClarkはGNU C++のデマングラ（demangler）を開発してくれました。C++に
+ついての初期の仕事はPeter TerMaatによるものです（彼はまた、リリース3.0ま
+での一般的なアップデート作業の多くを担当してくれました）。
+
+ GDB 4は、複数のオブジェクト・ファイル・フォーマットを調べるのに BFD サ
+ブルーチン・ライブラリを使用しています。BFDは、David V. Henkel-Wallace、
+Rich Pixley、Steve Chamberlain、John Gilmoreによる共同プロジェクトです。
+
+David Johnsonは、最初のCOFFサポートを開発してくれました。Pace Willisonは
+最初のカプセル化されたCOFF （encapsulated COFF）のサポートを開発してくれ
+ました。
+
+Harris Computer Systems社のBrent Bensonは、DWARF 2のサポート部分を提供し
+てくれました。
+
+Adam de BoorとBradley DavisはISI Optimum Vのサポート部分を提供してくれま
+した。Per Bothner、引地信之、Alessandro Forinは、MIPSのサポート部分を提
+供してくれました。Jean-Daniel FeketeはSun 386iのサポート部分を提供してく
+れました。Chris HansonはHP9000サポートを改善してくれました。引地信之と長
+谷井智之は、Sony/News OS 3のサポート部分を提供してくれました。David
+JohnsonはEncore Umaxのサポート部分を提供してくれました。Jyrki Kuoppalaは
+Altos 3068のサポート部分を提供してくれました。Jeff LawはHP PAとSOMのサポー
+ト部分を提供してくれました。Keith PackardはNS32Kのサポート部分を提供して
+くれました。Doug RabsonはAcorn Risc Machineのサポート部分を提供してくれ
+ました。Bob RuskはHarris Nighthawk CX-UXのサポート部分を提供してくれまし
+た。Chris SmithはConvexのサポート（および、Fortranデバッグのサポート）部
+分を提供してくれました。Jonathan StoneはPyramidのサポート部分を提供して
+くれました。Michael TiemannはSPARCのサポート部分を提供してくれました。
+Tim TuckerはGould NP1とGould Powernodeのサポート部分を提供してくれました。
+Pace WillisonはIntel 386のサポート部分を提供してくれました。Jay Vosburgh
+はSymmetryのサポート部分を提供してくれました。
+
+Andreas SchwabはM68K Linuxのサポート部分を提供してくれました。
+
+Rich SchaeferとPeter SchauerはSunOS共用ライブラリのサポートを手伝ってく
+れました。
+
+Jay FenlasonとRoland McGrathは、GDBとGASがいくつかのマシン命令セットに関
+して共通の認識を持つようにしてくれました。
+
+Patrick Duval、Ted Goldstein、Vikram Koka、Glenn Engelはリモート・デバッ
+グ機能の開発を手伝ってくれました。Intel社、Wind River Systems 社、AMD社、
+ARM社はそれぞれ、i960、VxWorks、A29K UDI、RDIターゲット用のリモート・デ
+バッグ・モジュールを提供してくれました。
+
+Brian Foxは、コマンドライン編集やコマンドライン・ヒストリを提供する
+readlineライブラリの開発者です。
+
+SUNY BuffaloのAndrew Beersは言語切り替えのソース・コードとModula-2サポー
+トを開発し、このマニュアルのプログラミング言語関連（Languages）の章を提
+供してくれました。
+
+Fred FishはUnix System Vr4サポートのほとんどを開発してくれました。彼はま
+た、C++のオーバーロードされたシンボルを扱えるようコマンド補完機能を拡張
+してくれました。
+
+Hitachi America, Ltd.は、H8/300プロセッサ、H8/500プロセッサ、および、
+Super-Hプロセッサのサポートを後援してくれました。
+
+NECは、v850プロセッサ、Vr4xxxプロセッサ、および、Vr5xxxプロセッサのサポー
+トを後援してくれました。
+
+Mitsubishi（三菱）は、D10Vプロセッサ、D30Vプロセッサ、および、M32R/Dプロ
+セッサのサポートを後援してくれました。
+
+Toshiba（東芝）は、TX39 Mipsプロセッサのサポートを後援してくれました。
+
+Matsushita（松下）は、MN10200プロセッサとMN10300プロセッサのサポートを後
+援してくれました。
+
+Fujitsu（富士通）は、SPARCliteプロセッサとFR30プロセッサのサポートを後援
+してくれました。
+
+Kung Hsu、Jeff Law、Rick Sladkeyはハードウェア・ウォッチポイントのサポー
+トを追加してくれました。
+
+Michael Snyderはトレースポイントのサポートを追加してくれました。
+
+Stu Grossmanはgdbserverを開発してくれました。
+
+Jim Kingdon、Peter Schauer、Ian Taylor、Stu GrossmanはGDB全体にわたって、
+ほとんど数えることができないほどのバグ・フィックスとソース・コードの整理
+を行ってくれました。
+
+Hewlett-Packard社のBen Krepp、Richard Title、John Bishop、Susan Macchia、
+Kathy Mann、Satish Pai、India Paul、Steve Rehrauer、Elena Zannoniは、
+PA-RISC 2.0アーキテクチャ、HP-UX 10.20、10.30、11.0(narrow mode)、HPによ
+るカーネル・スレッドの実装、HP aC++コンパイラ、および、端末ユーザ・イン
+ターフェイスの各サポート部分を提供してくれました。また、このマニュアルの
+中のHP固有の情報は、Kim Haaseにより提供されたものです。
+
+Cygnus Solutions社は、1991年以降、GDBの保守作業とGDBの多くの開発作業を後
+援しています。フルタイムでGDBに関わる仕事をしたCygnusのエンジニアは、
+Mark Alexander、Jim Blandy、Per Bothner、Edith Epstein、Chris Faylor、
+Fred Fish、Martin Hunt、Jim Ingham、John Gilmore、Stu Grossman、Kung Hsu、
+Jim Kingdon、John Metzler、Fernando Nasser、Geoffrey Noer、Dawn Perchik、
+Rich Pixley、Zdenek Radouch、Keith Seitz、Stan Shebs、David Taylor、
+Elena Zannoniです。さらに、Dave Brolley、Ian Carmichael、Steve
+Chamberlain、Nick Clifton、JT Conklin、Stan Cox、DJ Delorie、Ulrich
+Drepper、Frank Eigler、Doug Evans、Sean Fagan、David Henkel-Wallace、
+Richard Henderson、Jeff Holcomb、Jeff Law、Jim Lemke、Tom Lord、Bob
+Manson、Michael Meissner、Jason Merrill、Catherine Moore、Drew Moseley、
+Ken Raeburn、Gavin Romig-Koch、Rob Savoye、Jamie Smith、Mike Stump、Ian
+Taylor、Angela Thomas、Michael Tiemann、Tom Tromey、Ron Unrau、Jim
+Wilson、David Zuhnは、大小様々な貢献をしてくれました。
+
+
+
+
+File: gdb-ja.info, Node: Sample Session, Next: Invocation, Prev: Summary, Up: Top
+
+ GDBセッションのサンプル
+************************
+
+その気になれば、このマニュアルを使って GDBのすべてを学習することももちろ
+ん可能ですが、GDBを使い始めるには、いくつかのコマンドを知っていれば十分
+です。本章では、そのようなコマンドについて説明します。
+
+
+
+汎用的なマクロ・プロセッサであるGNU `m4'には、かつて、まだ正式なバージョ
+ンがリリースされる以前に、次のような不具合がありました。引用を表わす文字
+列をデフォルトとは異なるものに変更すると、あるマクロ定義の内部に入れ子状
+態になっている他のマクロ定義を取り出すために使われるコマンドが、正しく動
+作しなくなることがある、という不具合です。以下の短い`m4'セッションでは、
+`0000'に展開されるマクロ`foo'を定義しています。さらに、`m4'の組み込みコ
+マンド`defn'を使って、マクロ`bar'に同一の定義を与えています。ところが、
+引用の開始文字列を`<QUOTE>'に、引用の終了文字列を`<UNQUOTE>'にそれぞれ変
+更すると、全く同一の手順で新しい同義語`baz'を定義しようとしても、うまく
+いかないのです。
+
+     $ cd gnu/m4
+     $ ./m4
+     define(foo,0000)
+
+     foo
+     0000
+     define(bar,defn(`foo'))
+
+     bar
+     0000
+     changequote(<QUOTE>,<UNQUOTE>)
+
+     define(baz,defn(<QUOTE>foo<UNQUOTE>))
+     baz
+     C-d
+     m4: End of input: 0: fatal error: EOF in string
+
+ここで GDBを使って、何が起こっているのか調べてみましょう。
+
+     $  gdb m4
+      GDB is free software and you are welcome to distribute copies
+      of it under certain conditions; type "show copying" to see 
+      the conditions.
+     There is absolutely no warranty for  GDB; type "show warranty" 
+      for details.
+
+      GDB  4.18, Copyright 1999 Free Software Foundation, Inc...
+     ( gdb)
+
+ GDBは、必要なときに他のシンボルを見つけるのに最低限必要となるシンボル情
+報しか読み込みません。その結果、最初のプロンプトが表示されるまでの時間が
+極めて短いのです。ここで、出力情報がこのマニュアルの紙幅に収まるようにす
+るために、GDBに対して表示幅を通常よりも狭くするよう指示を出してみましょ
+う。
+
+     ( gdb) set width 70
+
+`m4'の組み込みコマンドである`changequote'がどのように動作するのかを調べ
+てみる必要があります。ソースを見ると、関連するサブルーチンが
+`m4_changequote'であることがわかります。そこで、GDBの`break'コマンドでブ
+レイクポイントを設定してみます。
+
+     ( gdb) break m4_changequote
+     Breakpoint 1 at 0x62f4: file builtin.c, line 879.
+
+`run'コマンドを使って、GDBの管理下で`m4'を走らせます。`m4_changequote'サ
+ブルーチンに到達するまでは、プログラムは通常どおりの動作をします。
+
+     ( gdb) run
+     Starting program: /work/Editorial/gdb/gnu/m4/m4
+     define(foo,0000)
+
+     foo
+     0000
+
+ブレイクポイントでプログラムを停止させるために`changequote'を実行すると、
+GDBは`m4'の実行を停止し、停止した箇所のコンテキスト情報を表示します。
+
+     changequote(<QUOTE>,<UNQUOTE>)
+
+     Breakpoint 1, m4_changequote (argc=3, argv=0x33c70) 
+         at builtin.c:879
+     879         if (bad_argc(TOKEN_DATA_TEXT(argv[0]),argc,1,3))
+
+次に`n'（`next'）コマンドを実行すると、現在停止している関数の中で1行だけ
+処理が実行されます。
+
+     ( gdb) n
+     882         set_quotes((argc >= 2) ? TOKEN_DATA_TEXT(argv[1])\
+      : nil,
+
+`set_quotes'というのは、いわくありげなサブルーチンです。`next'コマンドの
+代わりに`s'（`step'）コマンドを使うことで、このサブルーチンの中に入るこ
+とができます。`step'コマンドは、それが*どの*サブルーチンの中にあるかとい
+うことにかかわりなく、次の1行に移動します。この場合、次の1行は
+`set_quotes'の中ですから、そこへ移動することになります。
+
+     ( gdb) s
+     set_quotes (lq=0x34c78 "<QUOTE>", rq=0x34c88 "<UNQUOTE>")
+         at input.c:530
+     530         if (lquote != def_lquote)
+
+`m4'がその中で現在停止しているサブルーチン（および、そのサブルーチンへの
+引数）が表示されています。これをスタック・フレーム表示と呼びます。それは、
+スタックの状態を要約した情報を表示しています。`backtrace'コマンド（ある
+いは、`bt'と省略することもできます）を使って、現在、スタック全体の中のど
+こにいるかを知ることもできます。`backtrace'コマンドは、アクティブなサブ
+ルーチンのスタック・フレームを表示します。
+
+     ( gdb) bt
+     #0  set_quotes (lq=0x34c78 "<QUOTE>", rq=0x34c88 "<UNQUOTE>")
+         at input.c:530
+     #1  0x6344 in m4_changequote (argc=3, argv=0x33c70) 
+         at builtin.c:882
+     #2  0x8174 in expand_macro (sym=0x33320) at macro.c:242
+     #3  0x7a88 in expand_token (obs=0x0, t=209696, td=0xf7fffa30)
+         at macro.c:71
+     #4  0x79dc in expand_input () at macro.c:40
+     #5  0x2930 in main (argc=0, argv=0xf7fffb20) at m4.c:195
+
+次に、2、3行先に進んで、何が起こっているのかを見てみましょう。最初の2回
+は、`s'コマンドを使います。続く2回は、`xstrdup'サブルーチンの中に入って
+しまうのを防ぐために、`n'コマンドを使います。
+
+     ( gdb) s
+     0x3b5c  532         if (rquote != def_rquote)
+     ( gdb) s
+     0x3b80  535         lquote = (lq == nil || *lq == '\0') ?  \
+     def_lquote : xstrdup(lq);
+     ( gdb) n
+     536         rquote = (rq == nil || *rq == '\0') ? def_rquote\
+      : xstrdup(rq);
+     ( gdb) n
+     538         len_lquote = strlen(rquote);
+
+最後に表示された行は、少し妙な感じがします。2つの変数`lquote'、`rquote'
+を調べて、本当にそれが、新たに指定された引用開始文字列、引用終了文字列で
+あるかどうか確認することができます。値を調べるには`p'（`print'）コマンド
+を使用します。
+
+     ( gdb) p lquote
+     $1 = 0x35d40 "<QUOTE>"
+     ( gdb) p rquote
+     $2 = 0x35d50 "<UNQUOTE>"
+
+`lquote'と`rquote'は確かに引用開始文字列、引用終了文字列のようです。前後
+関係を調べるには、`l'（`list'）コマンドを使って、現在停止している行を中
+心にその前後10行を表示します。
+
+     ( gdb) l
+     533             xfree(rquote);
+     534
+     535         lquote = (lq == nil || *lq == '\0') ? def_lquote\
+      : xstrdup (lq);
+     536         rquote = (rq == nil || *rq == '\0') ? def_rquote\
+      : xstrdup (rq);
+     537
+     538         len_lquote = strlen(rquote);
+     539         len_rquote = strlen(lquote);
+     540     }
+     541
+     542     void
+
+`len_lquote'と`len_rquote'に値を設定している行を実行させてから、それらの
+値を調べてみましょう。
+
+     ( gdb) n
+     539         len_rquote = strlen(lquote);
+     ( gdb) n
+     540     }
+     ( gdb) p len_lquote
+     $3 = 9
+     ( gdb) p len_rquote
+     $4 = 7
+
+`len_lquote'と`len_rquote'が、それぞれ`lquote'と`rquote'の長さであるとす
+ると、ここに表示されている値は明らかに誤りです。`p'コマンドを使って、正
+しい値を設定することができます。`p'コマンドによって任意の式の値を表示す
+ることができますが、ここでいう「式」には、サブルーチンの呼び出しや、値の
+割り当ても含まれます。
+
+     ( gdb) p len_lquote=strlen(lquote)
+     $5 = 7
+     ( gdb) p len_rquote=strlen(rquote)
+     $6 = 9
+
+新しい引用文字列をセットした状態で、`m4'の組み込みコマンド`defn'を使用し
+ようとすると発生する問題を修正するには、これだけで十分でしょうか?  `c'
+（`continue'）コマンドを使えば、`m4'に処理を継続させて、実際に問題を発生
+させていた例を実行することができます。
+
+     ( gdb) c
+     Continuing.
+
+     define(baz,defn(<QUOTE>foo<UNQUOTE>))
+
+     baz
+     0000
+
+今度はうまくいきました。新たにセットされた引用文字列は、デフォルトの引用
+文字列と同じように機能しました。問題の原因は、プログラム内の2箇所のタイ
+プ・ミスで、長さの設定が正しく行われていないことにあったようです。EOFを
+入力して、`m4'を終了させましょう。
+
+     C-d
+     Program exited normally.
+
+`Program exited normally.'というメッセージは、GDBが出力したもので、`m4'
+の実行が終了したことを意味しています。GDBの`quit'コマンドで、GDBセッショ
+ンを終了することができます。
+
+     ( gdb) quit
+
+
+
+File: gdb-ja.info, Node: Invocation, Next: Commands, Prev: Sample Session, Up: Top
+
+ GDBの起動・終了
+****************
+
+本章では、GDBの起動方法、終了方法を説明します。基本は、以下の2つです。
+
+   * ` gdb'と入力してGDBを起動する
+   * `quit'または`C-d'を入力してGDBを終了する
+
+* Menu:
+
+* Invoking GDB::                 GDBの起動
+* Quitting GDB::                 GDBの終了
+* Shell Commands::               GDBの中でのシェル・コマンドの使用
+
+
+
+File: gdb-ja.info, Node: Invoking GDB, Next: Quitting GDB, Prev: Invocation, Up: Invocation
+
+ GDBの起動
+==========
+
+
+` gdb'というプログラムを実行することで、GDBが起動されます。ひとたび起動
+されると、GDBは終了を指示されるまで、端末からのコマンド入力を受け付けま
+す。
+
+あるいは、最初から GDBのデバッグ環境を指定するために、様々な引数やオプショ
+ンを指定して` gdb'プログラムを実行することもできます。
+
+ここで説明するコマンドライン・オプションは、様々な状況に対応するために設
+計されたものです。環境によっては、ここで説明するオプションのいくつかは、
+事実上使用できない場合もあります。
+
+ GDBの最も基本的な起動方法は、デバッグされる実行プログラムの名前を引数に
+指定することです。
+
+      gdb PROGRAM
+
+起動時に、実行プログラム名とともに、コア・ファイルの名前を指定することも
+できます。
+
+      gdb PROGRAM CORE
+
+あるいは、既に実行中のプロセスをデバッグする場合には、そのプロセスIDを第
+2引数に指定することもできます。
+
+      gdb PROGRAM 1234
+
+ここでは、GDBはプロセスID `1234'のプロセスにアタッチします（ただし、
+`1234'という名前のファイルが存在しないというのが条件です。GDBは、まずコ
+ア・ファイルの存在を確認します）。
+
+このような第2引数の利用が可能であるためには、かなり完成されたオペレーティ
+ング・システムが必要になります。ボード・コンピュータに接続して、リモート・
+デバッガとして GDBを使用する場合には、そもそも「プロセス」という概念がな
+いかもしれませんし、多くの場合、コア・ダンプというものもないでしょう。
+
+`gdb'を起動すると、GDBの無保証性を説明する文章が表示されますが、
+`-silent'オプションを指定することで、これを表示しないようにすることもで
+きます。
+
+      gdb -silent
+
+コマンドライン・オプションを指定することで、GDBの起動方法をさらに制御す
+ることができます。GDB自身に、使用可能なオプションを表示させることができ
+ます。
+
+
+      gdb -help
+
+のように gdbプログラムを実行することで、使用可能なオプションがすべて、そ
+の使用方法についての簡単な説明付きで表示されます（短縮して、` gdb -h'と
+いう形で実行しても同じ結果が得られます）。
+
+ユーザの指定したすべてのオプションと引数は、順番に処理されます。`-x'オプ
+ションが指定されている場合は特別で、順序の違いに意味がでてきます。
+
+* Menu:
+
+
+* File Options::                ファイルの選択
+* Mode Options::                モードの選択
+
+
+
+
+File: gdb-ja.info, Node: File Options, Next: Mode Options, Prev: Invoking GDB, Up: Invoking GDB
+
+ファイルの選択
+--------------
+
+起動された GDBは、指定された引数のうちオプション以外のものは、実行ファイ
+ル名およびコア・ファイル名（あるいはプロセスID）であると解釈します。これ
+は、`-se'オプションと`-c'オプションが指定されたのと同じことです（ GDBは、
+対応するオプション・フラグを持たない最初の引数を`-se'オプション付きと同
+等とみなし、同じく対応するオプション・フラグを持たない第2の引数があれば、
+これを`-c'オプション付きと同等とみなします）。
+
+多くのオプションには、完全形と短縮形があります。以下の一覧では、その両方
+を示します。オプション名は、他のオプションと区別がつけば、最後まで記述し
+なくても、GDBによって正しく認識されます（オプション名には`-'ではなく`--'
+を使うことも可能ですが、ここでは一般的な慣例にしたがうこととします）。
+
+`-symbols FILE'
+`-s FILE'
+     FILEで指定されるファイルからシンボル・テーブルを読み込みます。
+
+`-exec FILE'
+`-e FILE'
+     可能であれば、FILEで指定されるファイルを、実行ファイルとして使いま
+     す。また、このファイルを、コア・ダンプとともにデータを解析するため
+     に使います。
+
+`-se FILE'
+     FILEで指定されるファイルからシンボル・テーブルを読み込み、かつ、こ
+     のファイルを実行ファイルとして使います。
+
+`-core FILE'
+`-c FILE'
+     FILEで指定されるファイルを解析すべきコア・ダンプとして使います。
+
+`-c NUMBER'
+     NUMBERで指定されるプロセスIDを持つプロセスに接続します。これは、
+     `attach'コマンドを実行するのと同等です（ただし、NUMBERで指定される
+     名前のコア・ダンプ形式のファイルが存在する場合は、そのファイルをコ
+     ア・ダンプとして読み込みます）。
+
+`-command FILE'
+`-x FILE'
+     FILEで指定されるファイル内に記述された GDBコマンドを実行します。
+     *Note Command files: Command Files。
+
+`-directory DIRECTORY'
+`-d DIRECTORY'
+     ソース・ファイルを検索するパスにDIRECTORYで指定されるディレクトリを
+     追加します。
+
+`-m'
+`-mapped'
+     *注意: このオプションは、
+     すべてのシステムでサポートされているわけではない、
+     オペレーティング・システムのある機能に依存しています。*
+     システム上で、
+     `mmap'システム・コールによるファイルのメモリへのマッピングが使用可能である場合、
+     このオプションを使うことで、
+     プログラムのシンボル情報を再利用可能なファイルとしてカレント・ディレクトリに書き出させることができます。
+     仮にデバッグ中のプログラム名が`/tmp/fred'であるとすると、
+     マップされたシンボル・ファイルは`./fred.syms'となります。
+     この後の GDBデバッグ・セッションは、
+     このファイルの存在を検出し、
+     そこから迅速にシンボル情報をマップします。
+     この場合、
+     実行プログラムからシンボル情報を読み込むことはありません。
+
+     `.syms'ファイルは、GDBが実行されるホスト・マシンに固有のものです。
+     このファイルは、内部の GDBシンボル・テーブルのイメージをそのまま保
+     存したものです。これを、複数のホスト・プラットフォーム上において、
+     共有することはできません。
+
+`-r'
+`-readnow'
+     シンボル・ファイル内のシンボル・テーブル全体をただちに読み込みます。
+     デフォルトの動作では、シンボル情報は必要になるたびに徐々に読み込ま
+     れます。このオプションを使うと起動までに時間がかかるようになります
+     が、その後の処理は速くなります。
+
+`-mapped'オプションと`-readnow'オプションは、完全なシンボル情報を含む
+`.syms'ファイルを作成するために、通常は一緒に指定されます（`.syms'ファイ
+ルに関する詳細については、*Note Commands to specify files: Files）。後に
+使用する目的で`.syms'を作成するだけで、それ以外には何もしないようにする
+ためのGDBの単純な起動方法は、以下のとおりです。
+
+     	gdb -batch -nx -mapped -readnow programname
+
+
+
+File: gdb-ja.info, Node: Mode Options, Prev: File Options, Up: Invoking GDB
+
+モードの選択
+------------
+
+ GDBを様々なモードで実行することが可能です。例えば、batchモードやquietモー
+ドなどがあります。
+
+`-nx'
+`-n'
+     初期化ファイルに記述されたコマンドを実行しません（通常、初期化ファ
+     イルは`.gdbinit'という名前です。ただし、PC上では`gdb.ini'となりま
+     す）。通常は、すべてのコマンド・オプションと引数が処理された後に、
+     初期化ファイル内のコマンドが実行されます。*Note Command files:
+     Command Files。
+
+`-quiet'
+`-q'
+     紹介メッセージおよびコピーライト・メッセージを表示しません。これら
+     のメッセージは、batchモードでも表示されません。
+
+`-batch'
+     batchモードで実行されます。`-x'オプションで指定されたすべてのコマン
+     ド・ファイルを処理した後、終了コード`0'で終了します（`-n'オプション
+     によって禁止されていなければ、初期化ファイル内に記述されているすべ
+     てのコマンドも実行されます）。コマンド・ファイルに記述された GDBコ
+     マンドの実行中にエラーが発生した場合には、`0'以外の終了コードで終了
+     します。
+
+     batchモードは GDBをフィルタとして実行する場合に便利です。例えば、あ
+     るプログラムを別のコンピュータ上にダウンロードして実行する場合など
+     です。このような使い方の邪魔にならないよう、
+
+          Program exited normally.
+
+     というメッセージは、batchモードでは表示されません（通常このメッセー
+     ジは、GDBの管理下で実行中のプログラムが終了するときに、必ず表示され
+     ます）。
+
+`-cd DIRECTORY'
+     カレント・ディレクトリではなく、DIRECTORYで指定されたディレクトリを
+     作業ディレクトリとして、GDBを実行します。
+
+`-fullname'
+`-f'
+     GNU Emacsが GDBをサブ・プロセスとして起動するとき、このオプションを
+     指定します。このオプションは、スタック・フレームを表示するときには、
+     必ず完全なファイル名と行番号を標準的な認識可能な書式で出力するよう 
+     GDBに対して指示するものです（スタック・フレームは、例えば、プログラ
+     ムの実行が停止されたときに必ず表示されます）。認識可能な書式とは、
+     先頭に2つの`\032'文字、続いてコロンで区切られたファイル名、行番号、
+     桁位置、最後に改行、というものです。Emacs- GDBインターフェイス・プ
+     ログラムは、フレームに対応するソース・コードを表示させる命令として、
+     2つの`\032'文字を使用します。
+
+`-b BPS'
+      GDBによってリモート・デバッグ用に使用されるシリアル・インターフェ
+     イスの回線速度（ボーレートあるいはBPS）を設定します。
+
+`-tty DEVICE'
+     プログラムの標準入力および標準出力としてDEVICEを使用して実行します。
+
+
+
+
+File: gdb-ja.info, Node: Quitting GDB, Next: Shell Commands, Prev: Invoking GDB, Up: Invocation
+
+ GDBの終了
+==========
+
+`quit'
+      GDBを終了するためには、`quit'コマンド（省略形は`q'）を使用するか、
+     あるいは、ファイルの終端文字（通常は`C-d'）を入力します。EXPRESSION
+     を指定しない場合、GDBは正常終了します。EXPRESSIONが指定された場合、
+     EXPRESSIONの評価結果をエラー・コードとして終了します。
+
+割り込み（多くの場合`C-c'）は GDBを終了させません。割り込みは通常、実行
+中の GDBコマンドを終了させ、GDBのコマンド・レベルに復帰させます。割り込
+み文字は、いつ入力しても安全です。というのは、割り込みの発生が危険である
+間は、GDBが割り込みの発生を抑止するからです。
+
+アタッチされたプロセスやデバイスを制御するためにGDBを使用していた場合、
+`detach'コマンドでそれを解放することができます（*Note Debugging an
+already-running process: Attach.）。
+
+
+
+File: gdb-ja.info, Node: Shell Commands, Prev: Quitting GDB, Up: Invocation
+
+シェル・コマンド
+================
+
+デバッグ・セッションの途中でシェル・コマンドを実行する必要がある場合、
+GDBを終了したり一時停止させたりする必要はありません。`shell'コマンドを使
+用することができます。
+
+`shell COMMAND STRING'
+     COMMAND STRINGで指定されるコマンド文字列を実行するために標準シェル
+     を起動します。`SHELL'環境変数が設定されていれば、その値が実行される
+     べきシェルを決定します。`SHELL'環境変数が設定されていなければ、GDB
+     は`/bin/sh'を実行します。
+
+開発環境ではしばしば`make'ユーティリティが必要とされます。GDB内部で
+`make'ユーティリティを使用する場合は、`shell'コマンドを使用する必要はあ
+りません。
+
+`make MAKE-ARGS'
+     MAKE-ARGSで指定される引数とともに`make'プログラムを実行します。これ
+     は、`shell make MAKE-ARGS'を実行するのと同じことです。
+
+
+
+File: gdb-ja.info, Node: Commands, Next: Running, Prev: Invocation, Up: Top
+
+ GDB コマンド
+*************
+
+ GDBコマンドの名前は、最初の2、3文字に省略することができます。ただし、省
+略されたコマンド名があいまいであってはなりません。さらに、同じ GDBコマン
+ドを連続して使用する場合には、RETキーを押すだけで十分です。また、TABキー
+を押すことで、途中まで入力されたコマンド名を補完させることができます（複
+数の補完候補がある場合には、その一覧を表示します）。
+
+* Menu:
+
+* Command Syntax::               GDBに対するコマンドの指定
+* Completion::                  コマンド名の補完
+* Help::                        ヘルプの表示
+
+
+
+File: gdb-ja.info, Node: Command Syntax, Next: Completion, Prev: Commands, Up: Commands
+
+コマンドの構文
+==============
+
+ GDBコマンドは1行で入力されます。1行の長さには上限がありません。行は、コ
+マンド名で始まり、コマンド名によって意味が決まる引数がそれに続きます。例
+えば、`step'コマンドは`step'を実行する回数を引数に取ります。例えば、
+`step 5'のようになります。`step'コマンドは引数なしでも実行可能です。コマ
+ンドによっては、全く引数を受け付けないものもあります。
+
+ GDBコマンド名は省略可能です。ただし、省略された名前があいまいなものでは
+あってはなりません。省略形は、それぞれのコマンドのドキュメント内に記載さ
+れています。場合によっては、あいまいな省略形も許されることがあります。例
+えば、`s'は、文字`s'で始まるコマンドがほかにも存在するにもかかわらず、
+`step'コマンドの省略形として特別に定義されています。ある省略形が使用可能
+か否かは、それを`help'コマンドへの引数として使用することで判定可能です。
+
+ GDBへの入力として空行を与える（RETキーだけを押す）ことは、1つ前に実行し
+たコマンドを繰り返すということを意味します。ただし、いくつかのコマンド
+（例えば、`run'コマンド）は、この方法で実行を繰り返すことはできません。
+意図に反して再実行してしまうと問題を引き起こす可能性があるため、繰り返し
+実行してほしくないようなコマンドの場合です。
+
+`list'コマンドと`x'コマンドは、RETキーにより繰り返し実行すると、新たに引
+数が生成されて実行されるので、前回実行されたときと全く同様の状態で繰り返
+し実行されるわけではありません。こうすることで、ソース・コードの内容やメ
+モリの内容を容易に調べることができます。
+
+ GDBは、別の用途でもRETキーを使用します。`more'ユーティリティと同様の方
+法で、長い出力を分割して表示する場合です（*Note Screen size: Screen
+Size.）。このような場合、RETキーを余分に押してしまうことは往々にしてあり
+えるので、GDBはこのような表示方法を使用しているコマンドについては、RETキー
+による繰り返し実行を行いません。
+
+テキストの中に`#'記号があると、そこから行末まではコメントになります。コ
+メントの部分は実行されません。これは、特にコマンド・ファイルの中で便利で
+す（*Note Command files: Command Files.）。
+
+
+
+File: gdb-ja.info, Node: Completion, Next: Help, Prev: Command Syntax, Up: Commands
+
+コマンド名の補完
+================
+
+途中まで入力されたコマンド名は、それがあいまいでなければ、GDBが残りの部
+分を補完してくれます。また、いつでも、コマンド名の補完候補の一覧を表示し
+てくれます。この機能は、GDBコマンド名、GDBサブ・コマンド名、ユーザ・プロ
+グラムのシンボル名に対して有効です。
+
+ GDBに単語の残りの部分を補完させたい場合には、TABキーを押します。補完候
+補が1つしか存在しない場合、GDBは残りの部分を補完し、ユーザがコマンドを
+（RETキーを押すことで）完結させるのを待ちます。例えば、ユーザが以下のよ
+うに入力したとしましょう。
+
+     ( gdb) info bre TAB
+
+ GDBは`breakpoints'という単語の残りの部分を補完します。なぜなら、`info'
+コマンドのサブ・コマンドのうち、`bre'で始まるのはこの単語だけだからです。
+
+     ( gdb) info breakpoints
+
+この時点で、ユーザはRETキーを押して`info breakpoints'コマンドを実行する
+か、あるいは`breakpoints'コマンドが実行したいコマンドではなかった場合に
+は、バックスペース・キーを押してこれを消去してから、他の文字を入力するこ
+とができます（最初から`info breakpoints'コマンドを実行するつもりであれば、
+コマンド名補完機能ではなくコマンド名の省略形を利用して、`info bre'と入力
+した後、ただちにRETキーを押してもいいでしょう）。
+
+TABキーが押されたときに、2つ以上の補完候補が存在する場合、GDBはベル音を
+鳴らします。さらにいくつか文字を入力してから補完を再度試みることも可能で
+すし、単に続けてTABキーを押すことも可能です。後者の場合、GDBは補完候補の
+全一覧を表示します。例えば、`make_'で始まる名前を持つサブルーチンにブレ
+イクポイントを設定したいような場合に、`b make_'まで入力してTABキーを入力
+したところベル音が鳴ったとしましょう。ここで続けてTABキーを入力すると、
+プログラム内の`make_'で始まるすべてのサブルーチン名が表示されます。例え
+ば、以下のように入力したとします。
+
+     ( gdb) b make_ TAB
+
+ここで GDBはベル音を鳴らします。もう一度TABキーを入力すると、以下のよう
+に表示されます。
+
+     make_a_section_from_file     make_environ               
+     make_abs_section             make_function_type         
+     make_blockvector             make_pointer_type          
+     make_cleanup                 make_reference_type        
+     make_command                 make_symbol_completion_list
+     ( gdb) b make_
+
+補完候補を表示した後、ユーザが続きを入力できるよう、GDBは途中まで入力さ
+れた文字列（ここでは`b make_'）を再表示します。
+
+最初から補完候補の一覧を表示したいのであれば、TABキーを2回押す代わりに
+`M-?'を入力することもできます。ここで、`M-?'というのは`META ?'を意味しま
+す。これを入力するには、キーボード上にMETAシフト・キーとして指定されたキー
+があれば、それを押しながら`?'を入力します。METAシフト・キーがない場合に
+は、ESCキーを押した後、`?'を入力します。
+
+ときには、入力したい文字列が、論理的には『単語』であっても、GDBが通常は
+単語の一部に含めない括弧のような文字を含む場合があります。このような場合
+に単語の補完機能を使用するためには、GDBコマンド内において、そのような単
+語を`'' （単一引用符）で囲みます。
+
+このようなことが必要になる可能性が最も高いのは、C++関数名を入力するとき
+でしょう。これは、C++が関数のオーバーローディング（引数の型の違いによっ
+て識別される、同一の名前を持つ関数の複数の定義）をサポートしているからで
+す。例えば、関数`name'にブレイクポイントを設定する場合、それが`int'型の
+パラメータを取る`name(int)'なのか、それとも`float'型のパラメータを取る
+`name(float)'なのかをはっきりさせる必要があります。このような場合に単語
+の補完機能を使用するには、単一引用符`''を関数名の前に入力します。こうす
+ることによって、TABキーまたは`M-?'キーが押されて単語補完が要求されたとき
+に、補完候補の決定には通常よりも多くのことを検討する必要のあることが GDB
+に通知されます。
+
+     ( gdb) b 'bubble( M-?
+     bubble(double,double)    bubble(int,int)
+     ( gdb) b 'bubble(
+
+場合によっては、名前の補完をするには引用符を使用する必要があるということ
+を、GDBが自分で認識できることもあります。このような場合、ユーザが引用符
+を入力していなくても、GDBが（可能な限り補完を行いつつ）引用符を挿入して
+くれます。
+
+     ( gdb) b bub TAB
+ GDBは入力された1行を以下のように変更し、
+     ベル音を鳴らします。
+     ( gdb) b 'bubble(
+
+一般的には、オーバーロードされたシンボルに対して補完が要求された際に引数
+リストがまだ入力されていないと、GDBは、引用符が必要であると判断します
+（そして実際に挿入します）。
+
+オーバーロードされた関数に関する情報については、*Note C++ expressions:
+Cplus expressions.。コマンド`set overload-resolution off'を使用すれば、
+オーバーロードの解決を無効化することができます。*Note GDB features for
+C++: Debugging C plus plus.。
+
+
+
+
+File: gdb-ja.info, Node: Help, Prev: Completion, Up: Commands
+
+ヘルプの表示
+============
+
+`help'コマンドを使うことで、GDBコマンドに関するヘルプ情報を GDB自身に表
+示させることができます。
+
+`help'
+`h'
+     `help'コマンド（省略形は`h'）を引数なしで実行することで、コマンドの
+     クラス名の簡単な一覧を表示させることができます。
+
+          ( gdb) help
+          List of classes of commands:
+
+          running -- Running the program
+          stack -- Examining the stack
+          data -- Examining data
+          breakpoints -- Making program stop at certain points
+          files -- Specifying and examining files
+          status -- Status inquiries
+          support -- Support facilities
+          user-defined -- User-defined commands
+          aliases -- Aliases of other commands
+          obscure -- Obscure features
+
+          Type "help" followed by a class name for a list of 
+          commands in that class.
+          Type "help" followed by command name for full 
+          documentation.
+          Command name abbreviations are allowed if unambiguous.
+          ( gdb)
+
+`help CLASS'
+     一般的なクラス名を引数に指定することで、そのクラスに属するコマンド
+     の一覧を表示させることができます。`status'クラスを指定した場合の表
+     示例を以下に示します。
+
+          ( gdb) help status
+          Status inquiries.
+
+          List of commands:
+
+          show -- Generic command for showing things set
+           with "set"
+          info -- Generic command for printing status
+
+          Type "help" followed by command name for full 
+          documentation.
+          Command name abbreviations are allowed if unambiguous.
+          ( gdb)
+
+`help COMMAND'
+     `help'の引数にコマンド名を指定することで、そのコマンドの使用法に関
+     する簡単な説明が表示されます。
+
+`complete ARGS'
+     `complete ARGS'コマンドにコマンド名の先頭の部分を指定すると、コマン
+     ド名の補完候補の一覧を表示します。ARGSには、補完されるべきコマンド
+     名の先頭の文字列を指定します。例えば、
+
+          complete i
+
+     は、以下のような結果を表示します。
+
+          info
+          inspect
+          ignore
+
+     これは、GNU Emacsでの使用を想定したものです。
+
+`help'コマンドに加えて、GDBの`info'コマンドおよび`show'コマンドを使用す
+ることで、ユーザ・プログラムの状態や GDBの状態を問い合わせることができま
+す。どちらのコマンドも、多くの観点からの問い合わせをサポートしています。
+このマニュアルでは、それぞれを適切と思われる箇所で紹介しています。索引の
+`info'や`show'の部分に、それぞれのサブ・コマンドの紹介されているページが
+示されています。*Note Index::。
+
+`info'
+     このコマンド
+     （省略形は`i'）
+     は、
+     ユーザ・プログラムの状態を表わす情報を表示するものです。
+     例えば、
+     `info args'によってユーザ・プログラムに与えられた引数を、
+     `info registers'によって現在使用中のレジスタの一覧を、
+     `info breakpoints'によってユーザが設定したブレイクポイントの一覧を、
+     それぞれ表示することができます。
+     `help info'によって、
+     `info'コマンドのサブ・コマンドの完全な一覧が表示されます。
+
+`set'
+     `set'コマンドによって、ある式の評価結果を環境変数に割り当てることが
+     できます。例えば、GDBのプロンプト文字列を$記号に変更するには、`set
+     prompt $'を実行します。
+
+`show'
+     `info'コマンドとは異なり、`show'コマンドは GDB自身の状態を表わす情
+     報を表示するものです。`show'コマンドで表示可能な状態はすべて、対応
+     する`set'コマンドで変更可能です。例えば、数値の表示に使用する基数は
+     `set radix'コマンドで制御できます。現在どの基数が使用されているかを
+     単に知るためには、`show radix'コマンドを使用します。
+
+     変更可能なすべてのパラメータとそれらの現在の値を表示するためには、
+     `show'コマンドを引数なしで実行します。また、`info set'コマンドを使
+     用することもできます。どちらのコマンドも、同じ情報を出力します。
+
+以下に、対応する`set'コマンドを持たないという意味で例外的である、3つの
+`show'サブ・コマンドを示します。
+
+`show version'
+     実行中の GDBのバージョンを表示します。GDBに関する障害レポートには、
+     この情報を含める必要があります。もしも異なるバージョンの GDBを複数
+     使用しているのであれば、ときには現在実行している GDBのバージョンを
+     はっきりさせたいこともあるでしょう。GDBのバージョンが上がるにつれ、
+     新しいコマンドが導入され、古いコマンドはサポートされなくなるかもし
+     れません。バージョン番号は、GDBの起動の際にも表示されます。
+
+`show copying'
+      GDBのコピー作成許可に関する情報が表示されます。
+
+`show warranty'
+     GNUの『無保証（NO WARRANTY）』声明文が表示されます。
+
+
+
+File: gdb-ja.info, Node: Running, Next: Stopping, Prev: Commands, Up: Top
+
+ GDB配下でのプログラムの実行
+****************************
+
+プログラムを GDB配下で実行するには、コンパイル時にデバッグ情報を生成する
+必要があります。ユーザが選択した環境で、必要に応じて引数を指定して、GDB
+を起動することができます。プログラムの入力元と出力先をリダイレクトするこ
+と、既に実行中のプロセスをデバッグすること、子プロセスを終了させることも
+できます。
+
+* Menu:
+
+* Compilation::                 デバッグのためのコンパイル
+* Starting::                    ユーザ・プログラムの起動
+* Arguments::                   ユーザ・プログラムの引数
+* Environment::                 ユーザ・プログラムの環境
+
+* Working Directory::           ユーザ・プログラムの作業ディレクトリ
+* Input/Output::                ユーザ・プログラムの入出力
+* Attach::                      既に実行中のプロセスのデバッグ
+* Kill Process::                子プロセスの終了
+* Process Information::         追加のプロセス情報
+
+* Threads::                     マルチスレッド・プログラムのデバッグ
+* Processes::                   マルチプロセス・プログラムのデバッグ
+
+
+
+File: gdb-ja.info, Node: Compilation, Next: Starting, Prev: Running, Up: Running
+
+デバッグのためのコンパイル
+==========================
+
+プログラムを効率的にデバッグするためには、そのプログラムのコンパイル時に
+デバッグ情報を生成する必要があります。このデバッグ情報はオブジェクト・ファ
+イルに格納されます。この情報は、個々の変数や関数の型、ソース・コード内の
+行番号と実行形式コードのアドレスとの対応などを含みます。
+
+デバッグ情報の生成を要求するには、コンパイラの実行時に`-g'オプションを指
+定します。
+
+多くのCコンパイラでは、`-g'オプションと`-O'オプションを同時に指定するこ
+とができません。このようなコンパイラでは、デバッグ情報付きの最適化された
+実行ファイルを生成することができません。
+
+GNUのCコンパイラである GCCは、`-O'オプションの有無にかかわらず、`-g'オプ
+ションが指定できます。したがって、最適化されたコードをデバッグすることが
+可能です。プログラムをコンパイルするときには、*常に*`-g'オプションを指定
+することをお勧めします。自分のプログラムは正しいと思うかもしれませんが、
+自分の幸運を信じて疑わないというのは無意味なことです。
+
+`-g -O'オプションを指定してコンパイルされたプログラムをデバッグするとき
+には、オプティマイザがコードを再調整していることを忘れないでください。デ
+バッガは、実際に存在するコードの情報を表示します。実行されるパスがソース・
+ファイルの記述と一致していなくても、あまり驚かないでください。これは極端
+な例ですが、定義されているが実際には使われていない変数を、GDBは認識しま
+せん。なぜなら、コンパイラの最適化処理により、そのような変数は削除される
+からです。
+
+命令スケジューリング機能を持つマシンなどでは、`-g'を指定してコンパイルさ
+れたプログラムでは正しく動作することが、`-g -O'を指定してコンパイルされ
+たプログラムでは正しく動作しないということがあります。`-g -O'を指定して
+コンパイルされたプログラムのデバッグで何かおかしな点があれば、`-g'だけを
+指定してコンパイルしてみてください。これで問題が解決するようであれば、
+（再現環境と一緒に）障害として私たちに報告してください。
+
+古いバージョンのGNU Cコンパイラは、
+デバッグ情報の生成のためのオプションの1つとして
+`-gg'をサポートしていました。
+現在の GDBはこのオプションをサポートしていません。
+お手元のGNU Cコンパイラにこのオプションがあるようであれば、
+それは使わないでください。
+
+
+
+File: gdb-ja.info, Node: Starting, Next: Arguments, Prev: Compilation, Up: Running
+
+ユーザ・プログラムの起動
+========================
+
+`run'
+`r'
+      GDB配下でユーザ・プログラムの実行を開始するには`run'コマンドを使用
+     してください。（VxWorks以外の環境では）最初にプログラム名を指定する
+     必要があります。これには、GDBへの引数を使用する方法（*Note Getting
+     In and Out of GDB: Invocation.）と、`file'コマンドまたは`exec-file'
+     コマンドを使用する方法（*Note Commands to specify files: Files.）と
+     があります。
+
+
+プロセスをサポートする環境でプログラムを実行している場合、`run'コマンド
+は下位プロセスを生成し、そのプロセスにプログラムを実行させます（プロセス
+をサポートしていない環境では、`run'コマンドはプログラムの先頭アドレスに
+ジャンプします）。
+
+プログラムの実行は、上位プロセスから受け取る情報によって影響されます。
+GDBはこの情報を指定する手段を提供しています。これは、ユーザ・プログラム
+が起動される*前*に実行されていなければなりません（ユーザ・プログラムの実
+行後にその情報を変更することも可能ですが、その変更結果は、次にプログラム
+を実行したときに初めて有効になります）。この情報は、4つに分類することが
+できます。
+
+*引数*
+     ユーザ・プログラムに与える引数を、`run'コマンドへの引数として指定し
+     ます。ターゲット上でシェルが使用可能であれば、引数を表現するのに通
+     常使用する手法（例えば、ワイルドカード拡張や変数による代替など）が
+     利用できるよう、シェルを経由して引数を渡します。UNIXシステムでは、
+     `SHELL'環境変数によって、使用されるシェルを選択することができます。
+     *Note Your program's arguments: Arguments。
+
+*環境*
+     ユーザ・プログラムは通常、GDBの環境を継承します。GDBの`set
+     environment'コマンドと`unset environment'コマンドを使用して、ユーザ・
+     プログラムの実行に影響する環境の一部を変更することができます。*Note
+     Your program's environment: Environment。
+
+*作業ディレクトリ*
+     ユーザ・プログラムは GDBの作業ディレクトリを継承します。GDBの作業ディ
+     レクトリは、GDBの`cd'コマンドで設定可能です。*Note Your program's
+     working directory: Working Directory。
+
+*標準入力、標準出力*
+     ユーザ・プログラムは通常、GDBが標準入力、標準出力として使用している
+     のと同一のデバイスを、標準入力、標準出力として使用します。`run'コマ
+     ンドのコマンド・ライン上で、標準入力、標準出力をリダイレクトするこ
+     とも可能です。また、`tty'コマンドによって別のデバイスを割り当てるこ
+     とも可能です。*Note Your program's input and output: Input/Output。
+
+     *注意:* 入出力のリダイレクトは機能しますが、デバッグ中のプログラム
+     の出力を、パイプを使用して他のプログラムに渡すことはできません。こ
+     のようなことをすると、GDBは誤って、別のプログラムのデバッグを開始し
+     てしまうでしょう。
+
+`run'コマンドを実行すると、ユーザ・プログラムはすぐに実行を始めます。プ
+ログラムを停止させる方法については、*Note Stopping and continuing:
+Stopping。プログラムが停止すると、`print'コマンドまたは`call'コマンドを
+使用して、プログラム内の関数を呼び出すことができます。*Note Examining
+Data: Data。
+
+ GDBが最後にシンボル情報を読み込んだ後に、シンボル・ファイルの修正タイム
+スタンプが変更されている場合、GDBはシンボル・テーブルを破棄し再読み込み
+を行います。この場合、GDBは、その時点におけるブレイクポイントの設定を保
+持しようと試みます。
+
+
+
+File: gdb-ja.info, Node: Arguments, Next: Environment, Prev: Starting, Up: Running
+
+ユーザ・プログラムの引数
+========================
+
+ユーザ・プログラムへの引数は、`run'コマンドへの引数によって指定可能です。
+それはまずシェルに渡され、ワイルドカードの展開やI/Oのリダイレクトの後、
+プログラムに渡されます。`SHELL'環境変数によって、GDBの使用するシェルが指
+定されます。`SHELL'環境変数が定義されていないと、GDBは`/bin/sh'を使用し
+ます。
+
+引数を指定せずに`run'コマンドを実行すると、前回`run'コマンドを実行したと
+きの引数、または、`set args'コマンドでセットされた引数が使用されます。
+
+`set args'
+     ユーザ・プログラムが次に実行されるときに使用される引数を指定します。
+     `set args'が引数なしで実行された場合、`run'コマンドは、ユーザ・プロ
+     グラムを引数なしで実行します。一度プログラムに引数を指定して実行す
+     ると、次にプログラムを引数なしで実行する唯一の方法は、`run'コマンド
+     を実行する前に`set args'コマンドを実行することです。
+
+`show args'
+     ユーザ・プログラムが実行されるときに渡される引数を表示します。
+
+
+
+File: gdb-ja.info, Node: Environment, Next: Working Directory, Prev: Arguments, Up: Running
+
+ユーザ・プログラムの環境
+========================
+
+"環境"とは、環境変数とその値の集合のことです。環境変数は、慣例として、ユー
+ザ名、ユーザのホーム・ディレクトリ、端末タイプ、実行プログラムのサーチ・
+パスなどを記録します。通常、環境変数はシェル上で設定され、ユーザの実行す
+るすべてのプログラムによって継承されます。デバッグ時には、GDBを終了・再
+起動せずに環境を変更して、ユーザ・プログラムを実行できると便利でしょう。
+
+`path DIRECTORY'
+     DIRECTORYで指定されるディレクトリを環境変数`PATH' （実行ファイルの
+     サーチ・パス）の先頭に追加します。これは、GDBとユーザ・プログラムの
+     両方に対して有効です。`:' （コロン）またはスペースで区切られた複数
+     のディレクトリを指定することもできます。環境変数`PATH'の中に既に
+     DIRECTORYが含まれている場合には、DIRECTORYは環境変数`PATH'の先頭に
+     移動されます。これにより、DIRECTORYはより早く検索されることになりま
+     す。
+
+     文字列`$cwd'によって、GDBがパスを検索する時点における作業ディレクト
+     リを参照することができます。`.'  （ピリオド）を使用すると、`path'コ
+     マンドを実行したディレクトリを参照することになります。DIRECTORY引数
+     に`.'  （ピリオド）が含まれていると、GDBはまずそれを（カレント・ディ
+     レクトリに）置き換えてから、サーチ・パスに追加します。
+
+`show paths'
+     実行ファイルを検索するパスの一覧（環境変数`PATH'の値）を表示します。
+
+`show environment [VARNAME]'
+     ユーザ・プログラム起動時に渡される環境変数VARNAMEの値を表示します。
+     VARNAMEが指定されない場合は、プログラムに渡されるすべての環境変数の
+     名前と値が表示されます。`environment'は`env'に省略可能です。
+
+`set environment VARNAME [=] VALUE'
+     環境変数VARNAMEの値としてVALUEをセットします。値の変更はユーザ・プ
+     ログラムに対してのみ有効で、GDBに対しては無効です。VALUEには任意の
+     文字列が指定可能です。環境変数の値は単なる文字列であり、その解釈は
+     ユーザ・プログラムに委ねられています。VALUEは必須パラメータではあり
+     ません。省略された場合には、変数には空文字列がセットされます。
+
+     例えば、以下のコマンドは、後にUNIXプログラムが実行されるときのユー
+     ザ名として`foo'をセットします（`='の前後のスペースは見やすくするた
+     めのもので、実際には必要ありません）。
+
+          set env USER = foo
+
+`unset environment VARNAME'
+     ユーザ・プログラムに渡される環境から、環境変数VARNAMEを削除します。
+     これは、`set env VARNAME ='とは異なります。`unset environment'は、
+     環境変数の値として空文字列をセットするのではなく、環境変数そのもの
+     を環境から削除します。
+
+*注意:* GDBは、環境変数`SHELL'により指定されるシェル（環境変数`SHELL'が
+設定されていない場合には`/bin/sh'）を使用してプログラムを実行します。
+`SHELL'環境変数の指定するシェルが初期化ファイルを実行するものである場合
+（例えば、C-shellの`.cshrc'、BASHの`.bashrc'）、初期化ファイルの中で設定
+された環境変数はユーザ・プログラムに影響を与えます。環境変数の設定は、
+`.login'や`.profile'のように、ユーザがシステム内に入るときに実行されるファ
+イルに移したほうがよいでしょう。
+
+
+
+File: gdb-ja.info, Node: Working Directory, Next: Input/Output, Prev: Environment, Up: Running
+
+ユーザ・プログラムの作業ディレクトリ
+====================================
+
+`run'コマンドで実行されるユーザ・プログラムは、実行時の GDBの作業ディレ
+クトリを継承します。GDBの作業ディレクトリは、もともと親プロセス（通常は
+シェル）から継承したものですが、`cd'コマンドによって、GDBの中から新しい
+作業ディレクトリを指定することができます。
+
+ GDBの作業ディレクトリは、GDBによって操作されるファイルを指定するコマン
+ドに対して、デフォルト・ディレクトリとして機能します。*Note Commands to
+specify files: Files。
+
+`cd DIRECTORY'
+      GDBの作業ディレクトリをDIRECTORYにします。
+
+`pwd'
+      GDBの作業ディレクトリを表示します。
+
+
+
+File: gdb-ja.info, Node: Input/Output, Next: Attach, Prev: Working Directory, Up: Running
+
+ユーザ・プログラムの入出力
+==========================
+
+ GDB配下で実行されるプログラムは、デフォルトでは、GDBと同一の端末に対し
+て入出力を行います。GDBは、ユーザとのやりとりのために、端末モードを GDB
+用に変更します。このとき、ユーザ・プログラムが使用していた端末モードは記
+録され、ユーザ・プログラムを継続実行すると、そのモードに戻ります。
+
+`info terminal'
+     ユーザ・プログラムが使用している端末モードに関して GDBが記録してい
+     る情報を表示します。
+
+`run'コマンドにおいてシェルのリダイレクト機能を使用することによって、ユー
+ザ・プログラムの入出力をリダイレクトすることが可能です。例えば、
+
+     run > outfile
+
+はユーザ・プログラムの実行を開始し、その出力をファイル`outfile'に書き込
+みます。
+
+ユーザ・プログラムの入出力先を指定する別の方法に、`tty'コマンドがありま
+す。このコマンドはファイル名を引数として取り、そのファイルを後に実行され
+る`run'コマンドのデフォルトの入出力先とします。このコマンドはまた、後の
+`run'コマンドにより生成される子プロセスを制御する端末を変更します。例え
+ば、
+
+     tty /dev/ttyb
+
+は、それ以降に実行される`run'コマンドによって起動されるプロセスのデフォ
+ルトの入出力先および制御端末を`/dev/ttyb'端末とします。
+
+`run'コマンド実行時に明示的にリダイレクト先を指定することで、`tty'コマン
+ドで指定された入出力装置を変更することができますが、制御端末の設定は変更
+できません。
+
+`tty'コマンドを使用した場合も、`run'コマンドで入力をリダイレクトした場合
+も、ユーザ・プログラムの入力元だけが変更されます。これらのコマンドを実行
+しても、GDBの入力元は、ユーザの使用している端末のままです。
+
+
+
+File: gdb-ja.info, Node: Attach, Next: Kill Process, Prev: Input/Output, Up: Running
+
+既に実行中のプロセスのデバッグ
+==============================
+
+`attach PROCESS-ID'
+      GDBの外で起動され、既に実行中のプロセスにアタッチします（`info
+     files'コマンドで、現在デバッグ対象となっているプログラムの情報が表
+     示されます）。このコマンドは、プロセスIDを引数に取ります。UNIXプロ
+     セスのプロセスIDを知るのに通常使用する方法は、`ps'ユーティリティ、
+     または、シェル・コマンドの`jobs -l'の実行です。
+
+     `attach'コマンドを実行後RETキーを押しても、コマンドは再実行されませ
+     ん。
+
+`attach'コマンドを使用するには、プロセスをサポートする環境でユーザ・プロ
+グラムを実行する必要があります。例えば、オペレーティング・システムの存在
+しないボード・コンピュータのような環境で動作するプログラムに対して、
+`attach'コマンドを使うことはできません。さらに、ユーザは、プロセスに対し
+てシグナルを送信する権利を持っている必要があります。
+
+`attach'コマンドを使用すると、デバッガは、まずカレントな作業ディレクトリ
+の中で、プロセスにより実行されているプログラムを見つけようとします。（プ
+ログラムが見つからなければ）次に、ソース・ファイルのサーチ・パス（*Note
+Specifying source directories: Source Path.）を使用して、プログラムを見
+つけようとします。`file'コマンドを使用して、プログラムをロードすることも
+可能です。*Note Commands to Specify Files: Files。
+
+指定されたプロセスをデバッグする準備が整った後に、GDBが最初にすることは、
+そのプロセスを停止することです。`run'コマンドを使用してプロセスを起動し
+た場合は、通常使用可能なすべての GDBコマンドを使用して、アタッチされたプ
+ロセスの状態を調べたり変更したりすることができます。ブレイクポイントの設
+定、ステップ実行、継続実行、記憶域の内容の変更が可能です。プロセスの実行
+を継続したいのであれば、GDBがプロセスにアタッチした後に、`continue'コマ
+ンドを使用することができます。
+
+`detach'
+     アタッチされたプロセスのデバッグが終了した場合には、`detach'コマン
+     ドを使用してそのプロセスを GDBの管理から解放することができます。プ
+     ロセスからディタッチしても、そのプロセスは実行を継続します。
+     `detach'コマンド実行後は、ディタッチされたプロセスとGDBは互いに完全
+     に依存関係がなくなり、`attach'コマンドによる別のプロセスへのアタッ
+     チや、`run'コマンドによる別のプロセスの起動が可能になります。
+     `detach'コマンドを実行後RETキーを押しても、`detach'コマンドは再実行
+     されません。
+
+プロセスがアタッチされている状態で、GDBを終了したり`run'コマンドを使用し
+たりすると、アタッチされたプロセスを終了させてしまいます。デフォルトの状
+態では、このようなことを実行しようとすると、GDBが確認を求めてきます。こ
+の確認処理を行うか否かは、`set confirm'コマンドで設定可能です（*Note
+Optional warnings and messages: Messages/Warnings.）。
+
+
+
+File: gdb-ja.info, Node: Kill Process, Next: Process Information, Prev: Kill Process, Up: Running
+
+子プロセスの終了
+================
+
+`kill'
+      GDB配下で実行しているユーザ・プログラムのプロセスを終了させます。
+
+このコマンドは、実行中のプロセスではなく、コア・ダンプをデバッグしたいと
+きに便利です。GDBは、ユーザ・プログラムの実行中は、コア・ダンプ・ファイ
+ルを無視します。
+
+いくつかのオペレーティング・システム上では、GDBの管理下でブレイクポイン
+トを設定されている状態のプログラムを、GDBの外で実行することができません。
+このような場合、`kill'コマンドを使用することで、デバッガの外でのプログラ
+ムの実行が可能になります。
+
+`kill'コマンドは、プログラムを再コンパイル、再リンクしたい場合にも便利で
+す。というのは、多くのシステムでは、プロセスとして実行中の実行ファイルを
+更新することはできないからです。次に`run'コマンドを実行したときに、GDBは、
+実行ファイルが変更されていることを認識し、シンボル・テーブルを再度読み込
+みます（この際、その時点でのブレイクポイントの設定を維持しようと試みま
+す）。
+
+
+
+File: gdb-ja.info, Node: Process Information, Next: Threads, Prev: Kill Process, Up: Running
+
+プロセス情報
+============
+
+いくつかのオペレーティング・システムは、`/proc'と呼ばれる便利な機能を提
+供しています。これは、ファイル・システム関連のサブルーチンを使用して、実
+行中プロセスのイメージを調べるのに使用することができます。GDBが、この機
+能を持つオペレーティング・システム用に構成されていれば、`info proc'コマ
+ンドを使用することで、ユーザ・プログラムを実行しているプロセスに関するい
+くつかの情報を知ることができます。`info proc'は、`procfs'をサポートする
+SVR4システム上でのみ機能します。
+
+`info proc'
+     プロセスに関して入手可能な情報を要約して出力します。
+
+`info proc mappings'
+     プログラムがアクセスすることのできるアドレス範囲を表示します。出力
+     情報には、それぞれのアドレス範囲に対してユーザ・プログラムが持つ読
+     み込み権、書き込み権、実行権の情報が含まれます。
+
+`info proc times'
+     ユーザ・プログラムおよびその子（プロセス）の起動時刻、ユーザ・レベ
+     ルのCPU消費時間、システム・レベルのCPU消費時間を表示します。
+
+`info proc id'
+     ユーザ・プログラムに関連のあるプロセスのID情報を表示します。ユーザ・
+     プログラムのプロセスID、親（プロセス）のプロセスID、プロセス・グルー
+     プID、セッションIDを出力します。
+
+`info proc status'
+     プロセスの状態に関する一般的な情報を出力します。プロセスが停止して
+     いる場合は、停止した理由、（シグナルを受信した場合には）受信したシ
+     グナルが出力情報に含まれます。
+
+`info proc all'
+     プロセスに関する上記の情報をすべて表示します。
+
+
+
+File: gdb-ja.info, Node: Threads, Next: Processes, Prev: Threads, Up: Running
+
+マルチスレッド・プログラムのデバッグ
+====================================
+
+HP-UXやSolarisのようなオペレーティング・システムにおいては、1つのプログ
+ラムが複数の"スレッド"を実行することができます。「スレッド」の正確な意味
+は、オペレーティング・システムによって異なります。しかし、一般的には、1
+つのアドレス空間を共有するという点を除けば、プログラム内のマルチスレッド
+は、マルチプロセスと類似しています（アドレス空間の共有とは、複数のスレッ
+ドが同一の変数の値を参照したり変更したりすることが可能であるということで
+す）。その一方で、個々のスレッドは自分用のレジスタ、実行スタック、そして
+おそらくはプライベート・メモリを持ちます。
+
+ GDBは、マルチスレッド・プログラムのデバッグ用に、以下のような便利な機能
+を提供しています。
+
+   * 新規スレッド生成の自動的な通知
+   * スレッドを切り替えるコマンド`thread THREADNO'
+   * 既存のスレッドに関する情報を問い合わせるコマンド`info threads'
+   * 1つのコマンドを複数のスレッドに対して実行するコマンド`thread apply [THREADNO] [ALL] ARGS'
+   * スレッド固有のブレイクポイント
+
+     *注意:* これらの機能は、スレッドをサポートするオペレーティング・シ
+     ステム用に構成されたすべての GDBで使用可能なわけではありません。GDB
+     がスレッドをサポートしていない環境では、これらのコマンドは無効です。
+     例えば、スレッドをサポートしていないシステム上でGDBの`info threads'
+     コマンドを実行しても何も表示されませんし、`thread'コマンドの実行は
+     常に拒絶されます。
+
+          ( gdb) info threads
+          ( gdb) thread 1
+          Thread ID 1 not known.  Use the "info threads" command to
+          see the IDs of currently known threads.
+
+ GDBのスレッド・デバッグ機能により、ユーザ・プログラムの実行中に、すべて
+のスレッドを観察することができます。ただし、GDBに制御権のある状態では、
+特定の1つのスレッドだけがデバッグの対象となります。このスレッドは、"カレ
+ント・スレッド"と呼ばれます。デバッグ用のコマンドは、カレント・スレッド
+の立場から見たプログラムの情報を表示します。
+
+ユーザ・プログラム内部において新しいスレッドの存在を検出すると、GDBは、
+`[New SYSTAG]'という形式で、ターゲット・システム上におけるこのスレッドの
+IDを表示します。ここでSYSTAGとはスレッドのIDで、その形式はシステムによっ
+て異なります。例えば、LynxOS上では、GDBが新しいスレッドを検出すると、
+
+     [New process 35 thread 27]
+
+のように表示されます。一方、SGIのシステム上では、SYSTAGは単に`process
+368'のような形式で、これ以外の情報は含まれません。
+
+
+ GDBは、ユーザ・プログラム内の個々のスレッドに対して、デバッグ用の整数値
+のスレッド番号を独自に割り当てます。
+
+`info threads'
+     その時点においてユーザ・プログラム中に存在するすべてのスレッドに関
+     する要約を表示します。個々のスレッドに関して、以下の情報が（列挙さ
+     れた順に）表示されます。
+
+       1.  GDBにより割り当てられたスレッド番号
+
+       2. ターゲット・システムのスレッドID（SYSTAG）
+
+       3. スレッドのカレントなスタック・フレームの要約
+
+      GDBにより割り当てられたスレッド番号の左のアスタリスク`*'は、そのス
+     レッドがカレント・スレッドであることを意味しています。
+
+     以下に例を示します。
+
+     ( gdb) info threads
+       3 process 35 thread 27  0x34e5 in sigpause ()
+       2 process 35 thread 23  0x34e5 in sigpause ()
+     * 1 process 35 thread 13  main (argc=1, argv=0x7ffffff8)
+         at threadtest.c:68
+
+`thread THREADNO'
+     スレッド番号THREADNOを割り当てられたスレッドをカレント・スレッドと
+     します。このコマンドの引数THREADNOは、`info threads'コマンドの出力
+     の最初のフィールドに表示される、GDB内部のスレッド番号です。GDBは、
+     指定されたスレッドのシステム上のIDとカレントなスタック・フレームの
+     要約を表示します。
+
+          ( gdb) thread 2
+          [Switching to process 35 thread 23]
+          0x34e5 in sigpause ()
+
+     `[New ...]'メッセージと同様、`Switching to'の後ろに表示される情報の
+     形式は、そのシステムにおけるスレッドの識別方法に依存します。
+
+`thread apply [THREADNO] [ALL]  ARGS'
+     `thread apply'コマンドにより、1つのコマンドを1つ以上のスレッドに対
+     して実行することができます。実行対象となるスレッドのスレッド番号を、
+     引数THREADNOに指定します。THREADNOは、`info threads'コマンドの出力
+     の最初のフィールドに表示される、GDB内部のスレッド番号です。すべての
+     スレッドに対してコマンドを実行するには、`thread apply all' ARGSコマ
+     ンドを使用してください。
+
+ GDBがユーザ・プログラムを停止させるとき、その理由がブレイクポイントであ
+れシグナルの受信であれ、ブレイクポイントに到達したスレッド、または、シグ
+ナルを受信したスレッドが自動的に選択されます。GDBは、`[Switching to
+SYSTAG]'という形式のメッセージでそのスレッドを示し、コンテキスト切り替え
+の発生に注意を促します。
+
+複数スレッドを持つプログラムの停止時や起動時のGDBの動作の詳細については、
+*Note Stopping and starting multi-thread programs: Thread Stops。
+
+また、複数スレッドを持つプログラムの中におけるウォッチポイントについては、
+*Note Setting watchpoints: Set Watchpoints。
+
+
+
+File: gdb-ja.info, Node: Processes, Next: Processes, Prev: Threads, Up: Running
+
+マルチプロセス・プログラムのデバッグ
+====================================
+
+`fork'関数を使用して新たにプロセスを生成するプログラムのデバッグに関して
+は、GDBは特別な機能を提供していません。プログラムが`fork'を実行するとき、
+GDB は引き続き親プロセスのデバッグを継続し、子プロセスは妨げられることな
+く実行を続けます。子プロセスが実行するコードにブレイクポイントを設定して
+あると、子プロセスは`SIGTRAP'シグナルを受信し、（そのシグナルをキャッチ
+する処理がなければ）子プロセスは終了してしまいます。
+
+しかし、子プロセスをデバッグしたい場合には、それほど困難ではない回避策が
+あります。`fork'の呼び出し後に子プロセスが実行するソース・コードの中に、
+`sleep'関数の呼び出しを加えてください。GDBに子プロセスのデバッグをさせる
+理由がないときに遅延が発生することのないように、特定の環境変数が設定され
+ているときのみ、あるいは、特定のファイルが存在するときのみ、`sleep'関数
+を呼び出すようにするとよいでしょう。子プロセスが`sleep'を呼び出している
+間に、`ps'ユーティリティを使用して子プロセスのプロセスIDを獲得します。次
+に、GDBに対して（親プロセスもデバッグするのであれば、新たに GDBを起動し
+て、その GDBに対して）、子プロセスにアタッチするよう指示してください
+（*Note Attach::）。これ以降は、通常の方法でプロセスにアタッチした場合と
+全く同様に、子プロセスのデバッグが可能です。
+
+
+
+File: gdb-ja.info, Node: Stopping, Next: Stack, Prev: Running, Up: Top
+
+停止と継続
+**********
+
+デバッガを使用する主な目的は、プログラムが終了してしまう前に停止させたり、
+問題のあるプログラムを調査して何が悪いのかを調べたりすることにあります。
+
+ GDB内部においてプログラムが停止する原因はいくつかあります。例えば、シグ
+ナルの受信、ブレイクポイントへの到達、`step'コマンドのような GDBコマンド
+の実行後の新しい行への到達などです。プログラムが停止すると、変数の値の調
+査や設定、新しいブレイクポイントの設定、既存のブレイクポイントの削除など
+を行った後に、プログラムの実行を継続することができます。通常、GDBが表示
+するメッセージは、ユーザ・プログラムの状態について多くの情報を提供してく
+れます。ユーザはいつでも明示的にこれらの情報を要求することができます。
+
+`info program'
+     ユーザ・プログラムの状態に関する情報を表示します。表示される情報は、
+     そのプログラムの実行状態（実行中か否か）、そのプログラムのプロセス、
+     プログラムが停止した理由です。
+
+* Menu:
+
+* Breakpoints::                 ブレイクポイント、ウォッチポイント、キャッチポイント
+* Continuing and Stepping::     実行の再開
+* Signals::                     シグナル
+
+* Thread Stops::                マルチスレッド・プログラムの停止と起動
+
+
+
+
+File: gdb-ja.info, Node: Breakpoints, Next: Continuing and Stepping, Prev: Stopping, Up: Stopping
+
+ブレイクポイント、ウォッチポイント、キャッチポイント
+====================================================
+
+"ブレイクポイント"によって、プログラム内のある特定の箇所に到達するたびに、
+プログラムを停止することができます。個々のブレイクポイントについて、その
+ブレイクポイントにおいてプログラムを停止させるためには満足されなければな
+らない、より詳細な条件を設定することができます。ブレイクポイントの設定は、
+いくつかある`break'コマンドのいずれかによって行います（*Note Setting
+breakpoints: Set Breaks.）。行番号、関数名、プログラム内における正確なア
+ドレスを指定することで、プログラムのどこで停止するかを指定することができ
+ます。
+
+HP-UX、SunOS 4.x、SVR4、Alpha OSF/1上では、実行開始前に共用ライブラリ内
+にブレイクポイントを設定することもできます。HP-UXシステムでは、ちょっと
+した制約があります。プログラムによって直接呼び出されるのではない共用ライ
+ブラリ・ルーチン（例えば、`pthread_create'の呼び出しにおいて、引数として
+指定されるルーチン）にブレイクポイントをセットするためには、そのプログラ
+ムの実行が開始されるまで待たなければなりません。
+
+"ウォッチポイント"は、ある式の値が変化したときにユーザ・プログラムを停止
+させる、特別なブレイクポイントです。ウォッチポイントは、他のブレイクポイ
+ントと同じように管理することができますが、設定だけは特別なコマンドで行い
+ます（*Note Setting watchpoints: Set Watchpoints.）。有効化、無効化、お
+よび削除を行うときに使用する各コマンドは、対象がブレイクポイントであって
+もウォッチポイントであっても同一です。
+
+ブレイクポイントで GDBが停止するたびに、常に自動的にユーザ・プログラム内
+のある値を表示させるようにすることができます。*Note Automatic display:
+Auto Display。
+
+"キャッチポイント"は、C++の例外の発生やライブラリのローディングのような
+ある種のイベントが発生したときに、ユーザ・プログラムを停止させる、また別
+の特殊なブレイクポイントです。ウォッチポイントと同様、キャッチポイントを
+設定するために使用する特別なコマンドがあります。（*Note Setting
+catchpoints: Set Catchpoints.）。しかし、この点を除けば、キャッチポイン
+トを他のブレイクポイントと同様に管理することができます。（ユーザ・プログ
+ラムがシグナルを受信したときに停止するようにするためには、`handle'コマン
+ドを使用します。*Note Signals: Signals.）。
+
+ユーザが新規に作成した個々のブレイクポイント、ウォッチポイント、キャッチ
+ポイントに対して、GDBは番号を割り当てます。この番号は1から始まる連続する
+整数値です。ブレイクポイントの様々な側面を制御するコマンドの多くにおいて、
+変更を加えたいブレイクポイントを指定するのにこの番号を使用します。個々の
+ブレイクポイントを"有効化"、"無効化"することができます。無効化されたブレ
+イクポイントは、再度有効化されるまで、ユーザ・プログラムの実行に影響を与
+えません。
+
+* Menu:
+
+* Set Breaks::                  ブレイクポイントの設定
+* Set Watchpoints::             ウォッチポイントの設定
+* Set Catchpoints::             キャッチポイントの設定
+* Delete Breaks::               ブレイクポイントの削除
+* Disabling::                   ブレイクポイントの無効化
+* Conditions::                  ブレイクポイントの成立条件
+* Break Commands::              ブレイクポイント・コマンド・リスト
+* Breakpoint Menus::            ブレイクポイント・メニュー
+
+
+
+

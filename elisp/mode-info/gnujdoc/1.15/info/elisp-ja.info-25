@@ -1,0 +1,222 @@
+Info file: elisp-ja.info,    -*-Text-*-
+produced by `texinfo-format-buffer'
+from file `elisp-ja.texi'
+using `texinfmt.el' version 2.38 of 3 July 1998.
+
+
+INFO-DIR-SECTION Editors
+START-INFO-DIR-ENTRY
+* Elisp: (elisp-ja).	The Emacs Lisp Reference Manual.
+END-INFO-DIR-ENTRY
+
+
+
+Emacs Lispリファレンスマニュアル2.5版であり、Emacs 20.3版に対応します。
+
+Published by the Free Software Foundation 59 Temple Place, Suite 330
+Boston, MA 02111-1307 USA
+
+Copyright (C) 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1998 Free
+Software Foundation, Inc.
+
+Permission is granted to make and distribute verbatim copies of this
+manual provided the copyright notice and this permission notice are
+preserved on all copies.
+
+Permission is granted to copy and distribute modified versions of this
+manual under the conditions for verbatim copying, provided that the
+entire resulting derived work is distributed under the terms of a
+permission notice identical to this one.
+
+Permission is granted to copy and distribute translations of this manual
+into another language, under the above conditions for modified versions,
+except that this permission notice may be stated in a translation
+approved by the Foundation.
+
+Permission is granted to copy and distribute modified versions of this
+manual under the conditions for verbatim copying, provided also that the
+section entitled "GNU General Public License" is included exactly as in
+the original, and provided that the entire resulting derived work is
+distributed under the terms of a permission notice identical to this
+one.
+
+Permission is granted to copy and distribute translations of this manual
+into another language, under the above conditions for modified versions,
+except that the section entitled "GNU General Public License" may be
+included in a translation approved by the Free Software Foundation
+instead of in the original English.
+
+
+
+
+
+
+File: elisp-ja.info, Node: New Symbols, Prev: Top, Up: Top
+
+旧版以降の新しいシンボル
+************************
+
+
+* Menu:
+
+* menu-bar-mule-menu:           Standard Keymaps.       151.
+* checkdoc-minor-mode:          Documentation Tips.     5.
+* ring-bell-function:           Beeping.                27.
+* set-display-table-slot:       Display Table Format.   59.
+* display-table-slot:           Display Table Format.   53.
+* frame-update-face-colors:     Face Functions.         119.
+* face-documentation:           Face Functions.         100.
+* face-italic-p:                Face Functions.         91.
+* face-bold-p:                  Face Functions.         88.
+* set-face-italic-p:            Face Functions.         61.
+* set-face-bold-p:              Face Functions.         57.
+* frame-background-mode:        Defining Faces.         72.
+* defface:                      Defining Faces.         12.
+* truncate-string-to-width:     Width.                  19.
+* string-width:                 Width.                  15.
+* char-width:                   Width.                  11.
+* overlays-in:                  Managing Overlays.      53.
+* remove-from-invisibility-spec: Invisible Text.        58.
+* add-to-invisibility-spec:     Invisible Text.         54.
+* echo-area-clear-hook:         The Echo Area.          71.
+* current-message:              The Echo Area.          58.
+* tty-erase-char:               System Environment.     163.
+* set-process-coding-system:    Process Information.    102.
+* process-coding-system:        Process Information.    95.
+* process-contact:              Process Information.    45.
+* shell-command-to-string:      Synchronous Processes.  152.
+* parse-sexp-lookup-properties: Syntax Properties.      24.
+* regexp-opt-depth:             Syntax of Regexps.      292.
+* regexp-opt:                   Syntax of Regexps.      274.
+* input-method-alist:           Input Methods.          38.
+* read-input-method-name:       Input Methods.          30.
+* set-input-method:             Input Methods.          25.
+* default-input-method:         Input Methods.          20.
+* current-input-method:         Input Methods.          15.
+* set-terminal-coding-system:   Terminal I/O Encoding.  25.
+* terminal-coding-system:       Terminal I/O Encoding.  21.
+* set-keyboard-coding-system:   Terminal I/O Encoding.  16.
+* keyboard-coding-system:       Terminal I/O Encoding.  12.
+* decode-coding-string:         Explicit Encoding.      54.
+* decode-coding-region:         Explicit Encoding.      48.
+* encode-coding-string:         Explicit Encoding.      43.
+* encode-coding-region:         Explicit Encoding.      37.
+* inhibit-eol-conversion:       Specifying Coding Systems.  44.
+* coding-system-for-write:      Specifying Coding Systems.  35.
+* coding-system-for-read:       Specifying Coding Systems.  10.
+* find-operation-coding-system: Default Coding Systems.  71.
+* default-process-coding-system: Default Coding Systems.  63.
+* network-coding-system-alist:  Default Coding Systems.  56.
+* process-coding-system-alist:  Default Coding Systems.  35.
+* file-coding-system-alist:     Default Coding Systems.  18.
+* read-non-nil-coding-system:   User-Chosen Coding Systems.  32.
+* read-coding-system:           User-Chosen Coding Systems.  26.
+* select-safe-coding-system:    User-Chosen Coding Systems.  5.
+* detect-coding-string:         Lisp and Coding Systems.  64.
+* detect-coding-region:         Lisp and Coding Systems.  51.
+* find-coding-systems-for-charsets: Lisp and Coding Systems.  47.
+* find-coding-systems-string:   Lisp and Coding Systems.  41.
+* find-coding-systems-region:   Lisp and Coding Systems.  33.
+* coding-system-change-text-conversion: Lisp and Coding Systems.  28.
+* coding-system-change-eol-conversion: Lisp and Coding Systems.  22.
+* check-coding-system:          Lisp and Coding Systems.  17.
+* coding-system-p:              Lisp and Coding Systems.  14.
+* coding-system-list:           Lisp and Coding Systems.  9.
+* last-coding-system-used:      Encoding and I/O.       36.
+* save-buffer-coding-system:    Encoding and I/O.       29.
+* buffer-file-coding-system:    Encoding and I/O.       21.
+* coding-system-get:            Coding System Basics.   40.
+* find-charset-string:          Scanning Charsets.      20.
+* find-charset-region:          Scanning Charsets.      11.
+* make-char:                    Splitting Characters.   42.
+* split-char:                   Splitting Characters.   27.
+* char-bytes:                   Splitting Characters.   11.
+* charset-dimension:            Chars and Bytes.        15.
+* char-charset:                 Character Sets.         25.
+* charset-list:                 Character Sets.         22.
+* charsetp:                     Character Sets.         18.
+* string-as-multibyte:          Selecting a Representation.  30.
+* string-as-unibyte:            Selecting a Representation.  24.
+* set-buffer-multibyte:         Selecting a Representation.  10.
+* string-make-multibyte:        Converting Representations.  63.
+* string-make-unibyte:          Converting Representations.  58.
+* nonascii-translation-table:   Converting Representations.  52.
+* nonascii-insert-offset:       Converting Representations.  42.
+* multibyte-string-p:           Text Representations.   48.
+* default-enable-multibyte-characters: Text Representations.  38.
+* enable-multibyte-characters:  Text Representations.   30.
+* combine-after-change-calls:   Change Hooks.           31.
+* previous-char-property-change: Property Search.       76.
+* next-char-property-change:    Property Search.        71.
+* fill-nobreak-predicate:       Margins.                78.
+* backward-delete-char-untabify-method: Deletion.       72.
+* marker-insertion-type:        Marker Insertion Types.  19.
+* set-marker-insertion-type:    Marker Insertion Types.  14.
+* selection-coding-system:      Window System Selections.  55.
+* focus-follows-mouse:          Input Focus.            76.
+* after-make-frame-hook:        Creating Frames.        26.
+* before-make-frame-hook:       Creating Frames.        23.
+* window-configuration-change-hook: Window Hooks.       61.
+* window-redisplay-end-trigger: Window Hooks.           58.
+* set-window-redisplay-end-trigger: Window Hooks.       55.
+* redisplay-end-trigger-functions: Window Hooks.        47.
+* scroll-preserve-screen-position: Vertical Scrolling.  93.
+* scroll-conservatively:        Vertical Scrolling.     79.
+* scroll-margin:                Vertical Scrolling.     72.
+* buffer-display-time:          Buffers and Windows.    66.
+* with-temp-buffer:             Current Buffer.         118.
+* with-current-buffer:          Current Buffer.         111.
+* save-current-buffer:          Current Buffer.         100.
+* delete-old-versions:          Numbered Backups.       43.
+* access-file:                  Testing Accessibility.  64.
+* with-temp-file:               Writing to Files.       57.
+* insert-file-contents-literally: Reading from Files.   44.
+* help-event-list:              Help Functions.         69.
+* mode-line-frame-identification: Mode Line Variables.  28.
+* mode-line-mule-info:          Mode Line Variables.    12.
+* easy-mmode-define-minor-mode: Easy-Mmode.             10.
+* minor-mode-overriding-map-alist: Active Keymaps.      135.
+* last-prefix-arg:              Prefix Command Arguments.  85.
+* num-nonmacro-input-events:    Key Sequence Input.     79.
+* real-last-command:            Command Loop Info.      19.
+* read-passwd:                  Reading a Password.     8.
+* buffer-name-history:          Minibuffer History.     51.
+* print-escape-multibyte:       Output Variables.       41.
+* print-escape-nonascii:        Output Variables.       32.
+* with-output-to-string:        Output Functions.       107.
+* loadhist-special-hooks:       Unloading.              61.
+* defcustom:                    Variable Definitions.   9.
+* defgroup:                     Group Definitions.      22.
+* functionp:                    What Is a Function.     70.
+* keyword-symbols-constant-flag: Constant Variables.    19.
+* condition:                    Conditionals.           40.
+* when:                         Conditionals.           30.
+* bool-vector-p:                Bool-Vectors.           19.
+* make-bool-vector:             Bool-Vectors.           16.
+* map-char-table:               Char-Tables.            111.
+* set-char-table-range:         Char-Tables.            88.
+* char-table-range:             Char-Tables.            68.
+* set-char-table-extra-slot:    Char-Tables.            62.
+* char-table-extra-slot:        Char-Tables.            58.
+* set-char-table-parent:        Char-Tables.            55.
+* char-table-parent:            Char-Tables.            51.
+* set-char-table-default:       Char-Tables.            45.
+* char-table-subtype:           Char-Tables.            42.
+* char-table-p:                 Char-Tables.            38.
+* make-char-table:              Char-Tables.            30.
+* assoc-default:                Association Lists.      142.
+* cddr:                         List Elements.          109.
+* cdar:                         List Elements.          106.
+* cadr:                         List Elements.          103.
+* caar:                         List Elements.          100.
+* safe-length:                  List Elements.          91.
+* assoc-ignore-representation:  Text Comparison.        100.
+* assoc-ignore-case:            Text Comparison.        95.
+* compare-strings:              Text Comparison.        79.
+* store-substring:              Modifying Strings.      15.
+* split-string:                 Creating Strings.       118.
+* string:                       Creating Strings.       23.
+
+
+
+

@@ -1,0 +1,1958 @@
+Info file: cvs-ja.info,    -*-Text-*-
+produced by `texinfo-format-buffer'
+from file `cvs-ja.texinfo'
+using `texinfmt.el' version 2.38 of 3 July 1998.
+
+
+
+START-INFO-DIR-ENTRY
+* CVS-JA: (cvs-ja).        Concurrent Versions System (Japanese)
+END-INFO-DIR-ENTRY
+
+Copyright (C) 1992, 1993 Signum Support AB Copyright (C) 1993, 1994
+Free Software Foundation, Inc.  Copyright (C) 1995-1999 Makoto
+Hiroyasu Copyright (C) 1999 Yoshiki Hayashi
+
+Permission is granted to make and distribute verbatim copies of this
+manual provided the copyright notice and this permission notice are
+preserved on all copies.
+
+Permission is granted to copy and distribute modified versions of this
+manual under the conditions for verbatim copying, provided also that
+the entire resulting derived work is distributed under the terms of a
+permission notice identical to this one.
+
+Permission is granted to copy and distribute translations of this
+manual into another language, under the above conditions for modified
+versions, except that this permission notice may be stated in a
+translation approved by the Free Software Foundation.
+
+
+
+
+
+File: cvs-ja.info, Node: Server temporary directory, Prev: Read-only access, Up: Repository
+
+サーバの一時ディレクトリ
+========================
+
+CVS サーバは実行中に一時ディレクトリを作成します。それは
+
+     cvs-servPID
+
+のような名前で、PID はサーバのプロセス番号です。それらは環境変数
+`TMPDIR' (*Note Environment variables::)、`-T' 広域オプション (*Note
+Global options::)、で指定されるディレクトリもしくは、それらがないと 
+`/tmp' に置かれます。
+
+ほとんどの場合は、通常終了か異常終了かに関わらず、サーバは終了時に一時
+ディレクトリを消去します。しかし、サーバが一時ディレクトリを消去できな
+い場合がいくつかあります。例えば:
+
+   * サーバがサーバの内部エラーで異常終了すると、デバッグを助けるため
+     にディレクトリを保存するかもしれません。
+
+   * サーバが後始末をできない方法で kill されたとき (主にほとんど unix 
+     での `kill -KILL')。
+
+   * システムが、サーバに後始末をするように告げる通常のシャットダウン
+     をすることなくシャットダウンしたとき。
+
+このような場合は、手で `cvs-servPID' ディレクトリを消去する必要があり
+ます。プロセス番号 PID で動いているサーバが無ければ、その行為は安全で
+す。
+
+
+
+File: cvs-ja.info, Node: Starting a new project, Next: Revisions, Prev: Repository, Up: Top
+
+CVS でプロジェクトを始める
+**************************
+
+ファイルの改名とディレクトリ間の移動はうまくできないので、新しいプロジェ
+クトを始めるときには、最初にファイルの構成をよく考えておく必要がありま
+す。ファイルの改名や移動は、不可能ではありませんが非常にやっかいです。
+特にディレクトリの改名に関して、CVS は癖のある動作をします (*Note
+Moving files::)。
+
+次に何をするかは、始める状況に依ります。
+
+* Menu:
+
+* Setting up the files::        ファイルをリポジトリに加える
+* Defining the module::         ファイルからモジュールを作る
+
+
+
+File: cvs-ja.info, Node: Setting up the files, Next: Defining the module, Prev: Starting a new project, Up: Starting a new project
+
+ファイルの準備
+==============
+
+始めの一歩は、リポジトリ中にファイルを生成することです。これには幾つか
+異なる方法があります。
+
+* Menu:
+
+* From files::                  既存のプロジェクトに便利な方法
+                                (既にファイルが存在する場合)
+* From other version control systems::  古いプロジェクトの、他の
+                                        システムでの履歴を保存する
+* From scratch::                ゼロからディレクトリを作成する
+
+
+
+File: cvs-ja.info, Node: From files, Next: From other version control systems, Prev: Setting up the files, Up: Setting up the files
+
+存在するファイルからディレクトリを生成する
+------------------------------------------
+
+CVS を使い始める場合に、おそらく CVS を使用できるプロジェクトが既に幾
+つかあるでしょう。この場合 `import' コマンドを使用するのが最も簡単です。
+例を挙げて説明します。CVS に組み込みたいファイルが `WDIR' にあり、それ
+を `$CVSROOT/yoyodyne/RDIR' に置きたい時、次のようにします。
+
+     $ cd WDIR
+     $ cvs import -m "Imported sources" yoyodyne/RDIR yoyo start
+
+`-m' フラグでログ・メッセージを与えなかった場合、CVS によりエディタが
+開かれ、メッセージの入力が促されます。文字列 `yoyo' は "ベンダー・タグ
+"と呼ばれるものであり、`start' は"リリース・タグ"と呼ばれるものです。
+この文脈では意味をなさないかもしれませんが、CVS はそれらの存在を要求し
+ます。詳しくは *Note Tracking sources::.
+
+では実際に動作したことを確かめた後、元のソースディレクトリを削除します。
+
+     $ cd ..
+     $ mv DIR DIR.orig
+     $ cvs checkout yoyodyne/DIR       # 下で説明
+     $ diff -r DIR.orig yoyodyne/DIR
+     $ rm -r DIR.orig
+
+誤って CVS を通さないで編集してしまわないように、下のソースを削除する
+と良いでしょう。もちろん削除する前に、ソースのバックアップを取るのが賢
+明です。
+
+`checkout' コマンドはモジュールの名前 (以前の全ての例のように)、または 
+`$CVSROOT' からの相対パス (上の例のように) を引数に取ります。
+
+CVS が `$CVSROOT' 中のディレクトリに設定した使用許可とグループ属性が、
+適切かどうか調べると良いでしょう。*Note File permissions::.
+
+取り込みたいファイルの中にバイナリ・ファイルが含まれる場合、wrapper 機
+能を用いて、どのファイルがバイナリなのか明示するとよいでしょう。*Note
+Wrappers::.
+
+
+
+File: cvs-ja.info, Node: From other version control systems, Next: From scratch, Prev: From files, Up: Setting up the files
+
+他のバージョン管理システムからファイルを作成する
+------------------------------------------------
+
+RCS 等の、他のバージョン管理システムで保守されてきたプロジェクトがあり、
+そのプロジェクトのファイルを CVS に移管する場合、各ファイルの修正履歴
+の維持を望むでしょう。
+
+RCS から
+     RCS を使用してきた場合、RCS ファイルを見付けて下さい--- 通常 
+     `foo.c' という名前のファイルには、`RCS/foo.c,v' という RCS ファイ
+     ルが対応します (他の場所にあるかもしれませんので、詳細は RCS の文
+     書を調べて下さい)。次に、CVS リポジトリに適当なディレクトリを作成
+     して下さい。そして CVS リポジトリの当該ディレクトリに、ファイルを
+     コピーして下さい (リポジトリ中のファイル名は、ソース・ファイルに 
+     `,v' が付加されたものでなくてはならず、またファイルは `RCS' サブ
+     ディレクトリではなく、当該ディレクトリに直接置いて下さい)。この例
+     のように、CVS コマンドを利用せず、CVS リポジトリを直接利用するほ
+     うが適当な場合が稀にあります。以上で作業コピーを新たに取り出す準
+     備ができました。
+
+     RCS ファイルを CVS に移動するときに、ロックされていてはいけません。
+     ロックされている場合には、CVS での操作に支障を来します。
+
+他のバージョン管理システムから
+     多くのバージョン管理システムは、標準形式の RCS ファイルを出力する
+     機能を持っています。これが可能ならば、RCS ファイルを出力して、前
+     項の説明に従って下さい。
+
+     それが駄目なら、おそらく一番良いのは他のシステムのコマンド行のイ
+     ンターフェースを使って一回に一つのリビジョンを取り出し、それを 
+     CVS に格納するスクリプトを書くことでしょう。下の `sccs2rs' スクリ
+     プトはそのために役に立つ例でしょう。
+
+From SCCS
+SCCS から
+     CVS のソース配布物の中の `contrib' ディレクトリの中に、`sccs2rcs' 
+     という名前のスクリプトがあります。これを用いて SCCS ファイルを 
+     RCS ファイルに変換できます。注意: SCCS と RCS の両方を持つマシン
+     で実行する必要があり、また `contrib' 内の他の全てと同様に動作保証
+     はされません (使用者によって評価は異なるでしょう)。
+
+From PVCS
+     CVS のソース配布物の中の `contrib' ディレクトリの中に、
+     `pvcs_to_rcs' という名前のスクリプトがあります。これを用いて PVCS 
+     アーカイブを RCS ファイルに変換できます。PVCS と RCS のあるマシン
+     で実行する必要があり、また `contrib' 内の他の全てと同様に動作保証
+     はされません(使用者によって評価は異なるでしょう)。詳細はスクリプ
+     ト中のコメントを読んでください。
+
+
+
+File: cvs-ja.info, Node: From scratch, Prev: From other version control systems, Up: Setting up the files
+
+ゼロからディレクトリを作る
+--------------------------
+
+新しいプロジェクトを始める場合、まず次のように空のディレクトリを作りま
+す。
+
+     $ mkdir tc
+     $ mkdir tc/man
+     $ mkdir tc/testing
+
+その後 `import' コマンドを使って、リポジトリに各々の (空の) ディレクト
+リを登録(作成)します:
+
+     $ cd tc
+     $ cvs import -m "Created directory structure" yoyodyne/DIR yoyo start
+
+そして `add' コマンドで、ファイル (と新しいディレクトリ) を加えていき
+ます。
+
+その時、 `$CVSROOT' の中のファイルの使用許可が、正しいものかどうかを確
+認すると良いでしょう。
+
+
+
+File: cvs-ja.info, Node: Defining the module, Prev: Setting up the files, Up: Starting a new project
+
+モジュールの定義
+================
+
+二歩目は `modules' ファイルにモジュールの定義をする事です。必ずしも必
+要ではありませんが、関連するファイルやディレクトリをグループ化するのに
+便利です。
+
+モジュールを定義する簡単な手順を示します。
+
+  1. ファイル modules の作業コピーを取ってきます。
+
+          $ cvs checkout CVSROOT/modules
+          $ cd CVSROOT
+
+  2. ファイルを編集し、モジュールの定義を加えます。導入は *Note Intro
+     administrative files::.  詳細な記述は *Note modules:: 参照。モジュー
+     ル `tc' を定義するには次の行を加えます:
+
+          tc   yoyodyne/tc
+
+  3. modules ファイルに変更を格納します。
+
+          $ cvs commit -m "Added the tc module." modules
+
+  4. モジュール modules をリリースします。
+
+          $ cd ..
+          $ cvs release -d CVSROOT
+
+
+
+File: cvs-ja.info, Node: Revisions, Next: Branching and merging, Prev: Starting a new project, Up: Top
+
+リビジョン
+**********
+
+CVS の多くの利用ではあまりリビジョン番号について心配する必要はありませ
+ん。CVS は `1.1', `1.2' などのような番号を割当て、それだけが皆が知る必
+要のあることです。しかし、CVS がリビジョン番号を割当てる方法に関してよ
+り知識を持ち、より制御したい人もいます。
+
+どのリビジョンが特定のリリースになったか、などの 1 つより多くのファイ
+ルを含むリビジョンの組を追いかけたいときは、"タグ" を使います。それは
+それぞれのファイルの数字リビジョンに割当てることのできるリビジョン名で
+す。
+
+* Menu:
+
+* Revision numbers::            リビジョン番号の意味
+* Versions revisions releases::  このマニュアルでの用語
+* Assigning revisions::         リビジョンの割当て
+* Tags::                        タグ--文字によるリビジョン
+* Tagging the working directory::  cvs tag コマンド
+* Tagging by date/tag::         cvs rtag コマンド
+* Modifying tags::              タグの追加、改名、削除
+* Tagging add/remove::          ファイルの追加と削除を伴うタグ
+* Sticky tags::                 貼り付いたタグ
+
+
+
+File: cvs-ja.info, Node: Revision numbers, Next: Versions revisions releases, Prev: Revisions, Up: Revisions
+
+リビジョン番号
+==============
+
+各バージョンのファイルはそれぞれ一意な"リビジョン番号" ("revision
+number") を持ちます。`1.1', `1.2' とか `1.3.2.2' とか `1.3.2.2.4.5' な
+んてのもあります。リビジョン番号はピリオドで分けられた偶数個の十進整数
+です。初期設定ではファイルの最初のリビジョンは 1.1 で、リビジョンが新
+しくなると一番右の番号が1つ増えます。次の絵は、新しいリビジョンを右に
+して少しリビジョンを図示しています。
+
+            +-----+    +-----+    +-----+    +-----+    +-----+
+            ! 1.1 !----! 1.2 !----! 1.3 !----! 1.4 !----! 1.5 !
+            +-----+    +-----+    +-----+    +-----+    +-----+
+
+2 つ以上のピリオドを含む番号になることもあります。例えば、`1.3.2.2' で
+す。そのようなリビジョンは枝のリビジョンを表します (*Note Branching
+and merging::)。そのようなリビジョン番号は *Note Branching and
+merging:: で詳しく説明されています。
+
+
+
+File: cvs-ja.info, Node: Versions revisions releases, Next: Assigning revisions, Prev: Revision numbers, Up: Revisions
+
+バージョン、リビジョン、リリース
+================================
+
+上の説明のように、ファイルは複数のバージョンがあります。同様に、ソフト
+ウェア製品も複数のバージョンを持つことができます。ソフトウェア製品はよ
+く `4.1.1' のようなバージョン番号を付けられます。
+
+バージョンには二つの意味があり、最初のものはこの文書で"リビジョン"と呼
+ばれるものです。二番目は"リリース"と呼ばれるものです。混乱を避けるため
+に、この文書ではなるべく"バージョン"という単語は使わないようにします。
+
+
+
+File: cvs-ja.info, Node: Assigning revisions, Next: Tags, Prev: Versions revisions releases, Up: Revisions
+
+リビジョンの割当て
+==================
+
+初期設定では、CVS は最初の番号を同じにして 2番目の番号を増加させること
+により数字リビジョンを割当てます。例えば、`1.1', `1.2', `1.3' のように。
+
+新しいファイルを加えるときは、2番目の番号は常に 1 で、最初の番号はその
+ディレクトリの中のファイルの最初の番号の一番大きいものと等しくなります。
+例えば、現在のディレクトリの一番大きい番号が `1.7', `3.1', `4.12' であ
+ると、追加されたファイルの数字リビジョンは `4.1' になります。
+
+普通はリビジョン番号を気にかける必要はありません--それを CVS が維持し
+ている内部番号のように扱う方が簡単で、タグは製品リリース 1 とリリース 
+2 のような間を区別するより良い手段です (*Note Tags::)。 しかし、数字リ
+ビジョンを設定したいのであれば、`cvs commit' の `-r' オプションでする
+ことができます。`-r' オプションは `-f' オプションを暗黙に仮定しますの
+で、ファイルが修正されていなくても格納されるということになります。
+
+例えば、全てのファイルをリビジョン 3.0 にするためには (変更されていな
+いものも含めて)、次のように実行するかもしれません:
+
+     $ cvs commit -r 3.0
+
+`-r' で指定する番号は存在するリビジョン番号より大きくなければならない
+ことに注意してください。すなわち、リビジョン 3.0 が存在していると、
+`cvs commit -r 1.3' とはできないということです。複数のリリースを並行し
+て維持したいときは、枝を使う必要があります (*Note Branching and
+merging::).
+
+
+
+File: cvs-ja.info, Node: Tags, Next: Tagging the working directory, Prev: Assigning revisions, Up: Revisions
+
+タグ--文字によるリビジョン
+==========================
+
+リビジョン番号は開発に従って徐々に増えていきますが、ソフトウェア製品の
+リリース番号とは全く何の関係もありません。CVS の使い方にもよりますが、
+異なる二つのリリースにおけるリビジョン番号は異なっているでしょう。例え
+ば RCS 5.6 を作るソース・ファイルは、次のようなリビジョン番号を持ちま
+す:
+
+     ci.c            5.21
+     co.c            5.9
+     ident.c         5.3
+     rcs.c           5.12
+     rcsbase.h       5.11
+     rcsdiff.c       5.10
+     rcsedit.c       5.11
+     rcsfcmp.c       5.9
+     rcsgen.c        5.10
+     rcslex.c        5.11
+     rcsmap.c        5.2
+     rcsutil.c       5.10
+
+`tag' コマンドを使えば、特定のリビジョンに名前 (タグ名) を付けることが
+できます。各ファイルに付けられた全てのタグと対応するリビジョン番号を調
+べたい場合は、`status' コマンドに `-v' フラグを付けて下さい。タグには、
+大文字と小文字で始まる必要があり、大文字, 小文字, 数字, `-', `_' が使
+用可能です。`BASE' と `HEAD' の二つのタグ名は、CVS が使用するために予
+約されています。将来使われる CVS にとって特別な名前は、実際のタグ名と
+の衝突を避けるために `BASE' や `HEAD' などのような名前ではなく、例えば 
+`.' で始まるような特別な方法で命名されることが望まれています。
+
+タグの命名にプログラムの名前とリリースのバージョン番号のような情報に基
+いた何らかの習慣を選びたいでしょう。例えば、CVS 1.9 が `cvs1-9' という
+名前でタグ付けされるように、まずプログラムの名前を使い、その直後にバー
+ジョン番号の `.' を `-' に変更したものを続けるかもしれません。同じ習慣
+を続ければ、常にタグが `cvs-1-9' や `cvs1_9' や他のものであったかを推
+測する必要はなくなります。taginfo ファイルでその習慣を強制することさえ
+考えるかもしれません (*Note user-defined logging::).
+
+次の例は、ファイルにタグを付ける方法を示したものです。コマンドはあなた
+の作業ディレクトリで実行して下さい。すなわち、`backend.c' があるディレ
+クトリでコマンドを実行すべきである、ということです。
+
+     $ cvs tag rel-0-4 backend.c
+     T backend.c
+     $ cvs status -v backend.c
+     ===================================================================
+     File: backend.c         Status: Up-to-date
+
+         Version:            1.4     Tue Dec  1 14:39:01 1992
+         RCS Version:        1.4     /u/cvsroot/yoyodyne/tc/backend.c,v
+         Sticky Tag:         (none)
+         Sticky Date:        (none)
+         Sticky Options:     (none)
+
+         Existing Tags:
+             rel-0-4                     (revision: 1.4)
+
+
+`cvs tag' の構文の完全なまとめと、いろいろなオプションの説明は*Note
+Invoking CVS:: を参照してください。
+
+単独のファイルにタグを付けるべき理由はほとんどありません。タグの主な使
+い途は、モジュールを構成する全てのファイルに同じタグを付け、開発の流れ
+の重要点 (リリース時等) を示すことです。
+
+     $ cvs tag rel-1-0 .
+     cvs tag: Tagging .
+     T Makefile
+     T backend.c
+     T driver.c
+     T frontend.c
+     T parser.c
+
+(CVS に対する引数にディレクトリを指定した場合は、そのディレクトリに含
+まれる全てのファイルにタグが付けられます。そのディレクトリ以下の全ての
+サブディレクトリに対しても(再帰的に) 動作します。*Note Recursive
+behavior::.)
+
+`checkout' コマンドの `-r' フラグに、モジュールから取り出すリビジョン
+を指定します。このフラグを用いて、モジュール ` tc' のリリース 1.0 を作
+るソースを、将来のいつでも簡単に復元することができます:
+
+     $ cvs checkout -r rel-1-0 tc
+
+リリース時にタグを付けるようにしておけば、過去のリリースにバグが発見さ
+れたが最新版には無い、という場合などに非常に便利です。
+
+任意の時間を指定してモジュールを復元することもできます。 *Note
+checkout options::. `-r' をこれらのコマンドのどれかに指定するときは、
+貼り付きタグに注意する必要があります。*Note Sticky tags:: 参照。
+
+複数のファイルに同じタグを付けるという事を、「ファイル名とリビジョン番
+号の行列の中に線を引く」と考えると良いでしょう。以下のリビジョンの五つ
+のファイルがあるとしましょう:
+
+             file1   file2   file3   file4   file5
+
+             1.1     1.1     1.1     1.1  /--1.1*      <-*-  TAG
+             1.2*-   1.2     1.2    -1.2*-
+             1.3  \- 1.3*-   1.3   / 1.3
+             1.4          \  1.4  /  1.4
+                           \-1.5*-   1.5
+                             1.6
+
+過去の何らかの時点で、`*' の付けられたバージョンにタグが付けられていま
+す。上図では `*' の付いたリビジョンにタグが付けられています。仮にタグ
+名を「タグ付きリビジョンを結んだ紐」と考えると、`checkout' の `-r' は
+「紐を引くとタグ付きリビジョン全てが釣れる」などと解釈できるでしょう。
+あるいはタグ付きリビジョンを水平に並べた方が、分り易いかも知れません:
+
+             file1   file2   file3   file4   file5
+
+                             1.1
+                             1.2
+                     1.1     1.3                       _
+             1.1     1.2     1.4     1.1              /
+             1.2*----1.3*----1.5*----1.2*----1.1     (--- <--- ここを見る
+             1.3             1.6     1.3              \_
+             1.4                     1.4
+                                     1.5
+
+
+
+File: cvs-ja.info, Node: Tagging the working directory, Next: Tagging by date/tag, Prev: Tags, Up: Revisions
+
+作業ディレクトリからどれをタグ付けするかを指定する
+==================================================
+
+前の節の例は、どのリビジョンにタグを付けるかを選ぶ一番普通の方法を表し
+ています。つまり、引数無しの `cvs tag' コマンドでは、CVS は現在の作業
+ディレクトリに取り出されたリビジョンを選択します。例えば、作業ディレク
+トリの `backend.c' がリビジョン1.4から取り出されたのであれば、CVS はリ
+ビジョン1.4にタグを付けます。タグはリポジトリのリビジョン1.4にすぐに適
+用されることに注意してくさい。タグ付けはファイルの修正とは違いますし、
+まず作業ディレクトリを修正してそれから `cvs commit' を実行して修正をリ
+ポジトリに送信するような他の操作とも違います。
+
+`cvs tag' がリポジトリに作用するという事実による、もしかすると驚くかも
+しれない側面に、格納されたリビジョンにタグを付けていて、それは作業ディ
+レクトリにあるローカルで修正されているファイルと違うかもしれない、とい
+うものがあります。間違ってそうしてしまわないようにするには、`cvs tag' 
+に `-c' オプションを指定します。もしローカルで修正されたファイルがあれ
+ば、CVS はファイルをタグ付けする前にエラーを出し、異常終了します:
+
+     $ cvs tag -c rel-0-4
+     cvs tag: backend.c is locally modified
+     cvs [tag aborted]: correct the above errors first!
+
+
+
+File: cvs-ja.info, Node: Tagging by date/tag, Next: Modifying tags, Prev: Tagging the working directory, Up: Revisions
+
+どれにタグを付けるかを日付やリビジョンで指定する
+================================================
+
+`cvs rtag' コマンドは特定の日付や時間のリポジトリにタグを付けます(もし
+くは最新のリビジョンにタグを付けることに使うことができます)。`rtag' は
+リポジトリの内容に直接作用します (コマンドの前に取り出すことを要求しま
+せんし、作業ディレクトリを見に行きません)。
+
+以下のオプションはタグを付ける日付やリビジョンを指定します。完全な説明
+は *Note Common options:: 参照。
+
+`-D DATE'
+     DATE 以前の一番新しいリビジョンにタグを付けます。
+
+`-f'
+     `-D DATE' や `-r TAG' と一緒のときにだけ役に立ちます。合致するリ
+     ビジョンが見つからなければ、(ファイルを無視する代わりに) 一番新し
+     いリビジョンを使います。
+
+`-r TAG'
+     存在するタグ TAG を含むファイルにのみタグを付けます。
+
+`cvs tag' コマンドは同じ `-r', `-D', `-f' オプションを使って、ファイル
+をリビジョンや日付により指定することもできるようになっています。しかし、
+この機能はおそらくあなたが望むものではないでしょう。その理由は、`cvs
+tag' は与えられたタグ/日付ではなく、存在する作業ディレクトリに基づいて
+タグを付けるファイルを選ぶからです。ですから、普通は `cvs rtag' を使う
+方がうまくいくでしょう。例外はこのような場合です:
+
+     cvs tag -r 1.4 backend.c
+
+
+
+File: cvs-ja.info, Node: Modifying tags, Next: Tagging add/remove, Prev: Tagging by date/tag, Up: Revisions
+
+タグの削除、移動、改名
+======================
+
+
+普通はタグを修正しません。それはリポジトリの履歴を記録するために存在し
+ており、削除したり意味を変えたりすることは、普通は望むことではないでしょ
+う。
+
+しかし、一時的にタグを使用したり、偶然に間違った場所に付けてしまったり
+する場合もあるでしょう。ですから、タグを削除、移動、改名するかもしれま
+せん。警告: この節のコマンドは危険です。それは履歴情報を永遠に捨て去り、
+エラーからの復帰が難しくなるか、不可能になります。あなたが CVS の管理
+者なら、これらのコマンドを taginfo で制限することを考えるかもしれませ
+ん (*Note user-defined logging::)。
+
+タグを削除するには、`-d' オプションを `cvs tag' か`rtag' に指定します。
+例えば:
+
+     cvs rtag -d rel-0-4 tc
+
+はモジュール `tc' からタグ `rel-0-4' を削除します。
+
+"移動" とは、同じ名前を違うリビジョンを指すようにすることです。例えば、
+`stable' タグは現時点で `backend.c' のリビジョン1.4を指しており、おそ
+らくそれをリビジョン1.6を指すようにしたいと思っているかもしれません。
+タグを移動するには、`-F' オプションを `cvs tag' か`cvs rtag' に指定し
+ます。例えば、今書いた作業は以下のもので達成できます:
+
+     cvs tag -r 1.6 -F stable backend.c
+
+タグの "改名" とは、違った名前を古いタグと同じリビジョンを指すようにす
+ることです。例えば、タグ名の綴りを間違えて、修正したいと思っているかも
+しれません (できれば他の人が古い綴りに頼る前に)。タグを改名するために
+は、まず `-r' オプションを `cvs rtag' に与えて新しいタグを作り、それか
+ら古い名前を削除します。これは新しいタグを古いタグと全く同じファイルに
+つけることになります。例えば:
+
+     cvs rtag -r old-name-0-4 rel-0-4 tc
+     cvs rtag -d old-name-0-4 tc
+
+
+
+File: cvs-ja.info, Node: Tagging add/remove, Next: Sticky tags, Prev: Modifying tags, Up: Revisions
+
+タグ付けとファイルの追加、削除
+==============================
+
+タグ付けがどのようにファイルの追加と削除と関連して動作するかの正確な議
+題は少し複雑です。たいていの場合、CVS はファイルが存在したかどうかをた
+いして苦労することなく追い掛けることができます。既定では、タグはタグ付
+けされたリビジョンに対応するファイルだけに適用されます。ファイルがまだ
+存在していないか、既に削除されていると、単にタグを省略し、CVS はタグが
+無いものは、そのタグではファイルが存在しないという意味に扱うことを知っ
+ています。
+
+ところが、これは少し情報を失います。例えば、ファイルが追加されて、それ
+から削除されたとしましょう。そして、タグがそのファイルになければ、その
+タグがファイルの追加前のときか、削除の後かどちらを参照するかを知る方法
+はありません。`-r' オプションを `cvs rtag' に指定すれば、CVS は削除さ
+れたファイルにタグを付け、この問題を回避することができます。例えば、先
+頭のリビジョンにタグを付けるために `-r HEAD' を指定するかもしれません。
+
+ファイルの追加と削除という題に関して、`cvs rtag' コマンドには他の方法
+ではタグ付けされない、削除されたファイルのタグを消去する `-a' オプショ
+ンがあります。例えば、タグを移動しているときに `-F' と共に指定するでしょ
+う。`-a' 無しでタグを移動すれば、削除されたファイルはファイルが削除さ
+れたという事実を反映せずに、まだ古いリビジョンを参照しているでしょう。
+私は上に書いてあるように `-r' が指定されているときはこれは必要ではない
+と思います。
+
+
+
+File: cvs-ja.info, Node: Sticky tags, Prev: Tagging add/remove, Up: Revisions
+
+貼り付いたタグ
+==============
+
+
+作業コピーのリビジョンには関連した追加のデータがあることがあります。例
+えば、枝であったり (*Note Branching and merging::)、`checkout -D' か 
+`update -D' によって特定の日時より前のバージョンに制限されているかもし
+れません。このデータは永続しますので -- すなわち、作業コピーの残りのコ
+マンドに適用されます -- 我々はそれを "貼り付けられた" と表現しました。
+
+たいていの場合、貼り付きは考える必要のない CVS の隠れた側面です。しか
+し、この機能を使いたくないとしても、貼り付けられたタグに関して *何か* 
+知る必要があるかもしれません (例えば、それを避ける方法!).
+
+"貼り付いたタグ" ("sticky tag") や日付を調べるには、`status' コマンド
+を使用します:
+
+     $ cvs status driver.c
+     ===================================================================
+     File: driver.c          Status: Up-to-date
+
+         Version:            1.7.2.1 Sat Dec  5 19:35:03 1992
+         RCS Version:        1.7.2.1 /u/cvsroot/yoyodyne/tc/driver.c,v
+         Sticky Tag:         rel-1-0-patches (branch: 1.7.2)
+         Sticky Date:        (none)
+         Sticky Options:     (none)
+
+
+作業ファイルに貼り付いたタグは、`cvs update -A' を使って削除するまで残
+ります。オプション `-A' は、ファイルを幹の先頭のバージョンに戻し、貼り
+付いたタグ, 日付, オプションを全て剥します。
+
+貼り付けられたタグの一番普通の使用法は、*Note Accessing branches:: で
+説明されているようにどの枝で作業しているかを確認することです。しかし、
+枝でない貼り付きタグにも利用法はあります。ここでは、他人の変更が安定し
+ているかどうか分らないので、作業ディレクトリを更新したくない場合を例に
+挙げて考えます。もちろんこの場合、`cvs update' の実行を控えれば済みま
+す。しかし、更新したくないのが大きなツリー構造の一部分だけならば、そこ
+にリビジョンを貼り付ければ良いのです。ソースを取り出す際に (1.4 などと) 
+リビジョンを指定すれば、そのリビジョンを貼り付けることができます。以後、
+`cvs update -A' によってタグを剥がすまで、`cvs update' を実行しても最
+新リビジョンに更新されることはありません。同様にオプション `-D' を 
+`update' や `checkout' に使うと、"貼り付いた日付" ("sticky date") が設
+定され、これ以降のコマンドにその日付が与えられます。
+
+古いバージョンのファイルを取り出す際に、タグを貼り付けたくない場合も多
+いと思います。`checkout' や `update' にオプション `-p' を付けると、ファ
+イルの内容が標準出力に送られるので、これを利用します。例えば:
+
+     $ cvs update -p -r 1.1 file1 >file1
+     ===================================================================
+     Checking out file1
+     RCS:  /tmp/cvs-sanity/cvsroot/first-dir/Attic/file1,v
+     VERS: 1.1
+     ***************
+     $
+
+しかし、あなたの尋ねていることが前の格納に戻す (この例では、`file1' を
+リビジョン1.1であったときに戻す) 方法なら、これが一番簡単な方法ではあ
+りません。その場合は `update -j' オプションを`update' に付けるのが良い
+でしょう。さらなる議論は、*Note Merging two revisions:: 参照。
+
+
+
+File: cvs-ja.info, Node: Branching and merging, Next: Recursive behavior, Prev: Revisions, Up: Top
+
+枝とマージ
+**********
+
+CVS では変更を "枝" ("branch") として知られる別の開発ラインに分けるこ
+とができます。枝のファイルを変更しても、その変更は幹や他の枝には現れま
+せん。
+
+後程、"マージ" ("merging") によって変更をある枝から別の枝 (もしくは幹) 
+に移動することができます。マージはまず `cvs update -j' を実行して、変
+更を作業ディレクトリに混ぜることから始まります。それからそのリビジョン
+を格納することができ、こうして効果的に変更を別の枝にコピーすることがで
+きます。
+
+* Menu:
+
+* Branches motivation::         枝は何の役に立つか
+* Creating a branch::           枝の作成
+* Accessing branches::          枝の更新と取り出し
+* Branches and revisions::      枝はリビジョン番号に反映される
+* Magic branch numbers::        魔法の枝番号
+* Merging a branch::            枝全体をマージする
+* Merging more than once::      枝から何度もマージする
+* Merging two revisions::       二つのリビジョン間の差分をマージする
+* Merging adds and removals::   ファイルが追加/削除された場合はどうか?
+* Merging and keywords::        キーワード置換による衝突を回避する
+
+
+
+File: cvs-ja.info, Node: Branches motivation, Next: Creating a branch, Prev: Branching and merging, Up: Branching and merging
+
+枝は何の役に立つか
+==================
+
+tc のリリース 1.0 ができたとしましょう。tc の開発を継続していて、数ヶ
+月の間にリリース 1.1 を作成する計画を立てています。しばらくして、顧客
+が致命的なバグについて文句を言ってくるようになりました。リリース 1.0を
+取り出し (*Note Tags::)、バグを見つけました (結局些細な修正に終わりま
+した)。しかし、ソースの現在のリビジョンは流動的で、少くとも1ヶ月は安定
+しない状態です。最新のソースに基づくバグ修正リリースはとても作成できま
+せん。
+
+この様な状況でするべきことは tc のリリース 1.0 の全てのファイルのリビ
+ジョンツリーに基づく "枝" ("branch") を作成することです。そうすれば幹
+の邪魔をすることなく枝に修正を加えることができます。修正が終わったとき
+に、幹に取り込むか、枝に残しておくかを選択することができます。
+
+
+
+File: cvs-ja.info, Node: Creating a branch, Next: Accessing branches, Prev: Branches motivation, Up: Branching and merging
+
+枝の作成
+========
+
+`tag -b' で枝を作成することができます。例えば、作業コピーのところにい
+るとしましょう:
+
+     $ cvs tag -b rel-1-0-patches
+
+
+これは作業コピーの現在のリビジョンに基づいた枝を別に作成し、その枝に名
+前 `rel-1-0-patches' を割当てます。
+
+枝はリポジトリに作成されているのであって、作業コピーに作成されているの
+ではないということを理解することは重要です。上記の例の様に、現在のリビ
+ジョンに基づいた枝を作成することは、自動的に作業コピーを新しい枝に切り
+換えることは *しません*。それをする方法に関する情報は *Note Accessing
+branches:: を参照してください。
+
+`rtag' を使って、作業コピーへの参照無しに枝を作ることもできます:
+
+     $ cvs rtag -b -r rel-1-0 rel-1-0-patches tc
+
+`-r rel-1-0' はこの枝がタグ `rel-1-0' に対応するリビジョンを
+根とするということを指定します。最新のリビジョンである必要はありません 
+-- 古いリビジョンから枝を生やすことが役に立つことがしばしばあります
+(例えば、他の部分は安定していることが知られている過去のリリースのバグ
+を修正するとき)。
+
+`tag' と同様に `-b' フラグは `rtag' に枝を作成するように指示します (単
+なるリビジョン名ではなく)。`rel-1-0' に対応する数字リビジョン番号はファ
+イル毎に違うことを注意してください。
+
+ですから、命令の完全な効果は新しい枝を作成することです -- モジュール 
+`tc' で、`rel-1-0' でタグ付けされたリビジョンツリーを根元とする --
+`rel-1-0-patches' という名前のものを。
+
+
+
+File: cvs-ja.info, Node: Accessing branches, Next: Branches and revisions, Prev: Creating a branch, Up: Branching and merging
+
+枝のアクセス
+============
+
+2 つの方法のどちらかで枝を取得することができます: リポジトリから新しく
+取り出すか、存在する作業コピーをその枝に切り換える方法です。
+
+リポジトリから枝を取り出すには `checkout' をフラグ `-r' と、その後に枝
+のタグ名を続けて起動します (*Note Creating a branch::)。
+
+     $ cvs checkout -r rel-1-0-patches tc
+
+もしくは、既に作業コピーを持っていれば、`update -r' で任意の枝に切り換
+えることができます:
+
+     $ cvs update -r rel-1-0-patches tc
+
+もしくは、それと等価な:
+
+     $ cd tc
+     $ cvs update -r rel-1-0-patches
+
+作業コピーが元々幹にあったか他の枝にあったかは関係ありません -- 上のコ
+マンドはそれを指定された名前の枝に切り換えます。普通の `update' コマン
+ドと同様に、`update -r' は全ての変更をマージし、衝突がどこで起こったか
+を知らせます。
+
+一度特定の枝に結び付けられた作業コピーを手に入れると、指示しない限りそ
+こに残り続けます。これは、作業コピーから格納された変更はその枝に新しい
+リビジョンを加えますが、幹と他の枝には影響を及ぼさないということです。
+
+作業コピーがどの枝であるかを知るために、コマンド `status' を使うことが
+できます。その出力で、`Sticky tag' という名前の場所を探してください 
+(*Note Sticky tags::) -- それは現在の作業ファイルに、もし枝があれば、
+それを教える CVS の方法です:
+
+     $ cvs status -v driver.c backend.c
+     ===================================================================
+     File: driver.c          Status: Up-to-date
+
+         Version:            1.7     Sat Dec  5 18:25:54 1992
+         RCS Version:        1.7     /u/cvsroot/yoyodyne/tc/driver.c,v
+         Sticky Tag:         rel-1-0-patches (branch: 1.7.2)
+         Sticky Date:        (none)
+         Sticky Options:     (none)
+
+         Existing Tags:
+             rel-1-0-patches             (branch: 1.7.2)
+             rel-1-0                     (revision: 1.7)
+
+     ===================================================================
+     File: backend.c         Status: Up-to-date
+
+         Version:            1.4     Tue Dec  1 14:39:01 1992
+         RCS Version:        1.4     /u/cvsroot/yoyodyne/tc/backend.c,v
+         Sticky Tag:         rel-1-0-patches (branch: 1.4.2)
+         Sticky Date:        (none)
+         Sticky Options:     (none)
+
+         Existing Tags:
+             rel-1-0-patches             (branch: 1.4.2)
+             rel-1-0                     (revision: 1.4)
+             rel-0-4                     (revision: 1.4)
+
+
+それぞれのファイルの枝番号が違うという事実に混乱しないでください (それ
+ぞれ `1.7.1' と `1.4.2' です)。枝タグは同じ `rel-1-0-patches' で、ファ
+イルは実際に同じ枝にあります。番号は単に枝が作られたときのそれぞれのファ
+イルのリビジョン履歴を反映しています。上の例では、この枝が作成される前
+に、`driver.c' が `backend.c' よりも多くの変更が成されたということを導
+き出すことができます。
+
+枝番号が作成される方法の詳細は *Note Branches and revisions:: を参照し
+てください。
+
+
+
+File: cvs-ja.info, Node: Branches and revisions, Next: Magic branch numbers, Prev: Accessing branches, Up: Branching and merging
+
+枝とリビジョン
+==============
+
+普通はファイルのリビジョン履歴は線形増加です (*Note Revision
+numbers::):
+
+            +-----+    +-----+    +-----+    +-----+    +-----+
+            ! 1.1 !----! 1.2 !----! 1.3 !----! 1.4 !----! 1.5 !
+            +-----+    +-----+    +-----+    +-----+    +-----+
+
+しかし、CVS は線形の開発に限られているわけではありません。"リビジョン・
+ツリー" は "枝" に分割することができ、それぞれの枝は別に維持された開発
+ラインです。枝になされた変更は簡単に幹に戻すことができます。
+
+それぞれの枝には "枝番号" があり、ピリオドで分けられた奇数個の10進整数
+から成ります。枝番号は枝が分岐した元の枝に対応するリビジョン番号に整数
+を追加することによって作成されます。枝番号により、特定のリビジョンから 
+1 つ以上の枝を枝分かれすることができます。
+
+枝の全てのリビジョンは枝番号に普通の数字を追加することで形成されます。
+下図に、前述の例から枝が発展した例を示します。
+
+                                                           +-------------+
+                                Branch 1.2.2.3.2 ->        ! 1.2.2.3.2.1 !
+                                                         / +-------------+
+                                                        /
+                                                       /
+                      +---------+    +---------+    +---------+
+     Branch 1.2.2 -> _! 1.2.2.1 !----! 1.2.2.2 !----! 1.2.2.3 !
+                    / +---------+    +---------+    +---------+
+                   /
+                  /
+     +-----+    +-----+    +-----+    +-----+    +-----+
+     ! 1.1 !----! 1.2 !----! 1.3 !----! 1.4 !----! 1.5 !  <- The main trunk
+     +-----+    +-----+    +-----+    +-----+    +-----+
+                     !
+                     !
+                     !   +---------+    +---------+    +---------+
+     Branch 1.2.4 -> +---! 1.2.4.1 !----! 1.2.4.2 !----! 1.2.4.3 !
+                         +---------+    +---------+    +---------+
+
+
+
+
+枝番号が作成される厳密な詳細は普通は気にしなくて良いのですが、以下が動
+作の方法です: CVS が枝番号を作成するときは、2 から始まる最初の未使用の
+偶数を選びます。ですから、リビジョン 6.4 から枝を作成したいときは、そ
+れは 6.4.2 という番号になるでしょう。零で終わる全ての枝番号 (6.4.0 の
+ように) は CVS の内部で使用されます (*Note Magic branch numbers::)。枝 
+1.1.1 は特別な意味を持ちます。*Note Tracking sources::.
+
+
+
+File: cvs-ja.info, Node: Magic branch numbers, Next: Merging a branch, Prev: Branches and revisions, Up: Branching and merging
+
+魔法の枝番号
+============
+
+
+この部分は "魔法の枝" ("magic brandh") と呼ばれる CVS の機能を説明しま
+す。たいていの目的のためには魔法の枝を心配する必要はありません。CVS が
+代わりに扱ってくれます。しかし、特定の状況ではそれが見えていることもあ
+りますので、いくらか動作の仕方を知っていると役に立つかもしれません。
+
+表面的には、枝番号はドットで分けられた奇数個の10進の整数です。 *Note
+Revision numbers::.  しかし、これは真実の姿ではありません。CVS は能率
+のために、余分な 0 を右から2番目の位置に挿入することがあります(1.2.3 
+は 1.2.0.3 となり、8.9.10.11.12 は 8.9.10.11.0.12 になります)。
+
+この魔法の枝と呼ばれるものを、CVS はうまく隠しています。しかし、完璧に
+隠し切れていないところも数ヶ所あります。
+
+   * 魔法の枝番号が `cvs log' の出力に現われてしまう。
+
+   * `cvs admin' で枝のタグ名が指定できない。
+
+
+`admin' コマンドを使用して、RCS が枝のタグ名を理解できるように再設定す
+る方法があります。`R4patches' というタグ名が、ファイル `number.c' の枝 
+1.4.2 に付けられている場合(魔法の枝番号は 1.4.0.2 です)、次のようにし
+ます:
+
+     $ cvs admin -NR4patches:1.4.2 numbers.c
+
+この方法を用いる場合は、1つ以上のリビジョンが、既に枝に格納されている
+必要があります。タグに間違った番号を設定しないように、注意しなくてはい
+けません。(実行以前にタグがどう設定されていたかを調べる方法はありませ
+ん)。
+
+
+
+File: cvs-ja.info, Node: Merging a branch, Next: Merging more than once, Prev: Magic branch numbers, Up: Branching and merging
+
+枝全体をマージする
+==================
+
+`update' コマンドに `-j BRANCH' フラグを付けると、枝に加えられた変更を
+作業コピーに反映することができます。`-j BRANCH' オプションが1つだけだ
+と、枝の分岐点と枝の最新リビジョン間の違いを (あなたの作業コピーに) マー
+ジします。
+
+`-j' は、"join" の略です。
+
+次のリビジョン・ツリーを考えます。
+
+     +-----+    +-----+    +-----+    +-----+
+     ! 1.1 !----! 1.2 !----! 1.3 !----! 1.4 !      <- The main trunk
+     +-----+    +-----+    +-----+    +-----+
+                     !
+                     !
+                     !   +---------+    +---------+
+     Branch R1fix -> +---! 1.2.2.1 !----! 1.2.2.2 !
+                         +---------+    +---------+
+
+枝 1.2.2 には `R1fix' というタグ (文字列) が付けられています。次は 
+`m.c' というファイル1つを含むモジュール `mod' の例です。
+
+     $ cvs checkout mod               # 最新のリビジョン 1.4 を取り出す
+
+     $ cvs update -j R1fix m.c        # 枝で行なわれた変更(リビジョン 1.2
+                                      # と 1.2.2.2 の差分)を作業コピーに追加
+
+     $ cvs commit -m "Included R1fix" # リビジョン 1.5 を作成
+
+マージ作業で衝突が起きることもありますが、衝突が起きた場合は、それを解
+決してから新しいリビジョンを格納して下さい。 *Note Conflicts
+example::.
+
+もしソースファイルにキーワードがあれば (*Note Keyword substitution::), 
+本当に必要なものよりも余分に衝突を得るかもしれません。これを回避する方
+法は *Note Merging and keywords:: を参照してください。
+
+`checkout' コマンドでもフラグ `-j BRANCH' を使用できます。以下の様にし
+て上記と同じ効果を得ることができます:
+
+     $ cvs checkout -j R1fix mod
+     $ cvs commit -m "Included R1fix"
+
+
+
+File: cvs-ja.info, Node: Merging more than once, Next: Merging two revisions, Prev: Merging a branch, Up: Branching and merging
+
+枝から何度もマージする
+======================
+
+前節の例を続けると、現在のリビジョン・ツリーは次の様になっています:
+
+     +-----+    +-----+    +-----+    +-----+    +-----+
+     ! 1.1 !----! 1.2 !----! 1.3 !----! 1.4 !----! 1.5 !   <- The main trunk
+     +-----+    +-----+    +-----+    +-----+    +-----+
+                     !                           *
+                     !                          *
+                     !   +---------+    +---------+
+     Branch R1fix -> +---! 1.2.2.1 !----! 1.2.2.2 !
+                         +---------+    +---------+
+
+前節で枝 `R1fix' を幹にマージした事を、ここでは星線で表します。
+
+次に、枝 `R1fix' で開発が続けられたと仮定します:
+
+     +-----+    +-----+    +-----+    +-----+    +-----+
+     ! 1.1 !----! 1.2 !----! 1.3 !----! 1.4 !----! 1.5 !   <- The main trunk
+     +-----+    +-----+    +-----+    +-----+    +-----+
+                     !                           *
+                     !                          *
+                     !   +---------+    +---------+    +---------+
+     Branch R1fix -> +---! 1.2.2.1 !----! 1.2.2.2 !----! 1.2.2.3 !
+                         +---------+    +---------+    +---------+
+
+そしてこの新しい変更を幹にマージしたくなりました。ここで再び `cvs
+update -j R1fix m.c' コマンドを用いた場合、CVS は既にマージされた変更
+点を重ねてマージしようとして、望ましくない結果をもたらします。
+
+そこで、未だ幹にマージされてない変更点だけマージしたい旨を、明示する必
+要があります。これには、`-j' オプションで二つのリビジョンを指定します。
+CVS は、最初のリビジョンから次のリビジョンまでの変更をマージします。例
+えば、この場合、最も簡単な方法は次の様になります。
+
+     cvs update -j 1.2.2.2 -j R1fix m.c    # 1.2.2.2 から、枝 R1fix の
+                                           # 先頭までの変更をマージする
+
+この方法の問題点は、リビジョン 1.2.2.2 を自分で指定する必要がある事で
+す。最後にマージが行われた日時を使用する方が、少しましでしょう:
+
+     cvs update -j R1fix:yesterday -j R1fix m.c
+
+さらに良いのは、変更点を幹にマージする度に、枝 `R1fix' にタグを振って
+おき、後でマージする時にそのタグを用いる方法です:
+
+     cvs update -j merged_from_R1fix_to_trunk -j R1fix m.c
+
+
+
+File: cvs-ja.info, Node: Merging two revisions, Next: Merging adds and removals, Prev: Merging more than once, Up: Branching and merging
+
+二つのリビジョン間の差分をマージする
+====================================
+
+`update' (と `checkout') コマンドに `-j REVISION' フラグを二つ付けるこ
+とで、任意の二つのリビジョン間の違いをあなたの作業コピーに加えることが
+できます。
+
+     $ cvs update -j 1.5 -j 1.3 backend.c
+
+このようにするとリビジョン 1.3 と 1.5 間の変更を全て*元に戻す*ことにな
+ります。リビジョンを指定する順序に十分注意して下さい!
+
+複数のファイルに対してこのオプションを指定する場合は、ファイルごとにリ
+ビジョン番号が全く異なるであろうことを思い出して下さい。複数のファイル
+を操作する場合には、リビジョン番号ではなく、必ずタグ名を用いるようにし
+て下さい。
+
+2つ `-j' オプションを指定すると、追加や削除を元に戻すこともできます。
+例えば、リビジョン1.1として存在していた `file1' という名前のファイルが
+あり、それを消去した (つまり、死んだリビジョン1.2を追加しました) とし
+ましょう。今、またそれを以前と同じ内容で追加したいと思ったとしましょう。
+これがそれをする方法です:
+
+     $ cvs update -j 1.2 -j 1.1 file1
+     U file1
+     $ cvs commit -m test
+     Checking in file1;
+     /tmp/cvs-sanity/cvsroot/first-dir/file1,v  <--  file1
+     new revision: 1.3; previous revision: 1.2
+     done
+     $
+
+
+
+File: cvs-ja.info, Node: Merging adds and removals, Next: Merging and keywords, Prev: Merging two revisions, Up: Branching and merging
+
+ファイルの追加や削除もマージできる
+==================================
+
+マージする変更点に、ファイルの削除や追加が伴なう場合でも、`update -j' 
+は削除や追加を反映します。
+
+実行例:
+     cvs update -A
+     touch a b c
+     cvs add a b c ; cvs ci -m "added" a b c
+     cvs tag -b branchtag
+     cvs update -r branchtag
+     touch d ; cvs add d
+     rm a ; cvs rm a
+     cvs ci -m "added d, removed a"
+     cvs update -A
+     cvs update -jbranchtag
+
+これらのコマンドが実行され、`cvs commit' がなされた後、幹ではファイル 
+`a' は削除され、ファイル`d' は追加されます
+
+
+
+File: cvs-ja.info, Node: Merging and keywords, Prev: Merging adds and removals, Up: Branching and merging
+
+マージとキーワード
+==================
+
+キーワードを含むファイルをマージすると (*Note Keyword substitution::、
+通常マージの間に数多くの衝突が起こります。なぜなら、キーワードはマージ
+中のリビジョンで違う様に展開されているからです。
+
+ですから、しばしばマージのコマンド行で `-kk' (*Note Substitution
+modes::) スイッチを指定したいと思うでしょう。キーワードの展開された値
+を展開するのでは無く、キーワードの名前だけを置換することによって、この
+オプションはマージしているリビジョンがそれぞれ同じことを確実にして、見
+せかけの衝突を回避します。
+
+例えば、このようなファイルがあるとしましょう:
+
+            +---------+
+           _! 1.1.2.1 !   <-  br1
+          / +---------+
+         /
+        /
+     +-----+    +-----+
+     ! 1.1 !----! 1.2 !
+     +-----+    +-----+
+
+そして、作業ディレクトリは現在幹 (revision 1.2) にあります。そうすると、
+以下の結果をマージから得るでしょう:
+
+     $ cat file1
+     key $Revision: 1.2 $
+     . . .
+     $ cvs update -j br1
+     U file1
+     RCS file: /cvsroot/first-dir/file1,v
+     retrieving revision 1.1
+     retrieving revision 1.1.2.1
+     Merging differences between 1.1 and 1.1.2.1 into file1
+     rcsmerge: warning: conflicts during merge
+     $ cat file1
+     <<<<<<< file1
+     key $Revision: 1.2 $
+     =======
+     key $Revision: 1.1.2.1 $
+     >>>>>>> 1.1.2.1
+     . . .
+
+これで起こったことは、merge が 1.1 と 1.1.2.1 間の差分を作業ディレクト
+リにマージしようとした、ということです。キーワードは`Revision: 1.1' か
+ら `Revision: 1.1.2.1' へと変わっているので、CVS はその変更を作業ディ
+レクトリにマージしようとして、それは作業ディレクトリが `Revision: 1.2' 
+を含んでいた、という事実と衝突をしました。
+
+これは `-kk' を使用したときにに起こることです:
+
+     $ cat file1
+     key $Revision: 1.2 $
+     . . .
+     $ cvs update -kk -j br1
+     U file1
+     RCS file: /cvsroot/first-dir/file1,v
+     retrieving revision 1.1
+     retrieving revision 1.1.2.1
+     Merging differences between 1.1 and 1.1.2.1 into file1
+     $ cat file1
+     key $Revision$
+     . . .
+
+ここでは、リビジョン 1.1 とリビジョン 1.1.2.1 の両方ともが `Revision' 
+に展開され、それらの変更を作業コピーにマージすることは何も変更しません。
+ですから、衝突は起こりません。
+
+しかしながら、マージで `-kk' を使うことには一つ大きな注意があります。
+つまり、それは普通は CVS が使っていたであろうキーワード展開の様式を上
+書きします。特に、これは、バイナリファイルのために様式が `-kb' であっ
+たときに問題になります。ですので、リポジトリにバイナリファイルがあると
+きは、`-kk' を使用するよりは、衝突に対処する必要があるでしょう。
+
+
+
+
+File: cvs-ja.info, Node: Recursive behavior, Next: Adding and removing, Prev: Branching and merging, Up: Top
+
+再帰的動作
+**********
+
+ほとんど全ての CVS のコマンドは、ディレクトリを引数に取ったときに再帰
+的に動作します。例えば、次のディレクトリ構造を考えます。
+
+           `$HOME'
+             |
+             +--tc
+             |   |
+                 +--CVS
+                 |      (内部 CVS ファイル)
+                 +--Makefile
+                 +--backend.c
+                 +--driver.c
+                 +--frontend.c
+                 +--parser.c
+                 +--man
+                 |    |
+                 |    +--CVS
+                 |    |  (内部 CVS ファイル)
+                 |    +--tc.1
+                 |
+                 +--testing
+                      |
+                      +--CVS
+                      |  (内部 CVS ファイル)
+                      +--testpgm.t
+                      +--test2.t
+
+現在のディレクトリが `tc' であれば、以下が成立します:
+
+   * `cvs update testing' は
+
+          cvs update testing/testpgm.t testing/test2.t と等価です。
+
+   * `cvs update testing man' はサブディレクトリ中の全てのファイルを更
+     新します。
+
+   * `cvs update .' 又は `cvs update' は、ディレクトリ `tc' 中の全ての
+     ファイルを更新します。
+
+引数を付けない `update' コマンドは現在の作業ディレクトリと全てのサブディ
+レクトリを更新します。言い替えると、`.' は `update' の既定引数です。こ
+れは `update' コマンドだけではなく、たいていの CVS のコマンドにも当て
+はまります。
+
+`-l' オプションを付けることによって、CVS の再帰的な動作を抑止すること
+ができます。逆に、`-R' オプションは `~/.cvsrc' で `-l' が指定されてい
+るときに再帰的動作を強制するために使うことができます(*Note ~/.cvsrc::)。
+
+     $ cvs update -l         # サブディレクトリのファイルは更新しない。
+
+
+
+File: cvs-ja.info, Node: Adding and removing, Next: History browsing, Prev: Recursive behavior, Up: Top
+
+ファイルとディレクトリの追加、削除、改名
+****************************************
+
+プロジェクトの最中では、よく新しいファイルを追加します。削除や改名、も
+しくはディレクトリも同様です。心に留めておく総合的な概念は、元に戻せな
+い変更をする代わりに、存在するファイルの修正のように、CVS に変更が発生
+したという事実を記録させたい、ということです。CVS でこれをする厳密な機
+構は状況に依り異ります。
+
+* Menu:
+
+* Adding files::                ファイルの追加
+* Removing files::              ファイルの削除
+* Removing directories::        ディレクトリの削除
+* Moving files::                ファイルの移動と改名
+* Moving directories::          ディレクトリの移動と改名
+
+
+
+File: cvs-ja.info, Node: Adding files, Next: Removing files, Prev: Adding and removing, Up: Adding and removing
+
+ディレクトリにファイルを加える
+==============================
+
+ディレクトリにファイルを加える手順を説明します。
+
+   * ディレクトリの作業コピーが必要です。*Note Getting the source::.
+
+   * ディレクトリの作業コピーの中に、新しいファイルを作ります。
+
+   * `cvs add FILENAME' を用いて、バージョン管理に加えたいファイルを 
+     CVS に伝えます。ファイルがバイナリ・データを含んでいる場合には、
+     `-kb' を指定して下さい (*Note Binary files::)。
+
+   * `cvs commit FILENAME' を用いて、実際にリポジトリにファイルを格納
+     します。この手順を行なうまでは、他の開発者はファイルを見ることが
+     できません。
+
+`add' コマンドは、新しいディレクトリを加える場合にも使用します。
+
+他のほとんどのコマンドと異なり、`add' コマンドは再帰的に動作しません。
+`cvs add foo/bar' とタイプすることさえできません。代りに、次のようにす
+る必要があります。
+
+     $ cd foo
+     $ cvs add bar
+
+ -- コマンド: cvs add [`-K' KFLAG] [`-M' MESSAGE] FILES ...
+
+     FILES が加えられた事をリポジトリに伝えます。`add' で指定するファ
+     イルやディレクトリは、現在のディレクトリに存在している必要があり
+     ます。新しいディレクトリ階層の全てをリポジトリに加える場合は (例
+     えばサード・パーティーからのファイル等)、代りに `import' コマンド
+     を使用した方が良いでしょう。*Note import::.
+
+     内容を `commit' で格納するまで、ここで加えたファイルは実際にはリ
+     ポジトリに置かれません。`remove' コマンドで削除されたファイルに対
+     して、`commit' を発行する前に `add' を実行した場合、`remove' が無
+     効になります。例は *Note Removing files::.
+
+     オプション `-k' には、このファイルを取り出すときの置換モードを指
+     定します。詳細は *Note Substitution modes:: 参照。
+
+     `-m' オプションには、ファイルの説明文を記述します。(ログ情報を記
+     録する設定ならば)この説明文がファイル `history' に記録されます 
+     (*Note history file::)。またファイルを格納する際、リポジトリの履
+     歴ファイルにも記録されます。この説明文は `log' コマンドの出力で確
+     認できます。変更するには `admin -t' を用います。*Note admin::. 
+     フラグ `-m DESCRIPTION' を省略した場合、空の文字列が使用され、説
+     明を記述するように促されることはありません。
+
+例えば、以下のコマンドでファイル `backend.c' がリポジトリに加えられま
+す:
+
+     $ cvs add backend.c
+     $ cvs commit -m "Early version. Not yet compilable." backend.c
+
+加えたファイルは、作業中の枝だけに加えられます (*Note Branching and
+merging::)。他の枝にも加えたい場合は、後でマージすることができます 
+(*Note Merging adds and removals::)。
+
+
+
+File: cvs-ja.info, Node: Removing files, Next: Removing directories, Prev: Adding files, Up: Adding and removing
+
+ファイルを削除する
+==================
+
+ディレクトリは変わります。新しいファイルが加えられ、古いファイルが削除
+されます。しかし、モジュールの古いバージョンの、正確なコピーを復元でき
+るようにしておきたいと思うでしょう。
+
+ここでは、モジュールからファイルを削除した後も、古いバージョンの復元を
+可能にする手順を説明します:
+
+   * 未格納の修正がファイルに残ってないことを確認する必要があります。
+     確認方法は *Note Viewing differences::.  また `status' や 
+     `update' といったコマンドを使用しても確認できます。修正を格納せず
+     にファイルを消した場合、当然ですが以前の状態に復元することはでき
+     ません。
+
+   * モジュールの作業コピーからファイルを削除します。例えば、`rm' など
+     を使っても良いでしょう。
+
+   * ファイルを本当に削除するという意思を CVS に伝えるために、`cvs
+     remove FILENAME' を使います。
+
+   * リポジトリからファイルを実際に削除するために、`cvs commit
+     FILENAME' を使います。
+
+ファイルの削除を格納する場合、CVS は、ファイルがもう無いという事実を記
+録します。ファイルが他の枝に存在していても良いし、後で別のファイルを同
+じ名前で加えても構いません。`checkout' や `update' に指定するオプショ
+ン `-r' や `-D' に応じて、CVS が正しくファイルを作成したり、しなかった
+りします。
+
+ -- コマンド: cvs remove [OPTIONS] FILES ...
+
+     ファイルが削除された事実をリポジトリに伝えます (作業ディレクトリ
+     から未削除のファイルは処理されません)。このコマンドを実行しても、
+     リポジトリのファイルは、削除が格納されるまで実際には削除されませ
+     ん。オプションの完全な一覧は *Note Invoking CVS:: を参照してくだ
+     さい。
+
+以下に、幾つかファイルを削除する例を挙げます:
+
+     $ cd test
+     $ rm *.c
+     $ cvs remove
+     cvs remove: Removing .
+     cvs remove: scheduling a.c for removal
+     cvs remove: scheduling b.c for removal
+     cvs remove: use 'cvs commit' to remove these files permanently
+     $ cvs ci -m "Removed unneeded files"
+     cvs commit: Examining .
+     cvs commit: Committing .
+
+利便性のために、`-f' オプションを指定することでファイルの削除と `cvs
+remove' を一度に行うことができます。例えば、上の例はこのようにすること
+もできます:
+
+     $ cd test
+     $ cvs remove -f *.c
+     cvs remove: scheduling a.c for removal
+     cvs remove: scheduling b.c for removal
+     cvs remove: use 'cvs commit' to remove these files permanently
+     $ cvs ci -m "Removed unneeded files"
+     cvs commit: Examining .
+     cvs commit: Committing .
+
+ファイルに `remove' を実行したけれど、格納前に気が変わったのなら、
+`add' コマンドを用いて、簡単にファイルを復活させることができます。
+
+
+     $ ls
+     CVS   ja.h  oj.c
+     $ rm oj.c
+     $ cvs remove oj.c
+     cvs remove: scheduling oj.c for removal
+     cvs remove: use 'cvs commit' to remove this file permanently
+     $ cvs add oj.c
+     U oj.c
+     cvs add: oj.c, version 1.1.1.1, resurrected
+
+`remove' コマンドを実行する前に失敗に気付いた場合、`update' コマンドを
+用いてファイルを復活できます:
+
+     $ rm oj.c
+     $ cvs update oj.c
+     cvs update: warning: oj.c was lost
+     U oj.c
+
+削除したファイルは、作業中の枝だけから削除されます (*Note Branching
+and merging::)。他の枝からも削除したい場合は、後でマージすることができ
+ます (*Note Merging adds and removals::)。
+
+
+
+File: cvs-ja.info, Node: Removing directories, Next: Moving files, Prev: Removing files, Up: Adding and removing
+
+ディレクトリを削除する
+======================
+
+概念上では、ディレクトリの削除はファイルの削除と似ています--現在の作業
+ディレクトリからそのディレクトリを消したいけれど、ディレクトリが存在し
+た古いリリースも取得できるようにしたい、と思うでしょう。
+
+ディレクトリを削除する方法は、その中の全てのファイルを削除することです。
+ディレクトリ自身は削除しません。そうする方法はありません。代わりに、
+`cvs update', `cvs checkout', `cvs export' に `-P' オプションを指定し
+て、作業ディレクトリから空のディレクトリを削除するようにします。おそら
+く最良の方法は常に `-P' を指定することです。空のディレクトリが欲しけれ
+ば、削除されないように、ダミーファイルを作ってください (例えば、 
+`.keepme')。
+
+`checkout' と `export' の `-r' と `-D' のオプションでは `-P' が暗黙に
+含まれていることに注意してください。この方法により CVS は正しくディレ
+クトリを作ることができ、又、取り出した特定のバージョンのそのディレクト
+リにファイルがあるかどうかに左右されなくなります。
+
+
+
+File: cvs-ja.info, Node: Moving files, Next: Moving directories, Prev: Removing directories, Up: Adding and removing
+
+ファイルの改名と移動
+====================
+
+ファイルを他のディレクトリに移動したり、改名したりするのは、難しくはあ
+りません。しかし、難解な方法でこれを実現するものがあります。(ディレク
+トリの移動と改名は、より困難です。*Note Moving directories::.)。
+
+以降の例では、OLD というファイルを NEW に改名します。
+
+* Menu:
+
+* Outside::                     通常の改名方法
+* Inside::                      小技を使った別の方法
+* Rename by copying::           別の小技を使った方法
+
+
+
+File: cvs-ja.info, Node: Outside, Next: Inside, Prev: Moving files, Up: Moving files
+
+通常の改名方法
+--------------
+
+
+ファイルを移動する通常の方法は、OLD を NEW にコピーして、普通の CVS コ
+マンドで OLD をリポジトリから削除し、NEW を加えることです。
+
+     $ mv OLD NEW
+     $ cvs remove OLD
+     $ cvs add NEW
+     $ cvs commit -m "Renamed OLD to NEW" OLD NEW
+
+これがファイルを移動する最も単純な方法であり、間違いがなく、この操作の
+履歴も記録されます。このファイルの履歴を利用する際、古い名前か、新しい
+名前のどちらかを指定して、履歴のどの部分が欲しいのか知らせなくてはいけ
+ません。例えば、`cvs log OLD' を実行しても、改名が行なわれた時までのロ
+グ情報しか得られません。
+
+NEW が格納される場合には、リビジョン番号は普通は 1.1 から再び始まりま
+す。それが嫌ならば、格納時にオプション `-r rev' を用いると良いでしょう。
+詳しい情報は *Note Assigning revisions:: を参照してください。
+
+
+
+File: cvs-ja.info, Node: Inside, Next: Rename by copying, Prev: Outside, Up: Moving files
+
+履歴ファイルを移動する
+----------------------
+
+この方法は、リポジトリ中のファイルの移動を含むため、さらに危険です。こ
+の節を全部読んでから実行して下さい。
+
+     $ cd $CVSROOT/DIR
+     $ mv OLD,v NEW,v
+
+利点:
+
+   * 変更の記録が完全に保たれる。
+
+   * リビジョン番号に影響がない。
+
+欠点:
+
+   * リポジトリから、古いリリースを簡単に復元できない。(改名される以前
+     のリビジョンでもファイルの名前が NEW になる。)
+
+   * ファイルがいつ改名されたかの記録がない。
+
+   * ファイルの移動の最中に、誰かが履歴ファイルにアクセスした場合、酷
+     いことが起きる。あなたがファイルを移動させている間は、誰にも CVS 
+     コマンドを発行させてはいけません。
+
+
+
+File: cvs-ja.info, Node: Rename by copying, Prev: Inside, Up: Moving files
+
+履歴ファイルをコピーする
+------------------------
+
+この方法も、リポジトリ中のファイルの移動を含みます。欠点が無い訳ではあ
+りませんが、安全です。
+
+     # リポジトリ中の RCS ファイルをコピーする
+     $ cd $CVSROOT/DIR
+     $ cp OLD,v NEW,v
+     # 以前のファイルを削除する
+     $ cd ~/DIR
+     $ rm OLD
+     $ cvs remove OLD
+     $ cvs commit OLD
+     # NEW の全てのタグを削除する
+     $ cvs update NEW
+     $ cvs log NEW             # 枝でないタグ名を思い出す
+     $ cvs tag -d TAG1 NEW
+     $ cvs tag -d TAG2 NEW
+     ...
+
+タグを削除することで、以前のリビジョンを復元することができます。
+
+利点:
+
+   * リビジョンの取得に `-DDATE' を使わないで、`-rTAG' を使う限り、以
+     前のリビジョンのファイルを正しく復元できる。
+
+   * 変更の記録を完全に維持できる。
+
+   * リビジョン番号に影響しない。
+
+欠点:
+
+   * 改名の前後で履歴を辿ることが困難である。
+
+
+
+
+File: cvs-ja.info, Node: Moving directories, Prev: Moving files, Up: Adding and removing
+
+ディレクトリの改名と移動
+========================
+
+ディレクトリの改名と移動の普通の方法は *Note Outside:: で説明されてい
+るようにその中のそれぞれのファイルを改名もしくは移動することです。それ
+から *Note Removing directories:: に説明されているように `-P' オプショ
+ンを付けて取り出します。
+
+本当にリポジトリの中身を変更してディレクトリを改名したり削除したければ、
+次のようにしてください:
+
+  1. ディレクトリを改名する前に、ディレクトリの作業コピーを取り出して
+     いる全ての人に、その旨を知らせます。次のステップに進む前に、彼等
+     全員が変更内容を格納し、作業コピーを削除しなければなりません。
+
+  2. リポジトリ中のディレクトリを改名します。
+
+          $ cd $CVSROOT/PARENT-DIR
+          $ mv OLD-DIR NEW-DIR
+
+  3. CVS の管理用ファイルを修正します。(例えばモジュール名を改名する場
+     合等)。
+
+  4. 再び取り出して作業を続けられることを、全員に知らせます。
+
+
+誰かが作業コピーを消さずに持っていた場合、彼がリポジトリから消されたディ
+レクトリを削除するまで、彼の発行する CVS コマンドは無視されます。
+
+ディレクトリを移動させるよりは、ディレクトリ中のファイルを移動させる方
+を推奨します。ディレクトリを移動させれば、ディレクトリ名に依存している
+古いリリースを正確に復元する事は、ほとんど不可能になります。
+
+
+
+File: cvs-ja.info, Node: History browsing, Next: Binary files, Prev: Adding and removing, Up: Top
+
+履歴の閲覧
+**********
+
+
+何時、誰が、どのように、どのファイルを変更したか、といったバージョン管
+理の履歴を CVS を使って保存してきたならば、様々な機構を用いてこの履歴
+を調べることができます。
+
+* Menu:
+
+* log messages::                ログ・メッセージ
+* history database::            履歴データベース
+* user-defined logging::        ログ方法を使用者自身が設定する
+* annotate::                    各行がどのリビジョンで変更されたか?
+
+
+
+File: cvs-ja.info, Node: log messages, Next: history database, Prev: History browsing, Up: History browsing
+
+ログ・メッセージ
+================
+
+ファイルを格納する時には、必ずログ・メッセージを記述します。
+
+各リビジョンの格納時に記述されたログ・メッセージを調べる場合、`cvs
+log' コマンドを使用します (*Note log::)。
+
+
+
+File: cvs-ja.info, Node: history database, Next: user-defined logging, Prev: log messages, Up: History browsing
+
+履歴データベース
+================
+
+様々な CVS の実行履歴を記録するために、ファイル `history' が使用できま
+す (*Note history file::)。ファイル `history' の情報を検索するには、
+`cvs history' コマンドを使用して下さい (*Note history::)。
+
+
+
+File: cvs-ja.info, Node: user-defined logging, Next: annotate, Prev: history database, Up: History browsing
+
+ログ方法を使用者自身が設定する
+==============================
+
+CVS を用いた様々な作業の履歴は、利用者自身が選択する方法で記録されます。
+CVS は、様々な場面でスクリプトを実行し、この機構を実現します。これらの
+スクリプトには、ログ・ファイルに情報を追記したり、開発者グループにメー
+ルを送ったり、特定のニュース・グループに記事を投稿したりするものがあり
+ます。格納時のログ方法は `loginfo' で設定します(*Note loginfo::)。
+commit, checkout, export, tag 等を実行した時のログ方法は、各々オプショ
+ン `-i', `-o', `-e', `-t' を用いて、modules ファイルに設定できます。こ
+れらのスクリプトほどのものは必要としない使用者にも、`cvs watch add' コ
+マンドを使用して、様々な告知をする弾力的な方法を提供します(*Note
+Getting Notified::)。この方法は `cvs watch on' を使用していない場合で
+も利用できます。
+
+誰かが `tag' か `rtag' コマンドを実行した時に実行されるプログラムを、
+`taginfo' ファイルに設定します。管理用ファイルの標準書式に従い(*Note
+Administrative files::)、`taginfo' の各行には、正規表現に続いて実行さ
+れるコマンドが記述されます。コマンドに渡される引数を順に挙げると、タグ
+名, 操作(`tag' なら `add', `tag -F' なら `mov', `tag -d' なら `del'), 
+リポジトリ, 残りは全て ファイル名 と リビジョン の組です。フィルタ・プ
+ログラムが非零で終了した場合は、タグ処理が中止されます。
+
+これは taginfo を使って tag と rtag コマンドのログを取る例です。
+taginfo ファイルには以下のものを入れます:
+
+     ALL /usr/local/cvsroot/CVSROOT/loggit
+
+`/usr/local/cvsroot/CVSROOT/loggit' は以下のスクリプトになっています:
+
+     #!/bin/sh
+     echo "$@" >>/home/kingdon/cvsroot/CVSROOT/taglog
+
+
+
+File: cvs-ja.info, Node: annotate, Prev: user-defined logging, Up: History browsing
+
+コマンド annotate
+=================
+
+ -- コマンド: cvs annotate [`-FLR'] [`-R REV'|`-D DATE'] FILES ...
+
+     FILES で指定された各ファイルについて、幹の先頭リビジョンの内容と、
+     各行が最後に修正された時の情報を、併せて表示します。以下に例示し
+     ます:
+
+          $ cvs annotate ssfile
+          Annotations for ssfile
+          ***************
+          1.1          (mary     27-Mar-96): ssfile line 1
+          1.2          (joe      28-Mar-96): ssfile line 2
+
+     ファイル `ssfile' は現在 2行から成り、`ssfile line 1' という行は 
+     3月 27日に `mary' が格納しました。そして 3月 28日に `joe' が、
+     `ssfile line 1' という行を修正せずに、`ssfile line 2' という行を
+     格納しました。この報告では、削除されたり修正された行については何
+     も分らないので、`cvs diff' を用いる必要があるでしょう(*Note
+     diff::)。
+
+
+`cvs annotate' へのオプションは *Note Invoking CVS:: で一覧にされてて
+いて、annotate するファイルとリビジョンを選択するために使うことができ
+ます。オプションは *Note Common options:: でより詳しく説明されています。
+
+
+
+
+File: cvs-ja.info, Node: Binary files, Next: Multiple developers, Prev: History browsing, Up: Top
+
+バイナリ・ファイルの扱い
+************************
+
+最も普通の CVS の使用はテキスト・ファイルの保管です。テキスト・ファイ
+ルでは、CVS はリビジョンをマージしたり、リビジョン間の違いを人間が読め
+る形式で表示したり、他の似たような操作をすることができます。しかし、こ
+れらの中のいくつかの機能を諦めることで、CVS はバイナリ・ファイルも保管
+することができます。例えば、テキスト・ファイルとバイナリ画像の両方から
+なるウェブサイトを CVS で保管するかもしれません。
+
+* Menu:
+
+* Binary why::     バイナリ・ファイルの問題の詳細
+* Binary howto::   保管方法
+
+
+
+File: cvs-ja.info, Node: Binary why, Next: Binary howto, Prev: Binary files, Up: Binary files
+
+バイナリ・ファイルの問題
+========================
+
+普段作業するファイルがバイナリであれば、バイナリ・ファイルを管理する必
+要は明らかですが、それをバージョン管理に入れることは追加の問題を発生さ
+せます。
+
+バージョン管理の基本機能の一つは2つのリビジョンの違いを示すことです。
+例えば、別の誰かが新しいバージョンのファイルを格納すれば、何を変更して
+いて、変更が良いかどうかを決定したいと思うかもしれません。テキスト・ファ
+イルには、CVS は `cvs diff' コマンドでこの機能を提供します。バイナリ・
+ファイルには、2つのリビジョンを取り出して、CVS の外部にあるプログラム
+で比較することができるでしょう (例えば、ワープロにはよくそのような機能
+があります)。もしそのようなツールがなければ、人に良いログメッセージを
+書くことを強制するなどの他の機構を通じて変更を追跡し、実際にした変更が
+本当にそうしたいと思っている変更そのものであることを期待しなければなり
+ません。
+
+バージョン管理システムの他の機能は2つのリビジョンをマージする機能です。
+CVS ではこれは2つの文脈で発生します。1つめは使用者が分離された作業ディ
+レクトリで変更をしたときです (*Note Multiple developers::)。2つ目は 
+`update -j' コマンドで明示的にマージしたときです (*Note Branching and
+merging::)。
+
+テキスト・ファイルの場合は、CVS は独立になされた変更をマージでき、変更
+が衝突した場合は衝突を報せることができます。バイナリ・ファイルでは、
+CVS にできることは、せいぜい2つの違ったファイルのコピーを出して、使用
+者に衝突を解消するようにすることくらいです。使用者はどちらかのコピーを
+選ぶかもしれませんし、特定のファイル形式を知っている外部マージツールが
+あればそれを実行するかもしれません。使用者にマージをさせることは、主に
+使用者が偶然いくつかの変更を省略してしまわない、ということに依存してお
+り、エラーが発生する可能性が高いということに注意してください。
+
+この過程が望ましくないなら、最良の選択はマージを避けることでしょう。別
+の作業ディレクトリによるマージを避けるためには、*Note Multiple
+developers:: の独占取得 (ファイル占有) の議論を参照してください。枝に
+よるマージを避けるためには、枝の使用を制限してください。
+
+
+
+File: cvs-ja.info, Node: Binary howto, Prev: Binary why, Up: Binary files
+
+バイナリ・ファイルを保管する方法
+================================
+
+CVS でバイナリ・ファイルを保管する際の問題点が二つあります。一つ目は、
+CVS がファイルを取り出す際に、リポジトリで標準的に使用する行末形式 (ラ
+インフィードのみ) を、クライアント側のオペレーティングシステムに適した
+形式に変換する事です (例えば Windows NT だと、キャリッジリターンの後に
+ラインフィードとなります)。
+
+二つ目の問題点は、キーワードと同じデータが偶然バイナリ・ファイルに含ま
+れる可能性がある事です (*Note Keyword substitution::)。そのためキーワー
+ド展開を無効にする必要があります。
+
+
+幾つかの CVS コマンドで `-kb' オプションを用いれば、確実に行末変換とキー
+ワード展開を止めることができます。
+
+`-kb' フラグを用いて新しいファイルを登録する方法を、以下に例示します:
+
+     $ echo '$Id$' > kotest
+     $ cvs add -kb -m"A test file" kotest
+     $ cvs ci -m"First checkin; contains a keyword" kotest
+
+ふと油断して `-kb' 無しでファイルを加えてしまった場合、`cvs admin' コ
+マンドを使用して正常な状態に戻す必要があります。以下に例示します:
+
+     $ echo '$Id$' > kotest
+     $ cvs add -m"A test file" kotest
+     $ cvs ci -m"First checkin; contains a keyword" kotest
+     $ cvs admin -kb kotest
+     $ cvs update -A kotest
+     # For non-unix systems:
+     # Copy in a good copy of the file from outside CVS
+     $ cvs commit -m "make it binary" kotest
+
+ファイル `kotest' を格納した時はファイルはバイナリ・ファイルとしては保
+存されません。というのは、バイナリ・ファイルとしては格納しなかったから
+です。`cvs admin -kb' コマンドでファイルの置換モードを設定しますが、既
+にある作業コピーは変更してくれません。行末を適切に処理する必要がある場
+合 (CVS のクライアントとして unix 以外のシステムを使用している場合) は、
+上記の例に示した `cvs commit' コマンドのように、新たにファイルのコピー
+を格納する必要があります。Unix では、`cvs update -A' で十分です。
+
+ここで、`cvs admin -k' を用いて置換モードを変更しても、この置換モード
+はバージョン管理されないことを認識しておいて下さい。これは例えば古いリ
+リースにテキスト・ファイルがあり、新しいリリースに同じ名前のバイナリ・
+ファイルがあった場合、バージョンによってテキストとバイナリを区別して取
+り出す方法を、CVS が備えていないことを意味しています。この問題を解決す
+る方法は今のところありません。
+
+`cvs add' や `cvs import' を実行する際、既定でバイナリとして扱うかどう
+かを、ファイルの名前によって判断するように設定もできます。例えば、ファ
+イル名が `.exe' で終わるファイルをバイナリと判断するように設定できます。
+*Note Wrappers::.  現時点では内容に応じてファイルがバイナリかどうかを
+調べる方法はありません。そのような機能を設計する主な困難は、バイナリと
+そうでないファイルの区別をする方法が明らかでなく、適用する規則がオペレー
+ティングシステムに応じてかなり異なるであろうということです。
+
+
+
+File: cvs-ja.info, Node: Multiple developers, Next: Revision management, Prev: Binary files, Up: Top
+
+複数の開発者
+************
+
+複数の人間でソフトウェア開発を行なうと、色々面倒が起こります。例えば二
+人の人物が、同じファイルを同時に編集しようとすることがよくあります。解
+決策の一つは、"ファイル占有" ("file locking") または "独占取得"
+("reserved checkouts") と呼ばれるもので、同時にファイルを編集できる人
+数を一人に制限するものです。RCS や SCCS 等の履歴管理システムでは、これ
+が唯一の方法です。現時点では CVS で独占取得をする普通の方法は `cvs
+admin -l' コマンドです (*Note admin options::)。これは後述する監視機能
+のように CVS によく実装されてはいませんが、独占取得を必要なほとんどの
+人は十分だと思うでしょう。また後述する監視機構を適切な手順を踏んで用い
+ることでも (ソフトウェアからは強制されません)、同時編集を避けることが
+可能でしょう。
+
+CVS の既定モデルは"無条件取得" ("unreserved checkouts") と呼ばれるもの
+です。このモデルでは、開発者がそれぞれ自分の "作業コピー" ("working
+copy") のファイルを同時に編集できます。最初に変更を格納した人物は、他
+の人物が編集を始めたことが自動的には分りません。二番目の人物が格納する
+時にはエラー表示を受けますから、CVS コマンドを用いて、自分の作業コピー
+をリポジトリのリビジョンの最新のものにする必要があります。この手順はほ
+ぼ自動化されています。
+
+CVS は、独占取得がするような規則を強制することなく、種々の意志疎通を容
+易にする仕組みを用意しています。
+
+この章の残りでは、色々なモデルの動作方法と、各モデルの選択に伴なう問題
+点について述べます。
+
+
+* Menu:
+
+* File status::                 ファイルは幾つかの状態を取る
+* Updating a file::             ファイルを最新にする
+* Conflicts example::           有益な実行例
+* Informing others::            協力のために他の人にお知らせする
+* Concurrency::                 リポジトリの同時利用
+* Watches::                     ファイル編集者の追跡機構
+* Choosing a model::            独占取得か無条件取得か?
+
+
+
+File: cvs-ja.info, Node: File status, Next: Updating a file, Prev: Multiple developers, Up: Multiple developers
+
+ファイル状態
+============
+
+取り出した後にあなたが加えた操作や、他の人物がリポジトリに加えた操作に
+よって、ファイルを幾つかの状態に分類します。`status' コマンドによって
+報告される状態を以下に挙げます:
+
+Up-to-date
+     このファイルが、使用している枝の最新リビジョンと同じであることを
+     示します。
+
+Locally Modified
+     このファイルを修正したが、まだ変更内容を格納してないことを示しま
+     す。
+
+Locally Added
+     `add' コマンドによりファイルを加えたが、まだその内容を格納してな
+     いことを示します。
+
+Locally Removed
+     `remove' コマンドによりファイルを削除したが、まだその変更を格納し
+     てないことを示します。
+
+Needs Checkout
+     他の人物が新しいリビジョンをリポジトリに格納したことを示します。
+     この表示は少し紛らわしいのですが、新しいリビジョンを取り出す際に
+     は、`checkout' ではなく、`update' を使用するのが普通です。
+
+Needs Patch
+     Needs Checkout と似たようなものですが、CVS のサーバは、ファイル全
+     てではなく差分を送ります。差分を送る場合も、ファイル全てを送る場
+     合と結果は同じです。
+
+Needs Merge
+     他の人物が新しいリビジョンをリポジトリに格納したが、作業ファイル
+     も修正されていたため、マージする必要があることを示します。
+
+File had conflicts on merge
+     Locally Modified と似ていますが、先の `update' コマンドの結果、変
+     更点の衝突が発見されたことを示します。衝突を解消する方法は *Note
+     Conflicts example:: 参照。
+
+Unknown
+     このファイルについて CVS が何も知らないことを示します。例えば新た
+     なファイルを作成したが、`add' を実行していない場合などです。
+
+
+`status' は、ファイル状態を分類する際の補助として、作業中のファイルの
+由来となるリビジョンを示す `Working revision' と、使用中の枝のリポジト
+リにおける最新リビジョンを示す `Repository revision' とも報告します。
+
+`status' コマンドのオプションについての情報は、*Note Invoking CVS::参
+照。`Sticky tag' と `Sticky date' についての情報は、*Note Sticky
+tags:: 参照。`Sticky options' の情報は、*Note update options:: の `-k' 
+オプションを参照して下さい。
+
+`status' と `update' コマンドは補完するようなものとして考えることがで
+きます。ファイルを最新にするためには `update' を使い、`status' で 
+`update' が何をするかをある程度知ることができます (もちろん、リポジト
+リの状態は実際に `update' を実行するまでに変化するかもしれません)。実
+際は、`status' コマンドで表示されるより短い形式でコマンドに表示させた
+ければ、次を実行することができます
+
+     $ cvs -n -q update
+
+`-n' オプションは実際に update をしないが、状態を表示するだけである、
+ということです。`-q' オプションはそれぞれのディレクトリ名の印字を避け
+ます。`update' コマンドとこれらのオプションの情報は、*Note Invoking
+CVS:: を参照してください。
+
+
+

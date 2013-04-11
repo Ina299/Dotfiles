@@ -1,0 +1,1953 @@
+Info file: elisp-ja.info,    -*-Text-*-
+produced by `texinfo-format-buffer'
+from file `elisp-ja.texi'
+using `texinfmt.el' version 2.38 of 3 July 1998.
+
+
+INFO-DIR-SECTION Editors
+START-INFO-DIR-ENTRY
+* Elisp: (elisp-ja).	The Emacs Lisp Reference Manual.
+END-INFO-DIR-ENTRY
+
+
+
+Emacs Lispリファレンスマニュアル2.5版であり、Emacs 20.3版に対応します。
+
+Published by the Free Software Foundation 59 Temple Place, Suite 330
+Boston, MA 02111-1307 USA
+
+Copyright (C) 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1998 Free
+Software Foundation, Inc.
+
+Permission is granted to make and distribute verbatim copies of this
+manual provided the copyright notice and this permission notice are
+preserved on all copies.
+
+Permission is granted to copy and distribute modified versions of this
+manual under the conditions for verbatim copying, provided that the
+entire resulting derived work is distributed under the terms of a
+permission notice identical to this one.
+
+Permission is granted to copy and distribute translations of this manual
+into another language, under the above conditions for modified versions,
+except that this permission notice may be stated in a translation
+approved by the Foundation.
+
+Permission is granted to copy and distribute modified versions of this
+manual under the conditions for verbatim copying, provided also that the
+section entitled "GNU General Public License" is included exactly as in
+the original, and provided that the entire resulting derived work is
+distributed under the terms of a permission notice identical to this
+one.
+
+Permission is granted to copy and distribute translations of this manual
+into another language, under the above conditions for modified versions,
+except that the section entitled "GNU General Public License" may be
+included in a translation approved by the Free Software Foundation
+instead of in the original English.
+
+
+
+
+
+
+File: elisp-ja.info, Node: Command Line Arguments, Prev: Terminal-Specific, Up: Starting Up
+
+コマンド行引数
+--------------
+
+Emacsを始動するときにコマンド行引数を使ってさまざまな動作を要求できます。
+一日に一度より多くEmacsを始動する必要はないでしょうし、しばしばEmacsセッ
+ションをそれより長く動かし続けるでしょうから、コマンド行引数はほとんど使
+いません。実際、コマンド行引数を使う癖は避けたほうがよいです。そのような
+癖をつけると、Emacsを必要以上に終了したり再始動するからです。これらのオ
+プションは2つの理由で存在します。（別のプログラムから起動される）他のエ
+ディタと互換性があるようにするのと、シェルスクリプトから特定のLispプログ
+ラムを実行できるようにするためです。
+
+本節では、Emacsがコマンド行引数を処理する方法と、それらをカスタマイズす
+る方法について述べます。
+
+
+ -- Function: command-line
+     この関数は、Emacsを呼び出すときに指定されたコマンド行引数を解析して
+     処理し、ユーザーのファイル`.emacs'をロードし始動メッセージを表示す
+     る。
+
+ -- Variable: command-line-processed
+     この変数の値は、コマンド行引数を一度処理し終えると`t'である。
+
+     `dump-emacs'を呼んでEmacsを再ダンプするときには、この変数に`nil'を
+     設定すれば、新たにダンプしたEmacsでコマンド行引数を処理するようにで
+     きる。
+
+ -- Variable: command-switch-alist
+     この変数の値は、ユーザー定義のコマンド行オプションの連想リストであ
+     る。この変数は、読者が要素を追加できるように存在する。
+
+     "コマンド行オプション"（command line option）は、つぎの形のコマンド
+     行の引数である。
+
+          -OPTION
+
+     `command-switch-alist'の要素はつぎの形である。
+
+          (OPTION . HANDLER-FUNCTION)
+
+     HANDLER-FUNCTIONは、オプションOPTIONを処理するために呼ばれ、オプショ
+     ン名を唯一の引数として受け取る。
+
+     コマンド行のオプションには引数が続く場合もある。そのような場合、
+     HANDLER-FUNCTIONは変数`command-line-args-left'からすべての残りのコ
+     マンド行引数を調べることができる。（コマンド行引数全体のリストは
+     `command-line-args'にある。）
+
+     コマンド行引数は、ファイル`startup.el'の関数`command-line-1'が解析
+     する。*Note コマンド行引数: (emacs)Command Argumentsも参照。
+
+ -- Variable: command-line-args
+     この変数の値は、Emacsに渡されたコマンド行引数のリストである。
+
+ -- Variable: command-line-functions
+     この変数の値は、認識できないコマンド行引数を処理する関数のリストで
+     ある。つぎに処理する引数に特別な意味がないと、このリストの関数を
+     `nil'以外の値を返すまで現れる順に呼び出す。
+
+     これらの関数は引数なしで呼び出される。これらの関数では、呼び出し時
+     に束縛される変数`argi'を介して対象となるコマンド行引数を参照できる。
+     （いま対象となっている引数を除く）残りの引数は変数
+     `command-line-args-left'にある。
+
+     関数が`argi'を認識して処理したときには、その引数を処理したことを表
+     すために`nil'以外の値を返すこと。後続の引数の一部も処理した場合には、
+     `command-line-args-left'からそれらを削除することで処理したことを示
+     せる。
+
+     これらの関数すべてが`nil'を返すと、訪問するファイル名として引数を用
+     いる。
+
+
+
+File: elisp-ja.info, Node: Getting Out, Next: System Environment, Prev: Starting Up, Up: System Interface
+
+Emacsから抜ける
+===============
+
+Emacsから抜けるには2つの方法があります。Emacsを終了するためにEmacsジョブ
+をキルするか、あとでEmacsを継続できるように休止します。実用上は、ログア
+ウトするとき以外にはEmacsをほとんど終了しないでしょう。Emacsを休止するほ
+うが一般的です。
+
+* Menu:
+
+* Killing Emacs::        Exiting Emacs irreversibly.
+* Suspending Emacs::     Exiting Emacs reversibly.
+
+
+
+File: elisp-ja.info, Node: Killing Emacs, Next: Suspending Emacs, Prev: Getting Out, Up: Getting Out
+
+Emacsの終了
+-----------
+
+Emacsを終了するとは、Emacsプロセスの実行を終らせることを意味します。親プ
+ロセスが普通は制御を取り戻します。Emacsを終了するための下位の基本関数は
+`kill-emacs'です。
+
+ -- Function: kill-emacs &optional EXIT-DATA
+     この関数は、Emacsプロセスを終了しEmacsを終える。
+
+     EXIT-DATAが整数であると、Emacsプロセスの終了状態として使われる。
+     （これは主にバッチ処理で有用である。*Note Batch Mode::を参照。）
+
+     EXIT-DATAが文字列であると、その内容を端末入力バッファへ詰め込み、シェ
+     ル（やつぎに入力を読むプログラム）がそれらを読み取れるようにする。
+
+保存済みのファイルを除くEmacsプロセス内のすべての情報は、Emacsを終了する
+と失われます。Emacsを不注意に終了すると多くの作業を失うことになるので、
+保存する必要があるバッファがあったり動作中のサブプロセスがあると、Emacs
+は確認を求めます。これは関数`save-buffers-kill-emacs'が行います。
+
+ -- Variable: kill-emacs-query-functions
+     標準的な問い合わせをしたあとで、`save-buffers-kill-emacs'は、リスト
+     `kill-emacs-query-functions'内の関数を現れる順に引数なしで呼び出す。
+     これらの関数では、ユーザーにさらなる確認を求めることができる。これ
+     らのどれかが`nil'を返すと、Emacsは終了しない。
+
+ -- Variable: kill-emacs-hook
+     この変数はノーマルフックである。`save-buffers-kill-emacs'がファイル
+     をすべて保存し確認し終えると、このフックの関数群を実行する。
+
+
+
+File: elisp-ja.info, Node: Suspending Emacs, Prev: Killing Emacs, Up: Getting Out
+
+Emacsの休止
+-----------
+
+"Emacsを休止する"とは、Emacsを一時的に停止し、普通はシェルである親プロセ
+スに制御を戻すことです。これにより、あとで同じEmacsプロセスで、つまり、
+同じバッファ群、同じキルリング、同じアンドゥ履歴などで編集を再開できます。
+Emacsを再開するには、親シェルにおいてほとんどの場合`fg'などの適切なコマ
+ンドを使います。
+
+ジョブの休止を扱えないオペレーティングシステムもあります。そのようなシス
+テムでは、『休止』はEmacsのサブプロセスとして一時的に新たなシェルを実際
+には作成します。そのシェルを終了するとEmacsに戻ります。
+
+ウィンドウシステムを使っている場合には、Emacsジョブを再開する親プロセス
+がいないかもしれませんし、別のウィンドウへ移動すれば別のジョブへ入力でき
+ますから、Emacsの休止は有用ではありません。したがって、Emacsがウィンドウ
+システムを使っている場合には、休止できません。
+
+ -- Function: suspend-emacs STRING
+     この関数は、Emacsを休止し、親プロセスへ制御を戻す。親プロセスが
+     Emacsを再開した場合にのみ、`suspend-emacs'はLisp内の呼び出し側へ
+     `nil'を返す。
+
+     STRINGが`nil'以外であると、Emacsの親シェルが端末入力として読めるよ
+     うにその文字群を送る。親シェルはSTRINGの文字群を表示せず、その結果
+     のみが現れる。
+
+     休止するまえに、`suspend-emacs'はノーマルフック`suspend-hook'を実行
+     する。
+
+     ユーザーがEmacsを再開すると、`suspend-emacs'はノーマルフック
+     `suspend-resume-hook'を実行する。*Note Hooks::。
+
+     再開後のつぎの再表示では、変数`no-redraw-on-reenter'が`nil'ならばス
+     クリーン全体を再描画する。（*Note Refresh Screen::）。
+
+     つぎの例では、Emacsを休止しても`pwd'は表示されないことに注意。しか
+     し、シェルはそれを読み取って実行する。
+
+          (suspend-emacs)
+               => nil
+
+          (add-hook 'suspend-hook
+                    (function (lambda ()
+                                (or (y-or-n-p
+                                      "Really suspend? ")
+                                    (error "Suspend cancelled")))))
+               => (lambda nil
+                    (or (y-or-n-p "Really suspend? ")
+                        (error "Suspend cancelled")))
+          (add-hook 'suspend-resume-hook
+                    (function (lambda () (message "Resumed!"))))
+               => (lambda nil (message "Resumed!"))
+          (suspend-emacs "pwd")
+               => nil
+          ---------- Buffer: Minibuffer ----------
+          Really suspend? y
+          ---------- Buffer: Minibuffer ----------
+
+          ---------- Parent Shell ----------
+          lewis@slug[23] % /user/lewis/manual
+          lewis@slug[24] % fg
+
+          ---------- Echo Area ----------
+          Resumed!
+
+ -- Variable: suspend-hook
+     この変数は、休止するまえに実行されるノーマルフックである。
+
+ -- Variable: suspend-resume-hook
+     この変数は、再開後に実行されるノーマルフックである。
+
+
+
+File: elisp-ja.info, Node: System Environment, Next: User Identification, Prev: Getting Out, Up: System Interface
+
+オペレーティングシステム環境
+============================
+
+Emacsでは、さまざまな関数を介してオペレーティングシステム環境の変数を参
+照できます。これらの変数には、システムの名前、ユーザーの識別番号UIDなど
+が含まれます。
+
+ -- Variable: system-configuration
+     この変数は、読者のシステムのハードウェア／ソフトウェア構成に対する
+     GNUの構成名を文字列で保持している。この文字列の一部分を検査する簡便
+     な方法は`string-match'を使うことである。
+
+ -- Variable: system-type
+     この変数の値は、Emacsが動作しているオペレーティングシステムの種類を
+     表すシンボルである。つぎに可能な値の一覧を示す。
+
+     `alpha-vms'
+          Alphaマシン上のVMS。
+
+     `aix-v3'
+          AIX。
+
+     `berkeley-unix'
+          バークレーBSD。
+
+     `dgux'
+          データジェネラルDGUXオペレーティングシステム。
+
+     `gnu'
+          （HURDかMachから成るGNUカーネルを使っている）GNUシステム。
+
+     `gnu/linux'
+          GNU/Linuxシステム。つまり、Linuxカーネルを用いたGNUシステムの
+          変種。（これらのシステムは人々が『Linux』と呼ぶものの1つである
+          が、Linxuは実際にはカーネルのみであり、システム全体ではない。）
+
+     `hpux'
+          ヒューレットパッカードHPUXオペレーティングシステム。
+
+     `irix'
+          シリコングラフィックスIrixシステム。
+
+     `ms-dos'
+          マイクロソフトMS-DOS『オペレーティングシステム』。
+
+     `next-mach'
+          NeXTのMachベースのシステム。
+
+     `rtu'
+          マスコンプRTU、UCBユニバース。
+
+     `unisoft-unix'
+          ユニソフトUniPlus。
+
+     `usg-unix-v'
+          AT&T System V。
+
+     `vax-vms'
+          VAX VMS。
+
+     `windows-nt'
+          マイクロソフトWindows NT。
+
+     `xenix'
+          SCO Xenix 386。
+
+     絶対に必要でない限り、細分類のために新たなシンボルを追加したくない！
+     ` ' 実際、将来にはこれらのいくつかを削除することを願っている。オペ
+     レーティングシステムの違いを区別するには、`system-configuration'を
+     使うことを勧める。
+
+ -- Function: system-name
+     この関数は読者が使っているマシンの名前を返す。
+          (system-name)
+               => "www.gnu.org"
+
+シンボル`system-name'は、関数としても変数としても使えます。実際、関数と
+しては、変数`system-name'が現在保持している値を返します。したがって、
+Emacsが読者のシステム名に関して混乱している場合には、変数`system-name'に
+設定できます。変数はフレームタイトルの作成にも有用です（*Note Frame
+Titles::）。
+
+ -- Variable: mail-host-address
+     この変数が`nil'以外であると、`system-name'のかわりに電子メイルアド
+     レスの生成に使われる。たとえば、`user-mail-address'のデフォルト値の
+     作成に使われる。*Note User Identification::。（これはEmacsの始動時
+     に行われるため、Emacsをダンプしたときの値が実際に使われる値である。
+     *Note Building Emacs::）。
+
+ -- Function: getenv VAR
+     この関数は、環境変数VARの値を文字列で返す。Emacs内部では、環境変数
+     の値はLisp変数`process-environment'に保持されている。
+
+          (getenv "USER")
+               => "lewis"
+
+          lewis@slug[10] % printenv
+          PATH=.:/user/lewis/bin:/usr/bin:/usr/local/bin
+          USER=lewis
+          TERM=ibmapa16
+          SHELL=/bin/csh
+          HOME=/user/lewis
+
+ -- コマンド: setenv VARIABLE VALUE
+     このコマンドは、環境変数VARIABLEに値VALUEを設定する。どちらの引数も
+     文字列である。この関数は`process-environment'を修正することで動作す
+     る。この変数を`let'で束縛しても十分に実用的である。
+
+ -- Variable: process-environment
+     この変数は、各要素が1つの環境変数を記述する文字列のリストである。関
+     数`getenv'と`setenv'は、この変数を用いて動作する。
+
+          process-environment
+          => ("l=/usr/stanford/lib/gnuemacs/lisp"
+              "PATH=.:/user/lewis/bin:/usr/class:/nfsusr/local/bin"
+              "USER=lewis" 
+              "TERM=ibmapa16" 
+              "SHELL=/bin/csh"
+              "HOME=/user/lewis")
+
+ -- Variable: path-separator
+     この変数は、（環境変数などで）探索パスを区切る文字を指定する文字列
+     を保持する。UNIXとGNUシステムではその値は`":"'であり、MS-DOSと
+     Widows NTでは`";"'である。
+
+ -- Variable: invocation-name
+     この変数は、起動したEmacsのプログラム名を保持する。値は文字列であり、
+     ディレクトリ名は含まない。
+
+ -- Variable: invocation-directory
+     この変数は、起動したEmacsの実行形式のディレクトリを保持する。ディレ
+     クトリを判別できない場合には`nil'である。
+
+ -- Variable: installation-directory
+     `nil'以外であると、サブディレクトリ`lib-src'と`etc'を探すためのディ
+     レクトリである。Emacsがこれらのディレクトリを標準のインストールディ
+     レクトリでみつけられなくてもEmacsの実行形式になんらかの意味で関連す
+     るディレクトリでみつけられれば、`nil'以外である。
+
+ -- Function: load-average &optional USE-FLOAT
+     この関数は、1分間／5分間／15分間のロードアベレッジ（負荷平均）をリ
+     ストで返す。
+
+     デフォルトでは、これらの値は、動作しようとしてるプロセスの平均個数
+     を表すシステムのロードアベレッジを100倍した整数である。USE-FLOATが
+     `nil'以外であると、100倍しない浮動小数点数で返す。
+
+          (load-average)
+               => (169 48 36)
+          (load-average t)
+               => (1.69 0.48 0.36)
+
+          lewis@rocky[5] % uptime
+           11:55am  up 1 day, 19:37,  3 users,
+           load average: 1.69, 0.48, 0.36
+
+ -- Function: emacs-pid
+     この関数は、Emacsプロセスのプロセス番号IDを返す。
+
+ -- Variable: tty-erase-char
+     この変数は、Emacsが始動するまえにシステムの端末ドライバが選んでいた
+     消去文字を保持する。
+
+ -- Function: setprv PRIVILEGE-NAME &optional SETP GETPRV
+     この関数は、（UNIX上には存在しない）VMS基本操作を設定／再設定する。
+     最初の引数は文字列で表した基本操作の名前である。第2引数SETPは`t'か
+     `nil'であり、基本操作をオンにするかオフにするかを表す。デフォルトは
+     `nil'である。関数は、成功すれば`t'を返し、さもなければ`nil'を返す。
+
+     第3引数GETPRVが`nil'以外であると、`setprv'は基本操作を変更しないが、
+     その基本操作が現在オンであるかオフであるかを表す`t'か`nil'を返す。
+
+
+
+File: elisp-ja.info, Node: User Identification, Next: Time of Day, Prev: System Environment, Up: System Interface
+
+ユーザーの識別
+==============
+
+ -- Variable: init-file-user
+     この変数は、Emacsが使用すべきユーザー初期化ファイルを指定する。ある
+     いは、そのようなものがなければ`nil'である。この値は、`-q'や`-u
+     USER'のコマンド行オプションを反映する。
+
+     カスタマイズファイルや他の種類のユーザープロフィールをロードする
+     Lispパッケージは、それらを探す場所を判断するためにこの変数に従うこ
+     と。この変数のユーザー名のカスタマイズをロードするべきである。
+     `init-file-user'が`nil'であるとオプション`-q'が使われたことを意味し、
+     Lispパッケージはいかなるカスタマイズファイルやユーザープロフィール
+     もロードしないこと。
+
+ -- Variable: user-mail-address
+     これは、Emacsを使用しているユーザーの通常の電子メイルアドレスを保持
+     する。Emacsは通常、読者の初期化ファイルを読み取ったあと、この変数が
+     未設定であるとデフォルト値を設定する。したがって、デフォルト値を使
+     いたくない場合には、読者のファイル`~/.emacs'で別の値に設定できる。
+
+ -- Function: user-login-name &optional UID
+     UIDを指定しないと、この関数はログインしたユーザー名を返す。環境変数
+     `LOGNAME'が設定されていればその値を使う。さもなければ、環境変数
+     `USER'が設定されていればその値を使う。さもなければ、実UIDではなく実
+     効UIDに基づいた値である。
+
+     UIDを指定すると、値は（整数である）UIDに対応するユーザー名である。
+
+          (user-login-name)
+               => "lewis"
+
+ -- Function: user-real-login-name
+     この関数は、Emacsの実UIDに対応するユーザー名を返す。これは、実効UID
+     や環境変数`LOGNAME'と`USER'を無視する。
+
+ -- Function: user-full-name &optional UID
+     この関数は、ログインしたユーザーの氏名を返す。あるいは、環境変数
+     `NAME'が設定してあればその値を返す。
+
+          (user-full-name)
+               => "Bil Lewis"
+
+     UIDが`nil'以外であると、それは整数のユーザー番号か文字列のログイン
+     名であること。すると、`user-full-name'は、そのユーザー番号かログイ
+     ン名に対応するユーザーの氏名を返す。
+
+シンボル`user-login-name'、`user-real-login-name'、`user-full-name'は、
+関数でもある変数です。関数としては、その変数が保持する値と同じ値を返しま
+す。これらの変数により、関数として返す値を指定しておくことでEmacsを『ご
+まかせ』ます。これらの変数は、フレームタイトルの作成にも有用です（*Note
+Frame Titles::）。
+
+ -- Function: user-real-uid
+     この関数は、ユーザーの実UIDを返す。
+
+          (user-real-uid)
+               => 19
+
+ -- Function: user-uid
+     この関数は、ユーザーの実効UIDを返す。
+
+
+
+File: elisp-ja.info, Node: Time of Day, Next: Time Conversion, Prev: User Identification, Up: System Interface
+
+時刻
+====
+
+本節では、現在時刻と時刻帯（タイムゾーン）を調べる方法を説明します。
+
+ -- Function: current-time-string &optional TIME-VALUE
+     この関数は、人間向けの文字列で現在時刻と日付を返す。文字列の書式は
+     不変であり、各部分の文字数はつねに同じなので、各部分を取り出すのに
+     `substring'を使っても問題ない。将来、文字列の末尾に追加情報を付加す
+     ることもあるので、文字列の末尾からではなく先頭から文字を数えるほう
+     がよい。
+
+     引数TIME-VALUEを指定すると、それは現在時刻のかわりに書式付けする時
+     刻を指定する。引数は、最初の2つの要素が整数であるリストであること。
+     したがって、`current-time'（下記参照）や`file-attributes'（*Note
+     File Attributes::）で得た時刻を使える。
+
+          (current-time-string)
+               => "Wed Oct 14 22:21:05 1987"
+
+ -- Function: current-time
+     この関数は、システムの時刻の値を3つの整数のリスト`(HIGH LOW
+     MICROSEC)'で返す。整数HIGHとLOWを組み合わせると1970年1月1日0:00から
+     の経過秒数を与える。つまり、経過秒数はHIGH * 2**16 + LOWである。
+
+     第3要素MICROSECは、現在の秒内のミリ秒を表す（返す時間精度が秒のシス
+     テムでは0）。
+
+     最初の2つの要素は、関数`file-attributes'で得られるファイルに関する
+     時刻の値と比較できる。*Note File Attributes::。
+
+ -- Function: current-time-zone &optional TIME-VALUE
+     この関数は、ユーザーの地域の時刻帯を記述するリストを返す。
+
+     値は、`(OFFSET NAME)'の形である。ここで、OFFSETはUTC (1) (*Note
+     Time of Day-Footnotes::) に対して進んでいる（グリニッジの東）秒数を
+     与える整数である。第2要素NAMEは、その時刻帯の名称を与える文字列であ
+     る。夏時間制が始まったり終ると、どちらの要素も変わる。時刻帯には季
+     節の時刻調整はないとユーザーが指定すると、どちらの値も定数である。
+
+     値を計算するために必要な情報をオペレーティングシステムから得られな
+     いとリストのどちらの要素も`nil'である。
+
+     引数TIME-VALUEを指定すると、現在時刻のかわりに分析すべき時刻を指定
+     する。引数は、2つの整数を収めたコンスセルであるか、最初の2つの要素
+     が整数であるリストであること。したがって、`current-time'（上記参照）
+     や`file-attributes'（*Note File Attributes::）で得た時刻を使える。
+
+
+File: elisp-ja.info  Node: Time of Day-Footnotes, Up: Time of Day
+
+(1) 【訳注】協定世界時。旧グリニッジ標準時に相当。
+
+
+
+File: elisp-ja.info, Node: Time Conversion, Next: Timers, Prev: Time of Day, Up: System Interface
+
+時刻の変換
+==========
+
+これらの関数は、時刻の値（2つか3つの整数から成るリスト）を文字列や日時情
+報に変換します。日時情報を時刻の値に変換する関数もあります。時刻の値は、
+関数`current-time'（*Note Time of Day::）や`file-attributes'（*Note File
+Attributes::）で得られます。
+
+多くのオペレーティングシステムでは、時刻の値を32ビットに制限しています。
+これらのシステムでは、典型的には協定世界時1901年12月13日20:45:52から2038
+年1月19日03:14:07までしか表現できません。しかし、より大きな時刻の値を扱
+い、より広い範囲の過去から未来を表現できるシステムもあります。
+
+時刻変換関数は、グレゴリオ暦を導入するまえであってもつねにグレゴリオ暦を
+使います。紀元前1年からの経過年数を数え、通常のグレゴリオ暦のように0年を
+飛ばしません。たとえば、-37年は、グレゴリオ暦紀元前38年を表します。
+
+ -- Function: format-time-string FORMAT-STRING TIME
+     この関数は、TIMEをFORMAT-STRINGに従って文字列に変換する。引数
+     FORMAT-STRINGには、時刻のさまざまな部分で置き換えられる`%'列を含ん
+     でよい。`%'列の意味を以下に示す。
+
+     `%a'
+          曜日の省略名を表す。
+     `%A'
+          曜日の（省略しない）名称を表す。
+     `%b'
+          月の省略名を表す。
+     `%B'
+          月の（省略しない）名称を表す。
+     `%c'
+          `%x %X'の同義語。
+     `%C'
+          これにはローケル固有の意味がある。デフォルトのローケル（`C'）
+          では、`%A, %B %e, %Y'と等価。
+     `%d'
+          ゼロでパディングした月内の日。
+     `%D'
+          `%m/%d/%y'の同義語。
+     `%e'
+          空白でパディングした月内の日。
+     `%h'
+          `%b'の同義語。
+     `%H'
+          時（00-23）を表す。
+     `%I'
+          時（00-12）を表す。
+     `%j'
+          年内の日（001-366）を表す。
+     `%k'
+          空白でパディングした時（0-23）を表す。
+     `%l'
+          空白でパディングした時（0-12）を表す。
+     `%m'
+          月（01-12）を表す。
+     `%M'
+          分（00-59）を表す。
+     `%n'
+          改行を表す。
+     `%p'
+          `AM'か`PM'の適切なほうを表す。
+     `%r'
+          `%I:%M:%S %p'の同義語。
+     `%R'
+          `%H:%M'の同義語。
+     `%S'
+          秒（00-60）を表す。
+     `%t'
+          タブ文字を表す。
+     `%T'
+          `%H:%M:%S'の同義語。
+     `%U'
+          日曜日を週の始まりと仮定した年内の週（01-52）を表す。
+     `%w'
+          数字で表した曜日（0-6）。日曜日を0とする。
+     `%W'
+          月曜日を週の始まりと仮定した年内の週（01-52）を表す。
+     `%x'
+          これにはローケル固有の意味がある。デフォルトのローケル（`C'）
+          では、`%D'と等価。
+     `%X'
+          これにはローケル固有の意味がある。デフォルトのローケル（`C'）
+          では、`%T'と等価。
+     `%y'
+          年の下2桁（00-99）を表す。
+     `%Y'
+          100年単位の年を表す。
+     `%Z'
+          時刻帯の省略名を表す。
+
+     これらの`%'列には、桁数やパディングの種類も指定できる。`printf'と同
+     様に動作し、`%'列のあいだに桁数を数字で指定する。桁数を`0'で始める
+     とゼロでパディングすることを意味する。桁数を`_'で始めると空白でパディ
+     ングすることを意味する。
+
+     たとえば、`%S'は分内の秒数を指定し、`%03S'はゼロでパディングして3桁
+     にすることを意味し、`%_3S'は空白でパディングして3桁にすることを意味
+     する。`%S'は普通はパディングして2桁にするため、`%3S'だけであるとゼ
+     ロでパディングする。
+
+ -- Function: decode-time TIME
+     この関数は、時刻の値を日時情報に変換する。戻り値は、つぎの9要素のリ
+     ストである。
+
+          (SECONDS MINUTES HOUR DAY MONTH YEAR DOW DST ZONE)
+
+     各要素の意味はつぎのとおりである。
+
+     SEC
+          0から59の整数で表した分内の秒数。
+     MINUTE
+          0から59の整数で表した時内の分数。
+     HOUR
+          0から23の整数で表した日内の時。
+     DAY
+          1から31の整数で表した月内の日。
+     MONTH
+          1から12の整数で表した年内の月。
+     YEAR
+          年。典型的には1900より大きい。
+     DOW
+          日曜日を0とした0から6の整数で表した曜日。
+     DST
+          夏時間制が有効であると`t'、さもなければ`nil'。
+     ZONE
+          グリニッジから東周りではかった時刻帯を表す秒数。
+
+     Common Lispに関した注意：` ' Common Lispでは、DOWとZONEの意味が異な
+     る。
+
+ -- Function: encode-time SECONDS MINUTES HOUR DAY MONTH YEAR &optional ...ZONE
+     この関数は`decode-time'の逆である。7項目から成る日時情報を時刻の値
+     に変換する。引数の意味については、上記`decode-time'の一覧を参照。
+
+     100未満の年は普通の年として扱う。それらを1900年代として扱いたい場合
+     には、`encode-time'を呼び出すまえに修正しておくこと。
+
+     省略可能な引数ZONEのデフォルトは、現在の時刻帯とその夏時間制の規則
+     である。指定する場合には、（`current-time-zone'で得られるような）リ
+     ストであるか、環境変数`TZ'と同じ形式の文字列であるか、
+     （`decode-time'で得られるような）整数であること。指定した時刻帯は、
+     夏時間の補正をせずに使われる。
+
+     `encode-time'に7引数より多く渡すと、始めの6つをSECONDSからYEARまで
+     に、最後の引数をZONEに使い、そのあいだの引数は無視する。この機能は、
+     `decode-time'が返したリストの要素をつぎのようにして`encode-time'の
+     引数に使うことを可能にする。
+
+          (apply 'encode-time (decode-time ...))
+
+     引数SEC、MINUTE、HOUR、DAY、MONTHの値が範囲外になるようにすると単純
+     な日時演算を行える。たとえば、0日はその月のまえの日を意味する。
+
+     オペレーティングは可能な時刻の値の範囲を制限する。その範囲を越える
+     時刻を符号化しようとするとエラーになる。
+
+
+
+File: elisp-ja.info, Node: Timers, Next: Terminal Input, Prev: Time Conversion, Up: System Interface
+
+遅延実行のためのタイマ
+======================
+
+未来のある時刻に関数を呼び出したり、ある一定期間なにもしないでいたら関数
+を呼び出すために"タイマ"を設定できます。
+
+Emacsは、Lispプログラムの任意の箇所ではタイマを実行できません。サブプロ
+セスからの出力を受け取るときにだけタイマを実行できます。つまり、待つこと
+が*可能*な`sit-for'や`read-event'などの基本関数の内側や（入力を）待って
+いるあいだに実行できます。したがって、Emacsが忙しいとタイマの実行が遅れ
+ることがあります。しかし、Emacsが暇ならば、タイマの実行はとても正確です。
+
+ -- Function: run-at-time TIME REPEAT FUNCTION &rest ARGS
+     この関数は、時刻TIMEに引数ARGSで関数FUNCTIONを呼び出すように予約す
+     る。引数FUNCTIONはのちに呼び出される関数であり、引数ARGSはそれを呼
+     び出すときに与える引数である。時刻TIMEは文字列で指定する。
+
+     絶対時刻をさまざまな書式で指定できる。この関数は、よく使われる日時
+     の書式を受け付けるように努める。正しい書式にはつぎの2つを含む。
+
+          YEAR-MONTH-DAY HOUR:MIN:SEC TIMEZONE
+
+          HOUR:MIN:SEC TIMEZONE MONTH/DAY/YEAR
+
+     ここで、どちらの例のフィールドもすべて数である。
+     `current-time-string'が返す書式、および、他の書式も許される。
+
+     相対時刻を指定するには、単位を伴った数字を使う。たとえばつぎのとお
+     り。
+
+     `1 min'
+          今から1分後。
+     `1 min 5 sec'
+          今から65秒後。
+     `1 min 2 sec 3 hour 4 day 5 week 6 fortnight 7 month 8 year'
+          今からちょうど103ヵ月、123日、10862秒後。 (1) (*Note
+          Timers-Footnotes::)
+
+     TIMEが数（整数か浮動小数点数）であれば、秒単位の相対時刻を指定する。
+
+     引数REPEATは、呼び出しをどの程度頻繁に繰り返すかを指定する。REPEAT
+     が`nil'であると、繰り返さずに時刻TIMEに関数FUNCTIONを一度だけ呼び出
+     す。REPEATが数であると、繰り返し間隔を秒単位で指定する。
+
+     ほとんどの場合、*最初*の呼び出しではREPEATの効果はなく、TIMEだけが
+     時刻を指定する。1つ例外があり、TIMEが`t'であると、時刻がREPEATの整
+     数倍であるとタイマを実行する。これは`display-time'のような関数に有
+     用である。
+
+     関数`run-at-time'は、予約した未来の特定の動作を識別するタイマを返す。
+     この値は、`cancel-timer'（下記参照）の呼び出しに使える。
+
+ -- Macro: with-timeout (SECONDS TIMEOUT-FORMS...) BODY...
+     BODYを実行するが、SECONDS秒でその実行を諦める。時間が切れるまえに
+     BODYが終了すると`with-timeout'はBODYの最後のフォームの値を返す。し
+     かし、時間が切れるとBODYの実行を取り止め、`with-timeout'は
+     TIMEOUT-FORMSをすべて実行し、それらの最後の値を返す。
+
+     このマクロは、SECONDS秒後に動作するタイマを設定することで動作する。
+     その時間内にBODYが終了すれば、タイマを取り消す。タイマが実際に動作
+     するとBODYの実行を終了させてから、TIMEOUT-FORMSを実行する。
+
+     プログラムから待つことが可能な基本関数を呼び出したときにのみ、タイ
+     マはLispプログラム内で実行可能なため、`with-timeout'はBODYの計算途
+     中ではBODYの実行を停止できない。それらが待つことが可能な基本関数の1
+     つを呼び出したときにのみ停止できる。したがって、長い計算を行わない
+     入力を待つようなBODYに`with-timeout'を使う。
+
+関数`y-or-n-p-with-timeout'は、応答を長く待ちすぎないようにタイマを使っ
+た単純な例です。*Note Yes-or-No Queries::。
+
+ -- Function: run-with-idle-timer SECS REPEAT FUNCTION &rest ARGS
+     EmacsがSECS秒間なにもしないときに実行するタイマを設定する。SECSの値
+     は整数でも浮動小数点数でもよい。
+
+     REPEATが`nil'であると、これ以降にはじめてEmacsが十分長い期間なにも
+     しないでいると、タイマを一度だけ実行する。しばしばREPEATは`nil'以外
+     であり、EmacsがSECS秒なにもしないでいる*たびに* タイマを実行するこ
+     とを意味する。
+
+     関数`run-with-idle-timer'は、`cancel-timer'（下記参照）の呼び出しに
+     使えるタイマの値を返す。
+
+Emacsがユーザー入力を待ち始めると『アイドル状態』になり、なにか入力がく
+るまでアイドル状態のままです。5秒間のアイドル状態で動作するタイマがあっ
+たとすると、Emacsがアイドルになってから約5秒後にそのタイマが実行されます。
+しかしREPEATが真（`nil'以外）であったとしても、そのタイマはEmacsがアイド
+ル状態であり続ける限りは再実行されません。アイドル状態の期間は単調に増加
+するので、再度5秒後には戻りません。
+
+Emacsがアイドル状態のときにはさまざまなことを行います。ガベッジコレクショ
+ン、自動保存、サブプロセスからのデータの処理です。しかし、アイドル状態中
+のこれらの動作はアイドルタイマに干渉しません。アイドル状態の時間を0にし
+ないからです。600秒に設定されたアイドルタイマは、最後のユーザーコマンド
+を終了してから10分後に実行されます。たとえその10分間に、サブプロセスの出
+力を何千回も受け取ろうが、ガベッジコレクションや自動保存を行ったとしても
+です。
+
+ユーザーが入力を与えると、その入力を実行中はEmacsは非アイドル状態です。
+そして再度アイドル状態になり、繰り返すように設定されたアイドルタイマを1
+つずつそれ以降に実行します。
+
+ -- Function: cancel-timer TIMER
+     タイマTIMERの予約を取り消す。TIMERは、以前に`run-at-time'や
+     `run-with-idle-timer'が返した値であること。これは、`run-at-time'の
+     呼び出しの効果を取り消し、その時刻になってもなにも特別なことは起こ
+     らない。
+
+
+File: elisp-ja.info  Node: Timers-Footnotes, Up: Timers
+
+(1) 【訳注】fortnightは2週間のこと。
+
+
+
+File: elisp-ja.info, Node: Terminal Input, Next: Terminal Output, Prev: Timers, Up: System Interface
+
+端末入力
+========
+
+本節では、端末入力を記録したり処理する関数や変数について述べます。関連す
+る関数については*Note Display::を参照してください。
+
+* Menu:
+
+* Input Modes::		Options for how input is processed.
+* Translating Input::   Low level conversion of some characters or events
+			  into others.
+* Recording Input::	Saving histories of recent or all input events.
+
+
+
+File: elisp-ja.info, Node: Input Modes, Next: Translating Input, Prev: Terminal Input, Up: Terminal Input
+
+入力方式
+--------
+
+ -- Function: set-input-mode INTERRUPT FLOW META QUIT-CHAR
+     この関数は、キーボード入力を読み取るモードを設定する。INTERRUPTが
+     `nil'以外であると、Emacsは入力割り込みを用いる。`nil'であると、
+     CBREAKモードを用いる。デフォルトの設定はシステムに依存する。この指
+     定に関わらずつねにCBREAKモードを用いるシステムもある。
+
+     EmacsがXと直接通信しているときは、通信方法が割り込みであると承知し
+     ているとこの引数を無視して割り込みを使う。
+
+     FLOWが`nil'以外であると、Emacsは端末出力にフロー制御XON/XOFF（`C-q'、
+     `C-s'）を用いる。CBREAKモード以外ではこれの効果はない。*Note Flow
+     Control::。
+
+     引数METAは、文字コードが127を越える入力文字の扱い方を制御する。META
+     が`t'であると、8ビット目が立っている文字をメタ文字に変換する。META
+     が`nil'であると、8ビット目を無視する。パリティビットを用いる端末で
+     は、これが必要である。METAが`t'でも`nil'でもないと、Emacsは入力した
+     8ビットすべてを無変更で使う。8ビット文字集合を使う端末には、これが
+     よい。
+
+     QUIT-CHARが`nil'以外であると、中断に使用する文字を指定する。通常、
+     この文字は`C-g'である。*Note Quitting::。
+
+関数`current-input-mode'は、Emacsが現在使用している入力モードの設定を返
+します。
+
+ -- Function: current-input-mode
+     この関数は、キーボード入力を読み取るための現在のモードを返す。
+     `set-input-mode'の引数に対応する`(INTERRUPT FLOW META QUIT)'の形の
+     リストを返す。各要素の意味はつぎのとおりである。
+     INTERRUPT
+          `nil'以外であると、Emacsは割り込み駆動の入力を用いている。
+          `nil'であると、EmacsはCBREAKモードを用いている。
+     FLOW
+          `nil'以外であると、Emacsは端末出力にフロー制御XON/XOFF（`C-q'、
+          `C-s'）を用いている。この値は、INTERRUPTが`nil'の場合にのみ意
+          味を持つ。
+     META
+          Emacsが入力文字の8ビット目をメタビットとして扱うときには`t'で
+          ある。Emacsが各入力文字の8ビット目をつねに0にするときには`t'で
+          ある。さもなければ、Emacsは文字コードとして8ビットすべてを使っ
+          ている。
+     QUIT
+          現在Emacsが中断に使っている文字であり、普通は`C-g'である。
+
+
+
+File: elisp-ja.info, Node: Translating Input, Next: Recording Input, Prev: Input Modes, Up: Terminal Input
+
+入力イベントの変換
+------------------
+
+本節では、入力イベントをキー列の一部になるまえに別の入力イベントに変換す
+る機能について述べます。これらの機能は、ここに述べる順に各イベントに適用
+されます。つまり、各イベントはまず`extra-keyboard-modifiers'に従って修正
+され、つぎに（適切ならば）`keyboard-translate-table'を介して変換され、最
+後に指定されているキーボードコーディングシステムで復号化されます。キー列
+の一部として読み取られるイベントであると、読み取られるキー列に追加され、
+それを含む部分キー列をまず`function-key-map'で検査してから、つぎに
+`key-translation-map'で検査します。
+
+ -- Variable: extra-keyboard-modifiers
+     この変数は、Lispプログラムがキーボード上の修飾キーを『押す』ことが
+     できるようにする。
+
+     1
+          SHIFTキー。
+     2
+          LOCKキー。
+     4
+          CTLキー。
+     8
+          METAキー。
+
+     ユーザーがキーボードのキーを打つたびに、ビットマスクで指定した修飾
+     キーが押し下げられているかのようにキーを修正する。
+
+     ウィンドウシステムを使っているときには、プログラムは任意の修飾キー
+     を『押す』ことができる。さもなければ、CTLとMETAのキーのみを仮想的に
+     押すことができる。
+
+ -- Variable: keyboard-translate-table
+     この変数は、キーボード文字の変換表である。これにより、コマンドのバ
+     インディングを変更せずに、キーボードのキー配置を変更できる。その値
+     は普通は文字テーブルであるか、あるいは、`nil'である。
+
+     `keyboard-translate-table'が文字テーブルであると、キーボードから読
+     み取った各文字をこの文字テーブルで探す。みつけた値が`nil'以外である
+     と、実際の入力文字のかわりにその値を使う。
+
+     つぎの例では、`keyboard-translate-table'に文字テーブルを設定する。
+     そして、文字`C-s'と`C-\'、`C-q'と`C-^'を入れ換える。これ以降、`C-\'
+     を打つと`C-s'を打った効果があり、その逆もそうである。（この話題に関
+     しては詳しくは、*Note Flow Control::。）
+
+          (defun evade-flow-control ()
+            "Replace C-s with C-\ and C-q with C-^."
+            (interactive)
+            (setq keyboard-translate-table
+                  (make-char-table 'keyboard-translate-table nil))
+            ;; C-sとC-\を入れ換える
+            (aset keyboard-translate-table ?\034 ?\^s)
+            (aset keyboard-translate-table ?\^s ?\034)
+            ;; C-qとC-^を入れ換える
+            (aset keyboard-translate-table ?\036 ?\^q)
+            (aset keyboard-translate-table ?\^q ?\036))
+
+     この変換は、端末から読み取った文字に最初に行われる変換である。
+     `recent-keys'のような記録機能やドリブルファイルは、変換後の文字を記
+     録する。
+
+ -- Function: keyboard-translate FROM TO
+     この関数は、文字コードFROMを文字コードTOに変換するように
+     `keyboard-translate-table'を変更する。必要ならばキーボード変換表を
+     作成する。
+
+残りの変換機能は、読み取ったキー列の部分列を変換します。それらは
+`read-key-sequence'に実装されていて、`read-event'で読む入力には効果はあ
+りません。
+
+ -- Variable: function-key-map
+     この変数は、普通の文字端末上のファンクションキーが送出する文字の列
+     を記述したキーマップを保持する。このキーマップは他のキーマップと同
+     じ構造であるが、使い方が異なる。キー列のバインディングではなく、読
+     み取りつつあるキー列を変換する方法を指定する。
+
+     `function-key-map'がキー列KをベクトルVに『バインド』すると、キー列
+     の*どこに*Kが現れても、Vのイベントで置き換える。
+
+     たとえば、端末VT100は、キーパッドのキーPF1を押すと`ESC O P'を送出す
+     る。したがって、Emacsではこの列を1つのイベント`pf1'に変換したい。
+     VT100を使っているときに`function-key-map'において`ESC O P'を`[pf1]'
+     に『バインド』すれば、これを行える。
+
+     つまり、`C-c PF1'を打つと文字の列`C-c ESC O P'が送出される。のちに
+     関数`read-key-sequence'がこれを`C-c PF1'に戻し、ベクトル`[?\C-c
+     pf1]'を返す。
+
+     マイナモード／ローカル／グローバルのキーマップに矛盾するような
+     `function-key-map'内の項目は無視される。この意図は、ファンクション
+     キーが送出する文字の列にはそれ独自のキーバインディングがあるべきで
+     はなく、もしあったとしても、もとの定義を優先することである。
+
+     `function-key-map'の値は、端末のterminfoやtermcapの情報に従って自動
+     的に普通は設定されるが、端末固有のLispファイルの助けが必要な場合も
+     ある。Emacsには、一般的な多くの端末向けの端末固有ファイルがある。そ
+     れらの主目的は、terminfoやtermcapから推定できないものを
+     `function-key-map'に定義することである。*Note Terminal-Specific::。
+
+ -- Variable: key-translation-map
+     この変数は、`function-key-map'と同様に入力イベントを別の入力イベン
+     トへ変換するために用いる別のキーマップである。`function-key-map'と
+     は2つの意味で異なる。
+
+        * `key-translation-map'は、`function-key-map'の変換後に使われる。
+          `function-key-map'による変換結果を使う。
+
+        * `key-translation-map'は、実際のキーバインディングに優先する。
+          たとえば、`key-translation-map'で`C-x f'にバインディングがある
+          と、グローバルマップに`C-x f'のバインディングがあったとしても
+          変換結果が効果を持つ。
+
+     `key-translation-map'の意図は、`self-insert-command'に普通はバイン
+     ドされる通常の文字を含めてユーザー向けに文字集合を別の文字集合に対
+     応付けられるようにすることである。
+
+キーの『変換として』キー列のかわりに関数を用いると、`function-key-map'や
+`key-translation-map'は単なる配置替え以上のことに使えます。その関数で当
+該キーの変換を計算するのです。
+
+キー変換関数は1つの引数を受け取ります。その引数は、`read-key-sequence'で
+指定されたプロンプトか、エディタコマンドループがキー列を読み取っている場
+合には`nil'です。多くの場合、プロンプトの値は無視できます。
+
+関数自身が入力を読むときには、後続のイベントを変更することもできます。た
+とえば、後続の文字をハイパー文字にする`C-c h'の定義はつぎのようになりま
+す。
+
+     (defun hyperify (prompt)
+       (let ((e (read-event)))
+         (vector (if (numberp e)
+                     (logior (lsh 1 24) e)
+                   (if (memq 'hyper (event-modifiers e))
+                       e
+                     (add-event-modifier "H-" e))))))
+
+     (defun add-event-modifier (string e)
+       (let ((symbol (if (symbolp e) e (car e))))
+         (setq symbol (intern (concat string
+                                      (symbol-name symbol))))
+         (if (symbolp e)
+             symbol
+           (cons symbol (cdr e)))))
+
+     (define-key function-key-map "\C-ch" 'hyperify)
+
+`set-keyboard-coding-system'を用いたキーボード文字集合の復号化を有効にし
+ているときには、上に述べた変換を終えてから復号化を行います。*Note
+Specifying Coding Systems::。Emacsの将来の版では、他の変換のまえに復号化
+を行うでしょう。
+
+
+
+File: elisp-ja.info, Node: Recording Input, Prev: Translating Input, Up: Terminal Input
+
+入力を記録する
+--------------
+
+ -- Function: recent-keys
+     この関数は、キーボードやマウスからの最近の100個の入力イベントを収め
+     たベクトルを返す。キー列として使われたかどうかに関わらず、すべての
+     イベントを含む。したがって、キーボードマクロで生成したイベントを数
+     えずに最後の100個のイベントをつねに得ることになる。（キーボードマク
+     ロで生成したイベントを省くのは、それらはデバッグにはあまり役立たな
+     いからである。キーボードマクロを起動したイベントが見えれば十分なは
+     ずである。）
+
+ -- コマンド: open-dribble-file FILENAME
+     この関数は、FILENAMEという名前の"ドリブルファイル" （dribble file）
+     をオープンする。ドリブルファイルをオープンしていると、（キーボード
+     マクロを除く）キーボードやマウスからの各入力イベントをそのファイル
+     に書き出す。文字でないイベントは、その表示表現を`<...>'で囲って表す。
+
+     ドリブルファイルをクローズするには、引数に`nil'を指定してこの関数を
+     呼び出す。
+
+     この関数は、バグ報告のためにEmacsのバグを引き起こす入力を記録するた
+     めに普通は使う。
+
+          (open-dribble-file "~/dribble")
+               => nil
+
+関数`open-termscript'（*Note Terminal Output::）も参照してください。
+
+
+
+File: elisp-ja.info, Node: Terminal Output, Next: Special Keysyms, Prev: Terminal Input, Up: System Interface
+
+端末出力
+========
+
+端末出力関数は、端末に出力を送ったり、端末へ送った出力を記録します。変数
+`baud-rate'は、Emacsが考えている端末の出力速度を表します。
+
+ -- Variable: baud-rate
+     この変数の値は、Emacsが関知する端末の出力速度である。この変数に設定
+     しても実際のデータ転送速度を変更しないが、その値はパディングなどの
+     計算に用いられる。また、ウィンドウシステムを使っている場合であって
+     も、スクリーンのどの部分をスクロールするか、あるいは、再描画するか
+     の決定に影響する。（このような決定を調整する方法を与えるために、ウィ
+     ンドウシステムには真の『出力速度』はないがこのように設計した。）
+
+     値の単位はボー（baud）である。
+
+ネットワーク経由で使い、ネットワークの異なる部分が異なる速度で動いている
+ときには、Emacsが返す値はローカル端末で使っている場合の値と異なるかもし
+れません。リモートマシンへの通信速度でローカル端末と通信するネットワーク
+プロトコルもあり、そのような場合、Emacsや他のプログラムは正しい値を得ら
+れます。その他の場合では正しい値を得られません。Emacsの値がまちがってい
+るときには、あまり最適でない決定をくだすでしょう。この問題を修正するには、
+`baud-rate'に設定します。
+
+ -- Function: baud-rate
+     この廃れた関数は、変数`baud-rate'の値を返す。
+
+ -- Function: send-string-to-terminal STRING
+     この関数は、なにも変更せずに文字列STRINGを端末へ送る。STRING内のコ
+     ントロール文字は、端末に依存する効果を持つ。
+
+     この関数の1つの用途は、ファンクションキーの定義をダウンロード可能な
+     端末のファンクションキーを定義することである。たとえば、ファンクショ
+     ンキー4を（文字の列`C-u C-f'を計算機に送って）4文字進めると定義にす
+     るには、特定の端末ではつぎのようにする。
+
+          (send-string-to-terminal "\eF4\^U\^F")
+               => nil
+
+ -- コマンド: open-termscript FILENAME
+     この関数は、Emacsが端末へ送出するすべての文字を記録する"タームスク
+     リプトファイル"（termscript file）をオープンするために使う。関数は
+     `nil'を返す。タームスクリプトファイルは、Emacsがスクリーンを乱して
+     しまう問題、誤ったtermcap定義やEmacsの実際のバグではない端末の望ま
+     しくない設定の問題を調べるのに有用である。どのような文字の列が実際
+     に出力されるか確信できれば、それらが使用中のtermcapのどの定義に対応
+     するか調べられる。
+
+     *Note Terminal Input::の`open-dribble-file'も参照。
+
+          (open-termscript "../junk/termscript")
+               => nil
+
+
+
+File: elisp-ja.info, Node: Special Keysyms, Next: Flow Control, Prev: Terminal Output, Up: System Interface
+
+システム固有のX11のキーシンボル
+===============================
+
+システム固有のX11のキーシンボル（keysym）を定義するには、変数
+`system-key-alist'に設定します。
+
+ -- Variable: system-key-alist
+     この変数の値は、各要素がシステム固有の各キーシンボルに対応する連想
+     リストであること。要素は`(CODE . SYMBOL)'の形である。ここで、CODEは
+     （『提供業者固有の』ビット
+     -2**28を
+     含まない）数値のキーシンボルコードであり、SYMBOLはファンクションキー
+     の名前である。
+
+     たとえば、`(168 . mute-acute)'は、数値コードが
+     -2**28
+     + 168 であるHP Xサーバーが使うシステム固有キーを定義する。
+
+     実際に使用しているXサーバーのキーシンボルと衝突しなければ、他のXサー
+     バー向けのキーシンボルを連想リストから省かなくても問題ない。
+
+     変数は現在の端末につねにローカルであり、バッファローカルにはなりえ
+     ない。*Note Multiple Displays::。
+
+
+
+File: elisp-ja.info, Node: Flow Control, Next: Batch Mode, Prev: Special Keysyms, Up: System Interface
+
+フロー制御
+==========
+
+本節では、『Emacsがなぜコマンド文字集合の中からフロー制御文字を使うのか？』
+という質問に答えたいと思います。この話題に関する別の視点については、配布
+に含まれるファイル`emacs/INSTALL'の中のフロー制御に関する記述を読んでく
+ださい。termcapの定義とDECの端末集線器については、`emacs/etc/TERMS'を参
+照してください。
+
+ある時期には、ほとんどの端末ではフロー制御を行っておらず、`C-s'と`C-q'を
+フロー制御に用いるものもありませんでした。したがって、コマンド文字として
+`C-s'と`C-q'を選ぶことは自然であり議論の余地はありませんでした。キーに割
+り付けるべきコマンドがたくさんあったので、ほとんどすべてのASCIIコントロー
+ル文字に意味を与えました。
+
+のちに、フロー制御にこれらの文字を必要とする端末が導入されたのです。それ
+らはフルスクリーンエディタ向きの端末ではなかったので、Emacsの保守陣はそ
+れらを無視しました。後年、`C-s'と`C-q'によるフロー制御が端末で広く使われ
+るようになりましたが、当時はそれはオプションでした。Emacsユーザーの多く
+はフロー制御をオフにして、フロー制御のために無意味なキーバインディングに
+替えようとはしなかったのです。
+
+Emacsと端末や集線器の製造業者のどちらの使い方が『正しい』でしょう？` ' 
+この問に簡単な答えはありません。
+
+`C-s'と`C-q'で引き起こされる問題を解消するのに気が進まないのは、`C-s'と
+`C-q'であることに理由がないからです。文字ストリームに透過な別の（実用上
+一般的ではないが）フロー制御技術があります。さらに、それらをフロー制御に
+使うのは正式な規格ではありません。興味深いことですが、（1970年ころの）紙
+テープパンチャ付きのテレタイプモデル33では、計算機からパンチャをオン／オ
+フするために`C-s'と`C-q'を送っていました！
+
+ウィンドウシステムやPC端末エミュレータが文字端末を置き換えるようになりフ
+ロー制御の問題は徐々に解消しつつあります。しばらくは、読者が望むなら
+Emacsはフロー制御をオンにする手軽な方法を提供します。関数
+`enable-flow-control'を呼び出すのです。
+
+ -- コマンド: enable-flow-control
+     この関数は、出力のフロー制御に`C-s'と`C-q'を使うようにするとともに、
+     `keyboard-translate-table' （*Note Translating Input::）を用いて
+     `C-\'と`C-^'をそれらのかわりに使えるようにする。
+
+読者のファイル`.emacs'で関数`enable-flow-control-on'を使えば、特定の種類
+の端末で自動的にフロー制御をオンにできます。
+
+ -- Function: enable-flow-control-on &rest TERMTYPES
+     この関数は、端末の種類がTERMTYPESの1つであると、フロー制御をオンに
+     し`C-\'と`C-^'をかわりに使う。たとえば、つぎのように使う。
+
+          (enable-flow-control-on "vt200" "vt300" "vt101" "vt131")
+
+`enable-flow-control'が行う処理はつぎのとおりです。
+
+  1. `(set-input-mode nil t)'で端末入力をCBREAKモードに設定し、オペレー
+     ティングシステムにフロー制御を行うように指示する。
+
+  2. `C-\'と`C-^'を`C-s'と`C-q'に変換するように
+     `keyboard-translate-table'を設定する。非常に下位レベルであることを
+     除けば、Emacsは`C-s'や`C-q'を打ったと考えるので、たとえ他のコマンド
+     に対しても`C-\'や`C-^'を打ったとしても実質的には`C-s'や`C-q'を打っ
+     たことになる。*Note Translating Input::。
+
+端末側がフロー制御文字を発行するのであれば、カーネルのフロー制御処理をオ
+ンにすれば、その端末に対する普通のパディングより少なくしても動作するはず
+です。termcapの定義をカスタマイズしてパディング量を減らします。あるいは、
+`baud-rate'に小さめの値を設定すると、パディングの必要量の計算にEmacsは低
+い速度を使います。*Note Terminal Output::。
+
+
+
+File: elisp-ja.info, Node: Batch Mode, Prev: Flow Control, Up: System Interface
+
+バッチモード
+============
+
+コマンド行オプション`-batch'は、Emacsを非対話的に実行します。このモード
+では、Emacsは端末からコマンドを読まず、端末のモードを変更せず、スクリー
+ンに出力もしません。これは、実行するLispプログラムを指定できるようにする
+ためです。それが終るとEmacsも終了します。実行すべきプログラムは、FILEと
+いう名前のライブラリをロードする`-l FILE'、および、引数なしで関数
+FUNCTIONを呼び出す`-f FUNCTION'で指定します。
+
+バッチモードでは、ストリームとして`t'を指定した`message'や`prin1'などで
+エコー領域に表示されるLispプログラムの出力は、Emacsの標準エラー記述子へ
+出力されます。したがって、Emacsは非対話的なアプリケーションプログラムの
+ようにふるまいます。（コマンドの表示などのEmacs自身がエコー領域に出力す
+るものは完全に抑制される。）
+
+ -- Variable: noninteractive
+     この変数は、Emacsがバッチモードで動作していると`nil'以外である。
+
+
+File: elisp-ja.info, Node: Display, Next: Calendar, Prev: System Interface, Up: Top
+
+Emacsの画面表示
+***************
+
+本章では、Emacsがユーザーに提示する画面表示に関連するさまざまな機能につ
+いて述べます。
+
+* Menu:
+
+* Refresh Screen::      Clearing the screen and redrawing everything on it.
+* Truncation::          Folding or wrapping long text lines.
+* The Echo Area::       Where messages are displayed.
+* Invisible Text::      Hiding part of the buffer text.
+* Selective Display::   Hiding part of the buffer text (the old way).
+* Overlay Arrow::       Display of an arrow to indicate position.
+* Temporary Displays::  Displays that go away automatically.
+* Overlays::		Use overlays to highlight parts of the buffer.
+* Width::               How wide is a character or string.
+* Faces::		A face defines a graphics appearance: font, color, etc.
+* Blinking::            How Emacs shows the matching open parenthesis.
+* Inverse Video::	Specifying how the screen looks.
+* Usual Display::	The usual conventions for displaying nonprinting chars.
+* Display Tables::	How to specify other conventions.
+* Beeping::             Audible signal to the user.
+* Window Systems::      Which window system is being used.
+
+
+
+File: elisp-ja.info, Node: Refresh Screen, Next: Truncation, Prev: Display, Up: Display
+
+スクリーン全体の再表示
+======================
+
+関数`redraw-frame'は、指定したフレーム（*Note Frames::）の内容全体を再表
+示します。
+
+ -- Function: redraw-frame FRAME
+     この関数は、フレームFRAMEをクリアしてから再表示する。
+
+より強力なのは`redraw-display'です。
+
+ -- コマンド: redraw-display
+     この関数は、すべての可視フレームをクリアしてから再表示する。
+
+ユーザー入力の処理のほうが再表示より絶対的に優先します。入力があるときに
+これらの関数を呼び出してもただちにはなにもしませんが、入力をすべて処理し
+終えてから再表示します。
+
+通常、Emacsを停止したり再開してもスクリーン全体を再表示します。Emacsのよ
+うなディスプレイ向けプログラムと通常の逐次表示向けに、表示内容を個別に記
+録できる端末エミュレータもあります。そのような端末を使っているときには、
+再開時の再表示を禁止した場合もあります。
+
+ -- Variable: no-redraw-on-reenter
+     この変数は、停止後に再開したあとで、スクリーン全体を再表示するかど
+     うかを制御する。`nil'以外であると再描画の必要はないことを意味し、
+     `nil'であると再描画が必要であることを意味する。デフォルトは`nil'で
+     ある。
+
+
+
+File: elisp-ja.info, Node: Truncation, Next: The Echo Area, Prev: Refresh Screen, Up: Display
+
+表示の切り詰め
+==============
+
+テキスト行がウィンドウの右端を越えていると、その行をつぎのスクリーン行へ
+継続するか、スクリーン行1行に切り詰めます。長いテキスト行を表示するため
+に使われる追加のスクリーン行を"継続"行と呼びます。通常、ウィンドウの最右
+端のコラムに現れる`$'で切り詰めたことを示し、`\'でつぎの行に『折り返した』
+こと、つまり、"継続している"行であることを示します。（表示テーブルで別の
+文字を指定できる。*Note Display Tables::を参照。）
+
+継続することと詰め込みは別のことです。継続はスクリーン上だけのことであり、
+バッファ内容は変わりません。また、継続では単語の境界ではなく、正確にスク
+リーンの右端で行を分けます。*Note Filling::。
+
+ -- User Option: truncate-lines
+     このバッファローカルな変数は、ウィンドウの右端を越える行をどのよう
+     に表示するかを制御する。デフォルトは`nil'であり継続を意味する。値が
+     `nil'以外であると、そのような行を切り詰める。
+
+     変数`truncate-partial-width-windows'が`nil'以外であると、（フレーム
+     内で）左右に並んだウィンドウでは、`truncate-lines'の値に関わらずつ
+     ねに切り詰る。
+
+ -- User Option: default-truncate-lines
+     この変数は、`truncate-lines'のバッファローカルな値を持たないバッファ
+     向けの`truncate-lines'のデフォルト値である。
+
+ -- User Option: truncate-partial-width-windows
+     この変数は、左右に並んだウィンドウ（*Note Splitting Windows::）にお
+     いて、ウィンドウの右端を越える行の表示を制御する。`nil'以外であると、
+     そのような行を切り詰める。さもなければ、`truncate-lines'に従って表
+     示する。
+
+ウィンドウで水平方向にスクロールしている（*Note Horizontal Scrolling::）
+と、強制的に切り詰めます。
+
+継続や切り詰めを表す文字は、表示テーブルを使って変更できます。*Note
+Display Tables::。
+
+バッファに*とても*長い行があるときにそれらの表示に継続行を使うと、それに
+よりEmacsの再表示が遅くなります。コラム計算や字下げ関数も遅くなります。
+そのような場合には、`cache-long-line-scans'に`t'を設定するのがよいです。
+
+ -- Variable: cache-long-line-scans
+     この変数が`nil'以外であると、字下げ／移動関数とEmacsの再表示におい
+     て、バッファを走査した結果をキャッシュし、バッファが変更されていな
+     いときにはキャッシュを調べてバッファの対象領域の再走査を回避する。
+
+     キャッシュするようにすると、短い行の処理が多少遅くなる。
+
+     この変数は、すべてのバッファで自動的にバッファローカルである。
+
+
+
+File: elisp-ja.info, Node: The Echo Area, Next: Invisible Text, Prev: Truncation, Up: Display
+
+エコー領域
+==========
+
+"エコー領域"（echo area）は、基本関数`message'でメッセージを表示したり、
+打鍵を表示するために使われます。（活性な）ミニバッファはエコー領域と同じ
+スクリーン上の位置に現れますが、エコー領域とミニバッファは同じものではあ
+りません。`GNU Emacs マニュアル'には、エコー領域とミニバッファがスクリー
+ンの同じ箇所を使う際の衝突を回避する規則が述べてあります（*Note ミニバッ
+ファ: (emacs)Minibuffer.）。エラーメッセージもエコー領域に現れます。
+*Note Errors::。
+
+エコー領域に表示するには、ストリーム（*Note Output Functions::）として
+`t'を指定したLisp表示関数を使うか、あるいはつぎのようにします。
+
+ -- Function: message STRING &rest ARGUMENTS
+     この関数は、エコー領域に1行のメッセージを表示する。引数STRINGは、言
+     語Cの`printf'の制御文字列と同様である。書式指定について詳しくは、
+     *Note String Conversion::の`format'を参照。`message'は構築した文字
+     列を返す。
+
+     バッチモードでは、`message'はメッセージテキストと改行を標準エラース
+     トリームへ出力する。
+
+     STRINGが`nil'であると、`message'はエコー領域をクリアする。ミニバッ
+     ファが活性であると、これによりミニバッファの内容がスクリーンにただ
+     ちに表示される。
+
+          (message "Minibuffer depth is %d."
+                   (minibuffer-depth))
+           -| Minibuffer depth is 0.
+          => "Minibuffer depth is 0."
+
+          ---------- Echo Area ----------
+          Minibuffer depth is 0.
+          ---------- Echo Area ----------
+
+ -- Function: message-or-box STRING &rest ARGUMENTS
+     この関数は`message'と同様にメッセージを表示するが、エコー領域のかわ
+     りに対話ボックスを使うこともある。この関数がマウスを用いて起動され
+     たコマンドから呼ばれたとき、より正確には、`last-nonmenu-event'
+     （*Note Command Loop Info::）が`nil'かリストのいずれかであると、メッ
+     セージを表示するために対話ボックスかポップアップメニューを用いる。
+     さもなければエコー領域を用いる。（これは、同様な決定をくだす
+     `y-or-n-p'の判定条件と同じである。*Note Yes-or-No Queries::。）
+
+     呼び出しの周りで`last-nonmenu-event'に適切な値を束縛することで、マ
+     ウスを使うかエコー領域を使うか強制できる。
+
+ -- Function: message-box STRING &rest ARGUMENTS
+     この関数は`message'と同様にメッセージを表示するが、可能な限り対話ボッ
+     クス（やポップアップメニュー）を使う。対話ボックスやポップアップメ
+     ニューを扱えない端末などでこれらを使用できない場合には、
+     `message-box'は`message'と同様にエコー領域を使う。
+
+ -- Function: current-message
+     この関数は、エコー領域に現在表示されているメッセージを返す。なけれ
+     ば`nil'を返す。
+
+ -- Variable: cursor-in-echo-area
+     この変数は、エコー領域にメッセージを表示しているときにカーソルをど
+     こに表示するかを制御する。`nil'以外であると、メッセージの末尾にカー
+     ソルを表示する。さもなければ、エコー領域にではなく、ポイント位置に
+     カーソルを表示する。
+
+     この値は普通は`nil'である。Lispプログラムはこれに`t'を短い期間だけ
+     束縛する。
+
+ -- Variable: echo-area-clear-hook
+     このノーマルフックは、`(message nil)'や他の理由でエコー領域をクリア
+     するたびに実行される。
+
+エコー領域に表示したほとんどすべてのメッセージはバッファ`*Messages*'にも
+記録されます。
+
+ -- User Option: message-log-max
+     この変数は、バッファ`*Messages*'に保持する行数を指定する。値`t'は、
+     保持する行数を制限しないことを意味する。値`nil'は、メッセージをまっ
+     たく記録しないことを意味する。メッセージを表示しつつそれを記録しな
+     いようにするにはつぎのようにする。
+
+          (let (message-log-max)
+            (message ...))
+
+ -- Variable: echo-keystrokes
+     この変数は、コマンド文字を表示するまでの経過時間を決定する。この値
+     は整数であり、表示し始めるまでに待つ秒数を指定する。ユーザーが
+     （`C-x'などの）プレフィックスキーを打ってからつぎを打つまでにこの秒
+     数だけ遅れがあると、プレフィックスキーをエコー領域に表示する。（いっ
+     たんキー列の表示を始めると、同じキー列の以降の文字すべてを表示する。）
+
+     値がゼロであると、コマンド入力を表示しない。
+
+
+
+File: elisp-ja.info, Node: Invisible Text, Next: Selective Display, Prev: The Echo Area, Up: Display
+
+不可視なテキスト
+================
+
+属性`invisible'で文字群を"不可視"にできます。つまり、それらをスクリーン
+に表示されないようにするのです。テキスト属性（*Note Text Properties::）
+かオーバレイの属性（*Note Overlays::）を使います。
+
+もっとも単純な場合、属性`invisible'が`nil'以外であると文字は見えなくなり
+ます。これはデフォルトの場合、つまり、`buffer-invisibility-spec'のデフォ
+ルト値を変更していない場合であり、このようにして属性`invisible'は動作し
+ます。
+
+より一般的には、変数`buffer-invisibility-spec'を使って、属性`invisible'
+のどの値のものを不可視なテキストにするかを制御できます。つまり、
+`invisible'の異なる値を与えてテキストをあらかじめいくつかのグループに分
+類しておき、そのあとで`buffer-invisibility-spec'の値を変更してさまざまな
+グループを可視／不可視にします。
+
+`buffer-invisibility-spec'で可視性を制御することは、データベースの項目の
+一覧を表示するようなプログラムで特に有用です。データベースの特定の項目だ
+けを見るための便利なフィルタコマンドを実装できます。この変数に設定するの
+はとても速くでき、変更すべき属性を探すためにバッファ内の全テキストを走査
+するよりも速いのです。
+
+ -- Variable: buffer-invisibility-spec
+     この変数は、属性`invisible'のどの種類を実際に不可視な文字にするかを
+     指定する。
+
+     `t'
+          属性`invisible'が`nil'以外の文字を不可視にする。これがデフォル
+          ト。
+
+     リスト
+          リストの各要素で不可視にする条件を指定する。文字の属性
+          `invisible'がこれらの条件の1つを満たすと、その文字を不可視にす
+          る。リストには2種類の要素がありうる。
+
+          `ATOM'
+               文字の属性`invisible'の値がATOMであるか、そのリストのメン
+               バにATOMがあると、文字を不可視にする。
+
+          `(ATOM . t)'
+               文字の属性`invisible'の値がATOMであるか、そのリストのメン
+               バにATOMがあると、文字を不可視にする。さらに、その文字が
+               行末にあり、直後に目に見える改行がある場合には、`...'を表
+               示する。
+
+`buffer-invisibility-spec'に要素を追加したり削除するために2つの関数が特
+別にあります。
+
+ -- Function: add-to-invisibility-spec ELEMENT
+     （リストにELEMENTが既存でなければ）`buffer-invisibility-spec'に要素
+     ELEMENTを追加する。
+
+ -- Function: remove-from-invisibility-spec ELEMENT
+     `buffer-invisibility-spec'から要素ELEMENTを削除する。
+
+`buffer-invisibility-spec'の使い方の慣習の1つに、メジャーモードでは
+`buffer-invisibility-spec'の1要素と属性`invisible'の値にモード自体の名前
+を使うべきであるというのがあります。
+
+     ;; `...'を表示したければ
+     (add-to-invisibility-spec '(my-symbol . t)) 
+     ;; `...'を表示しくなければ
+     (add-to-invisibility-spec 'my-symbol) 
+
+     (overlay-put (make-overlay beginning end)
+                  'invisible 'my-symbol)
+
+     ;; オーバレイを終了したら
+     (remove-from-invisibility-spec '(my-symbol . t))
+     ;; 同じように
+     (remove-from-invisibility-spec 'my-symbol)
+
+普通、テキストを操作したりポイントを移動するコマンドは、テキストの可視性
+に注意しません。ユーザーレベルの移動コマンドは、
+`line-move-ignore-invisible'が`nil'以外であれば不可視な改行を明示的に無
+視しますが、それはそのように明示的にプログラムしてあるからにすぎません。
+
+インクリメンタルサーチでは、不可視なテキストを含む一致箇所では、不可視な
+オーバレイを一時的にあるいは恒久的に可視にできます。これを可能にするには、
+オーバレイの属性`isearch-open-invisible'が`nil'以外である必要があります。
+その属性の値は、オーバレイを引数として呼ばれる関数である必要があります。
+その関数がオーバレイを恒久的に可視にします。その関数は、探索から抜けると
+きに一致箇所がオーバレイにまたがっているときに使われます。
+
+探索中には、そのようなオーバレイは、それらの属性`invisible'と
+`intangible'を一時的に変更することで一時的に可視にされます。特定のオーバ
+レイに対して異なる扱いをしたければ、属性
+`isearch-open-invisible-temporary'に関数を与えておきます。その関数は2つ
+の引数で呼ばれます。第1引数はオーバレイ、第2引数は、オーバレイを可視にす
+る`t'、あるいは、オーバレイを再度不可視にする`nil'です。
+
+
+
+File: elisp-ja.info, Node: Selective Display, Next: Overlay Arrow, Prev: Invisible Text, Up: Display
+
+選択表示
+========
+
+"選択表示"とは、スクリーン上の特定の行を隠すための関連する機能対を指しま
+す。
+
+最初の変種は、明示的な選択表示で、Lispプログラムで使用するために設計され
+ています。テキストを変更することでどの行を隠すかを制御します。テキストを
+不可視にする機能（*Note Invisible Text::）は、この機能で部分的に置き換え
+てあります。
+
+2番目の変種は、字下げに基づいて自動的に隠す行を選択します。この変種は、
+ユーザーレベルの機能であるように設計されています。
+
+明示的な選択表示を制御するには、改行（コントロールJ）を復帰（コントロー
+ルM）に置き換えます。置換前の改行に続いていたそれまでの行は見えなくなり
+ます。厳密にいえば、改行だけが行を区切るため、一時的にはもう行ではなくなっ
+ているのです。つまり、先行する行の一部になっているのです。
+
+選択表示は、編集コマンドに直接には影響しません。たとえば、`C-f'
+（`forward-char'）は躊躇なく不可視なテキストの中へポイントを移動します。
+しかし、改行文字を復帰文字に置換すると影響を受ける編集コマンドもあります。
+たとえば、`next-line'は、改行だけを探すため不可視な行を飛び越してしまい
+ます。選択表示を使用するモードでは、改行を考慮するようにコマンドを定義し
+たり、テキストの一部を可視／不可視にするコマンドを定義できます。
+
+選択表示しているバッファをファイルに書き出すときには、すべてのコントロー
+ルM（復帰）は改行として出力されます。つまり、つぎにファイルを読み込むと
+不可視なものはなく、普通に見えるのです。選択表示の効果は、Emacsの内側だ
+けで見えるのです。
+
+ -- Variable: selective-display
+     このバッファローカルな変数は、選択表示をオンにする。つまり、行や行
+     の一部を不可視にできる。
+
+        * `selective-display'の値が`t'であると、行内のコントロールM（復
+          帰）以降の部分を表示しない。これは明示的な選択表示である。
+
+        * `selective-display'の値が正整数であると、字下げのコラム幅がそ
+          の数より大きな行を表示しない。
+
+     バッファのある部分が不可視であると、垂直方向に移動するコマンドは、
+     その部分が存在しないがごとく動作し、1つのコマンド`next-line'で任意
+     個数の不可視行を飛び越えられる。しかし、（`forward-char'などの）文
+     字単位の移動コマンドは不可視な部分を無視せず、不可視な部分へのテキ
+     ストの挿入／削除は可能である。
+
+     つぎの例では、`selective-display'の値を変えてバッファ`foo'の*見た目
+     *を示す。バッファの*内容*に変更はない。
+
+          (setq selective-display nil)
+               => nil
+
+          ---------- Buffer: foo ----------
+          1 on this column
+           2on this column
+            3n this column
+            3n this column
+           2on this column
+          1 on this column
+          ---------- Buffer: foo ----------
+
+          (setq selective-display 2)
+               => 2
+
+          ---------- Buffer: foo ----------
+          1 on this column
+           2on this column
+           2on this column
+          1 on this column
+          ---------- Buffer: foo ----------
+
+ -- Variable: selective-display-ellipses
+     このバッファローカルな変数が`nil'以外であると、不可視なテキストが続
+     く行末に`...'を表示する。つぎの例は、上の例の続きである。
+
+          (setq selective-display-ellipses t)
+               => t
+
+          ---------- Buffer: foo ----------
+          1 on this column
+           2on this column ...
+           2on this column
+          1 on this column
+          ---------- Buffer: foo ----------
+
+     表示テーブルを使って`...'にかわる別のテキストを指定できる。*Note
+     Display Tables::。
+
+
+
+File: elisp-ja.info, Node: Overlay Arrow, Next: Temporary Displays, Prev: Selective Display, Up: Display
+
+オーバレイ矢印
+==============
+
+"オーバレイ矢印"（overlay arrow）は、バッファの特定の行にユーザーの注意
+を向けるために有用です。たとえば、デバッガとのインターフェイスを取るため
+のモードでは、オーバレイ矢印で実行するコードの行を示します。
+
+ -- Variable: overlay-arrow-string
+     この変数は、特定の行に注意を向けるために表示する文字列を保持する。
+     矢印機能を使っていなければ`nil'である。
+
+ -- Variable: overlay-arrow-position
+     この変数は、オーバレイ矢印を表示する箇所を表すマーカを保持する。行
+     頭を指すこと。矢印のテキストはその行の先頭に現れ、その場所に本来現
+     れるべきテキストを隠す。矢印は普通は短く、行には字下げがあるので、
+     重要なものは普通はなにも上書きされない。
+
+     オーバレイ文字列は、マーカが指すバッファでのみ表示される。したがっ
+     て、ある時点では、1つのバッファだけにオーバレイ矢印を表示できる。
+
+同様のことは、属性`before-string'のオーバレイを作成してもできます。*Note
+Overlay Properties::。
+
+
+
+File: elisp-ja.info, Node: Temporary Displays, Next: Overlays, Prev: Overlay Arrow, Up: Display
+
+一時的な表示
+============
+
+一時的な表示は、出力をバッファに置き編集目的にではなくユーザーに読むよう
+に提示するためにLispプログラムが使います。
+
+ -- Special form: with-output-to-temp-buffer BUFFER-NAME FORMS...
+     この関数は、BUFFER-NAMEという名前のバッファにFORMSの任意の出力が挿
+     入されるように準備してFORMSを実行する。そのバッファは適当なウィンド
+     ウに表示されるが、そのバッファは選択されない。
+
+     文字列BUFFER-NAMEは、既存である必要はない一時的なバッファを指定する。
+     引数は、バッファではなく文字列であること。（問い合わせずに）はじめ
+     にバッファを消去し、`with-output-to-temp-buffer'が終了すると未変更
+     と印を付ける。
+
+     `with-output-to-temp-buffer'は、`standard-output'に一時的なバッファ
+     を束縛し、FORMSのフォーム群を評価する。FORMS内で用いたLisp出力関数
+     からの出力はデフォルトでそのバッファに入る（しかし、スクリーン表示
+     やエコー領域のメッセージは、用語の一般的な意味で『出力』であるが、
+     影響されない。）*Note Output Functions::。
+
+     FORMSの最後のフォームの値を返す。
+
+          ---------- Buffer: foo ----------
+           This is the contents of foo.
+          ---------- Buffer: foo ----------
+
+          (with-output-to-temp-buffer "foo"
+              (print 20)
+              (print standard-output))
+          => #<buffer foo>
+
+          ---------- Buffer: foo ----------
+          20
+
+          #<buffer foo>
+
+          ---------- Buffer: foo ----------
+
+ -- Variable: temp-buffer-show-function
+     この変数が`nil'以外であると、ヘルプバッファを表示するために
+     `with-output-to-temp-buffer'がこの値を関数として呼び出す。関数は1つ
+     の引数、つまり、表示すべきバッファを受け取る。
+
+     この関数では、`save-window-excursion'を使いウィンドウとバッファを選
+     択した内側で、`with-output-to-temp-buffer'が普通に行うように
+     `temp-buffer-show-hook'を呼び出すのがよい。
+
+ -- Variable: temp-buffer-show-hook
+     このノーマルフックは、ヘルプバッファを表示後に
+     `with-output-to-temp-buffer'が実行する。フックを実行するときには、
+     ヘルプバッファがカレントバッファであり、それを表示しているウィンド
+     ウが選択されているウィンドウである。
+
+ -- Function: momentary-string-display STRING POSITION &optional CHAR MESSAGE
+     この関数は、カレントバッファ内の位置POSITIONに文字列STRINGを瞬間的
+     に表示する。アンドゥリストやバッファの変更状態には影響しない。
+
+     瞬間的な表示は、つぎの入力イベントまで持続する。つぎの入力イベント
+     がCHARであると、`momentary-string-display'はそれを無視して戻る。さ
+     もなければ、そのイベントは入力として使われるように保存される。した
+     がって、CHARを打つと文字列の表示が単に消えるだけであるが、（たとえ
+     ば）`C-f'を打つと文字列の表示が消えるだけでなく（たぶん）ポイントを
+     進めることになる。引数CHARはデフォルトでは空白である。
+
+     `momentary-string-display'の戻り値に意味はない。
+
+     文字列STRINGにコントロール文字が含まれなければ、属性`before-string'
+     のオーバレイを作成（のちに削除）することでより一般的な方法で同じこ
+     とを行える。*Note Overlay Properties::。
+
+     MESSAGEが`nil'以外であると、STRINGをバッファに表示中には、MESSAGEを
+     エコー領域に表示する。`nil'であると、デフォルトは「継続するには文字
+     CHARを打つこと」といったメッセージである。
+
+     つぎの例では、ポイントは始めは2行目の先頭に位置している。
+
+          ---------- Buffer: foo ----------
+          This is the contents of foo.
+          -!-Second line.
+          ---------- Buffer: foo ----------
+
+          (momentary-string-display
+            "**** Important Message! ****"
+            (point) ?\r
+            "Type RET when done reading")
+          => t
+
+          ---------- Buffer: foo ----------
+          This is the contents of foo.
+          **** Important Message! ****Second line.
+          ---------- Buffer: foo ----------
+
+          ---------- Echo Area ----------
+          Type RET when done reading
+          ---------- Echo Area ----------
+
+
+
+File: elisp-ja.info, Node: Overlays, Next: Width, Prev: Temporary Displays, Up: Display
+
+オーバレイ
+==========
+
+ユーザーに提示するためにスクリーン上でのバッファのテキストの見た目を変え
+るために"オーバレイ"（overlay）を使えます。オーバレイは、特定のバッファ
+に属するオブジェクトであり、指定された開始位置と終了位置があります。また、
+調べたり設定できる属性もあります。これらの属性は、オーバレイの内側のテキ
+ストの表示に影響します。
+
+* Menu:
+
+* Overlay Properties::	How to read and set properties.
+			What properties do to the screen display.
+* Managing Overlays::   Creating, moving, finding overlays.
+
+
+
+File: elisp-ja.info, Node: Overlay Properties, Next: Managing Overlays, Prev: Overlays, Up: Overlays
+
+オーバレイ属性
+--------------
+
+オーバレイ属性はある意味でテキスト属性に似ていて、どちらの属性でも文字の
+表示方法を変更できます。しかし、多くの点で異なります。テキスト属性は、テ
+キストの一部であるとみなされますが、オーバレイはテキストの一部とはみなし
+ません。したがって、さまざまなバッファや文字列のあいだでテキストをコピー
+してもテキスト属性は保存されますが、オーバレイは保存されません。バッファ
+内のテキスト属性を変更するとバッファを変更済みと印を付けますが、オーバレ
+イを移動したりその属性を変更してもバッファの変更とは考えません。テキスト
+属性の変更と異なり、オーバレイの変更はバッファのアンドゥリストには記録さ
+れません。比較のために*Note Text Properties::。
+
+`priority'
+     この属性の値（非負の数であること）は、オーバレイの優先順位を決定す
+     る。優先順位は、複数のオーバレイが同じ文字を覆い、いずれも表示用の
+     フェイスを指定している場合に意味を持つ。`priority'の値の大きなもの
+     が他に優先し、そのフェイス属性が他の低い順位の属性のフェイス属性に
+     優先する。
+
+     現在、すべてのオーバレイ属性はテキスト属性に優先する。負の優先順位
+     の意味を決めかねているので、負の優先順位は避けてほしい。
+
+`window'
+     属性`window'が`nil'以外であると、オーバレイをそのウィンドウだけに適
+     用する。
+
+`category'
+     オーバレイに属性`category'があると、それをオーバレイの"カテゴリ"
+     （category）と呼ぶ。これはシンボルであること。シンボルの属性がオー
+     バレイの属性のデフォルトの役割を果たす。
+
+`face'
+     この属性は、テキストの表示方法、たとえば、フォントや表示色を制御す
+     る。その値は、フェイス名であるかフェイス名のリストである。詳しくは、
+     *Note Faces::。
+
+     属性値がリストであると、その要素は、`(foreground-color
+     . COLOR-NAME)'か`(background-color . COLOR-NAME)'の形でもよい。これ
+     らの要素は、前景色だけや背景色だけを指定する。したがって、使用する
+     各色を表すフェイスを作成する必要はない。
+
+`mouse-face'
+     この属性は、マウスがオーバレイの範囲に入っているときに`face'のかわ
+     りに使われる。
+
+`modification-hooks'
+     この属性の値は、オーバレイの内側の文字を変更したり、オーバレイの内
+     側にテキストを挿入したときに呼び出される関数のリストである。
+
+     フック関数は、各変更の前後に呼び出される。関数が受け取った情報を保
+     存し呼び出しごとに比較すればバッファテキストにどのような変更が行わ
+     れたかを正確に判定できる。
+
+     変更前に呼ばれるときには、各関数は4つの引数を受け取る。オーバレイ、
+     `nil'、変更対象のテキスト範囲の先頭と末尾である。
+
+     変更後に呼ばれるときには、各関数は5つの引数を受け取る。オーバレイ、
+     `t'、変更済みのテキスト範囲の先頭と末尾、その範囲の変更前のテキスト
+     の長さである。（挿入では変更前の長さはゼロである。削除では変更前の
+     長さは削除された文字数であり、変更後の先頭位置と末尾位置は同じであ
+     る。）
+
+`insert-in-front-hooks'
+     この属性の値は、オーバレイの開始位置へのテキスト挿入の前後に呼び出
+     される関数のリストである。呼び出し方法は`modification-hooks'の関数
+     群と同じである。
+
+`insert-behind-hooks'
+     この属性の値は、オーバレイの終了位置へのテキスト挿入の前後に呼び出
+     される関数のリストである。呼び出し方法は`modification-hooks'の関数
+     群と同じである。
+
+`invisible'
+     属性`invisible'は、オーバレイ内のテキストを不可視にする。つまり、そ
+     れらはスクリーン上に現れない。詳しくは、*Note Invisible Text::。
+
+`intangible'
+     属性`intangible'は、オーバレイにおいてテキスト属性`intangible'と同
+     様に働く。詳しくは、*Note Special Properties::。
+
+`isearch-open-invisible'
+     この属性は、インクリメンタルサーチに対して、一致箇所がオーバレイに
+     重なったときに不可視なオーバレイを恒久的に可視にする方法を指示する。
+     *Note Invisible Text::。
+
+`isearch-open-invisible-temporary'
+     この属性は、インクリメンタルサーチに対して、探索中に不可視なオーバ
+     レイを一時的に可視にする方法を指示する。*Note Invisible Text::。
+
+`before-string'
+     この属性の値は、オーバレイの先頭位置に追加表示する文字列である。文
+     字列はいかなる意味においてもバッファには現れず、スクリーン上のみに
+     現れる。文字列は1コラムで表示される文字のみであること。タブや改行を
+     含むコントロール文字を含むと奇妙な結果を生じる。
+
+`after-string'
+     この属性の値は、オーバレイの末尾位置に追加表示する文字列である。文
+     字列はいかなる意味においてもバッファには現れず、スクリーン上のみに
+     現れる。文字列は1コラムで表示される文字のみであること。タブや改行を
+     含むコントロール文字を含むと奇妙な結果を生じる。
+
+`evaporate'
+     この属性が`nil'以外であると、オーバレイが空に（つまり覆う文字がなく）
+     なると、自動的にオーバレイを削除する。
+
+`local-map'
+     この属性が`nil'以外であると、当該部分のテキストに対するキーマップを
+     指定する。ポイントの直後の文字がオーバレイに入っていると、属性の値
+     はバッファローカルなキーマップに置き換わる。*Note Active Keymaps::。
+
+つぎは、オーバレイの属性を読み書きするための関数です。
+
+ -- Function: overlay-get OVERLAY PROP
+     この関数は、オーバレイOVERLAYに記録されている属性PROPの値をあれば返
+     す。OVERLAYにそのような属性に対する値が記録されていなくても、属性
+     `category'がありそれがシンボルであれば、そのシンボルの属性PROPを使
+     う。さもなければ値は`nil'である。
+
+ -- Function: overlay-put OVERLAY PROP VALUE
+     この関数は、オーバレイOVERLAYに属性PROPの値としてVALUEを設定する。
+     VALUEを返す。
+
+与えられた文字のオーバレイ属性とテキスト属性の両方を調べる関数
+`get-char-property'も参照してください。*Note Examining Properties::。
+
+
+

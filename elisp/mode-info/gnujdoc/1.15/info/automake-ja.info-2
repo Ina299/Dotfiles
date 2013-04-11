@@ -1,0 +1,2073 @@
+Info file: automake-ja.info,    -*-Text-*-
+produced by `texinfo-format-buffer'
+from file `automake-ja.texi'
+using `texinfmt.el' version 2.38 of 3 July 1998.
+
+
+
+
+INFO-DIR-SECTION GNU programming tools
+START-INFO-DIR-ENTRY
+* automake(ja): (automake-ja).		Making Makefile.in's
+END-INFO-DIR-ENTRY
+
+
+INFO-DIR-SECTION Individual utilities
+START-INFO-DIR-ENTRY
+* aclocal(ja): (automake-ja)Invoking aclocal.          Generating aclocal.m4
+END-INFO-DIR-ENTRY
+
+
+このファイルでGNU automake 1.7を説明します．
+
+Copyright 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002 Free Software
+Foundation, Inc.
+
+Permission is granted to make and distribute verbatim copies of this
+manual provided the copyright notice and this permission notice are
+preserved on all copies.
+
+Permission is granted to copy and distribute modified versions of this
+manual under the conditions for verbatim copying, provided that the
+entire resulting derived work is distributed under the terms of a
+permission notice identical to this one.
+
+Permission is granted to copy and distribute translations of this manual
+into another language, under the above conditions for modified versions,
+except that this permission notice may be stated in a translation
+approved by the Foundation.
+
+
+
+
+
+
+
+
+File: automake-ja.info, Node: Conditional Programs, Prev: Conditional Sources, Up: A Program
+
+プログラムの条件付コンパイル
+----------------------------
+
+ビルドされるプログラムをconfigure時に決定することが役に立つときもありま
+す．例えば，GNU `cpio'は特別な状況のときだけ`mt'と`rmt'をビルドします．
+
+
+この場合は，ビルドされる可能性のあるすべてのプログラムをAutomakeに知らせ
+る必要がありますが，同時に，`configure'で指定されるプログラムを使用する
+ように`Makefile.in'を生成させる必要もあります．このことは，それぞれの
+`_PROGRAMS'定義に`configure'での置換式の値を持たせることで行なわれますが，
+一方では，`EXTRA_PROGRAMS'でオプションとしてビルドされるプログラムがすべ
+てリストアップされています．
+
+もちろん，ビルドするプログラムを定義するために，Automakeの条件式を使用す
+ることも可能です．
+
+
+
+
+File: automake-ja.info, Node: A Library, Next: A Shared Library, Prev: A Program, Up: Programs
+
+ライブラリのビルド
+==================
+
+
+
+ライブラリをビルドすることは，プログラムをビルドすることによく似ています．
+この場合は，プライマリの名前は`LIBRARIES'です．ライブラリは`libdir'や
+`pkglibdir'にインストールされます．
+
+Libtoolと`LTLIBRARIES'プライマリを使用して共有ライブラリをビルドする方法
+についての詳細は，*Note A Shared Library::.
+
+それぞれの`_LIBRARIES'変数は，ビルドされるライブラリのリストです．例えば，
+`libcpio.a'という名前のライブラリを作成し，それをインストールしないため，
+以下のように書きます．
+
+     noinst_LIBRARIES = libcpio.a
+
+ライブラリに組み込まれるソースは，プログラムのときのように，`_SOURCES'変
+数によって正しく決定されます．ライブラリ名は標準的にされるので(*Note
+Canonicalization::)，`liblob.a'に対応する`_SOURCES'変数は
+`liblob.a_SOURCES'ではなく`liblob_a_SOURCES'になることに注意してください．
+
+
+追加のオブジェクトは，`LIBRARY_LIBADD'変数を使用してライブラリに追加する
+ことが可能です．これは`configure'で決定されるオブジェクトに対して使用さ
+れるべきです．再び`cpio'からの引用です．
+
+     libcpio_a_LIBADD = @LIBOBJS@ @ALLOCA@
+
+さらに，configure時まで存在しない追加のオブジェクトに対するソースは，
+`BUILT_SOURCES'変数に追加する必要があります(*Note Sources::)．
+
+
+
+
+File: automake-ja.info, Node: A Shared Library, Next: Program and Library Variables, Prev: A Library, Up: Programs
+
+共有ライブラリのビルド
+======================
+
+
+共有ライブラリをビルドすることは比較的複雑な問題です．このために，GNU
+Libtoolは(*Note Introduction: (libtool)Top.)プラットホームに依存しない方
+法で共有ライブラリをビルドする補助を行なうために作成されました．
+
+
+
+Automakeは，`LTLIBRARIES'プライマリで宣言されたライブラリをビルドするた
+めにLibtoolを使用します．それぞれの`_LTLIBRARIES'変数はビルドする共有ラ
+イブラリのリストです．例えば，`libgettext.a'という名前のライブラリとそれ
+に対応する共有ライブラリを作成し，`libdir'にインストールするために，以下
+のように書いてください．
+
+     lib_LTLIBRARIES = libgettext.la
+
+
+
+共有ライブラリが正しく動作するようにインストールする*必要がある*ので，
+`check_LTLIBRARIES'が使用不可能だということに注意してください．しかし，
+`noinst_LTLIBRARIES'は使用可能です．この機能はlibtoolの"convinience
+library"で使用されます．
+
+
+それぞれのライブラリに対して，`LIBRARY_LIBADD'変数は，共有ライブラリに加
+える追加のlibtoolオブジェクト(`.lo'ファイル)の名前を含んでいます．
+`LIBRARY_LDFLAGS'変数は，`-version-info'や`-static'といった，付加的な
+libtoolフラグも含んでいます．
+
+
+普通のライブラリが`@LIBOBJS@'を使用するところで，libtoolライブラリは
+`@LTLIBOBJS@'を使用する必要があります．libtoolが処理するオブジェクトファ
+イルは必ずしも`.o'で終わらないので，これが必要になります．libtoolマニュ
+アルには，このトピックに関する詳細が書かれています．
+
+いくつかのディレクトリにインストールされるライブラリに対して，Automakeは
+自動的に適切な`-rpath'オプションを供給します．しかし，configure時(と
+`EXTRA_LTLIBRARIES'に書いたとき)に決定されるライブラリに対して，Automake
+は最終的なインストールディレクトリを知りません．このようなライブラリに対
+しては，適切な`_LDFLAGX'変数に`-rpath' オプションを手書きで加える必要が
+あります．
+
+通常，Automakeは共有ライブラリの名前が`lib'で始まることを要求します．し
+かし，動的にロードされるモジュールをビルドしている場合，"標準的でない" 
+名前を使用したいかもしれません．この場合は，`-module'を`_LDFLAGS'変数に
+書き込んでください．
+
+詳細は*Note Using Automake with Libtool: (libtool)Using Automake.
+
+
+
+
+File: automake-ja.info, Node: Program and Library Variables, Next: LIBOBJS, Prev: A Shared Library, Up: Programs
+
+プログラムとライブラリの変数
+============================
+
+それぞれのプログラムに関連して，プログラムのビルドの方法を修正するために
+使用可能な，変数の集合があります．それぞれのライブラリに対しても，それに
+似たような変数のリストがあります．プログラム(やライブラリ)の標準的な名前
+が，これらの変数の命名に対してベースとして使用されます．
+
+以下のリストでは，名前"maude"をプログラムやライブラリを示すものとして使
+用しています．`Makefile.am'で，これをプログラムの標準的な名前に置換して
+ください．このリストは，"maude"をプログラムを示すものとしていますが，一
+般的に同じ規則を，スタティックライブラリやダイナミックライブラリに適用し
+ます．以下の文章では，プログラムとライブラリで異なる状況をコメントしてい
+ます．
+
+`maude_SOURCES'
+     存在する場合，この変数は，プログラムをビルドするためにコンパイルさ
+     れる，すべてのソースファイルをリストアップします．プログラムをビル
+     ドしているとき，Automakeはそれぞれのソースファイルを単一の`.o'ファ
+     イル(やlibtoolを使用しているときは`.lo')にコンパイルさせます．通常
+     これらのオブジェクトファイルはソースファイルの後に命名されますが，
+     他の要因で変更することが可能です．`_SOURCES'変数のファイルに認識で
+     きない拡張子がある場合，Automakeは二つのうちの一つを実行します．認
+     識できない拡張子を持つファイルを`.o'に変換するためのサフィックス規
+     則が存在する場合，automakeはこのファイルを，その他の(言語の)ソース
+     ファイルとして扱います(*Note Support for Other Languages::)．それ以
+     外では，ファイルがヘッダファイルと考えて無視されます．
+
+     接頭辞の`dist_'と`nodist_'で，`_SOURCES'にリストアップされているファ
+     イルを配布するかどうか制御するために使用することが可能です．ソース
+     はデフォルトで配布されるので，`dist_'は冗長ですが，必要があれば明確
+     にするために指定可能です．
+
+     `_SOURCES'変数に与えるものとして`dist_'と`nodist_'の両方を一度に用
+     いることが可能です．これによって，配布するファイルとしないものに簡
+     単に分類することができ，例えば以下のようにします．
+
+          nodist_maude_SOURCES = nodist.c
+          dist_maude_SOURCES = dist-me.c
+
+     デフォルトで，出力ファイル(Unixシステム上では`.o'ファイル)は，現在
+     のビルドディレクトリに書き込まれます．しかし，現在のディレクトリに
+     対してオプションの`subdir-objects'の影響がある場合，`.o'ファイルは
+     ソースファイルの後で指名されるサブディレクトリに書き込まれます．例
+     えば，`subdir-objects'が利用可能な場合，`sub/dir/file.c'は
+     `sub/dir/file.o'にコンパイルされます．この処理モードを好む人もいま
+     す．`subdir-objects'を`AUTOMAKE_OPTIONS'で指定することが可能です
+     (*Note Options::)．
+
+
+`EXTRA_maude_SOURCES'
+     Automakeは，コンパイルしたいファイルのリストを*静的に*知っている必
+     要があります．一つには，該当する`Makefile.in'が要求する言語のサポー
+     トの種類をAutomakeが知るための唯一の方法だということがあげられます． 
+     (1) (*Note Program and Library Variables-Footnotes::) 例えばこれに
+     は，`@my_sources@'のようなconfigure の置換式を`_SOURCES'に書き込む
+     ことができないという意味があります．ソースファイルの条件コンパイル
+     を行ない，例えば`_LDADD'(以下を参照してください)のオブジェクト名を
+     適切に置換するために`configure'を使用したい場合，対応するソースファ
+     イルを`EXTRA_'にリストアップした方が良いでしょう．
+
+     この変数は，例えば`nodist_EXTRA_maude_SOURCES'のように，`dist_'と
+     `nodist_'もサポートします．
+
+`maude_AR'
+     スタティックライブラリは，デフォルトで，`$(AR) cru'にライブラリ名と
+     ライブラリに書き込むオブジェクトを続けて呼び出すことで作成されます．
+     `_AR'変数でこれに優先することが可能です．これは，通常C++で使用され
+     ます．C++コンパイラには，ライブラリに組み込むすべてのテンプレートを
+     instantiateするために，特殊な呼び出しが必要なものもあります．例えば，
+     SGI C++コンパイラは，この変数を以下のように設定します．
+          libmaude_a_AR = $(CXX) -ar -o
+
+`maude_LIBADD'
+     `_LIBADD'変数を使用することで，追加のオブジェクトをライブラリに加え
+     ることが可能です．これは，`configure'で決定されるオブジェクトに対し
+     て使用すべきです．
+
+`maude_LDADD'
+     `_LDADD'変数に追加のオブジェクトをリストアップすることで，共有ライ
+     ブラリやプログラムに加えることが可能です．これは，`configure'で決定
+     されるオブジェクトに対して使用すべきです．
+
+     (`-l'，`-L'，`-dlopen'，そして`-dlpreopen'以外の)プログラム特有のリ
+     ンカフラグを渡すために`_LDADD'と`_LIBADD'を使用することは不適切です．
+     この目的に対しては，`_LDFLAGS'変数を使用してください．
+
+     例えば，`configure.in'で`AC_PATH_XTRA'を使用している場合，Xのライブ
+     ラリに対してプログラムをリンクするため，以下のようにすることが可能
+     でしょう．
+
+          maude_LDADD = $(X_PRE_LIBS) $(X_LIBS) $(X_EXTRA_LIBS)
+
+`maude_LDFLAGS'
+     これは，プログラムや共有ライブラリのリンク段階に特別なフラグを渡す
+     ために使用する変数です．
+
+`maude_LINK'
+     プログラムごとを基本として，(デフォルトの)リンカに優先することが可
+     能です．デフォルトで，プログラムで使用されている言語によってリンカ
+     は選択されます．例えば，C++のソースコードを含むプログラムでは，C++
+     コンパイラがリンクに使用されます．`_LINK'変数は，すべての`.o'ファイ
+     ル名を引数として渡すことが可能なコマンドの名前を含んでいる必要があ
+     ります．基礎となるプログラム名は，`_LINK'に渡され*ない*ことに注意し
+     てください．通常は`$@'を使用します．
+
+          maude_LINK = $(CCLD) -magic -o $@
+
+`maude_CCASFLAGS'
+`maude_CFLAGS'
+`maude_CPPFLAGS'
+`maude_CXXFLAGS'
+`maude_FFLAGS'
+`maude_GCJFLAGS'
+`maude_LFLAGS'
+`maude_OBJCFLAGS'
+`maude_RFLAGS'
+`maude_YFLAGS'
+     Automakeでは，プログラムごと(またはライブラリごと)を基本として，コ
+     ンパイルフラグを設定することが可能です．単一のソースファイルを複数
+     のプログラムに含めることが可能で，それぞれのプログラムに対して異な
+     るフラグでコンパイルされる可能性もあります．これは，あらゆる言語に
+     対し，直接Automakeがサポートすることで動作します．フラグは，
+     `_CCASFLAGS'，`_CFLAGS'，`_CPPFLAGS'，`_CXXFLAGS'，`_FFLAGS'，
+     `_GCJFLAGS'，`_LFLAGS'，`_OBJCFLAGS'，`_RFLAGS'，そして`_YFLAGS'で
+     す．
+
+     プログラムごとにコンパイルフラグを使用するとき，Automakeは，中間的
+     なオブジェクトファイルに対して異なる名前を選択します．通常，
+     `sample.c'のようなファイルは，コンパイルされて`sample.o'が生成され
+     ます．しかし，プログラムの`_CFLAGS'変数を設定した場合，オブジェクト
+     ファイルは，例えば`maude-sample.o'のように命名されます．
+
+     プログラムごとにフラグを用いてコンパイルする際は，通常の`AM_'形式の
+     フラグ変数は自動的にコンパイルに組み込まれ*ません*(しかし，ユーザ形
+     式の変数は組み込まれ*ます*)．そのため，例えば，`AM_CFLAGS'の変数も
+     使用して`maude'のコンパイルを行なうと仮定すると，以下のように書く必
+     要があります．
+
+          maude_CFLAGS = ... your flags ... $(AM_CFLAGS)
+
+
+`maude_DEPENDENCIES'
+     実際には，プログラムの一部にはならない他のターゲットに依存するプロ
+     グラムがあることが，役に立つ場合もあります．これは，`_DEPENDENCIES'
+     変数を使用することで可能になります．それぞれのプログラムは，その変
+     数の内容に依存しますが，それ以上の解釈はなされません．
+
+     `_DEPENDENCIES'が提供されていない場合，それはAutomakeが考慮します．
+     自動的に割り当てられる値は`_LDADD'や`_LIBADD'の内容で，ほとんどの
+     configure置換式，`-l'，`-L'，`-dlopen'，そして`-dlpreopen'は削除さ
+     れています．残っているconfigureの置換式は，`@LIBOBJS@'と`@ALLOCA@'
+     です．これらは，生成される`_DEPENDENCIES'に対して無効な値を生成しな
+     いことが分かっているので残されます．
+
+`maude_SHORTNAME'
+     利用可能なファイル名が非常に短いプラットフォームもあります．これら
+     のシステムと，プログラムごとのコンパイルフラグを同時にサポートする
+     ために，Automakeでは，中間的なオブジェクトファイルの命名方法に影響
+     する"短い名前" を設定することが可能です．例えば，`maude_SHORTNAME'
+     を`m'に設定する場合，上記のプログラムごとのコンパイルフラグの例では，
+     オブジェクトファイルは`maude-sample.o'ではなく`m-sample.o'と命名さ
+     れます．この機能は，実行上滅多に必要になりませんし，要求されている
+     ことが分かるまで使用を避けることを推奨します．
+
+
+
+File: automake-ja.info  Node: Program and Library Variables-Footnotes, Up: Program and Library Variables
+
+(1) それ以外にも，この制限に対してあまり知られていない理由が同じよ
+うに存在します．
+
+
+
+File: automake-ja.info, Node: LIBOBJS, Next: Program variables, Prev: Program and Library Variables, Up: Programs
+
+LIBOBJSとALLOCAに対する特別扱い
+===============================
+
+
+Automakeは，`@LIBOBJS@'と`@ALLOCA@'を使用していることを明示的に認識し，
+そしてこの情報を使用し，配布物に適切なソースファイルを自動的に含めるため
+(*Note Dist::)，`configure.in'から派生される`LIBOBJS'ファイルのリストに
+追加します．これらのソースファイルは，依存性追跡でも自動的に処理されます．
+*Note Dependencies::.
+
+`@LIBOBJS@'と`@ALLOCA@'は，あらゆる`_LDADD'や`_LIBADD'で特別に認識されま
+す．
+
+
+
+
+File: automake-ja.info, Node: Program variables, Next: Yacc and Lex, Prev: LIBOBJS, Up: Programs
+
+プログラムビルド時に使用される変数
+==================================
+
+Automakeがコンパイルに使用する`Makefile'変数を知ることが役に立ちつことも
+あります．例えば，特別な状況では，自分でコンパイルをする必要があるかもし
+れません．
+
+Autoconfから継承される変数もあります．これらは`CC'，`CFLAGS'，`CPPFLAGS'，
+`DEFS'，`LDFLAGS'，そして`LIBS'です．
+
+Automake自身が定義する追加の変数もあります．
+
+`AM_CPPFLAGS'
+     この変数の内容は，Cプリプロセッサを呼び出すコンパイルで毎回渡されま
+     す．それはプリプロセッサへの引数リストです．例えば，`-I'と`-D'オプ
+     ションは，ここにリストアップすべきです．
+
+     Automakeは，すでに`-I'オプションを自動的に提供しています．特に，
+     `-I$(srcdir)'，`-I.'，そして(`AC_CONFIG_HEADERS'や
+     `AM_CONFIG_HEADER'を使用している場合は)`config.h'があるディレクトリ
+     を示す`-I'を生成します．`nostdinc'オプションを使用することで，デフォ
+     ルトの`-I'オプションを利用不可能にすることが可能です．
+
+     実行形式ごと(またはライブラリごと)に`_CPPFLAGS'変数が定義されている
+     場合，それを優先するので，`AM_CPPFLAGS'は無視されます，
+
+`INCLUDES'
+     これは，`AM_CPPFLAGS'と同じ仕事をします．それは同じ機能に対する古い
+     名前です．この変数の使用には反対です．代わりに`AM_CPPFLAGS'の使用を
+     勧めます．
+
+`AM_CFLAGS'
+     これは，`Makefile.am'の著者が，追加のCコンパイラフラグを渡すために
+     使用することが可能な変数です．その完全な説明はどこかにあるでしょう．
+     状況によっては，実行形式ごと(またはライブラリごと)の`_CFLAGS'が優先
+     され，これは使用されません．
+
+`COMPILE'
+     これはCソースファイルをコンパイルするために実際に使用されるコマンド
+     です．完全なコマンドラインを構成するために，ファイル名が追加されま
+     す．
+
+`AM_LDFLAGS'
+     これは，`Makefile.am'の著者が，追加のリンカフラグを渡すために使用す
+     ることが可能な変数です．状況によっては，実行形式ごと(またはライブラ
+     リごと)の`_LDFLAGS'が優先され，これは使用されません．
+
+`LINK'
+     これはCプログラムをリンクするために実際に使用されるコマンドです．そ
+     れにはすでに，`-o $@'と通常参照される変数(例えば，`CFLAGS')が含まれ
+     ています．それは，リンクされるオブジェクトファイルとライブラリの名
+     前を"引数"として受けとります．
+
+
+
+
+File: automake-ja.info, Node: Yacc and Lex, Next: C++ Support, Prev: Program variables, Up: Programs
+
+YaccとLexのサポート
+===================
+
+AutomakeはYaccとLexに対して幾分特異なサポートを行ないます．
+
+Automakeは，`yacc'(あるいは`lex')によって生成された`.c'ファイルが，入力
+ファイルのベース名を使用して命名されていると仮定します．すなわち，yaccソー
+スファイル`foo.y'に対して，Automakeは中間ファイルを(より伝統的な
+`y.tab.c'ではなく)`foo.c'と命名します．
+
+yaccソースファイルの拡張子は，結果として生じる`C'あるいは`C++' ファイル
+の拡張子を決定するために使用されます．ファイルの拡張子が`.y'の場合は`.c'
+になります．同様に`.yy'は`.cc'に，`.y++'は`c++'に，そして`.yxx'は`.cxx'
+になります．
+
+同様に，lexソースファイルは，`C'や`C++'を生成するために使用することが可
+能です．拡張子の`.l'，`.ll'，`.l++'，そして`.lxx'が認識されます．
+
+あらゆる`SOURCES'変数に，(`C'や`C++'の)中間的なファイルを明示的に書いて
+はいけません．ソースファイルだけをリストアップします．
+
+`yacc'(あるいは`lex')によって生成さる中間的なファイルは，作成されるすべ
+ての配布物に含められます．そのためユーザが`yacc'や`lex'を持っている必要
+がありません．
+
+`yacc'ソースファイルが見つかった場合，`configure.in'で変数`YACC'を定義す
+る必要があります．これは，マクロ`AC_PROG_YACC'を呼び出すことで最も容易に
+行なえます(*Note Particular Program Checks: (autoconf)Particular
+Programs.)．
+
+`yacc'が呼び出された時，`YFLAGS'と`AM_YFLAGS'フラグが渡されます．前者は
+ユーザ変数で，後者は`Makefile.am'の著者のためのものです．
+
+同様に，`lex'ソースファイルがある場合，`configure.in'で変数`LEX'を定義す
+る必要があります．こうするために`AC_PROG_LEX'を使用することが可能ですが
+(*Note Particular Program Checks: (autoconf)Particular Programs.)，
+`AM_PROG_LEX'マクロ(*Note Macros::)の使用を推奨します．
+
+`lex'が呼び出されたとき，`LFLAGS'と`AM_LFLAGS'フラグが渡されます．前者は
+ユーザ変数で，後者は`Makefile.am'の著者のためのものです．
+
+
+
+
+
+Automakeで，一つのプログラムに複数の`yacc'(または`lex')ソースファイルを
+含めることが可能になります．ディレクトリに一つ以上の異なる`yacc' (または
+`lex')のソースファイルがあるとき，Automakeは，サブディレクトリで`yacc'
+(または`lex')を実行するために，`ylwrap'と呼ばれる小さいプログラムを使用
+します．これが必要になるのは，yaccの出力ファイル名が固定されていて，並列
+的なmakeで`yacc'の一つ以上のインスタンスを同時に呼び出す可能性があるため
+です．`ylwrap' プログラムは，Automakeと一緒に配布されます．それは
+`AC_CONFIG_AUX_DIR'が指定するディレクトリ (*Note Finding `configure'
+Input: (autoconf)Input.)，または，そのマクロが`configure.in'で使用されて
+いない場合はカレントディレクトリにあります．
+
+`yacc'に対しては，簡単なロックでの管理は不十分です．`yacc'の出力は，内部
+で常に同じシンボル名を使うので，同じ実行形式の中に二つの`yacc'パーサーを
+リンクするは不可能です．
+
+`gdb'では，使用する名前を以下のように変更してください．
+     #define	yymaxdepth c_maxdepth
+     #define	yyparse	c_parse
+     #define	yylex	c_lex
+     #define	yyerror	c_error
+     #define	yylval	c_lval
+     #define	yychar	c_char
+     #define	yydebug	c_debug
+     #define	yypact	c_pact
+     #define	yyr1	c_r1
+     #define	yyr2	c_r2
+     #define	yydef	c_def
+     #define	yychk	c_chk
+     #define	yypgo	c_pgo
+     #define	yyact	c_act
+     #define	yyexca	c_exca
+     #define yyerrflag c_errflag
+     #define yynerrs	c_nerrs
+     #define	yyps	c_ps
+     #define	yypv	c_pv
+     #define	yys	c_s
+     #define	yy_yys	c_yys
+     #define	yystate	c_state
+     #define	yytmp	c_tmp
+     #define	yyv	c_v
+     #define	yy_yyv	c_yyv
+     #define	yyval	c_val
+     #define	yylloc	c_lloc
+     #define yyreds	c_reds
+     #define yytoks	c_toks
+     #define yylhs	c_yylhs
+     #define yylen	c_yylen
+     #define yydefred c_yydefred
+     #define yydgoto	c_yydgoto
+     #define yysindex c_yysindex
+     #define yyrindex c_yyrindex
+     #define yygindex c_yygindex
+     #define yytable	 c_yytable
+     #define yycheck	 c_yycheck
+     #define yyname   c_yyname
+     #define yyrule   c_yyrule
+
+それぞれの定義に対して，`c_'接頭辞は好みのものに置き換えて下さい．これら
+は，`bison'，`byacc'，そして伝統的な`yacc'に対する動作を定義します．パー
+サジェネレータが，ここでカバーされていないシンボルを使用していることが分
+かった場合，リストに加えることができるように，新しい名前を報告してくださ
+い．
+
+
+
+
+File: automake-ja.info, Node: C++ Support, Next: Assembly Support, Prev: Yacc and Lex, Up: Programs
+
+C++のサポート
+=============
+
+
+Automakeには，C++に対する完全なサポートが含まれています．
+
+C++コードを含んでいるすべてのパッケージでは，`configure.in'で出力変数
+`CXX'を定義する必要があります．これを行う最も単純な方法は，`AC_PROG_CXX'
+マクロを使用することです(*Note Particular Program Checks:
+(autoconf)Particular Programs.)．
+
+C++ソースファイルがあるとき，少しだけ追加変数が定義されます．
+
+`CXX'
+     C++コンパイラの名前です．
+
+`CXXFLAGS'
+     C++コンパイラに渡すすべてのフラグです．
+
+`AM_CXXFLAGS'
+     管理者のための`CXXFLAGS'です．
+
+`CXXCOMPILE'
+     C++ソースファイルを実際にコンパイルするために使用されるコマンドです．
+     完全なコマンドラインを構成するためにファイル名が追加されます．
+
+`CXXLINK'
+     実際にC++プログラムをリンクするコマンドです．
+
+
+
+
+File: automake-ja.info, Node: Assembly Support, Next: ANSI, Prev: C++ Support, Up: Programs
+
+アセンブラのサポート
+====================
+
+Automakeは，アセンブラコードに対するサポートも含んでいます．
+
+変数`CCAS'には，アセンブラコードをビルドするために使用するコンパイラ名が
+保持されています．このコンパイラは，Cコンパイラにちょっと似ている動作を
+する必要があります．特に，それは`-c'と`-o'を受け入れる必要があります．
+`CCASFLAGS'の値はコンパイラに渡されます．
+
+`configure.in'で`CCAS'と`CCASFLAGS'を設定する必要があります．autoconfマ
+クロの`AM_PROG_AS'でこれを行ないます．前もって設定されていない場合は，
+`CCAS'をCコンパイラに， `CCASFLAGS'をCコンパイラフラグに，単純に設定しま
+す．
+
+接尾子の`.s'と`.S'だけがアセンブリコードを含んでいるファイルだと
+`automake'で認識されます．
+
+
+
+
+File: automake-ja.info, Node: Fortran 77 Support, Next: ANSI, Prev: Assembly Support, Up: Programs
+
+Fortran 77のサポート
+====================
+
+
+Automakeには，Fortran 77に対する完全なサポートが含まれています．
+
+Fortran 77コードを含むパッケージでは，`configure.in'で出力変数`F77'を定
+義する必要があります．こうするための最も簡単な方法は`AC_PROG_F77'マクロ
+を使用することです(*Note Particular Program Checks: (autoconf)Particular
+Programs.)．*Note Fortran 77 and Autoconf::.
+
+Fortran 77ソースファイルが見つかるときは，追加変数がいくつか定義されます．
+
+
+`F77'
+     Fortran 77コンパイラの名前です．
+
+`FFLAGS'
+     Fortran 77コンパイラに渡す，すべてのフラグです．
+
+`AM_FFLAGS'
+     管理者のための`FFLAGS'です．
+
+`RFLAGS'
+     Ratforコンパイラに渡す，すべてのフラグです．
+
+`AM_RFLAGS'
+     管理者のための`RFLAGS'です．
+
+`F77COMPILE'
+     実際にFortran 77ソースファイルをコンパイルするコマンドです．完全な
+     コマンドラインを構成するために，ファイル名が追加されます．
+
+`FLINK'
+     実際に純粋なFortran 77プログラムあるいは共有ライブラリをリンクする
+     コマンドです．
+
+
+さらにAutomakeは，コンパイルするためにFortran 77とRatforソースファイルの
+プリプロセス処理を行なうことが可能です (1) (*Note Fortran 77
+Support-Footnotes::)．Automakeには，Fortran 77と他の言葉が混合しているプ
+ログラムと共有ライブラリを作成するためのサポートも含まれています(*Note
+Mixing Fortran 77 With C and C++::)．
+
+これらの問題は次のセクションで述べます．
+
+* Menu:
+
+* Preprocessing Fortran 77::
+* Compiling Fortran 77 Files::
+* Mixing Fortran 77 With C and C++::
+* Fortran 77 and Autoconf::
+
+
+
+File: automake-ja.info  Node: Fortran 77 Support-Footnotes, Up: Fortran 77 Support
+
+(1) 以下のセクションにあるFortran 77プログラムのプリプロセスに関する情報
+については，大部分でないが，多くのものを*Note Catalogue of Rules: (make)Catalogue of Rulesからほとんどそのまま持って
+きています．
+
+
+
+File: automake-ja.info, Node: Preprocessing Fortran 77, Prev: Assembly Support, Up: Assembly Support
+
+Fortran 77のプリプロセス
+------------------------
+
+
+`N.f'は自動的に`N.F'あるいは`N.r'から作成されます．この規則は，プリプロ
+セス可能なFortran 77やRatforソースファイルを，厳密なFortran 77ソースファ
+イルに変換するためだけにプリプロセッサを走らせます．使用される正確なコマ
+ンドは以下のようになります．
+
+
+`.F'
+     `$(F77) -F $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS)
+     $(AM_FFLAGS) $(FFLAGS)'
+
+`.r'
+     `$(F77) -F $(AM_FFLAGS) $(FFLAGS) $(AM_RFLAGS) $(RFLAGS)'
+
+
+
+
+
+File: automake-ja.info, Node: Compiling Fortran 77 Files, Prev: Assembly Support, Up: Assembly Support
+
+Fortran 77ファイルのコンパイル
+------------------------------
+
+`N.o'は，Fortran 77を実行することによって`N.f'，`N.F'や`N.r'から自動的に
+作成されます．使用される正確なコマンドは以下のようになります．
+
+
+`.f'
+     `$(F77) -c $(AM_FFLAGS) $(FFLAGS)'
+
+`.F'
+     `$(F77) -c $(DEFS) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS)
+     $(AM_FFLAGS) $(FFLAGS)'
+
+`.r'
+     `$(F77) -c $(AM_FFLAGS) $(FFLAGS) $(AM_RFLAGS) $(RFLAGS)'
+
+
+
+
+
+File: automake-ja.info, Node: Mixing Fortran 77 With C and C++, Prev: Assembly Support, Up: Assembly Support
+
+CとC++と，Fortran 77の混在
+--------------------------
+
+
+Automakeは現在，Fortran 77とCそして/またはC++が混在しているプログラムと
+共有ライブラリを作成するため，*限定された*サポートを提供しています．しか
+し，(現在は)Automakeによって処理され*ません*が，他のパッケージ (1)
+(*Note Mixing Fortran 77 With C and C++-Footnotes::)で処理される，
+Fortran 77と他の言葉との混在に関連して，多くの問題が発生しています．
+
+
+Automakeは二つの方法でそれを助けることが可能です．
+
+  1. ソースコードの組み合わせに依存したリンカの自動的な選択．
+
+  2. 適切なFortran 77のイントリンシックとランタイムライブラリにリンクす
+     るために，自動的に選択されたリンカに渡す適切なリンカフラグ(例えば
+     `-L'と`-l')の自動的な選択．
+
+     これらの追加されたFortran 77リンカフラグは，Autoconf(Autoconfバージョ
+     ン2.13やそれ以降)の新しいバージョンで供給された，
+     `AC_F77_LIBRARY_LDFLAGS'というAutoconfマクロでの出力変数`FLIBS'で提
+     供されます．*Note Fortran 77 Compiler Characteristics:
+     (autoconf)Fortran 77 Compiler Characteristics.
+
+(`_PROGRAMS'や`_LTLIBRARIES'プライマリで記述されているような) プログラム
+や共有ライブラリが，Fortran 77と，Cそして/またはC++が混合するソースコー
+ドを含んでいることをAutomakeが検出した場合，`AC_F77_LIBRARY_LDFLAGS'マク
+ロを`configure.in'で呼び出し，`$(FLIBS)'または`@FLIBS@'のどちらかで，適
+切な(プログラムに対する)`_LDADD'や，(共有ライブラリに対する)`_LIBADD'変
+数が書かれていることを要求します．`$(FLIBS)'や`@FLIBS@'が適切な`_LDADD'
+や`_LIBADD'変数に書かれていることを確かめるのは，`Makefile.am'を書いてい
+る人の責任です．
+
+
+例えば，以下の`Makefile.am'を考えます．
+
+     bin_PROGRAMS = foo
+     foo_SOURCES  = main.cc foo.f
+     foo_LDADD    = libfoo.la @FLIBS@
+
+     pkglib_LTLIBRARIES = libfoo.la
+     libfoo_la_SOURCES  = bar.f baz.c zardoz.cc
+     libfoo_la_LIBADD   = $(FLIBS)
+
+この場合は，Automakeは，`AC_F77_LIBRARY_LDFLAGS'が`configure.in'で記述さ
+れることを強く要求します．また，`@FLIBS@'が`foo_LDADD'と
+`libfoo_la_LIBADD'で記述されていない場合も，Automakeは警告を出します．
+
+
+* Menu:
+
+* How the Linker is Chosen::
+
+
+File: automake-ja.info  Node: Mixing Fortran 77 With C and C++-Footnotes, Up: Mixing Fortran 77 With C and C++
+
+(1) 例えば，the cfortran package (http://www-zeus.desy.de/~burow/cfortran/)は，これらすべての言語間の問題を扱い，ほとんどすべてのプラットホー
+ムの，ほとんどすべてのFortran 77，C，そしてC++コンパイラで動作します．し
+かしながら，`cfortran'はまだフリーソフトウェアではありませんが，次
+のメジャーリリースでそうなるでしょう．
+
+
+
+File: automake-ja.info, Node: How the Linker is Chosen, Prev: Assembly Support, Up: Assembly Support
+
+リンカの選択方法
+................
+
+
+Automakeによって特定のリンカが選択される条件を以下の図で明示します．
+
+例えば，Fortran 77，C，そしてC++ソースコードがプログラムにコンパイルされ
+る場合，C++リンカが使用されます．この場合，CあるいはFortran 77リンカが，
+C++リンカに含まれていない特別なライブラリを必要とした場合，`Makefile.am'
+を書いているユーザが，`_LDADD'や`_LIBADD' 変数を手作業で付け加える必要が
+あります．
+
+                          \              Linker
+               source      \
+                code        \     C        C++     Fortran
+          -----------------  +---------+---------+---------+
+                             |         |         |         |
+          C                  |    x    |         |         |
+                             |         |         |         |
+                             +---------+---------+---------+
+                             |         |         |         |
+              C++            |         |    x    |         |
+                             |         |         |         |
+                             +---------+---------+---------+
+                             |         |         |         |
+                    Fortran  |         |         |    x    |
+                             |         |         |         |
+                             +---------+---------+---------+
+                             |         |         |         |
+          C + C++            |         |    x    |         |
+                             |         |         |         |
+                             +---------+---------+---------+
+                             |         |         |         |
+          C +       Fortran  |         |         |    x    |
+                             |         |         |         |
+                             +---------+---------+---------+
+                             |         |         |         |
+              C++ + Fortran  |         |    x    |         |
+                             |         |         |         |
+                             +---------+---------+---------+
+                             |         |         |         |
+          C + C++ + Fortran  |         |    x    |         |
+                             |         |         |         |
+                             +---------+---------+---------+
+
+
+
+
+File: automake-ja.info, Node: Fortran 77 and Autoconf, Prev: Assembly Support, Up: Assembly Support
+
+Fortran 77とAutoconf
+--------------------
+
+Fortran 77に対する現在のAutomakeサポートは，Fortran 77に対するサポートが
+含まれている最近のバージョンのAutoconfも必要になります．Fortran 77の完全
+なサポートがAutoconf2.13で加えられたので，それかそれ以降のバージョンの
+Autoconfを使用したいと思うことでしょう．
+
+
+
+
+File: automake-ja.info, Node: Java Support, Next: ANSI, Prev: Assembly Support, Up: Programs
+
+Javaのサポート
+==============
+
+
+Automakeには，GNU Compiler CollectionのJavaフロントエンドである`gcj'を使
+用してコンパイルされるJavaに対するサポートも含まれています．
+
+Javaコードを含んでいるパッケージのコンパイルには，`configure.in'で出力変
+数`GCJ'の定義する必要があります．変数`GCJFLAGS'も，(`configure.in'や
+`Makefile.am'で)なんとかして定義する必要があります．こうするための最も簡
+単な方法は，`AM_PROG_GCJ'マクロを使用することです．
+
+
+デフォルトで，Javaソースファイルを含んでいるプログラムは，`gcj'でリンク
+されます．
+
+通常通り，`AM_GCJFLAGS'の内容は，`gcj'が呼び出されるコンパイルごとに渡さ
+れます(コンパイル前でのその役割を果たすもの -- `.class' ファイルを作成す
+るためにそれを呼び出すとき，`AM_JAVACFLAGS'が代わりに使用されます)．
+`Makefile.am'から`gcj'にオプションを渡す必要がある場合，この変数とユーザ
+変数でない`GCJFLAGS'を使用すべきでしょう．
+
+
+`gcj'は，`.java'，`.class'，`.zip'，または`.jar'ファイルをコンパイルする
+ために使用することが可能です．
+
+リンク時に，`gcj'はメインクラスが`--main='オプションを使用して指定されて
+いることを要求します．こうするための最も簡単な方法は，プログラムで
+`_LDFLAGS'変数を使用することです．
+
+
+
+
+File: automake-ja.info, Node: Support for Other Languages, Next: ANSI, Prev: Assembly Support, Up: Programs
+
+他の言語のサポート
+==================
+
+Automakeには現在，C，C++(*Note C++ Support::)，Fortran 77(*Note Fortran
+77 Support::)，そしてJava(*Note Java Support::)のみの完全なサポートが含
+まれています．他の言葉に対しては，基本的なサポートとユーザの需要に基づい
+て改善されるサポートしかありません．
+
+独自の言語を加えるため幾分制限されているサポートは，サフィックスルールの
+処理によって利用可能になっています．*Note Suffixes::を参照してください．
+
+
+
+
+File: automake-ja.info, Node: ANSI, Next: Dependencies, Prev: Assembly Support, Up: Programs
+
+自動的なde-ANSI-fication
+========================
+
+
+GNU standardsはANSI Cの使用を許可していますが，これはもっと古いコンパイ
+ラ(特にSunOS C コンパイラ)へのパッケージの移植性を制限することになるはず
+です．
+
+実際にコンパイルされる前に"de-ANSI-fyng"したそれぞれのファイルによって，
+Automakeではそのようなマシン上でのこの問題を解決することが可能になります．
+
+
+`Makefile.am'の変数`AUTOMAKE_OPTIONS'(*Note Options::)がオプション
+`ansi2knr'を含んでいる場合，de-ANSI-ficationを処理するためのコードが生成
+された`Makefile.in'に挿入されます．
+
+これによって，ディレクトリ内のそれぞれのCソースファイルをANSI Cとして扱
+います．ANSI Cコンパイラが利用可能な場合，それが使用されます．ANSI C コ
+ンパイラが利用可能でない場合，`ansi2knr'プログラムがソースファイルをK&R
+Cに変換するために使用され，そしてコンパイルされます．
+
+`ansi2knr'プログラムは単純です．それはソースコードが特定の方法で書式化さ
+れると仮定します．詳細は`ansi2knr'のmanページを参照してください．
+
+de-ANSI-ficationに対するサポートでは，ソースファイル`ansi2knr.c'と
+`ansi2knr.1'がANSI Cソースと同じパッケージにある必要があります．これらの
+ファイルはAutomakeと一緒に配布されます．また，パッケージ`configure.in'で
+は，`AM_C_PROTOTYPES'マクロを呼び出す必要もあります(*Note Macros::)．
+
+Automakeは，現在のパッケージの他のディレクトリで`ansi2knr'サポートファイ
+ルを見つけることもできます．これは，`ansi2knr'オプションへ適切なディレク
+トリへの相対的なパスを前置することで行なわれます．例えば，パッケージの
+`src'と`lib'サブディレクトリにANSI Cコードがあると仮定します．ファイル
+`ansi2knr.c'と`ansi2knr.1'は`lib'にあります．この場合，`src/Makefile.am'
+は以下のように書くことが可能でしょう．
+
+     AUTOMAKE_OPTIONS = ../lib/ansi2knr
+
+ディレクトリの接頭辞が与えられてない場合，ファイルはカレントディレクトリ
+にあると仮定されます．
+
+de-ANSI-ficationを必要とする`LIBOBJS'に書かれているファイルは，自動的に
+処理されません．その理由は，`configure'が`regex.o'のようなオブジェクト名
+を生成しますが，`make'は(de-ANSI-fyingの時)，`regex_.o'を探すためです．
+最終的に，この問題は`autoconf'によって修正されますが，しばらくは
+`AC_OUTPUT'を呼び出す直前に，`configure.in'に以下のコードを書き込む必要
+があります．
+
+     # This is necessary so that .o files in LIBOBJS are also built via
+     # the ANSI2KNR-filtering rules.
+     LIBOBJS=`echo $LIBOBJS|sed 's/\.o /\$U.o /g;s/\.o$/\$U.o/'`
+
+自動的なde-ANSI-ficationは，パッケージが異なるホストアーキテクチャに対す
+るビルドでは動作しないことに注意してください．それは，ビルドマシンに対し
+て`ansi2knr'をビルドする方法が，現在のautomakeには無いためです．
+
+
+
+
+File: automake-ja.info, Node: Dependencies, Next: EXEEXT, Prev: ANSI, Up: Programs
+
+自動的な依存性追跡
+==================
+
+プロジェクトで，インクルードファイルの依存性が変化するときはいつでも，絶
+えず`Makefile.in'を更新することは開発者として辛いことも多いものです．
+Automakeは自動的に依存性の変更を追跡する方法を提供しています．
+
+
+Automakeは常に，システムヘッダを含むコンパイルに対する完全な依存性を使用
+します．Automakeのモデルは，依存性の評価がビルドの副作用になるというもの
+です．つまり依存性は，`depcomp'と呼ばれる特別なラッパプログラムを通じて
+すべてのコンパイルを実行することで求められます．`depcomp'は，多くの異な
+るCとC++コンパイラで，それが要求する書式で依存情報の生成させるように上手
+に扱う方法を理解してます．`automake -a'で，`depcomp' をソースツリーにイ
+ンストールします．`depcomp'がコンパイラの正しい呼び出し方が分からない場
+合，依存性の追跡はビルドで利用不可能になるだけです．
+
+
+これまでのバージョンのAutomakeの経験上 (1) (*Note
+Dependencies-Footnotes::)，コンフィグレーションが多くなるにつれ，管理者
+のシステムでのみ生成される依存性が信頼できないことを我々に教えてくれまし
+た．そのため，Automakeはビルド時に依存性を追跡することをその代わりに実装
+しました．
+
+自動的な依存性の追跡で，変数`AUTOMAKE_OPTIONS'に`no-dependencies'を書く
+ことや，`AM_INIT_AUTOMAKE'への引数として`no-dependencies'を渡すこと(これ
+は推奨されるべき方法です)が無くなるはずです．そうしない場合は，
+`automake'を`-i'オプションを用いて呼び出してください．依存性の追跡はデフォ
+ルトで利用可能です．
+
+
+パッケージを構築している人々も，`--disable-dependency-tracking'を用いて
+コンフィグレーションすることで，依存性の追跡を利用不可能にすることを選択
+することが可能です．
+
+
+
+
+File: automake-ja.info  Node: Dependencies-Footnotes, Up: Dependencies
+
+(1) Automakeでの自動的な依存性の追跡に関する歴史と経験についての情報は，
+`http://sources.redhat.com/automake/dependencies.html'を参照してく
+ださい．
+
+
+
+File: automake-ja.info, Node: EXEEXT, Prev: Dependencies, Up: Programs
+
+実行形式の拡張子のサポート
+==========================
+
+
+プラットフォームによっては，Windowsのように実行形式が`.exe'のような拡張
+子を持つことを期待するものもあります．これらのプラットフォームでは，(GCC
+を含む)コンパイラは，`foo'を生成するように依頼されるとき，自動的に
+`foo.exe'を生成します．
+
+Automakeは，これに対するほとんどの変換でサポートを提供します．残念ながら
+*ほとんど*とは完全では無いということです．英語の辞書では反対になりますが，
+パッケージをこれらのプラットフォームでサポートされるようにしたい場合，
+Automakeを補助する必要があります．
+
+気付いていると思われることの一つは，Automakeが以下のような内容に内部で書
+き直すことです．
+
+     bin_PROGRAMS = liver
+
+これを以下のようにします．
+
+     bin_PROGRAMS = liver$(EXEEXT)
+
+Automakeが生成するターゲットは，`$(EXEEXT)'拡張子が与えられたものになり
+ます．`EXEEXT'
+
+しかし，Automakeがこの書き換えを`configure'の置換式に適用することは不可
+能です．そのような置換式を使用しているプログラムを条件付きでビルドしてい
+る場合，出力変数を作成しているときに`configure.in'に`$(EXEEXT)'を注意し
+て加えるようにする必要があるということを，これは意味します．
+
+Autoconf 2.13とそれ以前のものを用いると，このサポートを得るために，明示
+的に`AC_EXEEXT'を使用する必要があります．Autoconf 2.50を用いると，コンパ
+イラをコンフィグレーションする際に(すなわち`AC_PROG_CC'を通じて)，
+`AC_EXEEXT'が自動的に実行されます．
+
+それらのプログラムに対し，管理者が明示的にリンク規則を書きたいときもあり
+ます．実行形式の拡張子サポートを用いなければ，これは簡単です -- ターゲッ
+トをプログラムと同じ名前にするだけです．しかし，実行形式の拡張子のサポー
+トが利用可能な時は，代わりに`$(EXEEXT)'接尾辞を加える必要があります．
+
+残念ながら，Autoconf 2.50の変更のため，常にこの拡張子を加える必要がある
+ことを，これは意味しています．しかし，パッケージが実行形式の拡張子を持つ
+プラットフォームで実行されるはずがないことを知っている管理者にとって，こ
+のことは問題になります．これらの管理者に対しては，`no-exeext'オプション
+(*Note Options::)でこの機能が利用不可能になります．これは，かなり醜い方
+法で動作します．`no-exeext'が見つかった場合，`Makefile.am'の`foo'という
+名前のターゲットが存在すると，automekeが生成する`foo$(EXEEXT)'形式のター
+ゲットで上書きされます．`no-exeext'オプションが用いなければ，これでエラー
+が生じます．
+
+
+
+
+File: automake-ja.info, Node: Other objects, Next: Other GNU Tools, Prev: Programs, Up: Top
+
+その他の派生されるオブジェクト
+******************************
+
+AutomakeはCプログラムではない派生されるオブジェクトを扱うことが可能です．
+このようなオブジェクトを実際にビルドするサポートを明示的に供給する必要が
+あることもありますが，Automakeは自動的にインストールと配布物を扱います．
+
+* Menu:
+
+* Scripts::                     Executable scripts
+* Headers::                     Header files
+* Data::                        Architecture-independent data files
+* Sources::                     Derived sources
+
+
+
+
+File: automake-ja.info, Node: Scripts, Next: Headers, Prev: Other objects, Up: Other objects
+
+実行可能なスクリプト
+====================
+
+
+スクリプトのプログラムを定義しインストールすることが可能です．そのような
+プログラムは，`SCRIPTS'プライマリを使用してリストアップします．Automake
+は，スクリプトに対する依存性の定義を全く行ないません．`Makefile.am'に適
+切な規則を含ませるべきでしょう．
+
+Automakeはスクリプトがオブジェクトからの派生物であると想定しません．その
+ようなオブジェクトは手動で削除する必要があります(*Note Clean::)．
+
+`automake'プログラム自身は，`automake.in'からconfigure時に生成されるPerl
+スクリプトです．これを処理する方法は以下のようになります．
+
+     bin_SCRIPTS = automake
+
+`automake'が`AC_OUTPUT'マクロにあるので，それに対するターゲットは自動的
+に生成され，(それがスクリプトであるという事実にもかかわらず)自動的にクリー
+ンもされます．
+
+
+
+スクリプトオブジェクトは`bindir'，`sbindir'，`libexecdir'，または
+`pkgdatadir'にインストールすることが可能です．
+
+インストールする必要が無いスクリプトは`noinst_SCRIPTS'にリストアップする
+ことが可能で，その中で`make check'だけで必要なものは`check_SCRIPTS'に書
+くべきです．
+
+
+
+
+File: automake-ja.info, Node: Headers, Next: Data, Prev: Scripts, Up: Other objects
+
+ヘッダファイル
+==============
+
+
+
+ヘッダファイルは，`HEADERS'等の変数で指定します．ヘッダファイルは通常イ
+ンストールされないので，`noinst_HEADERS'変数が最も多く使用されます． (1)
+(*Note Headers-Footnotes::)
+
+すべてのヘッダファイルは，どこかにリストアップする必要があります．行方不
+明のものは配布物に含まれません．プログラムのソースの残りにインストールし
+ないヘッダをリストアップすることが，最も分かり易くなることが多いです．
+*Note A Program::.  `_SOURCES'変数でリストアップされているヘッダを，
+`_HEADERS'変数でリストアップする必要はありません．
+
+
+
+ヘッダは`includedir'，`oldincludedir'，または`pkgincludedir'にインストー
+ルすることが可能です．
+
+
+
+File: automake-ja.info  Node: Headers-Footnotes, Up: Headers
+
+(1) しかし，実際に特定のプログラムで使用されるがインストールされないヘッ
+ダファイルに対しては，`noinst_HEADERS'の代わりに，プログラムの
+`_SOURCES'変数でリストアップすることを推奨します．これがより明白だ
+と信じています．
+
+
+
+File: automake-ja.info, Node: Data, Next: Sources, Prev: Headers, Up: Other objects
+
+アーキテクチャ非依存のデータファイル
+====================================
+
+
+Automakeは，`DATA'等の変数を使用して様々なデータファイルのインストールを
+サポートします．
+
+
+そのようなデータは，ディレクトリ`datadir'，`sysconfdir'，
+`sharedstatedir'，`localstatedir'，または`pkgdatadir'にインストールする
+こと可能です．
+
+デフォルトで，データファイルは配布物に含まれ*ません*．もちろん，`dist_'
+接頭辞を使用することで，変数毎にこの(デフォルト動作)を変更することが可能
+です．
+
+Automakeでその補助データファイルを宣言する方法は，以下のとおりです．
+
+     dist_pkgdata_DATA = clean-kr.am clean.am ...
+
+
+
+
+File: automake-ja.info, Node: Sources, Prev: Data, Up: Other objects
+
+ビルドされているソース
+======================
+
+
+`source'と呼ばれるファイル(例えばCの`.h'ファイル)は，実際に何か他のファ
+イルから派生する場合もあります．そのようなファイルは`BUILT_SOURCES'変数
+でリストアップすべきです．
+
+ビルドプロセスの初期に作成する必要があるファイルは，この変数でリストアッ
+プすることが可能なので，`BUILT_SOURCES'は実際にはちょっと誤った名称です．
+
+`BUILT_SOURCES'にリストアップされているソースファイルは，他の`all'ターゲッ
+トが作成される前に作成されます．しかし，そのようなソースファイルは，他の
+`_SOURCES'変数に記述して明示的に要求されていない限りコンパイルされません．
+
+そのため，例えば，ビルド時に実行されるスクリプトで作成されるヘッダファイ
+ルがある場合，他のすべての(おそらくこれらのヘッダを使用するものがある)コ
+ンパイルの前にそれらのビルドを開始することを確実にするため，これらのヘッ
+ダを`BUILT_SOURCES'に記述すべきでしょう．
+
+
+
+
+File: automake-ja.info, Node: Other GNU Tools, Next: Documentation, Prev: Other objects, Up: Top
+
+その他のGNUツール
+*****************
+
+Automakeは，GNUプログラムで使用する`Makefile.in'を生成することを主目的に
+しているので，他のGNUツールとの相互作用を試みます．
+
+* Menu:
+
+* Emacs Lisp::                  Emacs Lisp
+* gettext::                     Gettext
+* Libtool::                     Libtool
+* Java::                        Java
+* Python::                      Python
+
+
+
+
+File: automake-ja.info, Node: Emacs Lisp, Next: gettext, Prev: Other GNU Tools, Up: Other GNU Tools
+
+Emacs Lisp
+==========
+
+
+
+Automakeは，Emacs Lispに対するサポートも供給します．`LISP'プライマリは
+`.el'ファイルのリストを保持するために使用されます．このプライマリに対し
+て利用可能な接頭辞は`lisp_'と`noinst_'です．`lisp_LISP'が定義されている
+場合，`configure.in'で`AM_PATH_LISPDIR'を実行する必要があります(*Note
+Macros::)．
+
+
+デフォルトでAutomakeは，`AM_PATH_LISPDIR'で見つかったEmacsを使用しながら，
+すべてのEmacs Lispソースファイルをバイトコンパイルします．バイトコンパイ
+ルしたくない場合，変数`ELCFILES'を空のまま定義してください．バイトコンパ
+イルされたEmacs Lispファイルは，すべてのEmacsのバージョンの間で移植性が
+あるわけではないので，一種類以上のEmacsバージョンをインストールしている
+サイトがあることが予想される場合，これを止めることに意味があります．さら
+に，実際にはバイトコンパイルの利点がないパッケージも多くあります．しかし，
+我々はデフォルトでバイトコンパイルを使用可能なままにしておくことを勧めま
+す．恐らく，他の全員がインストールしなくてすむことより，それぞれに対して
+対処するためにそれぞれ設定した方が良いでしょう．
+
+
+
+
+File: automake-ja.info, Node: gettext, Next: Libtool, Prev: Emacs Lisp, Up: Other GNU Tools
+
+Gettext
+=======
+
+
+`AM_GNU_GETTEXT'が`configure.in'にある場合，Automakeは，国際化のためのメッ
+セージカタログシステム，GNU gettextに対するサポートを開始します(*Note
+GNU Gettext: (gettext)GNU Gettext.)．
+
+Automakeでの`gettext'サポートには，パッケージに`intl'と`po'の二つのサブ
+ディレクトリの追加が必要です．Automakeは，これらのディレクトリが存在して
+`SUBDIRS'に書かれていることを保証します．
+
+
+
+
+File: automake-ja.info, Node: Libtool, Next: Java, Prev: gettext, Up: Other GNU Tools
+
+Libtool
+=======
+
+Automakeは，`LTLIBRARIES'プライマリを用いることで，GNU Libtool(*Note
+Introduction: (libtool)Top.)に対するサポートを提供します．*Note A Shared
+Library::.
+
+
+
+
+File: automake-ja.info, Node: Java, Next: Python, Prev: Libtool, Up: Other GNU Tools
+
+Java
+====
+
+
+Automakeは`JAVA'プライマリを用いることで，Javaコンパイルに対する最低限の
+サポートも提供します．
+
+`_JAVA'変数でリストアップされているすべての`.java'ファイルは，ビルド時に
+`JAVAC'でコンパイルされます．デフォルトで，`.class' ファイルは配布物に含
+められません．
+
+
+現在のAutomakeには，`_JAVA'プライマリを`Makefile.am'で一つだけしか使用で
+きないという制限があります．この制限の理由は，どの`.java' ファイルからど
+の`.class'ファイルが生成されるのかが通常は分からないためです -- そのため，
+どこにどのファイルをインストールするのか分かりません．例えば，`.java'ファ
+イルで複数のクラスを定義することが可能です．結果として得られる`.class'ファ
+イル名は，`.java'ファイルをパースしない限り特定不可能です．
+
+Javaソースをコンパイルする時に使用される変数がいくつかあります．
+
+`JAVAC'
+     Javaコンパイラの名前です．デフォルトは，`javac'です．
+
+`JAVACFLAGS'
+     コンパイラに渡すフラグです．これは，ユーザ変数として考慮されます
+     (*Note User Variables::)．
+
+`AM_JAVACFLAGS'
+     Javaコンパイラに渡す追加フラグです．`JAVACFLAGS'とは異なり，
+     `Makefile.am'にJavaコンパイラフラグを書く必要があるとき，これを使用
+     すべきではありません．
+
+`JAVAROOT'
+     この変数の値は，`javac'に渡す`-d'オプションです．デフォルトは，
+     `$(top_builddir)'です．
+
+`CLASSPATH_ENV'
+     この変数は，`javac'コマンドラインで`CLASSPATH'環境変数に設定するた
+     めに使用される`sh'式です．(将来，クラスパスの設定を異なる方法で扱う
+     ようにする予定です．)
+
+
+
+
+File: automake-ja.info, Node: Python, Prev: Java, Up: Other GNU Tools
+
+Python
+======
+
+
+
+Automakeは，`PYTHON'プライマリを用いることで，Pythonのコンパイルに対する
+サポートを提供します．
+
+`_PYTHON'変数でリストアップされているすべてのファイルは，インストール時
+に`py-compile'でバイトコンパイルされます．`py-compile'は，実際にはソース
+ファイルの標準的なバージョン(`.pyc')とバイトコンパイルされたバージョン
+(`.pyo')の両方を作成します．バイトコンパイルはインストール時に行なわれる
+ので，`noinst_PYTHON'にリストアップされているファイルはコンパイルされな
+いことに注意してください．Pythonのソースファイルは，デフォルトで配布物に
+含められます．
+
+Automakeは，Pythonに関連するディレクトリ変数(以下を参照してください)を決
+定する`AM_PATH_PYTHON'と呼ばれるAutoconfとともに出荷されています．
+`configure.in'で`AM_PATH_PYTHON'が呼び出す場合，Pythonソースファイルをリ
+ストアップするために以下の変数を変数内に使用してもかまいません．
+`python_PYTHON'，`pkgpython_PYTHON'，`pyexecdir_PYTHON'，
+`pkgpyexecdir_PYTHON'はファイルをインストールしたい場所に依存します．
+
+`AM_PATH_PYTHON'は，単一のオプション引数を受けとります．この引数が存在す
+る場合，このパッケージで使用可能なPythonの最小バージョンになります．シス
+テムで見つかったPythonのバージョンが要求されたバージョンより古い場合，
+`AM_PATH_PYTHON'はエラーを発生します．
+
+`AM_PATH_PYTHON'は，コンフィグレーションで分かったPythonのインストール状
+況を基に，いくつかの出力変数を生成します．
+
+`PYTHON'
+     Pythonの実行形式の名前です．
+
+`PYTHON_VERSION'
+     MAJOR.MINOR形式(例えば，`1.5')の，Pythonのバージョンナンバーです．
+     これは，現在`sys.version[:3]'の値です．
+
+`PYTHON_PREFIX'
+     文字列`$prefix'です．この単語は，Pythonの`sys.prefix'の内容が必要と
+     なる将来の動作で使用されるかもしれませんが，一般的な同意事項として
+     `configure'からの値が常に使用されます．
+
+`PYTHON_EXEC_PREFIX'
+     文字列`$exec_prefix'です．この単語は，Pythonの`sys.exec_prefix'の内
+     容が必要となる将来の動作で使用されるかもしれませんが，一般的な同意
+     事項として`configure'からの値が常に使用されます．
+
+`PYTHON_PLATFORM'
+     Pythonがオペレーティングシステムを記述するために使用する標準的な名
+     前で，`sys.platform'で与えられます．この値は，Pythonの拡張をビルド
+     する時，必要となるときもあります．
+
+`pythondir'
+     標準的にPythonがインストールされるツリーの，`site-packages'サブディ
+     レクトリのディレクトリの名前です．
+
+`pkgpythondir'
+     これは，パッケージの後で命名される`pythondir'以下のディレクトリです．
+     すなわち，それは`$(pythondir)/$(PACKAGE)'です．それは便宜上提供され
+     ます．
+
+`pyexecdir'
+     これは，Pythonの拡張モジュール(共有ライブラリ)がインストールされる
+     ディレクトリです．
+
+`pkgpyexecdir'
+     これは，`$(pyexecdir)/$(PACKAGE)'として定義されている，便宜上の変数
+     です．
+
+
+
+
+File: automake-ja.info, Node: Documentation, Next: Install, Prev: Other GNU Tools, Up: Top
+
+ドキュメントのビルド
+********************
+
+現在Automakeは，Texinfoとman pageに対するサポートを提供します．
+
+* Menu:
+
+* Texinfo::                     Texinfo
+* Man pages::                   Man pages
+
+
+
+
+File: automake-ja.info, Node: Texinfo, Next: Man pages, Prev: Documentation, Up: Documentation
+
+Texinfo
+=======
+
+
+カレントディレクトリにTexinfoソースを含んでいる場合，`TEXINFOS'プライマ
+リでそれを宣言する必要があります．通常，Texinfoファイルはinfoに変換され
+るので，`info_TEXINFOS'変数が最も一般的に使用されます．すべてのTexinfoソー
+スファイルは，`.texi'，`.txi'，または`.texinfo'の拡張子で終える必要があ
+ります．新しいマニュアルには，`.texi'を推奨します．
+
+Automakeは，`.info'，`.dvi'，`.ps'，そして`.pdf'ファイルを，Texinfoソー
+スからビルドする規則を生成します．`.info'ファイルは`make all'でビルドさ
+れ，`make install'でインストールされます(`no-installinfo'を使用していな
+い場合に限ります．以下を参照してください)．それ以外のファイルは，`make
+dvi'，`make ps'，そして`make pdf'でビルドを要求することが可能です．
+
+
+
+
+`.texi'ファイルが`version.texi'を`@include'している場合，そのファイルが
+自動的に生成されます．ファイル`version.texi'は，四つのTexinfoのフラグを
+定義し，それは`@value{EDITION}'，`@value{VERSION}'，`@value{UPDATED}'，
+そして`@value{UPDATED-MONTH}'を使用することで参照可能です．
+
+`EDITION'
+`VERSION'
+     これらのフラグは両方とも，プログラムのバージョンナンバーです．それ
+     らは明確さのために別々にしています．
+
+`UPDATED'
+     これは，主要な`.texi'ファイルが最後に修正された日付を保持します．
+
+`UPDATED-MONTH'
+     これは，主要な`.texi'ファイルが最後に修正された月名を保持します．
+
+`version.texi'サポートには，`mdate-sh'プログラムが必要です．このプログラ
+ムはAutomakeと一緒に供給されていて，`automake'が`--add-missing'オプショ
+ンで呼び出されるとき，自動的に含まれます．
+
+複数のTexinfoファイルがあり，`version.texi'の機能を使用したい場合，それ
+ぞれのTexinfoファイルに対し個別のバージョンファイルを持たせる必要があり
+ます．Automakeは`vers*.texi'に一致したTexinfoファイル内に含まれるものを，
+単純に自動的に生成されたバージョンファイルとして扱います．
+
+infoファイルが再びビルドされるとき，`MAKEINFO'変数で指名されたプログラム
+が，その呼び出しで使用されます．システムで`makeinfo'が見つかった場合，そ
+れがデフォルトで使用されます．それ以外の場合，`missing'が代わりに使用さ
+れます．変数`MAKEINFOFLAGS'と`AM_MAKEINFOFLAGS' にあるフラグは，
+`makeinfo'の呼び出しに渡されます．最初のものは，ユーザが使用する(*Note
+User Variables::)目的で，二番目のもの`Makefile.am'の著者が使用する目的で
+す．
+
+infoファイルが，実際には一つ以上の`.texi'ファイルに依存する場合もありま
+す．例えば，GNU Helloでは，`hello.texi'は`gpl.texi'ファイルを含んでいま
+す．`TEXI_TEXINFOS'変数を使用することでこれらの依存性をAutomakeに伝える
+ことが可能です．GNU Helloで用いた方法は，以下のようになっています．
+
+     info_TEXINFOS = hello.texi
+     hello_TEXINFOS = gpl.texi
+
+
+デフォルトでAutomakeは，ファイル`texinfo.tex'がTexinfoソースと同じディレ
+クトリに存在することを要求します．しかし，`configure.in'で
+`AC_CONFIG_AUX_DIR'を使用した場合(*Note Finding `configure' Input:
+(autoconf)Input.)，`texinfo.tex'はそこで探されます．Automakeは，
+`--add-missing'が与えられている場合，`texinfo.tex'を供給します．
+
+
+多くのディレクトリにTexinfoファイルがあるパッケージの場合，パッケージに
+対する標準的な`texinfo.tex'が見つかる場所をAutomakeに伝えるため，変数
+`TEXINFO_TEX'を使用することが可能です．この変数の値は，現在の
+`Makefile.am'から`texinfo.tex'への相対的なパスにすべきです．
+
+     TEXINFO_TEX = ../doc/texinfo.tex
+
+
+オプション`no-texinfo.tex'を，`texinfo.tex'を要求することを止めるために
+使用することが可能です．しかし，変数`TEXINFO_TEX'の使用は望ましく，それ
+は`dvi'，`ps'，そして`pdf'ターゲットを動作させることが可能だからです．
+
+
+
+Automakeは`install-info'ターゲットを生成します．これを明示的に使用する人
+もいます．デフォルトで，infoページは`make install'でインストールされます．
+これは`no-installinfo'オプションによって止めることが可能です．
+
+
+
+
+File: automake-ja.info, Node: Man pages, Prev: Texinfo, Up: Documentation
+
+manページ
+=========
+
+
+パッケージにmanページを含めることも可能です(しかし，この件に関しては，
+*Note Man Pages: (standards)Man Pagesを参照してください)．manページは
+`MANS'プライマリを使用して宣言します．一般に `man_MANS'変数を使用します．
+manページは，`mandir'の正しいサブディレクトリに，ファイル拡張子に基づい
+て自動的にインストールされます．
+
+`.1c'のようなファイルの拡張子は，有効な拡張子を探すために処理され，
+`mandir'の正しいサブディレクトリを決定するために使用されます．有効なセク
+ション名は，10進数の`0'から`9'と，文字の`l'と`n'です．
+
+開発者によっては，ソースファイルで`foo.man'のようなファイル名でman ペー
+ジを命名し，ファイルをインストールするときに，例えば`foo.1'のような正し
+い接尾子を持つものに名前を変更したい時もあります．Automakeはこのモードも
+サポートします．有効なセクションに命名されたSECTIONに対して，
+`manSECTIONdir'と命名されている対応するディレクトリと，対応する`_MANS'変
+数があります．そのような変数でリストアップされているファイルは，示されて
+いるセクションにインストールされます．ファイルに有効な接尾子が既について
+いる場合，それはそのままインストールされます．それ以外の場合，ファイルの
+接尾子はセクションに一致するように変更されます．
+
+例えば，以下のような例を考えます．
+     man1_MANS = rename.man thesame.1 alsothesame.1c
+
+この場合は，`rename.man'はインストールする時に`rename.1'に名前を変更され，
+他のファイルはその名前のままになります．
+
+
+デフォルトで，manページは`make install'でインストールされます．しかし，
+GNUプロジェクトはmanページを必要としないので，多くの管理者はmanページを
+最新にしておきません．この場合，`no-installman'オプションでman ページを
+デフォルトでインストールしないようにします．ユーザは`make install-man'に
+よって，明示的にそれらをインストールすることができます．
+
+(Texinfoドキュメントとmanページの両方を含んでいる)GNU`cpio'では，ドキュ
+メントを以下のようにして処理しています．
+
+     man_MANS = cpio.1 mt.1
+     EXTRA_DIST = $(man_MANS)
+
+manページは，現在ソースであると考慮されておらず，そのわけはmanページが自
+動的に生成されることが珍しくないからです．このため，それらは自動的に配布
+物に含められません．しかし，これは`dist_'接頭辞を使用することで変更可能
+です．
+
+`nobase_'接頭辞はmanページに対しては意味が無く利用できません．
+
+
+
+
+File: automake-ja.info, Node: Install, Next: Clean, Prev: Documentation, Up: Top
+
+インストールされるもの
+**********************
+
+
+
+基本的なインストール
+====================
+
+当然，Automakeは，一旦ビルドされたプログラムを実際のインストールの細部ま
+での処理を行ないます．様々なプライマリで指名されているすべてのファイルは，
+ユーザが`make install'を実行する時に，適切な場所に自動的にインストールさ
+れます．
+
+プライマリで指名されているファイルは，ビルドされたファイルを適切なディレ
+クトリにコピーすることでインストールされます．ファイルのベース名はインス
+トール時に使用されます．
+
+     bin_PROGRAMS = hello subdir/goodbye
+
+この例では，`hello'と`goodbye'の両方が`$(bindir)'にインストールされます．
+
+インストール時にベース名のステップを避けた方が役に立つこともあるでしょう．
+例えば，ソースツリーのサブディレクトリに，インストール時にインストールし
+たい方法で正確に配置したいヘッダファイルがいくつかあるかもしれません．こ
+の場合，ベース名のステップを停止するために，`nobase_'接頭辞を使用するこ
+とが可能です．例えば以下のようにします．
+
+     nobase_include_HEADERS = stdio.h sys/types.h
+
+これで，`stdio.h'は`$(includedir)'に，そして`types.h'は
+`$(includedir)/sys'にインストールされます．
+
+
+インストールの二つの部分
+========================
+
+インストーラーが共有ディレクトリ構造を持っている複数のマシンにインストー
+ルする場合，Automakeは`install-data'と`install-exec'ターゲットを分けて生
+成します--これらのターゲットで，マシンに依存しない部分を一度にインストー
+ルすることができます．`install-exec'はプラットフォームに依存するファイル
+をインストールし，`install-data'はプラットフォームに依存しないファイルを
+インストールします．`install'ターゲットはこれらのターゲットの両方に依存
+します．Automakeは，オブジェクトを正しいカテゴリに自動的に区別するよう試
+みますが，`Makefile.am'の作者は，これが正しく行なわれていることを確かめ
+る責任があります．
+
+`data'，`info'，`man'，`include'，`oldinclude'，`pkgdata'，または
+`pkginclude'(例えば `data_DATA')といった標準ディレクトリの接頭辞を使用し
+ている変数は，`install-data'でインストールされます．
+
+`bin'，`sbin'，`libexec'，`sysconf'，`localstate'，`lib'，または
+`pkglib'(例えば `bin_PROGRAMS')といった標準ディレクトリの接頭辞を使用し
+ている変数は， `install-exec'でインストールされます．
+
+ユーザが定義した名前で，名前に`exec'を含むディレクトリ接頭辞を使用してい
+る変数は(例えば`myexecbin_PROGRAMS')，`install-exec'でインストールされま
+す．ユーザによって定義されたそれ以外のすべての接頭辞は，`install-data'で
+インストールされます．
+
+
+インストールの拡張
+==================
+
+`install-exec-local'や`install-data-local'ターゲットを定義することで，こ
+のメカニズムを拡張することが可能です．これらのターゲットが存在する場合，
+それらは`make install'時に実行されます．これらの規則でほとんどすべてのこ
+とが可能になります．注意が必要です．
+
+Automakeは， `install-exec-hook'と`install-data-hook'の，二つのインストー
+ルのフックもサポートしています．これらのフックは，適切な形式，execやdata
+といった，他のすべてのインストール規則が完了した後で実行されます．そのた
+め，例えば，インストールのフックを使用して，インストール後の変更を実施す
+ることが可能です．
+
+
+インストールの実行
+==================
+
+Automakeは，すべてのインストール規則で，`DESTDIR'変数に対するサポートを
+生成します．`DESTDIR'は，インストールオブジェクトを実行領域に再配置する
+`make install'の段階で使用されます．それぞれのオブジェクトとパスは，イン
+ストール領域にコピーされる前に，`DESTDIR'の値が前置されます．典型的な
+`DESTDIR'使用法の例は，以下のようになります．
+
+     make DESTDIR=/tmp/staging install
+
+これで，インストールオブジェクトを`/tmp/staging'の下に構築されているディ
+レクトリツリーに配置します．`/gnu/bin/foo'と`/gnu/share/aclocal/foo.m4'
+がインストールされる場合，上のコマンドでは，`/tmp/staging/gnu/bin/foo'と
+`/tmp/staging/gnu/share/aclocal/foo.m4'にインストールされます．
+
+この機能は，インストールイメージとパッケージをビルドするために，通常使用
+されます．詳細は，*Note Makefile Conventions: (standards)Makefile
+Conventionsを参照してください．
+
+`DESTDIR'に対するサポートは，インストール規則に直接コーディングすること
+で実装されています．`Makefile.am'でローカルインストール規則(例えば，
+`install-exec-local')やインストールフックを使用している場合，`DESTDIR'に
+対応するコードを書く必要があります．
+
+
+ユーザのための規則
+==================
+
+Automakeは，`uninstall'ターゲット，`installdirs'ターゲット，そして
+`install-strip'ターゲットも生成します．
+
+Automakeは，`uninstall-local'と`uninstall-hook'をサポートしています．こ
+れらの機能は，機能の追加のために提供されているわけでないので，"exec"と
+"data"に対してアンインストールを分ける必要はないでしょう．
+
+`uninstall'には，実際のパッケージツールを置換する意味が無いことに注意し
+てください．
+
+
+
+
+File: automake-ja.info, Node: Clean, Next: Dist, Prev: Install, Up: Top
+
+クリーンされるもの
+******************
+
+
+GNU Makefile Standardsは多くの異なったクリーンの規則を指定します．*Note
+Standard Targets for Users: (standards)Standard Targets.
+
+一般に，クリーンされるファイルはAutomakeが自動的に決定します．もちろん，
+Automakeはクリーンするファイルを追加で指定するために定義することが可能な
+変数も認識します．これらの変数は`MOSTLYCLEANFILES'，`CLEANFILES'，
+`DISTCLEANFILES'，そして`MAINTAINERCLEANFILES'です．
+
+ターゲットによって削除されるファイルは，GNU Standardsで常に明示されてい
+るというわけではないので，我々は，Franc,ois Pinardが最初に公式化したもの
+を信じて，発見的手法で適用してきました．
+
+   * `make'がビルドするもので，通常それをリビルドしたいときがあるもの(例
+     えば，`.o'ファイル)は`mostlyclean'でそれを削除します．
+
+   * それ以外で，`make'がビルドするものは`clean'で削除します．
+
+   * `configure'でビルドするものは，`distclean'で削除します．
+
+   * 管理者がビルドするものは，`maintainer-clean'で削除します．
+
+我々は，皆さんの`Makefile.am'で発見的に同じように設定するよう，このこと
+に従って欲しいと思っています．
+
+
+
+
+File: automake-ja.info, Node: Dist, Next: Tests, Prev: Clean, Up: Top
+
+配布物に含まれるもの
+********************
+
+
+基本的な配布物
+==============
+
+
+`Makefile.in'で生成された`dist'ターゲットは，配布物に対してgzipされた
+`tar'ファイルやそれ以外の特色を持ったものを生成するために使用することが
+可能です．ファイルは，`AM_INIT_AUTOMAKE' (*Note Macros::)で定義される
+`PACKAGE'と`VERSION'変数に基づいて命名されます．より正確には，gzipされた
+`tar'ファイルは`PACKAGE-VERSION.tar.gz'と命名されます．gzipを実行する方
+法を制御するために，`make'の`GZIP_ENV'変数を使用することが可能です．デフォ
+ルト設定は`--best'です．
+
+ほとんどの部分で，配布するファイルは自動的にAutomakeが見つけます．ソース
+ファイルはすべて自動的に配布物に含まれ，すべての`Makefile.am'と
+`Makefile.in'も同様に扱われます．Automakeには，カレントディレクトリで(物
+理的にまたは`Makefile.am'規則のターゲットとして)見つかる場合，自動的に含
+まれる一般的に使用されるファイルの組み込みリストがあります．このリストは
+`automake --help'で出力されます．`configure'で読み込まれるファイルも(す
+なわち，`AC_CONFIG_FILES'とその仲間のような様々なAutoconfマクロで指定さ
+れているファイルに対応しているソースファイル)，自動的に配布されます．
+
+配布する必要がありながら自動的な規則でカバーされていないファイルがあるこ
+とも，まだあります．これらのファイルは，`EXTRA_DIST'変数でリストアップし
+ます．`EXTRA_DIST'では，サブディレクトリのファイルを記述することが可能で
+す．
+
+`EXTRA_DIST'ではディレクトリを記述することも可能です．この場合は，ディレ
+クトリ全体が再帰的に配布物にコピーされます．これはディレクトリの*すべて
+のもの*をコピーし，CVS/RCSのバージョンコントロールファイルも含まれること
+に注意してください．我々は，この機能を使用しないことを推奨します．
+
+
+
+きめ細かな配布物の制御
+======================
+
+配布物に含め*ない*ものを細かく制御する必要があるときもあります．例えば，
+生成されたソースファイルと配布したくないソースファイルがあると仮定します．
+この場合は，Automakeは`dist'と`nodist'接頭辞を使用したきめ細かな制御を提
+供します．すべてのプライマリや`_SOURCES'変数は，リストアップされているファ
+イルを配布物に追加するため，`dist_'を前置することが可能です．同様に，ファ
+イルを配布物から除去するために，`nodist_'を使用することが可能です．
+
+例えば，配布するデータがあり配布しないソースコードもあるようにする方法は，
+以下のようになります．
+
+     dist_data_DATA = distribute-this
+     bin_PROGRAMS = foo
+     nodist_foo_SOURCES = do-not-distribute.c
+
+
+distフック
+==========
+
+これを使用するもう一つの方法は，EXTRA_DISTでディレクトリを指定することで，
+再帰的に含まれる不必要なファイルを削除するために存在します．
+
+     EXTRA_DIST = doc
+
+     dist-hook:
+     	rm -rf `find $(distdir)/doc -name CVS`
+
+`SUBDIRS'を定義している場合，Automakeはサブディレクトリを再帰的に配布物
+に含めます．`SUBDIRS'を条件つきで定義している場合(*Note Conditionals::)，
+Automakeは通常，`SUBDIRS'にあるすべてのディレクトリをできる限り配布物に
+含めます．条件つきでディレクトリの組を指定する必要がある場合，配布物に含
+めるサブディレクトリの正確なリストを変数`DIST_SUBDIRS'に設定することで可
+能となります．
+
+
+パッケージ化する前に，配布物の変更を可能にすことが有効な時もあります．
+`dist-hook'ターゲットが存在する場合，配布ディレクトリが満たされた後で，
+実際のtar(あるいはshar)ファイルが作成される前に，それが実行されます．こ
+れを利用する方法の一つには，新しい`Makefile.am'を作るまでもないサブディ
+レクトリのファイルを配布するためにあります．
+
+     dist-hook:
+             mkdir $(distdir)/random
+             cp -p $(srcdir)/random/a1 $(srcdir)/random/a2 $(distdir)/random
+
+
+配布物の調査
+============
+
+
+Automakeは，与えられた配布物が実際に動作することの保証に役立つ
+`distcheck'ターゲットを生成します．`distcheck'は実際に配布物を作成し，
+`VPATH'のビルドを試み，テストスイートを実行し，そして配布物自身が含まれ
+ることを確認するため，最終的に別のtarファイルを作成します．
+
+パッケージのビルドは`./configure'の実行も含まれます．`configure'に追加フ
+ラグを供給する必要がある場合は，トップレベルの`Makefile.am'，または
+`make'の呼出時のコマンドラインで`DISTCHECK_CONFIGURE_FLAGS'変数で定義す
+る必要があります．
+
+ターゲット`distcheck-hook'が`Makefile.am'で定義されている場合，新しい配
+布物が展開された後，展開されたコピーがコンフィグレーションされてビルドさ
+れる前に，`distcheck'で呼び出されます．いつも通りの注意とアドバイスはあ
+りますが，`distcheck-hook'でほとんどすべてのことが可能です．通常このフッ
+クは，配布物のエラーが標準的なメカニズムで発生する可能性を調査するために
+使用されます．
+
+配布物エラーの可能性について述べると，`distcheck'は`distclean' ターゲッ
+トが実際に全てのビルドファイルも確実に削除するということです．これは，
+`VPATH'のビルドの終りに`make distcleancheck'を実行することでなされます．
+デフォルトで，`distcleancheck'は`distclean'を実行し，
+`$(distcleancheck_listfiles)'を実行することでビルドツリーが空になること
+を確かめます．通常この調査は，`DISTCLEANFILES'変数(*Note Clean::)に追加
+し忘れた，生成されるファイルを検出します．
+
+`distcleancheck'の動作は，ほとんどのパッケージでOKにすべきで，そうでない
+場合は，`distcleancheck'ターゲットや`$(distcleancheck_listfiles)'変数の
+定義を優先している可能性があります．`distcleancheck'が完全にできないもの
+に対して，トップレベルの`Makefile.am'に以下の規則を追加してください．
+
+     distcleancheck:
+             @:
+
+配布物の一部にもなるためクリーンしたくないビルドされたファイルを
+`distcleancheck'で無視したい場合，代わりに以下の定義を追加してください．
+
+     distcleancheck_listfiles = \
+       find -type f -exec sh -c 'test -f $(scrdir)/{} || echo {}'
+
+ユーザがパッケージをビルドするときMakefileが配布されたファイルをリビルド
+するものもあるので，通常エラーとなるので，上記の定義はデフォルトではあり
+ません．(ファイルをビルドするために必要なユーザに足りないツールを考えて
+みてください．または，要求されたツールがパッケージでビルドされる場合，実
+行不可能なクロスコンパイルの状況を考慮してください．)
+
+`distcheck'は，`uninstall'ターゲットが，通常の場合と`DESTDIR'でのビルド
+の両方で適切に動作するかどうかも調査します．それは`make uninstall'の呼び
+出しで行ない，ファイルが残っていないかどうかをインストールツリーを見て調
+査します．この調査で，`uninstall'に関連するターゲットを正しくコーディン
+グしていることを確認します．
+
+デフォルトで，その調査は`distuninstallcheck'ターゲットで行なわれ，インス
+トールツリーのファイルリストは，`$(distuninstallcheck_listfiles)'で生成
+されます(これは，ファイルリストを標準出力に出力するために実行するシェル
+コマンドを値に持つ変数です)．
+
+これらのいずれかで，`distcheck'の動作を変更するために優先させることが可
+能です．例えば，この調査を完全に無効にするため，以下のように書くでしょう．
+
+     distuninstallcheck:
+             @:
+
+
+配布物の形式
+============
+
+Automakeは，配布物を生成する要求があったとき，`.tar.gz'ファイルと，その
+他のアーカイブ形式を生成します，*Note Options::．ターゲット`dist-gzip'は
+`.tar.gz'ファイルのみを生成します．
+
+
+
+
+File: automake-ja.info, Node: Tests, Next: Options, Prev: Dist, Up: Top
+
+テストスイートのサポート
+************************
+
+
+Automakeは二つの形式のテストスイートをサポートします．
+
+
+単純なテスト
+============
+
+変数`TESTS'が定義されている場合，その値はテストを行なうために実行するプ
+ログラムのリストになります．プログラムは，派生するオブジェクトあるいはソー
+スオブジェクトです．生成される規則は`srcdir'と`.'の両方で探します．デー
+タファイルを必要としているプログラムは，(環境変数とmake 変数の両方の)
+`srcdir'でそれらを探すので，それらは，別々のディレクトリでビルドするとき
+(*Note Build Directories: (autoconf)Build Directories.)，特に`distcheck'
+ターゲットに対して動作します(*Note Dist::)．
+
+
+失敗の数は実行後に出力されます．所定のテストプログラムが77のステータスで
+終了する場合，その結果は最終的なカウントで無視されます．この機能で，非移
+植性のテストが意味をなさない環境で無視することができます．
+
+変数`TESTS_ENVIRONMENT'は，テストの実行に対して環境変数を設定するために
+使用することが可能です．環境変数`srcdir'は，規則内に設定されます．すべて
+のテストプログラムがスクリプトの場合，`TESTS_ENVIRONMENT' をシェルの呼び
+出しに設定することが可能です(例えば`$(SHELL) -x')．これはテストをデバッ
+グするときに役立つはずです．
+
+
+変数`XFAIL_TESTS'を，失敗を期待するテストのリスト(通常は`TESTS'のサブセッ
+ト)に定義してもかまいません．これは，それらのテストの結果を反転します．
+
+Automakeは，`TESTS'でリストアップされているそれぞれのプログラムが，テス
+トを実行する前にビルドされることを確実にします．ソースと派生するプログラ
+ムを`TESTS'にリストアップすることが可能です．例えば，テストとしてCプログ
+ラムを実行したいかもしれません．こうするためには，その名前を`TESTS'と
+`check_PROGRAMS'にもリストアップし，それを他のプログラムとして指定します．
+
+
+DejaGNUのテスト
+===============
+
+`dejagnu' (ftp://ftp.gnu.org/gnu/dejagnu/)が`AUTOMAKE_OPTIONS'にある場合，
+`dejagnu'ベースのテストスイートが想定されます．変数`DEJATOOL'は，
+`runtest'の呼び出しに`--tool'引数として，一度に渡される名前のリストです．
+それはパッケージの名前をデフォルトとします．
+
+変数`RUNTESTDEFAULTFLAGS'は，デフォルトでdejagnuに渡される`--tool'と
+`--srcdir'フラグを保持します．必要な場合は，これで優先することが可能です．
+
+変数`EXPECT'と`RUNTEST'で，プロジェクト特有の値を提供するために優先する
+ことが可能です．例えば，コンパイラツールチェインをテストする場合，デフォ
+ルト値はホストとターゲットの名前を考慮しないので，こうする必要があります．
+
+変数`RUNTESTFLAGS'の内容は，`runtest'の呼び出しに渡されます．これは，"ユー
+ザ変数"(*Note User Variables::)として扱われます．`Makefile.am'に
+`runtest'フラグを設定する必要がある場合，代わりに`AM_RUNTESTFLAGS'を使用
+することが可能です．
+
+Automakeは，`./configure'で検出した様々な変数を定義するローカルな
+`site.exp'ファイルを生成するための規則を生成します．このファイルは，自動
+的にDejaGnuで読み込まれます．パッケージユーザがテストスイートを調整する
+ためにこのファイルを編集することは問題ありません．しかし，テストスイート
+の著者が新しい変数を定義する場所に書くものではありません．これは，実際の
+テストスイートのコードのどこかでなされるべきです．特に，`site.exp'を配布
+すべきではありません．
+
+どちらの状況でも，テストは`make check'で実行されます．
+
+
+インストールテスト
+==================
+
+`installcheck'ターゲットは，パッケージがインストールされた後でテストを実
+行する方法をユーザが利用可能にします．`installcheck-local'ターゲットを書
+くことで，これをテストに追加することが可能です．
+
+
+
+
+File: automake-ja.info, Node: Options, Next: Miscellaneous, Prev: Tests, Up: Top
+
+Automakeの動作の変更
+********************
+
+Automakeの様々な機能は，`Makefile.am'のオプションで制御可能です．このよ
+うなオプションは，`AUTOMAKE_OPTIONS'という名前の特別な`Makefile'変数にリ
+ストアップすることで，`Makefile'ごとを基本に適用されます．`configure.in'
+の`AM_INIT_AUTOMAKE'の最初の引数にリストアップすることで，処理されるすべ
+ての`Makefiles'に大域的に適用されます．現在理解されるオプションは以下の
+とおりです．
+
+`gnits'
+`gnu'
+`foreign'
+`cygnus'
+
+     適切に厳密さを設定します．`gnits'オプションは，`readme-alpha' と
+     `check-news'も暗黙に指定します．
+
+`ansi2knr'
+`PATH/ansi2knr'
+     自動的なde-ANSI-ficationを開始します．*Note ANSI::. パスが前置され
+     ている場合，生成される`Makefile.in'は，`ansi2knr'プログラムを見つけ
+     るために指定されたディレクトリを探します．パスは(Automakeは現在これ
+     を調査しませんが)，同じ配布物内の他のディレクトリへの相対的なパスに
+     すべきです．
+
+`check-news'
+     現在のバージョンナンバーが`NEWS'ファイルの最初の数行に無い場合，
+     `make dist'は失敗します．
+
+`dejagnu'
+     `dejagnu'特有の規則を生成します．*Note Tests::.
+
+`dist-bzip2'
+     配布物のbzip2されたtarアーカイブを作成する`dist-bzip2'ターゲットを
+     生成します．`dist'は他の形式への追加としてそれを作成します．bzip2アー
+     カイブは，gzipされたアーカイブより小さくなることが多くなっています．
+
+`dist-shar'
+     配布物のsharアーカイブを作成する`dist-shar'ターゲットを生成します．
+     `dist'は他の形式への追加としてそれを作成します．
+
+`dist-zip'
+     配布物のzipアーカイブを作成する`dist-zip'ターゲットを生成します．
+     `dist'は他の形式への追加としてそれを作成します．
+
+`dist-tarZ'
+     配布物の圧縮されたtarアーカイブを作成する`dist-tarZ'ターゲットを生
+     成します．`dist'は他の形式への追加としてそれを作成します．
+
+`no-define'
+     このオプションは，`AM_INIT_AUTOMAKE'への引数として渡すときだけ意味
+     があります．それは`PACKAGE'と`VERSION'変数が`AC_DEFINE'されることを
+     妨げます．
+
+`no-dependencies'
+     これは，コマンドラインで`--include-deps'を使用することに似ています
+     が，自動的な依存追跡の仕事をするために必要なビットが無い状況で役に
+     立ちます．*Note Dependencies::. この場合は，効率的な自動的な依存追
+     跡に障害を与えます．
+
+`no-exeext'
+     `Makefile.am'でターゲット`foo'を定義している場合，`foo$(EXEEXT)'と
+     指名されているターゲットに優先します．`EXEEXT' が空のとき，これが必
+     要です．しかし，デフォルトで，automakeではこれの使用に対してエラー
+     を発生します．`no-exeext'オプションで，このエラーが発生しないように
+     します．これは，Windowsや実行形式の拡張子を使用しているそれ以外のす
+     べてのオペレーティングシステムに移植する予定の無いパッケージだと分
+     かっている場合のみ使用するものです．
+
+`no-installinfo'
+     生成された`Makefile.in'はデフォルトで，infoページをビルドしたりイン
+     ストールしたりしません．しかし，`info'と`install-info'ターゲットは
+     利用可能です．このオプションは`GNU'の厳密さでは拒絶されます．
+
+`no-installman'
+     生成された`Makefile.in'はデフォルトでman pageをインストールしません．
+     しかし，`install-man'ターゲットはオプショナルインストールで利用可能
+     です．このオプションは`GNU'の厳密さで使用不可能です．
+
+`nostdinc'
+     このオプションは，通常Automakeが自動的に供給する標準的な`-I'オプショ
+     ンを利用不可能にするために使用可能です．
+
+`no-texinfo.tex'
+     このディレクトリにTexinfoファイルがあっても，`texinfo.tex'を必要と
+     しません．
+
+`readme-alpha'
+     このリリースがアルファリリースで，ファイル`README-alpha'が存在する
+     場合，それは配布物に加えられます．このオプションが与えられている場
+     合，バージョンナンバーは次の二つの形式のうちの一つだと期待されます．
+     最初の形式は`MAJOR.MINOR.ALPHA'で，それぞれの要素が数字です．最後の
+     ピリオドと数字は非アルファのリリースのときに捨てられます．二番目の
+     形式は`MAJOR.MINORALPHA'で，ALPHAは文字列です．それは非アルファのリ
+     リースのときに取り除かれます．
+
+`std-options'
+     `installcheck'ターゲットで，インストールされたスクリプトとプログラ
+     ムが，`--help'と`--version'オプションをサポートしているかどうかを調
+     査するようにします．これは，プログラムの実行時の依存性がインストー
+     ル後にも満足しているという基本的な調査も提供します．
+
+     状況によって，プログラム(またはスクリプト)でこのテストを免除させる
+     必要があるかもしれません．例えば，(GNUのsh-utilsの)`false'は，
+     `--help'や`--version'でさえ，決して成功しません．そのようなプログラ
+     ムは，変数`AM_INSTALLCHECK_STD_OPTIONS_EXEMPT'でリストアップするこ
+     とが可能です．
+
+`subdir-objects'
+     このオプションが指定されている場合，オブジェクトはソースファイルの
+     サブディレクトリに対応する，ビルドディレクトリのサブディレクトリに
+     配置されます．例えば，ソースファイルが`subdir/file.cxx'の場合，出力
+     ファイルは`subdir/file.o'になります．
+
+VERSION
+     バージョンナンバー(例えば`0.30')が指定可能です．Automakeが，指定さ
+     れているバージョンより新しくない場合，`Makefile.in'の作成は行なわれ
+     ません．
+
+`-WCATEGORY'や`--warnings=CATEGORY'
+     これらのオプションは，コマンドラインに正確に対応するもののように動
+     作します(*Note Invoking Automake::)．これでファイルごとを基本に，警
+     告のカテゴリを有効にしたり無効にしたりすることが可能になります．プ
+     ロジェクト全体に警告の設定を行なうことも可能です．例えば，
+     `configure.in'で`AM_INIT_AUTOMAKE([-Wall])'を試してください．
+
+
+認識できないオプションは`automake'が判断します．
+
+ツリーの全てのファイルにオプションを適用したい場合，`configure.in' の
+`AM_INIT_AUTOMAKE'を使用することが可能です．*Note Macros::.
+
+
+
+

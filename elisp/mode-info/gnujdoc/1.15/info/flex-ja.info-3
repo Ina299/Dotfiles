@@ -1,0 +1,1912 @@
+Info file: flex-ja.info,    -*-Text-*-
+produced by `texinfo-format-buffer'
+from file `flex-ja.texi'
+using `texinfmt.el' version 2.38 of 3 July 1998.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+This file documents Version 2.3.7 - 2.5.4 of the Flex lexical scanner
+generator.
+
+This is Edition  1.03,  February 1993, 
+of the `Flex Version  2.3.7 - 2.5.4 Manual'.
+
+Copyright (C) 1992, 1993 Free Software Foundation, Inc.
+
+Permission is granted to make and distribute verbatim copies of this
+manual provided the copyright notice and this permission notice are
+preserved on all copies.
+
+
+Permission is granted to copy and distribute modified versions of this
+manual under the conditions for verbatim copying, provided that the
+entire resulting derived work is distributed under the terms of a
+permission notice identical to this one.
+
+Permission is granted to copy and distribute translations of this manual
+into another language, under the above conditions for modified versions,
+except that this permission notice may be stated in a translation
+approved by the Free Software Foundation.
+
+
+
+
+
+
+
+
+File: flex-ja.info, Node: Translation Tables, Next: Multiple Input Buffers, Prev: Table Compression and Scanner Speed, Up: Other Flex Features
+
+翻訳テーブル
+============
+
+翻訳テーブルは、文字をグループにマップするのに使われます。このテーブルは
+Lexの持つ機能の１つですが、POSIXでは定義されていません。Flexでも翻訳テー
+ブルを使うことはできますが、サポート対象外の機能です。Flexにおいては翻訳
+テーブルは不要です。というのは、Flexには`-i'オプションによる同等クラスと
+いうものがあり、これが翻訳テーブルと同等の機能を実現しているからです
+（*Note `-i'オプション: The -i Switch.）。翻訳テーブルの機能は、互換性の
+ためだけに存在する余分な機能です。翻訳テーブルを使うことは*お勧めできま
+せん*。翻訳テーブルを使いたいのであれば、定義ファイルの先頭の定義セクショ
+ンにおいて定義しなければなりません。
+
+翻訳テーブルの一般的な形式は以下のとおりです。
+
+     %t 
+     1 ABCDEFGHIJKLMNOPQRSTUVWXYZ
+     2 0123456789
+     %t
+     %%
+
+これは、`A'から`Z'までの任意の文字がルールの中で使われている場合、そのパ
+ターンは`A'から`Z'までの*どの*文字にもマッチするということを意味していま
+す。したがって、`A(BC)'と`X(YZ)'はまったく同一であるということになります。
+
+
+
+File: flex-ja.info, Node: Multiple Input Buffers, Next: End-Of-File Rules, Prev: Translation Tables, Up: Other Flex Features
+
+複数の入力バッファ
+==================
+
+スキャナが、複数のファイルからの入力を処理することができるということが必
+要になる状況は、たくさんあります。例えば、多くのPascalの実装では、コンパ
+イル時に複数のファイルを取り込むことを許していますし、Cでは、スキャナも
+しくはプリプロセッサが`#include'文を処理できなければなりません。このこと
+が意味しているのは、スキャナは、カレントなスキャン処理の"コンテキスト"を
+保存してから新しいコンテキストに変更し、その後で、以前の状態と完全に一致
+する状態に復帰することができなければならないということです。
+
+Flexスキャナは、スキャン処理のコンテキストを維持するために余分の処理が必
+要になるような、大きな入力バッファを使っています。しかしFlexは、複数の入
+力バッファの作成、切り替え、削除が非常に簡単に行えるような特別な機能を提
+供しています。
+
+========================================================================
+* Menu:
+
+* Buffer Manipulation:: バッファ操作関数
+* Buffer Manipulation (Flex 2.5)::  同上（Flex 2.5の補足情報）
+* Example of Multiple Buffers::  複数バッファを使う実例
+========================================================================
+
+
+
+File: flex-ja.info, Node: Buffer Manipulation, Next: Example of Multiple Buffers, Prev: Multiple Input Buffers, Up: Multiple Input Buffers
+
+バッファを操作する関数
+----------------------
+
+Flexは、複数の入力バッファを取り扱うために、以下のような関数やマクロを提
+供しています。
+
+     `YY_BUFFER_STATE yy_create_buffer( FILE *file, int size)'
+          `file'で指定されるファイルのために、`size'で指定される数の文字
+          を格納するのに十分な大きさのバッファを作成します。この関数は、
+          後に複数のバッファ間の切り替え、または新規に作成されたバッファ
+          の削除に使うことのできるハンドルを返します。
+
+     `YY_BUF_SIZE'
+          デフォルトのバッファ・サイズを定義するマクロです。
+          `yy_create_buffer()'に渡すべきサイズが分からない場合に、これを
+          使うことができます。
+
+     `void yy_switch_to_buffer( YY_BUFFER_STATE new_buffer)'
+          バッファを切り替えます。次に読み込まれるトークンは、
+          `new_buffer'で指定されるバッファから取られます。ファイルの終端
+          （EOF）に達するか、次に`yy_switch_to_buffer()'が呼び出されるま
+          で、`new_buffer'からトークンが読み込まれます。`new_buffer'が
+          EOFに達すると、新しいバッファに切り替えることができます。
+
+     `void yy_delete_buffer( YY_BUFFER_STATE buffer )'
+          `buffer'で指定されるバッファを削除し、それに割り当てられたメモ
+          リを解放します。
+
+     `YY_CURRENT_BUFFER'
+          使用中のカレントなバッファを返すマクロです。
+
+
+上記が、複数の入力バッファを取り扱うのに必要なすべての機能を提供していま
+す。
+
+
+
+
+File: flex-ja.info, Node: Buffer Manipulation (Flex 2.5), Next: Example of Multiple Buffers, Prev: Buffer Manipulation, Up: Multiple Input Buffers
+
+バッファを操作する関数（Flex 2.5の補足情報）
+--------------------------------------------
+
+Flex 2.5では、以下のバッファ操作関数もサポートされています。
+
+     `YY_BUFFER_STATE yy_new_buffer(FILE *file, int size)'
+          `yy_create_buffer'の別名です。
+
+     `void yy_flush_buffer(YY_BUFFER_STATE buffer)'
+          引数で指定されたバッファの内容を破棄し、バッファの先頭２バイト
+          に`YY_END_OF_BUFFER_CHAR'（`\0'）をセットします。
+
+     `YY_FLUSH_BUFFER'
+          引数にカレント・バッファを指定して`yy_flush_buffer()'を呼び出
+          すよう定義されたマクロです。
+
+さらに、Flex 2.5では、メモリ上の文字列を操作するための入力バッファを作成
+する関数が提供されています。いずれも、新しく作成された入力バッファに対応
+する`YY_BUFFER_STATE'型のハンドルを戻り値とします。入力バッファを使い終
+わったら、このハンドルを引数に指定して`yy_delete_buffer()'を呼び出す必要
+があります。
+
+     `YY_BUFFER_STATE yy_scan_string(const char *STR)'
+          NULL文字で終端する文字列をスキャンするための入力バッファを作成
+          します。実際には、引数STRに指定された文字列の長さを調べて、次
+          に説明する`yy_scan_bytes()'を呼び出し、その戻り値を返します。
+
+     `YY_BUFFER_STATE yy_scan_bytes(const char *BYTES, int LEN)'
+          BYTESから始まるLENバイトのメモリ領域をスキャンするためのバッファ
+          を作成します。実際には、次に説明する`yy_scan_buffer()'を呼び出
+          し、その戻り値を返します。
+
+          `yy_scan_buffer()'の第１引数には、BYTESではなく、この関数の内
+          部で獲得された`LEN + 2'バイトの領域へのポインタが渡される点に
+          注意してください。`yy_scan_buffer()'が呼び出される前に、BYTES
+          から始まるLENバイトのデータが、新たに獲得した領域にコピーされ、
+          さらに、末尾の2バイトに`YY_END_OF_BUFFER_CHAR'（`\0'）がセット
+          されます。
+
+     `YY_BUFFER_STATE yy_scan_buffer(char *BASE, yy_size_t SIZE)'
+          BASEから始まるSIZEバイトのメモリ領域をスキャンするためのバッファ
+          を作成します。メモリ領域の末尾2バイトは、
+          `YY_END_OF_BUFFER_CHAR'（`\0'）でなければなりません。この末尾2
+          バイトは、スキャン処理の対象になりません。
+
+          引数で指定されたメモリ領域の末尾2バイトが
+          `YY_END_OF_BUFFER_CHAR'でない場合は、`yy_scan_buffer()'はバッ
+          ファを作成せず、NULLポインタを返します。
+
+
+
+
+File: flex-ja.info, Node: Example of Multiple Buffers, Prev: Buffer Manipulation, Up: Multiple Input Buffers
+
+複数バッファを使う実例
+----------------------
+
+複数のバッファを使うというアイデアを理解するための手助けとして、インクルー
+ドすべきファイルを探すCのスキャナの一部を以下に示します。これはCの
+`#include'のうち、引用符で囲まれた文字列のみを受け付けます。例えば、
+
+     #include"file1.c"
+     #include "file2.c"
+     #include " file3.c"
+
+は、最後の例のファイル名が空白を含むことになりますが、いずれも正当な入力
+です。ここでの例はまた、EOFルールとスタート状態の使用法を実演する良い例
+でもあります。
+
+     /*
+      * eof_rules.lex : 複数バッファ、EOFルール、スタート状態
+      *                 の使い方の例
+      */
+
+     %{
+
+     #define MAX_NEST 10                   
+
+     YY_BUFFER_STATE include_stack[MAX_NEST];
+     int             include_count = -1;
+
+     %}
+
+     %x INCLUDE
+
+     %%
+
+     ^"#include"[ \t]*\"  BEGIN(INCLUDE);
+     <INCLUDE>\"          BEGIN(INITIAL); 
+     <INCLUDE>[^\"]+ {  /* インクルード・ファイルの名前を獲得する */
+             if ( include_count >= MAX_NEST){
+                fprintf( stderr, "Too many include files" );
+                exit( 1 );
+             }
+
+             include_stack[++include_count] = YY_CURRENT_BUFFER;
+
+             yyin = fopen( yytext, "r" );
+             if ( ! yyin ){
+                fprintf(stderr,"Unable to open \"%s\"\n",yytext);
+                exit( 1 );
+             }
+
+             yy_switch_to_buffer(
+                        yy_create_buffer(yyin,YY_BUF_SIZE));
+
+             BEGIN(INITIAL);
+           }
+     <INCLUDE><<EOF>>  {
+             fprintf( stderr, "EOF in include" );
+             yyterminate();
+           }
+     <<EOF>> {
+             if ( include_count <= 0 ){
+               yyterminate();
+             } else {
+               yy_delete_buffer(include_stack[include_count--] );
+               yy_switch_to_buffer(include_stack[include_count] );
+               BEGIN(INCLUDE);
+             }
+           }
+     [a-z]+             ECHO;
+     .|\n               ECHO;
+
+スタート状態を使ってファイル名のスキャナを生成する方法や、バッファの切り
+替えを発生させる方法に注目してください。ほかに注目すべき重要な点は、
+`<<EOF>>'を取り扱うセクション、および、古いバッファに復帰する際に`BEGIN'
+を使って確実に正しい状態に遷移するようにする点です。これを怠ると、状態は
+`INITIAL'にリセットされ、`#include'の最後の`"'が`ECHO'されてしまいます。
+
+*注：*<<EOF>>機能は次の節で説明します。<<EOF>>が何であり、何を行うものか
+という点に関する詳細な議論については、*Note Start States::。
+
+
+
+File: flex-ja.info, Node: End-Of-File Rules, Prev: Multiple Input Buffers, Up: Other Flex Features
+
+ファイルの終端（End-Of-File）ルール
+===================================
+
+ファイルの終端（EOF）が見つかると、Flexは`yywrap()'を呼び出し、ほかに処
+理できる状態のファイルが存在するか調べます。`yywrap()'が0以外の値を返す
+と、もうこれ以上ファイルはないということを意味し、したがって、これがまさ
+に入力の最後であるということになります。状況によっては、この時点でさらに
+処理を行う必要のある場合があります（例えば、入力のために別のファイルをセッ
+トアップしたいということがあるかもしれません）。このような場合のために、
+Flexは`<<EOF>>'演算子を提供しています。これを使うことで、EOFが見つかった
+時に実行すべきことを定義することができます。*Note 複数バッファを使う実例:
+Example of Multiple Buffers。EOFルールを使って、終わりのないコメントやイ
+ンクルードされているファイルの終端を見つける、良い例が示されています。
+
+`<<EOF>>'演算子の使用にはいくつか制限があります。制限事項を以下に示しま
+す。
+
+
+   * パターンと一緒に使用することは不可
+
+     EOFルールは、スタート状態とのみ一緒に使うことができます。スタート状
+     態が指定されていない場合（すなわち、`<<EOF>>'ルールが状態により制限
+     されない場合）、`<<EOF>>'が使われていないすべての（排他的スタート状
+     態を含む）状態が影響を受けます。つまり、
+
+          "foo"<<EOF>>
+
+     が不当である一方で、
+
+          <<EOF>>           /* <<EOF>>が使われていないすべての */
+                            /* 状態におけるEOF                 */
+          <indent><<EOF>>   /* indent状態におけるEOF           */
+          <comment><<EOF>>  /* コメント内のEOF                 */
+
+     はすべて正当であることを意味しています。
+
+   * アクションの終端
+
+     １つ注意しなければならない点は、EOFルールは入力の最後で呼び出される
+     という点です。したがって、EOFルールのアクションは、(1) 
+     （`yy_switch_to_buffer()'、または`YY_NEW_FILE'を使って）新しい入力
+     ストリームを確立する、(2) （`return'文を使って）復帰する、(3) 
+     （`yyterminate()'、または`exit()'を使って）スキャナの実行を終了させ
+     る、のいずれかを実行しなければなりません。
+
+     *Note 複数バッファを使う実例: Example of Multiple Buffers。
+     `yy_terminate()'と`yy_switch_to_buffer()'を使う例が示されています。
+     また、`yyterminate()'の説明については、*Note Flex and C::を参照して
+     ください。
+
+
+
+File: flex-ja.info, Node: Optimization, Next: More Examples, Prev: Other Flex Features, Up: Top
+
+スキャナの最適化
+****************
+
+デバッグをしている間は、スキャナの性能は通常それほど重要ではなく、Flexの
+デフォルトの設定で十分です。しかしデバッグ終了後は、スピード、またはサイ
+ズの面でスキャナを最適化したくなることもあるでしょう。ここでは、スキャナ
+を最適化するのによく使われる手法をいくつか紹介します。
+
+
+========================================================================
+* Menu:
+
+* Optimizing for Speed:: ファスト・スキャナを作るためのフラグ、関連する
+トピック* Optimizing for Size:: サイズの小さいスキャナの作り方
+========================================================================
+
+
+
+File: flex-ja.info, Node: Optimizing for Speed, Next: Optimizing for Size, Prev: Optimization, Up: Optimization
+
+スピードの最適化
+================
+
+多くのプログラムは、字句解析の処理に多くの時間を費やします。したがって、
+スキャナの最適化はかなり大きな性能改善に結びつくことが多いのです。Flexに
+よるスキャナは、Lexによるスキャナと比較するとかなり高速になる傾向があり
+ますが、特定の構成もしくはアクションによって、性能に大きな影響を与えるこ
+とができます。注意すべき点は以下のとおりです。
+
+  1. テーブルの圧縮 どのような圧縮も結果的にスキャナを遅くします。したがっ
+     て、スピードのことが心配であるならば、常にコマンドラインで`-f'オプ
+     ション、または`-F'オプションを使ってください。テーブルの圧縮とスピー
+     ドに関連するオプションに関する詳細な議論については、*Note Table
+     Compression and Scanner Speed::。
+
+  2. REJECT スピードに対して最も大きな影響を及ぼします。これが使われると
+     *すべて*のマッチ処理が遅くなります。というのは、スキャナは、マッチ
+     する前の状態に自身を復旧する必要があるからで、このようなことが必要
+     ない場合と比較して、より多くの内部的な保守作業を行わなければならな
+     いからです。スピードが重要な場合には、使わないようにしてください。
+
+  3. バックトラッキング スキャナがあるテキストにマッチするために「逆行」
+     しなければならないことを、バックトラッキングといいます。これは、ス
+     キャナの性能に悪い影響を及ぼしますので、スピードが最も重要である場
+     合には避けるべきです。圧縮されたテーブルは常にバックトラッキングを
+     発生させるので、`-f'オプション、または`-F'オプションを使わない場合
+     は、ルールからバックトラッキングを削除しようとするのは時間の無駄で
+     す。スキャナからバックトラッキングを削除することに関する詳細な情報
+     については、*Note Removing Backtracking::。
+
+  4. 可変長後続コンテキスト（variable trailing context） 可変長後続コン
+     テキストとは、あるルールの先頭部分と後続部分の両方が固定長でないよ
+     うな場合を指します。性能の観点からは`REJECT'と同じくらい悪影響を及
+     ぼすもので、可能な場合にはいつでも避けるべきです。この例を示すと、
+     以下のようになります。
+
+          %%
+          linux|hurd/(OS|"Operating system")
+
+     これは、以下のように分割すべきです。
+
+          linux/OS|"Operating system"
+          hurd/OS|"Operating system"
+
+     こうすることによって、問題は解消されます。
+
+  5. 行の先頭を表す演算子 `^'演算子は、性能に不利な影響を及ぼします。ス
+     ピードが最も重要な場合には、使わないでください。
+
+  6. yymore() `yymore'を使うと性能を低下させます。スピードが最も重要な場
+     合には、使わないでください。
+
+  7. テキスト長 スキャナの性能は、マッチするテキストの長さによっても影響
+     を受けます。常に長い文字列にマッチするような場合には、スキャナは高
+     速に実行されます。というのは、`yytext'環境をセットアップする必要が
+     ないからです。スキャナの実行時間のほとんどは、内部の高速なマッチン
+     グ・ループの中で費やされることになります。
+
+  8. `NUL' Flexは、`NUL'を含むトークンをマッチするのに時間がかかります。
+     この場合には、*短い*テキストにマッチするようルールを記述するほうが
+     良いでしょう。
+
+
+========================================================================
+* Menu:
+
+* Removing Backtracking:: バックトラッキングの除去による性能の飛躍的向上
+========================================================================
+
+
+
+
+File: flex-ja.info, Node: Removing Backtracking, Prev: Optimizing for Speed, Up: Optimizing for Speed
+
+バックトラッキングの削除
+------------------------
+
+スキャナからバックトラッキングを削除することは、スキャナの性能にかなりの
+影響をもたらします。残念ながら、バックトラッキングの削除はかなり複雑な作
+業になる可能性があります。例えば、
+
+     %%
+     hurd     return(GNU_OS);
+     hurdle   return(JUMP);
+     hurdled  return(JUMPED);
+
+では、バックトラッキングが発生します。スキャナが`hu'をマッチし、次の文字
+が`r'ではない場合、マッチされなかったテキストを`ECHO'するデフォルトのルー
+ルを使って`h'と`u'を処理するために、スキャナはバックトラッキングを行わな
+ければなりません。同じことが`d'と`e'についても適用されます。（これは、何
+かにマッチするようスキャナが努力を継続するということが、もはやできないか
+らです。この場合、スキャナはデフォルトのルールを適用し、`yyext'環境をリ
+セットしなければなりませんが、いずれも時間のかかる処理です。）
+
+コマンドライン・オプション`-b'を使うことで、バックトラッキングを発生させ
+ている原因に関する情報を知ることができます。これにより、バックトラッキン
+グに関する情報を含む`lex.backtrack'というファイルが生成されます。上記の
+例の場合、このファイルは以下のような情報を含みます。
+
+     State #6 is non-accepting -
+      associated rule line numbers:
+             2       3       4
+      out-transitions: [ r ]
+      jam-transitions: EOF [ \000-q  s-\177 ]
+
+     State #7 is non-accepting -
+      associated rule line numbers:
+             2       3       4
+      out-transitions: [ d ]
+      jam-transitions: EOF [ \000-c  e-\177 ]
+
+     State #9 is non-accepting -
+      associated rule line numbers:
+             3       4
+      out-transitions: [ e ]
+      jam-transitions: EOF [ \000-d  f-\177 ]
+
+     Compressed tables always backtrack.  
+
+バックトラッキング情報はセクションに分割され、個々のセクションにおいて、
+バックトラッキングを引き起こしている１つの状態のことが記述されています。
+個々のセクションの最初の行から、状態番号を知ることができます。２行目から
+は、記述ファイルの何行目が関連しているのかを知ることができます。３行目か
+らは、バックトラッキングを発生させた文字を知ることができます。よって、最
+初のブロックからは、文字`r'でバックトラッキングが発生し、それは記述ファ
+イルの２，３，４行目に関連していることを見てとることができます。最後の行
+は、圧縮されたテーブルは常にバックトラッキングを発生させるので、テーブル
+圧縮を引き起こすようなコマンドライン・オプションを使う場合には、バックト
+ラッキングを削除しようとして時間を費やすべきではないことを思い出させるた
+めのものです。
+
+バックトラッキングを削除するためには、バックトラッキングが関与している状
+態をキャッチするルールを加える必要があります。これは、スキャナのスピード
+には*影響を与えない*ということに注意してください。スキャナのスピードは、
+ルールの数や複雑さとはまったくといえるほど無関係です。
+
+バックトラッキングを削除するためにルールを追加する方法は、２種類あります。
+第１の方法は、以下のようなルールを追加することです。
+
+     %%
+     hurd     return(GNU_OS);
+     hurdle   return(JUMP);
+     hurdled  return(JUMPED);
+     hu       return(OTHER);
+     hur      return(OTHER);
+     hurdl    return(OTHER);
+
+別の方法として、すべてをキャッチするようなルールを追加することもできます。
+
+     %%
+     hurd     return(GNU_OS);
+     hurdle   return(JUMP);
+     hurdled  return(JUMPED);
+     [a-z]+   return(OTHER);
+
+この第２の方法を適用できる場合は、常にこれを使うべきです。上記のどちらか
+と`-b'オプションを一緒に使うと、
+
+     Compressed tables always backtrack.  
+
+というメッセージだけが出力されるようになります。これは、バックトラッキン
+グ状態が存在しないことを示唆しています。
+
+これに付随する問題の１つとして、複雑なスキャナではバックトラッキング問題
+はカスケードする傾向があるので、`lex.backtrack'内の情報が混乱をもたらす
+ものになる可能性があります。しかし、バックトラッキングの原因は通常２、３
+個のルールにしぼることが可能なので、バックトラック・データを調べようと努
+力するだけの*値打ちはあります*。
+
+
+
+File: flex-ja.info, Node: Optimizing for Size, Prev: Optimizing for Speed, Up: Optimization
+
+サイズの最適化
+==============
+
+Flexは、サイズの小さいスキャナよりも、むしろ非常に高速なスキャナを作成す
+ることを目標としていますが、いずれにしても、作成されるテーブルのサイズは
+Lexによるそれと比較しても、通常はかなり小さいものになります。
+
+デフォルトでは、Flexは可能な限りサイズの小さいスキャナを作成します。これ
+は、コマンドラインで`-Cem'を使うのと同等です。デフォルトを使うのであれば、
+コマンドライン・オプションを気にする必要はありません。
+
+さらにテーブルのサイズを小さくするには、より大きなテキスト・グループにマッ
+チするルールを使い、字句の値を認識するためにCのサブルーチンを使うのが最
+も良い方法です。この良い例がコンパイラで、以下のようなルールを与えること
+ができます。
+
+     %%
+     begin    return(BEGINSYM);
+     end      return(ENDSYM);
+     program  return(PROGSYM);
+         ... 
+
+あるいは、以下のようにテーブル検索を使うことも可能です。
+
+     [a-zA-Z][a-zA-Z0-9]*  return(lookup(yytext));
+
+ここでは、一般的なルールが指定されていて、`lookup()'がテキストをキーワー
+ドにマッチさせ、そのトークンが何であるかを示す整数値を返します。これによ
+り、サイズのより小さいテーブルが生成されますが、性能は悪くなる傾向があり
+ます。また、数が少なく複雑ではないルール集合については、テーブル・サイズ
+を縮小することの効果は、シンボル・マッピング用の情報をプログラム中の他の
+領域に格納しなければならないという事実によって、相殺されるかもしれません。
+というのは、シンボル・マッピング用の情報は、Flexテーブルと比較して、より
+多くのスペースを必要とする可能性があるからです。
+
+
+
+File: flex-ja.info, Node: More Examples, Next: Flex and Lex, Prev: Optimization, Up: Top
+
+Flexを使うその他の実例
+**********************
+
+     ここでは、Flexの使用例をさらにいくつか紹介します。ここでの例も、必
+     ずしも最適な実装ではありませんが、一般的なFlexの使い方を示してくれ
+     るはずです。
+
+
+========================================================================
+* Menu:
+
+* Example-Counting Words:: wc風のユーティリティ* Example-Pascal Lexical
+Scanner:: 本物の言語をスキャンする実例* Example-Jargon Converter:: 専門
+用語ファイルのTexinfo形式への変換
+========================================================================
+
+
+
+File: flex-ja.info, Node: Example-Counting Words, Next: Example-Pascal Lexical Scanner, Prev: More Examples, Up: More Examples
+
+単語数、文字数、行数のカウント
+==============================
+
+以下の定義は、与えられたファイルの中の単語数、文字数、行数をカウントする
+のにFlexを使う方法を示す、簡単な例です。実際にFlexに関係のある部分は、非
+常に少ないことに注意してください。以下のコードのほとんどは、コマンドライ
+ン・パラメータを処理したり、カウントの合計を保持したりするものです。
+
+
+     /*
+      * wc.lex : wcのようなユーティリティを、
+      *          Flexを使って作成する簡単な例
+      */
+
+     %{
+     int  numchars = 0;
+     int  numwords = 0;
+     int  numlines = 0;
+     int  totchars = 0;
+     int  totwords = 0;
+     int  totlines = 0;
+     %}
+
+     /*
+      * ルールはここから始まる
+      */
+
+     %%
+
+     [\n]        { numchars++;  numlines++;         }
+     [^ \t\n]+   { numwords++;  numchars += yyleng; }
+     .           { numchars++;                      }
+
+     %%
+
+     /*
+      * 追加的なCコードがここから始まる。
+      * ここで、すべての引数処理等を行うコードが提供される
+      */
+
+     void main(int argc, char **argv)
+     {
+       int  loop;
+       int  lflag = 0; /* 行数をカウントする場合は1         */
+       int  wflag = 0; /* 単語数をカウントする場合は1       */
+       int  cflag = 0; /* 文字数をカウントする場合は1       */
+       int  fflag = 0; /* ファイル名が指定されている場合は1 */
+
+       for(loop=1; loop<argc; loop++){
+          char *tmp = argv[loop];
+          if(tmp[0] == '-'){
+          switch(tmp[1]){
+            case 'l':
+               lflag = 1;
+               break;
+            case 'w':
+               wflag = 1;
+               break;
+            case 'c':
+               cflag = 1;
+               break;
+            default:
+               fprintf(stderr,"unknown option -%c\n",tmp[1]);
+          }
+         } else {
+           fflag = 1;
+           numlines = numchars = numwords = 0;  
+           if((yyin = fopen(tmp,"rb")) != 0){
+             (void) yylex();
+             fclose(yyin);
+             totwords += numwords;
+             totchars += numchars;
+             totlines += numlines;
+             printf("file  : %25s :",tmp) ;
+             if(lflag){
+               fprintf(stdout,"lines %5d ",numlines); 
+             }
+             if(cflag){
+               fprintf(stdout,"characters %5d ",numchars); 
+             }
+             if(wflag){
+               fprintf(stdout,"words %5d ",numwords); 
+             }
+             fprintf(stdout,"\n");
+           }else{
+             fprintf(stderr,"wc : file not found %s\n",tmp);
+           } 
+         }
+       }
+       if(!fflag){
+         fprintf(stderr,"usage : wc [-l -w -c] file [file...]\n");
+         fprintf(stderr,"-l = count lines\n");
+         fprintf(stderr,"-c = count characters\n");
+         fprintf(stderr,"-w = count words\n");
+         exit(1);
+       }
+       for(loop=0;loop<79; loop++){
+         fprintf(stdout,"-");
+       }
+       fprintf(stdout,"\n");
+       fprintf(stdout,"total : %25s  ","") ;
+       if(lflag){
+         fprintf(stdout,"lines %5d ",totlines); 
+       }
+       if(cflag){
+         fprintf(stdout,"characters %5d ",totchars); 
+       }
+       if(wflag){
+          fprintf(stdout,"words %5d ",totwords); 
+       }
+       fprintf(stdout,"\n");
+     }
+
+
+
+File: flex-ja.info, Node: Example-Pascal Lexical Scanner, Next: Example-Jargon Converter, Prev: Example-Counting Words, Up: More Examples
+
+Pascalのサブセット用の字句スキャナ
+==================================
+
+ここでは、Pascalのような言語用の字句スキャナを作る方法を示します。このス
+キャナ定義では、個々のキーワードがルールとしてリストされています。（一般
+的には、すべてのキーワードをテーブルに格納してからテーブル検索を使う手法
+がよく見られますが、）ここでの方法は、キーワードと識別子とを区別するため
+の方法としては、一般的に最も簡単なものです。また、識別子用にただ１つのルー
+ルがあるという点に注意してください。多くの場合、このルールはシンボル・テー
+ブルを管理するためのサブルーチンを呼び出します。
+
+もう１つ注意すべき点は、`_FILE'と`_BEGIN'が先頭にアンダースコアを持つと
+いう点です。Flex、またはCで定義済みの名前は、追加的な工夫なしでは使えな
+いということを示すために、このようにしてあります。これよりももっと一般的
+に使われる手法は、*すべて*のトークンの先頭もしくは末尾に何らかの文字列を
+付加するというもので、こうすることによって問題は発生しなくなります。
+`TOK'や`SYM'が一般的によく使われる拡張子です。
+
+     /*
+      * pascal.lex : PASCALスキャナの例
+      */
+
+     %{
+     #include <stdio.h>
+     #include "y.tab.h"
+
+     int line_number = 0;
+
+     void yyerror(char *message);
+
+     %}
+
+     %x COMMENT1 COMMENT2
+
+     white_space       [ \t]*
+     digit             [0-9]
+     alpha             [A-Za-z_]
+     alpha_num         ({alpha}|{digit})
+     hex_digit         [0-9A-F]
+     identifier        {alpha}{alpha_num}*
+     unsigned_integer  {digit}+
+     hex_integer       ${hex_digit}{hex_digit}*
+     exponent          e[+-]?{digit}+
+     i                 {unsigned_integer}
+     real              ({i}\.{i}?|{i}?\.{i}){exponent}?
+     string            \'([^'\n]|\'\')+\'
+     bad_string        \'([^'\n]|\'\')+
+
+     %%
+     "{"                  BEGIN(COMMENT1);
+     <COMMENT1>[^}\n]+
+     <COMMENT1>\n            ++line_number;
+     <COMMENT1><<EOF>>    yyerror("EOF in comment");
+     <COMMENT1>"}"        BEGIN(INITIAL);
+
+     "(*"                 BEGIN(COMMENT2);
+     <COMMENT2>[^)*\n]+
+     <COMMENT2>\n            ++line_number;
+     <COMMENT2><<EOF>>    yyerror("EOF in comment");
+     <COMMENT2>"*)"       BEGIN(INITIAL);
+     <COMMENT2>[*)]
+
+     /* FILEとBEGINは、FlexやCにおいては既に定義されているため
+      * 使うことができない点に注意。これは、すべてのトークンの
+      * 先頭にTOK_やその他の接頭辞を付加することによって、より
+      * すっきりと克服することができる
+      */
+
+     and                  return(AND);
+     array                return(ARRAY);
+     begin                return(_BEGIN);
+     case                 return(CASE);
+     const                return(CONST);
+     div                  return(DIV);
+     do                   return(DO);
+     downto               return(DOWNTO);
+     else                 return(ELSE);
+     end                  return(END);
+     file                 return(_FILE);
+     for                  return(FOR);
+     function             return(FUNCTION);
+     goto                 return(GOTO);
+     if                   return(IF);
+     in                   return(IN);
+     label                return(LABEL);
+     mod                  return(MOD);
+     nil                  return(NIL);
+     not                  return(NOT);
+     of                   return(OF);
+     packed               return(PACKED);
+     procedure            return(PROCEDURE);
+     program              return(PROGRAM);
+     record               return(RECORD);
+     repeat               return(REPEAT);
+     set                  return(SET);
+     then                 return(THEN);
+     to                   return(TO);
+     type                 return(TYPE);
+     until                return(UNTIL);
+     var                  return(VAR);
+     while                return(WHILE);
+     with                 return(WITH);
+
+     "<="|"=<"            return(LEQ);
+     "=>"|">="            return(GEQ);
+     "<>"                 return(NEQ);
+     "="                  return(EQ);
+
+     ".."                 return(DOUBLEDOT);
+
+     {unsigned_integer}   return(UNSIGNED_INTEGER);
+     {real}               return(REAL);
+     {hex_integer}        return(HEX_INTEGER);
+     {string}             return{STRING};
+     {bad_string}         yyerror("Unterminated string");
+
+     {identifier}         return(IDENTIFIER);
+
+     [*/+\-,^.;:()\[\]]   return(yytext[0]);
+
+     {white_space}        /* 何もしない */
+     \n                   line_number += 1;
+     .                    yyerror("Illegal input");
+
+     %%
+     void yyerror(char *message)
+     {
+        fprintf(stderr,"Error: \"%s\" in line %d.  Token = %s\n",
+                message,line_number,yytext);
+        exit(1);
+     }
+
+
+
+File: flex-ja.info, Node: Example-Jargon Converter, Prev: Example-Pascal Lexical Scanner, Up: More Examples
+
+専門用語の変換
+==============
+
+ここでは、スタート状態を使って、Flexにより生成されるスキャナの内部に小規
+模のパーサを作る方法の例を示します。このコードはThe New Hackers
+Dictionary （`prep.ai.mit.edu'、およびその他の多くのインターネットFTPサ
+イトから入手可能なテキスト形式のもの）を入力として受け取り、すぐに製版お
+よび印刷できる状態のTexinfoフォーマットのドキュメントに変換するものです。
+このコードは`jargon2910.ascii'を使ってテスト済みです。
+
+典型的な使い方は以下のとおりです。
+
+     j2t < jargon > jargon.texi 
+     tex jargon.texi
+     lpr -d jargon.dvi
+
+このプログラムは、使用に耐える`info'ファイルに変換可能なファイルは*作成
+しません*が、こうした機能は大した困難もなく追加することが可能です。この
+例は非常に長いものですが、大して複雑でもないので、尻込みしないで研究して
+みてください。
+
+
+     /*
+      * j2t.lex : スタート状態を利用（ひょっとして悪用！）する例
+      */
+
+     %{
+     #define MAX_STATES 1024
+     #define TRUE  1
+     #define FALSE 0
+
+     #define CHAPTER   "@chapter"
+     #define SECTION   "@section"
+     #define SSECTION  "@subsection"
+     #define SSSECTION "@subsubsection"
+
+     int  states[MAX_STATES];
+     int  statep = 0;
+
+     int  need_closing = FALSE;
+
+     char buffer[YY_BUF_SIZE];
+
+     extern char *yytext;
+
+     /*
+      * このプログラムが生成する*.texinfoファイルの先頭部分を作る。
+      * これは標準的なTexinfoヘッダである
+      */
+
+     void print_header(void)
+     {
+        printf("\\input texinfo @c -*-texinfo-*-\n");
+        printf("@c           %c**start of header\n",'%');
+        printf("@setfilename       jargon.info\n");
+        printf("@settitle          The New Hackers Dictionary\n");
+        printf("@synindex          fn cp\n");
+        printf("@synindex          vr cp\n");
+        printf("@c           %c**end of header\n",'%');
+        printf("@setchapternewpage odd\n");
+        printf("@finalout\n");
+        printf("@c @smallbook\n");
+        printf("\n");
+        printf("@c ====================================================\n\n");
+        printf("@c This file was produced by j2t.  Any mistakes are *not*\n");
+        printf("@c the fault of the jargon file editors.\n");
+        printf("@c ====================================================\n\n");
+        printf("@titlepage\n");
+        printf("@title    The New Hackers Dictionary\n");
+        printf("@subtitle Version 2.9.10\n");
+        printf("@subtitle Generated by j2t\n");
+        printf("@author Eric S. Raymond, Guy L. Steel, and Mark Crispin\n"); 
+        printf("@end titlepage\n");
+        printf("@page\n");
+        printf("@c ====================================================\n");
+        printf("\n\n");
+        printf("@unnumbered Preface\n");
+        printf("@c          *******\n");
+     }
+
+     /*
+      * 生成されるTexinfoファイルの末尾の部分を作成する
+      */
+
+     void print_trailer(void)
+     {
+        printf("\n");
+        printf("@c ====================================================\n");
+        printf("@contents\n");   /* 目次を表示する */ 
+        printf("@bye\n\n");     
+     }
+
+     /*
+      * 後でそれを見つけることができるよう、節または章に下線を引く
+      */
+
+     void write_underline(int len, int space, char ch)
+     {
+       int loop;
+
+       printf("@c ");
+
+       for(loop=3; loop<space; loop++){
+         printf(" ");
+       }
+
+       while(len--){
+         printf("%c",ch);
+       }
+       printf("\n\n");
+     }
+
+     /*
+      * Texinfoにおいて特殊な意味を持つ文字をチェックし、エスケープする
+      */
+
+     char *check_and_convert(char *string)
+     {
+       int  buffpos = 0;
+       int  len,loop;
+
+       len = strlen(string);  
+       for(loop=0; loop<len; loop++){
+         if(string[loop] == '@' || 
+            string[loop] == '{' || 
+            string[loop] == '}')
+         {
+           buffer[buffpos++] = '@';
+           buffer[buffpos++] = string[loop];
+         } else {
+           buffer[buffpos++] = string[loop];
+         }
+       }
+       buffer[buffpos] = '\0';
+       return(buffer);
+     }
+
+     /*
+      * 章、節、項のヘッダを書き出す
+      */
+
+     void write_block_header(char *type)
+     {
+       int loop;
+       int len;
+
+       (void)check_and_convert(yytext);
+       len = strlen(buffer);
+       for(loop=0; buffer[loop] != '\n';loop++)
+
+       buffer[loop] = '\0';
+       printf("%s %s\n",type,buffer);
+       write_underline(strlen(buffer),strlen(type)+1,'*');
+     }
+
+     %}
+
+     /*
+      * Flexの記述情報がここから始まる
+      */
+
+     %x HEADING EXAMPLE ENUM EXAMPLE2
+     %x BITEM BITEM_ITEM 
+     %s LITEM LITEM2 
+
+     %%
+
+     ^#[^#]*"#"  /* ヘッダとフッタをスキップする */
+                          /*
+                           * 章は、その下にアスタリスクを持ち、コロンで終わる
+                           */
+     ^[^\n:]+\n[*]+\n      write_block_header(CHAPTER); 
+
+     ^"= "[A-Z]" ="\n"="*  { /* 個々のカテゴリごとに節を作成する */
+                             if(need_closing == TRUE){
+                               printf("@end table\n\n\n");
+                             }
+                             need_closing = TRUE;
+                             write_block_header(SECTION);
+                             printf("\n\n@table @b\n");
+                           }
+
+     "Examples:"[^\.]+     ECHO;
+
+     "*"[^*\n]+"*"         { /* @emph{}（強調された）テキスト */
+                             yytext[yyleng-1] = '\0';
+                             (void)check_and_convert(&yytext[1]);
+                             printf("@i{%s}",buffer);
+                           }
+
+     "{{"[^}]+"}}"         { /* 特別な強調 */
+                             yytext[yyleng-2] = '\0';
+                             (void)check_and_convert(&yytext[2]);
+                             printf("@strong{%s}",buffer);
+                           }
+
+     "{"[^}]+"}"           { /* 特別な強調 */
+                             yytext[yyleng-1] = '\0';
+                             (void)check_and_convert(&yytext[1]);
+                             printf("@b{%s}",buffer);
+                           }
+
+      /* 特殊なTexinfo文字をエスケープする */
+     <INITIAL,LITEM,LITEM2,BITEM,ENUM,EXAMPLE,EXAMPLE2>"@"  printf("@@");
+     <INITIAL,LITEM,LITEM2,BITEM,ENUM,EXAMPLE,EXAMPLE2>"{"  printf("@{");
+     <INITIAL,LITEM,LITEM2,BITEM,ENUM,EXAMPLE,EXAMPLE2>"}"  printf("@}");
+
+      /*
+       * @exampleコードを再生成する
+       */
+
+     ":"\n+[^\n0-9*]+\n"     "[^ ]   {
+                             int loop;
+                             int len;
+                             int cnt;
+
+                             printf(":\n\n@example \n");
+                             strcpy(buffer,yytext);
+                             len = strlen(buffer);
+                             cnt = 0;
+                             for(loop=len; loop > 0;loop--){
+                               if(buffer[loop] == '\n')
+                                  cnt++;
+                               if(cnt == 2)
+                                   break;
+                             }
+                             yyless(loop+1);
+                             statep++;
+                             states[statep] = EXAMPLE2;
+                             BEGIN(EXAMPLE2);
+                           }
+     <EXAMPLE,EXAMPLE2>^\n  {
+                           printf("@end example\n\n");
+                           statep--; 
+                           BEGIN(states[statep]);
+                         }
+
+      /*
+       * @enumerateリストを再生成する
+       */
+
+     ":"\n+[ \t]*[0-9]+"."   {
+                           int loop;
+                           int len;
+
+                           printf(":\n\n@enumerate \n");
+                           strcpy(buffer,yytext);
+                           len = strlen(buffer);
+                           for(loop=len; loop > 0;loop--){
+                             if(buffer[loop] == '\n')
+                                break;
+                           }
+                           yyless(loop);
+                           statep++;
+                           states[statep] = ENUM;
+                           BEGIN(ENUM);
+                         }
+
+     <ENUM>"@"           printf("@@");
+     <ENUM>":"\n+"     "[^0-9]    {
+                         printf(":\n\n@example\n");
+                         statep++;
+                         states[statep] = EXAMPLE;
+                         BEGIN(EXAMPLE); 
+                       }
+
+     <ENUM>\n[ \t]+[0-9]+"." {
+                         printf("\n\n@item ");
+                        }
+     <ENUM>^[^ ] | 
+     <ENUM>\n\n\n[ \t]+[^0-9] {
+                         printf("\n\n@end enumerate\n\n");
+                         statep--;
+                         BEGIN(states[statep]);
+                       }
+
+      /*
+       * １種類の@itemizeリストを再生成する
+       */
+
+     ":"\n+":"         {
+                         int loop;
+                         int len;
+
+                         printf(":\n\n@itemize @bullet \n");
+                         yyless(2);
+                         statep++;
+                         states[statep] = LITEM2;
+                         BEGIN(LITEM2);
+                       }
+     <LITEM2>^":".+":" {
+                         (void)check_and_convert(&yytext[1]);
+                         buffer[strlen(buffer)-1]='\0';
+                         printf("@item @b{%s:}\n",buffer);
+                       }
+
+     <LITEM2>\n\n\n+[^:\n] {
+                         printf("\n\n@end itemize\n\n");
+                         ECHO;
+                         statep--;
+                         BEGIN(states[statep]);
+                       }
+
+      /*
+       * リビジョン・ヒストリ部からリストを作成する。
+       * ここで"Version"が必要なのは、そうしないと他のルール
+       * と衝突するからである
+       */
+
+     :[\n]+"Version"[^:\n*]+":" {
+                         int loop;
+                         int len;
+
+                         printf(":\n\n@itemize @bullet \n");
+                         strcpy(buffer,yytext);
+                         len = strlen(buffer);
+                         for(loop=len; loop > 0;loop--){
+                           if(buffer[loop] == '\n')
+                              break;
+                         }
+                         yyless(loop);
+                         statep++;
+                         states[statep] = LITEM;
+                         BEGIN(LITEM);
+                       }
+     <LITEM>^.+":"     {
+                         (void)check_and_convert(yytext);
+                         buffer[strlen(buffer)-1]='\0';
+                         printf("@item @b{%s}\n\n",buffer);
+                       }
+
+     <LITEM>^[^:\n]+\n\n[^:\n]+\n  {
+                         int loop;
+
+                         strcpy(buffer,yytext);
+                         for(loop=0; buffer[loop] != '\n'; loop++);
+                         buffer[loop] = '\0';
+                         printf("%s\n",buffer);
+                         printf("@end itemize\n\n");
+                         printf("%s",&buffer[loop+1]);
+                         statep--;
+                         BEGIN(states[statep]);
+                       }
+
+      /*
+       * @itemize @bulletリストを再生成する
+       */
+
+     ":"\n[ ]*"*"      {
+                         int loop;
+                         int len;
+
+                         printf(":\n\n@itemize @bullet \n");
+                         len = strlen(buffer);
+                         for(loop=0; loop < len;loop++){
+                           if(buffer[loop] == '\n')
+                              break;
+                         }
+                         yyless((len-loop)+2);
+                         statep++;
+                         states[statep] = BITEM;
+                         BEGIN(BITEM);
+                       }
+
+     <BITEM>^" "*"*"   {
+                         printf("@item");
+                         statep++;
+                         states[statep] = BITEM_ITEM;
+                         BEGIN(BITEM_ITEM);
+                       }
+     <BITEM>"@"          printf("@@");
+     <BITEM>^\n        { 
+                         printf("@end itemize\n\n");
+                         statep--;
+                         BEGIN(states[statep]);
+                       } 
+     <BITEM_ITEM>[^\:]* {
+                          printf(" @b{%s}\n\n",check_and_convert(yytext));
+                        }
+     <BITEM_ITEM>":"   { 
+                         statep--; 
+                         BEGIN(states[statep]);
+                       }
+
+      /*
+       * @chapter、@section等を再作成する
+       */
+
+     ^:[^:]*           { 
+                         (void)check_and_convert(&yytext[1]); 
+                         statep++;
+                         states[statep] = HEADING;
+                         BEGIN(HEADING); 
+                       }
+     <HEADING>:[^\n]   {
+                         printf("@item @b{%s}\n",buffer); 
+                         write_underline(strlen(buffer),6,'~');
+                         statep--; 
+                         BEGIN(states[statep]);
+                       }
+     <HEADING>:\n"*"*  { 
+                         if(need_closing == TRUE){
+                           printf("@end table\n\n\n");
+                           need_closing = FALSE;
+                         }
+                         printf("@chapter %s\n",buffer); 
+                         write_underline(strlen(buffer),9,'*');
+                         statep--; 
+                         BEGIN(states[statep]);
+                       }
+     <HEADING>:\n"="*  { 
+                         if(need_closing == TRUE){
+                          printf("@end table\n\n\n");
+                           need_closing = FALSE;
+                         }
+                         printf("@section %s\n",buffer); 
+                         write_underline(strlen(buffer),9,'=');
+                         statep--; 
+                         BEGIN(states[statep]);
+                       }
+     <HEADING>"@"        printf("@@");
+     <HEADING>:\n"-"*  { 
+                         if(need_closing == TRUE){
+                           printf("@end table\n\n\n");
+                           need_closing = FALSE;
+                         }
+                         printf("@subsection %s\n",buffer); 
+                         write_underline(strlen(buffer),12,'-');
+                         statep--; 
+                         BEGIN(states[statep]);
+                       }
+
+      /*
+       * @exampleテキストを再作成する
+       */
+
+     ^"     "          {
+                         printf("@example\n");
+                         statep++;
+                         states[statep] = EXAMPLE;
+                         BEGIN(EXAMPLE); 
+                       }
+     <EXAMPLE>^"     "
+     .                 ECHO;
+
+     %%
+
+      /*
+       * 初期化して実行する
+       */
+
+     int main(int argc, char *argv[])
+     {
+       states[0] = INITIAL;
+       statep    = 0;
+       print_header();
+       yylex();
+       print_trailer();
+       return(0);
+     }
+
+
+このプログラムは、ASCIIの専門用語ファイルを読み込んで、いくつかのよく見
+られるパターンを検索します。このパターンは、オリジナルのTexinfo形式の専
+門用語ファイルを単なるASCIIテキストに変換した際に作成されたものです。こ
+の変換の過程で、多くのマークアップ情報が失われているために、ある出力結果
+の元になったオリジナルの情報が*何*であったか、あるいは、そのオリジナルの
+候補が２つ３つあったとしても、そのうちの*どれ*がその出力結果をもたらした
+かを正確に決定することが困難であるという事情のため、この検索作業はいくら
+か複雑なものになります。よく見られるパターンをいくつか挙げると、以下のよ
+うになります。
+
+章、節、項
+     これらの先頭にはいずれも同じパターンが来ます。
+
+          :SOME TEXT:\n
+
+     この後ろに、（章の場合は）アスタリスクによる下線、（節の場合は）等
+     号による下線、（項の場合は）マイナス記号による下線が続きます。
+
+強調
+     これは少し難しいのですが、一般的には強調は（イタリックの場合は）
+     `*'...`*'、（強調文字（strong）の場合は）`{{'...`}}'、（太字（bold）
+     の場合は）`{'...`}'の対によって示されます。ここでは、この３種類を検
+     索して、コマンドを出力します。
+
+実例、および列挙されたリスト
+     ともにコロンで始まり、その後ろに、１つ以上の改行、少なくとも５つの
+     空白、そして最後に数字もしくは何らかのテキストが続きます。例えば、
+     列挙されたリストは以下のようになります。
+
+
+          ...enumerated:
+
+                0.SOME TEXT
+                1.SOME MORE TEXT
+
+
+     また、実例は以下のようになります。 (1) (*Note Example-Jargon
+     Converter-Footnotes::)
+
+          ...example:
+
+                SOME TEXT
+
+項目化されマークを付けられたリスト
+     実例、および列挙されたリストによく似ていますが、違いは、項目の先頭
+     にコロン、またはアスタリスクがあり、末尾にコロンがあるという点です。
+
+ここでの例は、パースされているものが何であるかを示す*ヒント*としてこのよ
+うなパターンを使い、その特定のセクション用の部分的なパーサを（ほとんどの
+場合、排他的）スタート状態を使って作ります。ASCII版の専門用語ファイルを
+持っているのであれば、スキャナのどの部分がそのファイル中の何にマッチする
+かを検証してみる値打ちがあります。例えば、`HEADING'状態において`@item'を
+生成するルールが、すべての専門用語のエントリを処理するルールでもあるとい
+うことは、おそらく一見しただけでは明らかではないでしょう。
+
+
+
+File: flex-ja.info  Node: Example-Jargon Converter-Footnotes, Up: Example-Jargon Converter
+
+(1) 訳注：SOME TEXTの部分に、インデントされたテキストが記され
+ます。
+
+
+File: flex-ja.info, Node: Flex and Lex, Next: Useful Code, Prev: More Examples, Up: Top
+
+FlexとLex
+*********
+
+     ここで非常に簡単にではありますが、FlexとLexの両方を概観してみます。
+     Flex、Lexそれぞれの性能と、Lexのようなユーティリティに関するPOSIX標
+     準への準拠度についても、いくつか一般的なコメントを示します。
+
+========================================================================
+* Menu:
+
+* Flex:: Flex * Lex:: Lex
+========================================================================
+
+
+
+File: flex-ja.info, Node: Flex, Next: Lex, Prev: Flex and Lex, Up: Flex and Lex
+
+Flex
+====
+   
+Flexは、Lexのより優れた再実装であり、Lexと同様、パターンとアクションの記
+述情報を入力として受け取って、そのパターンにマッチする能力を持つCのスキャ
+ナに変換するものです。しかしながら、Flexはより少ない時間でテーブルを生成
+しますし、Flexにより生成されるテーブルは、Lexにより生成されるテーブルと
+比較して、はるかに効率的なものです。（Flexが正確には何を生成するのかとい
+う説明については、このマニュアルの冒頭で言及した書籍を参照してください。）
+
+
+Flexは、LexおよびPOSIXと十分に互換性があり、それ独自の特別な機能もいくつ
+か追加しています。
+
+========================================================================
+* Menu:
+
+* Flex and POSIX:: FlexとPOSIX
+* Flex and POSIX (Flex 2.5)::   FlexとPOSIX（Flex 2.5の補足情報）
+========================================================================
+
+
+
+File: flex-ja.info, Node: Flex and POSIX, Prev: Flex, Up: Flex
+
+FlexとPOSIX
+-----------
+
+Flexは、大体のところLexおよびPOSIXの両方と互換性があります。将来は（Flex、
+POSIXのどちらかが変わることによって）、さらにPOSIXとの互換性を高めていく
+でしょう。しかし、Flex、Lex、POSIXには、異なる部分もいくつかあります。そ
+れを以下に示します。
+
+排他的スタート状態
+     FlexとPOSIXは排他的スタート状態をサポートしていますが、Lexはサポー
+     トしていません。
+
+定義
+     LexとFlexでは定義の展開の方法が違います。Flex（およびPOSIXのドラフ
+     ト仕様）は、定義を展開する時に丸括弧( )で囲みますが、Lexは囲みませ
+     ん。 (1) (*Note Flex and POSIX-Footnotes::) このことは、Flex定義で
+     は演算子`^'、`$'、`/'、`<<EOF>>'、および`<START STATE>'は使うことが
+     できないということを意味しています。
+
+     このことがもたらす主要な問題の１つに、マッチの優先順位に影響を与え、
+     FlexとLexの間でスキャン処理に微妙な差異が出てくるということがありま
+     す。この問題の例については、*Note パターン・セクション: Pattern
+     Matchingを参照してください。
+
+`input()'
+     FlexおよびPOSIXのドラフト仕様では、`input()'は再定義可能ではありま
+     せん。Flexで入力を制御するためには、`input()'を再定義する代わりに、
+     `YY_INPUT'という拡張機能を使います（これは現在のところPOSIXではサポー
+     トされていません）。また、Lexとは異なり、Flexの`input()'は`yytext'
+     の値を変更するという点に注意してください。
+
+`output()'
+     Flexは`output()'ルーチンをサポートしていません。`ECHO'の出力は
+     `yyout'経由で行われます。この`yyout'のデフォルトは`stdout'です。こ
+     れを使うように`output()'を書くことも可能ですが、現在のPOSIXのドラフ
+     ト仕様は、`output()'が正確には何をすべきなのかを示していません。
+
+Ratforスキャナ
+     Flex、POSIXのどちらも、LexのRatfor (2) (*Note Flex and
+     POSIX-Footnotes::)スキャナ・オプション（`%r'）をサポートしていませ
+     ん。
+
+`yylineno'
+     これは、FlexやPOSIXには存在しない、ドキュメント化されていないLexの
+     機能です。 (3) (*Note Flex and POSIX-Footnotes::) しかし、Flexで行
+     数をカウントする機能を実装するのは難しくありません。定義中に行数カ
+     ウント機能を組み込む方法の例については、*Note Miscellaneous::を参照
+     してください。
+
+`yywrap()'
+     現在のところ`yywrap()'はマクロです。POSIXのドラフト仕様では、これは
+     関数であるべきとされていますので、おそらく将来は変更されることにな
+     るでしょう。 (4) (*Note Flex and POSIX-Footnotes::)
+
+`unput()'
+     現在のところ`unput()'は`yytext'と`yyleng'の値を破壊しますが、次のトー
+     クンがマッチされるまでは、これは不当です。LexとPOSIXでは、`yytext' 
+     と`yyleng'は`unput()'の影響を受けません。 (5) (*Note Flex and
+     POSIX-Footnotes::)
+
+数値範囲
+     POSIX によると、`abc{1,3}'は「`ab'の後ろに１個、２個、または３個の
+     `c'が続くもの」にマッチすべきとなっています。Flexはこのとおりに動き
+     ますが、Lexはこれを「１個、２個、または３個の`abc'」と解釈します。
+
+`yytext'
+     Flexにおいて`yytext'の正しい定義は`extern char *yytext'ですが、Lex 
+     では`extern char yytext[]'です。 (6) (*Note Flex and
+     POSIX-Footnotes::) 配列によるアクセス方法は、性能にかなりの影響を及
+     ぼすので、Flexでは`extern char *yytext'を使い続けるでしょう。
+
+     最新のPOSIXドラフト仕様は、`%array'と`%pointer'を導入することによっ
+     て、両方の方法をサポートしています。これは、FlexとLexのいずれにもま
+     だ組み込まれていません。 (7) (*Note Flex and POSIX-Footnotes::)
+
+テーブル・サイズ
+     Lexにはテーブル・サイズ宣言子（`%p'、`%a'等）がありますが、Flexでは
+     必要ありません。互換性のために認識はされますが、無視されるだけです。
+
+`FLEX_SCANNER'
+     スキャナがFlexとLexのどちらにより生成されたかによって、コードをイン
+     クルードしたりしなかったりすることができるように、`FLEX_SCANNER'が
+     `#define'によって定義されています。
+
+アクション
+     Flexでは、大括弧の対`{...}'を使うことなく、単一行において複数の文を
+     置くことができます。これに対してLexは、そのような行を単一文に切り詰
+     めてしまいます。
+
+コメント
+     Flexではコメントを`#'で始めることができますが、LexとPOSIXではできま
+     せん。ただし、この形式のコメントを使うことはお勧めできません。
+
+`yyterminate()'、`yyrestart()'、`<<EOF>>'、`YY_DECL'、`#line' 指示子
+     これらはいずれもLexではサポートされていませんし、POSIXにおいて明示
+     的に定義されてもいません。`#line'指示子の説明に関しては、*Note Flex 
+     コマンドライン・オプションの要約: Switches Summary。
+
+
+
+
+File: flex-ja.info  Node: Flex and POSIX-Footnotes, Up: Flex and POSIX
+
+(1) 訳注：Flex 2.5では、`-l'オプションを指定して生成されたスキャ
+ナは、Lexの場合と同じように、定義を展開する時に丸括弧( )で囲みませ
+ん。
+
+(2) 訳注：Rational Fortran
+
+(3) 訳注：Flex 2.5では、Flex起動時に`-l'オプションを指定するか、
+スキャナ定義ファイルの中に`%option yylineno'を指定することによっ
+て、変数`yylineno'を利用することができます。
+
+(4) 訳注：Flex 2.5では、`%option noyywrap'が指定されない限り、
+`yywrap()'は関数です。
+
+(5) 訳注：Flex 2.5では、`%array'を指定すれば、`unput()'は
+`yytext'の内容を破壊しません。
+
+(6) 訳注：Flex 2.5では、`%pointer'と`%array'により、
+`yytext'の型を選択できるようになりました。デフォルトは
+`%pointer'です。
+
+(7) 訳注：Flex 2.5は、`%pointer'と`%array'をサポートして
+います。
+
+
+
+File: flex-ja.info, Node: Flex and POSIX (Flex 2.5), Prev: Flex and POSIX, Up: Flex
+
+FlexとPOSIX（Flex 2.5の補足情報）
+---------------------------------
+
+Flex 2.5でサポートされている新しい機能のうち、POSIXの仕様（および、Lex）
+に存在しないものを以下に列挙します。
+
+     C++スキャナ
+     %option指示子
+     スタート状態スコープ
+     スタート状態スタック
+     yy_scan_string()、yy_scan_bytes()、yy_scan_buffer()
+     yy_set_interactive()
+     yy_set_bol()
+     YY_AT_BOL()
+     <*>
+     YY_START
+
+
+
+File: flex-ja.info, Node: Lex, Prev: Flex, Up: Flex and Lex
+
+標準Lex
+=======
+
+
+Lexはスキャナを作成するための標準的なUnixユーティリティであり、長い歴史
+を持っています。LexはFlexと非常によく似ていますが、スキャナを生成するの
+により多くの時間がかかりますし、Lexの生成するスキャナはFlexの生成するス
+キャナよりも通常は遅いものです。Lexは、特に多くのPOSIX機能を提供していな
+いという理由から、置き換える必要が大いにあります。FlexはこうしたPOSIX機
+能を提供しています。より多くのコンピュータ・システムがPOSIX互換になるに
+つれて、Flexの提供する多くの機能をサポートしなければならなくなり、このた
+めに、おそらくはFlexがLexの代わりにインストールされるようになるでしょう
+（例えば、4.4 BSDリリースはFlexを使うことになります）。しかし、Lexがイン
+ストールされている少数のシステムがあるために、しばらくの間はLexの存在は
+確実に維持されるでしょう。
+
+FlexとLexの大きな違いは、Flexが性能を考慮して書かれたという点にあります。
+一般的には、Flexを持っているのであればそれを使うべきです。両者の性能差は、
+無視するにはあまりにも大きすぎます。しかし、移植性が最も重要なのであれば、
+スキャナ定義は可能な限りLexのものに近づけるべきです。というのは、Lexは事
+実上すべてのUnixマシンに入っていることが保証されていますが、Flexは入って
+いない可能性があるからです（しかし、Flexのインストールは通常は取るに足り
+ない作業です）。このような場合に残念なのは、FlexとPOSIXが持っている排他
+的スタート状態のような、より便利な拡張機能を使うことができなくなるという
+ことです。
+
+この問題を回避するためのもう１つの方法は、Flexでスキャナを作成して、作成
+されたスキャナを配布することです。スキャナというものは一度書かれるとほと
+んど変更されることがないので、多くの場合この方法は実行可能です。仮に変更
+が必要になったとしても、プログラムの他の部分も相当変更しなければならない
+可能性があり、よってプログラムを更新するための努力全体から見れば、Flexを
+インストールすることなどはほんの些細なものでしょう。
+
+
+
+File: flex-ja.info, Node: Useful Code, Next: Summary, Prev: Flex and Lex, Up: Top
+
+役に立つコードの抜粋
+********************
+
+     ここでは、読者がプログラムの中で使うことのできる、ちょっとしたFlex
+     定義を一覧にして示します。多くは、このマニュアルを読んだあとでは、
+     かなり自明のものになるはずです。しかし、読者がこうしたコードを最初
+     から作らずに済むように、ここに入れてあります。
+
+参照したい項目を選択してください。
+
+========================================================================
+* Menu:
+
+* Handling Comments:: コメントの処理* Handling Strings:: 文字列の処理*
+Handling Numbers:: 数値の処理* Multiple Scanners:: 複数のスキャナ*
+Miscellaneous:: その他
+========================================================================
+
+
+
+File: flex-ja.info, Node: Handling Comments, Next: Handling Strings, Prev: Useful Code, Up: Useful Code
+
+コメントの処理
+==============
+
+*Note Flex and C::において述べたように、コメントは`input()'を使って処理
+することができます。これを行うためのコードは以下のようになります。
+
+
+     %%
+     "/*" {
+             int a,b;
+        
+             a = input();
+             while(a != EOF){
+               b = input();
+               if(a == '*' && b == '/'){
+                 break;
+                }else{
+                 a = b;
+                }
+              }
+             if(a == EOF){
+               error_message("EOF in comment");
+             }
+           }
+
+これは、FlexとLexの両方で正当なコードです。コメントは排他的スタート状態
+を使って処理することも可能で、こちらの方がより美しく、より効率的です。ス
+タート状態を使ってコメントを処理するコードは、以下のようになります。
+
+     %x COMMENT
+     %%
+     "/*"                  BEGIN(COMMENT);
+     <COMMENT>[^\n]
+     <COMMENT>\n   
+     <COMMENT><<EOF>>      yyerror("EOF in comment");
+     <COMMENT>"*/"         BEGIN(INITIAL);
+
+改行の１つ前までと改行とを別々に処理した方が良いのは、そうしないと、内部
+のマッチ処理用のバッファをオーバーフローさせてしまうようなルールを作るこ
+とになってしまうからです。Lexは排他的スタート状態をサポートしていないの
+で、このコードはLexでは動きません。この例は分かりやすいのですが、実際に
+は単一文字をマッチするのに多くの時間を無駄に消費するため、非効率的です。
+もっと長いテキストにマッチするように変更することで、スピードをかなり向上
+させることができます。例えば、以下のように書き直すことができます。
+
+     %x COMMENT
+     %%
+     "/*"                     BEGIN(COMMENT);
+     <COMMENT>[^*\n]*         
+     <COMMENT>[^*\n]*\n
+     <COMMENT>"*"+[^*/\n]*    /* 余分な*を探す */
+     <COMMENT>"*"+[^*/\n]*\n
+     <COMMENT><<EOF>>         yyerror("EOF in comment");
+     <COMMENT>"*"+"/"         BEGIN(INITIAL);
+
+これは、Flexと一緒に配布されている`flexdoc.1'の中にある例とほとんど同一
+です。より長いテキスト・ブロックにマッチするため、はるかに高速ですし、ルー
+ルの中で改行のみにマッチさせる必要もありません。
+
+
+
+File: flex-ja.info, Node: Handling Strings, Next: Handling Numbers, Prev: Handling Comments, Up: Useful Code
+
+文字列リテラルの処理
+====================
+
+文字列は、それが入力として与えられた時に破棄されないという点で、コメント
+とは若干異なります。しかし、基本的なアプローチは同じです。第１の方法とし
+ては、`input()'を使って文字列を処理することができます。コードは以下のよ
+うになります。
+
+     /*
+      * string1.lex: input()を使って文字列を処理する
+      */
+
+     %{
+     #include <stdio.h>
+     #include <malloc.h>
+     #include <ctype.h>
+
+     #define ALLOC_SIZE 32 /* バッファの（再）割り当て用 */
+
+     #define isodigit(x) ((x) >= '0' && (x) <= '7') 
+     #define hextoint(x) (isdigit((x)) ? (x) - '0'\
+                                        : ((x) - 'A') + 10)  
+
+     void yyerror(char *message)
+     {
+       printf("\nError: %s\n",message);
+     }
+
+     %}
+
+     %%
+
+     \" {
+        int  inch,count,max_size;
+        char *buffer;
+        int  temp;
+
+        buffer   = malloc(ALLOC_SIZE);
+        max_size = ALLOC_SIZE;
+        inch     = input();
+        count    = 0;
+        while(inch != EOF && inch != '"' && inch != '\n'){
+           if(inch == '\\'){
+             inch = input();
+             switch(inch){
+             case '\n': inch = input(); break;
+             case 'b' : inch = '\b';    break;
+             case 't' : inch = '\t';    break;
+             case 'n' : inch = '\n';    break;
+             case 'v' : inch = '\v';    break;
+             case 'f' : inch = '\f';    break;
+             case 'r' : inch = '\r';    break;
+             case 'X' :  
+             case 'x' : inch = input();
+                        if(isxdigit(inch)){
+                          temp = hextoint(toupper(inch));
+                          inch = input();
+                          if(isxdigit(inch)){
+                            temp = (temp << 4) + 
+                                  hextoint(toupper(inch));
+                          } else {
+                            unput(inch);
+                          }
+                          inch = temp; 
+                        } else {
+                          unput(inch);
+                          inch = 'x';
+                        }
+                break;
+             default:
+                if(isodigit(inch)){
+                   temp = inch - '0';
+                   inch = input();
+                   if(isodigit(inch)){
+                     temp = (temp << 3) + (inch - '0');
+                   } else {
+                     unput(inch);
+                     goto done;
+                   }
+                   inch = input();
+                   if(isodigit(inch)){
+                     temp = (temp << 3) + (inch - '0');
+                   } else {
+                     unput(inch);
+                   }
+                done:
+                   inch = temp; 
+                }
+             } 
+          }
+           buffer[count++] = inch;
+           if(count >= max_size){
+              buffer = realloc(buffer,max_size + ALLOC_SIZE);
+              max_size += ALLOC_SIZE;
+           }           
+           inch = input();
+        }
+        if(inch == EOF || inch == '\n'){
+          yyerror("Unterminated string.");
+        }
+        buffer[count] = '\0';
+        printf("String = \"%s\"\n",buffer);
+        free(buffer);
+      }
+     .  
+     \n
+     %%
+
+このスキャナは、複数行にわたる文字列や、様々なエスケープ・シーケンスを処
+理します。また、文字列がどのような長さでも構わないように、動的バッファを
+使っています。これと同じことをスタート状態を使って行うコードは、以下のよ
+うになります。
+
+     /*
+      * string2.lex: スタート状態を使って文字列をスキャンする例
+      */
+
+     %{
+     #include <ctype.h>
+
+     #define isodigit(x) ((x) >= '0' && (x) <= '7') 
+     #define hextoint(x) (isdigit((x)) ? (x) - '0' \
+                                       : ((x) - 'A') + 10)  
+
+     char *buffer      = NULL;
+     int  buffer_size  = 0;
+
+     void yyerror(char *message)
+     {
+       printf("\nError: %s\n",message);
+     }
+
+     %}
+
+     %x STRING
+
+     hex (x|X)[0-9a-fA-F]{1,2}
+     oct [0-7]{1,3}
+
+     %%
+
+     \"                { 
+                         buffer      = malloc(1); 
+                         buffer_size = 1; strcpy(buffer,"");
+                         BEGIN(STRING);
+                       }
+     <STRING>\n        {
+                          yyerror("Unterminated string");       
+                          free(buffer);
+                          BEGIN(INITIAL);
+                       }
+     <STRING><<EOF>>   {
+                          yyerror("EOF in string");       
+                          free(buffer);
+                          BEGIN(INITIAL);
+                       }
+     <STRING>[^\\\n"]  {
+                         buffer_size += yyleng;
+                         buffer = realloc(buffer,buffer_size+1);
+                         strcat(buffer,yytext);
+                       }
+     <STRING>\\\n      /* エスケープされた改行を無視する */
+     <STRING>\\{hex} {
+                         int temp =0,loop = 0, foo;
+                         for(loop=yyleng-2; loop>0; loop--){
+                           temp <<= 4;
+                           foo    = toupper(yytext[yyleng-loop]);
+                           temp += hextoint(foo);
+                         } 
+                         buffer = realloc(buffer,buffer_size+1);
+                         buffer[buffer_size-1] = temp;
+                         buffer[buffer_size]   = '\0';
+                         buffer_size += 1;
+                       }
+     <STRING>\\{oct} {
+                         int temp =0,loop = 0;
+                         for(loop=yyleng-1; loop>0; loop--){
+                           temp  <<= 3;
+                           temp  += (yytext[yyleng-loop] - '0');
+                         } 
+                         buffer = realloc(buffer,buffer_size+1);
+                         buffer[buffer_size-1] = temp;
+                         buffer[buffer_size]   = '\0';
+                         buffer_size += 1;
+                       }
+     <STRING>\\[^\n]   {
+                         buffer = realloc(buffer,buffer_size+1);
+                         switch(yytext[yyleng-1]){
+                         case 'b' : buffer[buffer_size-1] = '\b';  
+                                    break;
+                         case 't' : buffer[buffer_size-1] = '\t';
+                                    break;
+                         case 'n' : buffer[buffer_size-1] = '\n';
+                                    break;
+                         case 'v' : buffer[buffer_size-1] = '\v';
+                                    break;
+                         case 'f' : buffer[buffer_size-1] = '\f';
+                                    break;
+                         case 'r' : buffer[buffer_size-1] = '\r';
+                                    break;
+                         default  : buffer[buffer_size-1] = 
+                                         yytext[yyleng-1];
+                         }
+                         buffer[buffer_size] = '\0';
+                         buffer_size += 1;
+                       }
+     <STRING>\"        {
+                         printf("string = \"%s\"",buffer); 
+                         free(buffer);
+                         BEGIN(INITIAL);
+                       }
+     %%
+
+このスキャナは、`string1.lex'よりもモジュール化されていて、おそらくはよ
+り分かりやすいでしょう。エラーのルールは、`INITIAL'状態に戻るようになっ
+ていることに注意してください。こうしないと、スキャナは不当な文字列と正当
+な文字列とを結合してしまいます。ここでも、Flexのバッファ（`YY_BUF_SIZE'）
+が十分に大きいということをあてにせず、動的バッファを使いました。内部バッ
+ファが十分に大きいという確信が持てるのであれば、`yytext'だけを使うことも
+可能です。この場合には、`yytext'の右端が確実に最初の位置に留まるようにす
+ることが重要です。より詳しい情報については、*Note Flex and C::の`yymore'
+の項を参照してください。
+
+
+

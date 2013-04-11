@@ -1,0 +1,2421 @@
+これは $s、  $s より makeinfo バージョン  $s によって作成されました。
+
+このマニュアルは，GNU Info (バージョン4.2，23 March 2002)
+に対するもので，それは，(通常Texinfoソースファイルから作成される)Info書
+式のドキュメントを閲覧するためのプログラムです．
+
+   Copyright (C) 1992, 93, 96, 97, 98, 99, 2001, 02 Free Software
+Foundation, Inc.
+
+     Permission is granted to copy, distribute and/or modify this
+     document under the terms of the GNU Free Documentation License,
+     Version 1.1 or any later version published by the Free Software
+     Foundation; with no Invariant Sections, with the Front-Cover texts
+     being "A GNU Manual," and with the Back-Cover Texts as in (a)
+     below.  A copy of the license is included in the section entitled
+     "GNU Free Documentation License."
+
+     (a) The FSF's Back-Cover Text is: "You have freedom to copy and
+     modify this GNU Manual, like GNU software.  Copies published by
+     the Free Software Foundation raise funds for GNU development."
+   
+INFO-DIR-SECTION Texinfo documentation system
+START-INFO-DIR-ENTRY
+* info standalone(ja): (info-stndi-ja).         Read Info documents without Emacs.
+* infokey(ja): (info-stnd-ja)Invoking infokey.  Compile Info customizations.
+END-INFO-DIR-ENTRY
+
+
+File: info-stnd-ja.info,  Node: Top,  Next: What is Info,  Up: (dir)
+
+GNU Info
+********
+
+このマニュアルは，GNU Info (バージョン4.2，23 March 2002)
+に対するもので，それは，(通常Texinfoソースファイルから作成される)Info書
+式のドキュメントを閲覧するためのプログラムです．
+
+   Copyright (C) 1992, 93, 96, 97, 98, 99, 2001, 02 Free Software
+Foundation, Inc.
+
+     Permission is granted to copy, distribute and/or modify this
+     document under the terms of the GNU Free Documentation License,
+     Version 1.1 or any later version published by the Free Software
+     Foundation; with no Invariant Sections, with the Front-Cover texts
+     being "A GNU Manual," and with the Back-Cover Texts as in (a)
+     below.  A copy of the license is included in the section entitled
+     "GNU Free Documentation License."
+
+     (a) The FSF's Back-Cover Text is: "You have freedom to copy and
+     modify this GNU Manual, like GNU software.  Copies published by
+     the Free Software Foundation raise funds for GNU development."
+   
+   このドキュメントは，GNU
+Emacsの一部となっているInfoリーダのドキュメント
+ではありません．Infoの使用方法を知らないがInfoリーダでの作業がある場合，
+背景となる情報とチュートリアルが含まれているEmacsのドキュメントを最初に
+読むべきです．
+
+* Menu:
+
+* What is Info::                What is Info?
+* Invoking Info::               Options you can pass on the command line.
+* Cursor Commands::             Commands which move the cursor within a node.
+* Scrolling Commands::          Commands for reading the text within a node.
+* Node Commands::               Commands for selecting a new node.
+* Searching Commands::          Commands for searching an Info file.
+* Xref Commands::               Commands for selecting cross references.
+* Window Commands::             Commands which manipulate multiple windows.
+* Printing Nodes::              How to print out the contents of a node.
+* Miscellaneous Commands::      A few commands that defy categories.
+* Variables::                   How to change the default behavior of Info.
+* Custom Key Bindings::         How to define your own key-to-command
+				  bindings.
+* Copying This Manual::         The GNU Free Documentation License.
+* Index::                       Global index containing keystrokes,
+                                  command names, variable names,
+                                  and general concepts.
+
+
+File: info-stnd-ja.info,  Node: What is Info,  Next: Invoking Info,  Prev: Top,  Up: Top
+
+Infoとは？
+**********
+
+   "Info"とは，ASCII端末でInfoファイルを閲覧するために使用するプログラ
+ムです．"Infoファイル"とは，Texinfoをプログラム`makeinfo'や `M-x
+texinfo-format-buffer'のようなEmacsコマンドの1つで処理された結
+果生成されるものです．Texinfo自身は，単一ファイルからオンラインの情報と
+印刷された出力の両方を生成するために使用されるドキュメントシステムです．
+Infoで読んでいるファイルを，植字し印刷することが可能です．
+
+
+File: info-stnd-ja.info,  Node: Invoking Info,  Next: Cursor Commands,  Prev: What is Info,  Up: Top
+
+Infoの呼び出し
+**************
+
+   GNU
+Infoは，閲覧する最初のノードを制御するため，そしてInfoファイルを探す
+ディレクトリを指定するため，いくつかのオプションを受け入れます．シェルか
+らGNU Infoの呼び出しを表しているテンプレートは以下のようになります．
+
+     info [OPTION]... [MENU-ITEM...]
+
+   プログラムは，以下のオプションを受け入れます．
+
+`--apropos=STRING'
+     システムにインストールされているすべてのInfoファイルの全ての索引で検索す
+     る文字列を指定します．Infoは，検索が可能な全ての索引でSTRINGで指名
+     されたているものを探し，結果を標準出力に出力し，そして終了します．特定の
+     問題を説明しているInfoファイルが不確かな場合，このオプションは味方になり
+     ます．システムに多くのInfoファイルがインストールされている場合，全ての検
+     索に多少時間がかかることに注意してください．
+
+     Info内部から適切なコマンドを呼び出すことが可能です．*Note
+     Searching Commands::を参照してください．
+
+`--directory DIRECTORY-PATH'
+`-d DIRECTORY-PATH'
+     Infoファイルを探す必要があるとき，検索するディレクトリのリストに
+     DIRECTORY-PATHを前置します．複数回`--directory'を使用してもか
+     まいません．Infoファイルを含むそれぞれのディレクトリにつき一つです．Info
+     が検索するディレクトリリストは，環境変数`INFOPATH'の値から成り立ち
+     ます．`--directory'は，DIRECTORY-PATHで指名されたものを，その
+     リストに前置します．`INFOPATH'の値は，通常コロンで分けられたディレ
+     クトリリストです．MS-DOS/MS-Windowsシステムでは，セミコロンが使用されま
+     す．`INFOPATH'を定義していない場合，Infoは，ビルドされたときに定義
+     されたデフォルトパスをディレクトリの初期リストとして使用します．
+     `INFOPATH'がコロン(または，MS-DOS/MS-Windowsでのセミコロン)で終る場
+     合，ディレクトリの初期リストは，ビルド時のデフォルトに`INFOPATH'の
+     値を加えます．
+
+`--dribble=DRIBBLE-FILE'
+     全てのユーザのキーストロークを記録するファイルを指定します．このファイル
+     は，コマンドを同じ順序で再生するために後で使用することが可能です．以下の
+     `--restore'オプションを参照してください．
+
+`--file FILENAME'
+`-f FILENAME'
+     閲覧する特定のInfoファイルを指定します．デフォルトで，Infoはファイル
+     `dir'を閲覧します．このオプションを使用した場合，Infoは最初のファイ
+     ルとノードとして，`(FILENAME)Top'で開始します．
+
+     FILENAMEが絶対パスのファイル名や，`./'や`../'で始まる場
+     合，InfoはFILENAMEを指定されたFILENAMEのディレクトリのみで検
+     索し，FILENAMEのディレクトリを`INFOPATH'の値に加えます．対照
+     的に，FILENAMEが相対パスのファイル名の形式で，`./'や `../'
+     が前置されていない場合，Infoは`INFOPATH'で指定されたディ
+     レクトリのみで探します．言い換えると，Infoは`./'と`../'の前置
+     が無いファイル名をカレントディレクトリの相対パスにあるものとして扱い
+     _ません_．
+
+     Infoが試みる全てのディレクトリでFILENAMEが見付からない場合，Info
+     はInfoファイルの数ある既知の拡張子(1)でそれを探します．全ての既知の拡張子に対し，
+     通常のファイルが見付からない場合，Infoは圧縮されたファイルを探します．
+     Infoは，`gzip'，`bzip2'，`compress'，そして`yabba'プ
+     ログラムで圧縮されたファイルをサポートしています．そのようなファイルを解
+     凍するために，それぞれ`gunzip'，`bunzip2'，`uncompress'，
+     そして`unyabba'を呼び出します．圧縮されたInfoファイルは，おそらく既
+     知のInfoファイルの拡張子の一つに，`.z'，`.gz'，`.bz2'，
+     `.Z'や，`.Y'の拡張子が追加されたものになっていると考えられます
+     (2)．
+
+`--help'
+`-h'
+     利用可能なInfoオプションの比較的短い記述を生成します．
+
+`--index-search STRING'
+     全てのコマンドライン引数を処理した後，Infoファイルの索引に行き，
+     STRINGに一致する索引項目を探します．そのような項目が見付かった場合，
+     Infoセッションは，最初に一致した項目で指し示されているノードの表示を開始
+     します．一致した項目の残りへ行くために`,'を押してください．そのよう
+     な項目が存在しない場合，`no entries found'と出力し，ゼロではないス
+     テータスで終了します．これは，他のプログラムからのオンラインヘルプを供給
+     する方法として使用したり，正確なノード名を知らないとき，特定のノードで
+     Infoファイルを読むことを開始する素早い方法として使用できます．
+
+     このコマンドは，Info内部から呼び出すことも可能です．*Note
+     Searching Commands::を参照してください．
+
+`--node NODENAME'
+`-n NODENAME'
+     Infoの初期ファイルで訪問する特定のノードを指定します．`--file'と一
+     緒に組み合わせると特に役に立ちます(3)．`--node'を複数回指定しても
+     かまいません．対話的なInfoでは，それぞれのNODENAMEは独自のウィンド
+     ウで閲覧され，対話的でないInfo(`--output'が与えられたようなとき)で
+     は，それぞれのNODENAMEは順番に処理されます．
+
+`--output FILENAME'
+`-o FILENAME'
+     直接出力するファイル名としてFILENAMEを指定します．Infoで閲覧するそ
+     れぞれのノードは，対話的に閲覧するのではなく，FILENAMEに出力されま
+     す．FILENAMEに対する`-'の値で，標準出力を指定します．
+
+`--raw-escapes'
+`-R'
+     manページからANSIのエスケープシーケンスを削除しません．GNUドキュメント
+     フォーマッタのGroffのバージョンによっては，ボールド，イタリック，そして
+     下線が引かれた文字や，色付きの文字に対して，ANSIエスケープシーケンスを用
+     いたmanページを生成します．デフォルトでは，manページを表示する前に，Info
+     はこれらのエスケープシーケンスを削除します．端末がこれらのエスケープシー
+     ケンスをサポートしている場合，端末にそれらを処理させ，manページをその属
+     性を用いて表示するために．`--raw-escapes'を使用してください．
+
+`--restore=DRIBBLE-FILE'
+     これまでのInfoセッションの間に記録されている(上記の`--dribble'オプ
+     ションの記述を参照してください)DRIBBLE-FILEからキーストロークを読
+     み出します．ファイルのキーストロークが全て読まれたとき，Infoは，その入力
+     を通常の対話的操作に戻します．
+
+`--show-options'
+`--usage'
+`-O'
+     このオプションは，プログラムの呼び出し方とそのコマンドラインオプションを
+     記述しているノードを探し，そのノードを表示することように，Infoにセッショ
+     ンを開始させます．それは，複雑なメニュー階層を通り抜ける必要無く，マニュ
+     アルの最も重要な使用方法の情報を探すことを簡単するために提供されています．
+     その効果は，Info内部からの`M-x goto-invocation'コマンド (*note
+     goto-invocation::)に似ています．
+
+`--speech-friendly'
+`-b'
+     MS-DOS/MS-Windowsのみで，このオプションで，Infoは標準ファイルI/O関数を使
+     用して画面に表示します．(デフォルトでは，オペレーションを高速し，カラー
+     ディスプレイをサポートするため，Infoはこれらのシステムで直接ビデオメモリ
+     に書き出します．)これで，目が見えない人が使用しているスピーチシンセサイ
+     ザーで出力を捕らえ，音声のスピーチに変換することが可能になります．
+
+`--subnodes'
+     このオプションは，`--output'と一緒に与えられたときのみ意味がありま
+     す．それは，出力されているそれぞれのノードのメニューに現われるノードを，
+     再帰的に出力することを意味します．外部Infoファイルが解決するメニュー項目
+     は出力されず，索引のメンバーとなっているメニュー項目もそうです．それぞれ
+     のノードは1度だけ出力されます．
+
+`--version'
+     Infoのバージョン情報を出力し終了します．
+
+`--vi-keys'
+     このオプションは，`vi'とLessのキーバインドをエミュレートするために，
+     機能を異なるキーにバインドします．デフォルトのキーバインドは，通常Emacs
+     をモデルにしています．(GNU
+     Infoのキーバインドを変更する一般的な方法の詳 細は*Note Custom Key
+     Bindings::.)
+
+`MENU-ITEM'
+     Infoはその残りの引数を，メニュー項目の名前として扱います．最初の引数は閲
+     覧しようとする初期ノードのメニュー項目で(通常は`dir')，2番目の引数
+     は最初の引数のノードのメニュー項目等のようになります．そのノードへのパス
+     を記述したメニュー名を指定することで，選択したノードに簡単に移動できます．
+     例えば以下のようにします．
+
+          info emacs buffers
+
+     最初にノード`(dir)Top'のメニュー項目`Emacs'を選択し，そしてノー
+     ド`(emacs)Top'のメニュー項目`Buffers'を選択します．
+
+   `dir'ファイルの検索を避け，すぐに任意のファイルを表示させるため
+`-f'とファイル名を，`info -f ./foo.info'のように使用してくださ い．
+
+索引の検索とプログラムの呼び出しとコマンドラインオプションを記述している
+ノードの検索は，全てのメニュー項目を処理した_後に_開始します．この
+ため，索引やノード呼び出しで検索されたInfoファイルは，コマンドラインで与
+えられている全てのメニュー項目をたどった後にInfo自身が見つけたファイルに
+なります．これは，`info emacs --show-options'で期待したものになりま す．
+
+   ---------- Footnotes ----------
+
+   (1)  `.info'，`-info'， `/index'と，`.inf'.
+
+   (2) MS-DOS版では，DOSはファイルのベース名で1つのドット以外を許可し
+ていないので，`.inf'のようなInfo拡張子と，`.z'と`.gz'のよ
+うな短い圧縮ファイルの拡張子を，単一の拡張子に統合することを許可していま
+す．このためMS-DOSでは，Infoが`bison'を探す場合，`bison.igz'
+と`bison.inz'のようなファイル名を探し，`gunzip'で解凍します．
+
+   (3) もちろん，ファイルとノードの
+両方を`--node'コマンドで指定することが可能です．しかし，`info --node
+"(emacs)Buffers"'のように，シェルでは開きカッコと閉じカッコと空白
+によるエスケープを忘れてはいけません．
+
+
+File: info-stnd-ja.info,  Node: Cursor Commands,  Next: Scrolling Commands,  Prev: Invoking Info,  Up: Top
+
+カーソルの移動
+**************
+
+テキストページをページ単位で画面に表示されているのを読む際に，ある種のポ
+インティングデバイスでテキストの特定の部分を示すことができれば，より読み
+易いことを多くの人は知っています．こういうわけで，GNU Info(Emacsとスタン
+ドアローンバージョンの両方)には，画面上でのカーソル移動が可能になるコマ
+ンドもあります．キーストロークを記述するため，このマニュアルで使用される
+表記方法は，EmacsマニュアルとGNU Readlineマニュアルで使用された表記方法
+と同じです．その表記に慣れていない場合(1)，*Note Character Conventions:
+(emacs)Characters.
+
+以下の表では，Infoでカーソルを移動する基本的なコマンドをリストアップして
+います．それぞれの項目は，カーソル移動を実行するため入力するキーの順序，
+`M-x'(2)コマンド名
+(カッコ内に表示)，そしてコマンドが行うことの短い記述から成り立っています．
+全てのカーソル移動コマンドは，数字の引数をとります(*Note
+`universal-argument': Miscellaneous Commandsを参
+照してください)．数字の引数を用いることで，移動コマンドを単純に複数回実
+行します．例えば，`next-line'に4という数字の引数が与えられた場合，
+カーソルは4行下に移動します．負の数字の引数を用いることで，移動は逆にな
+ります．-4が`next-line'に与えられると，カーソルは4行_上に_移動 します．
+
+<C-n> (`next-line')
+<DOWN> (an arrow key)
+     カーソルを次の行に進めます．
+
+<C-p> (`prev-line')
+<UP> (an arrow key)
+     カーソルを前の行に戻します．
+
+<C-a> (`beginning-of-line')
+<Home> (on DOS/Windows only)
+     カーソルを現在の行頭に戻します．
+
+<C-e> (`end-of-line')
+<End> (on DOS/Windows only)
+     カーソルを現在の行末に進めます．
+
+<C-f> (`forward-char')
+<RIGHT> (an arrow key)
+     カーソルを次の文字に進めます．
+
+<C-b> (`backward-char')
+<LEFT> (an arrow key)
+     カーソルを前の文字に戻します．
+
+<M-f> (`forward-word')
+`C-<RIGHT>' (on DOS/Windows only)
+     カーソルを1単語先に進めます．
+
+<M-b> (`backward-word')
+`C-<LEFT>' (on DOS/Windows only)
+     カーソルを1単語前に戻します．
+
+<M-<> (`beginning-of-node')
+<C-<Home>> (on DOS/Windows only)
+<b>
+<M-b>, vi-like operation
+     カーソルを現在のノードの最初に戻します．
+
+<M->> (`end-of-node')
+<C-<End>> (on DOS/Windows only)
+<e>
+     カーソルを現在のノードの終りに進めます．
+
+<M-r> (`move-to-window-line')
+     カーソルをウィンドウの指定した行に移動します．数字の引数が無い場合，
+     `M-r'はカーソルをウィンドウの真中の行の最初に移動します．Nの
+     数字の引数を用いた場合，`M-r'はウィンドウのN番目の行の最初に
+     カーソルを移動します．
+
+   ---------- Footnotes ----------
+
+   (1) ここに短い概要があります．
+`C-X'は`CTRL'キーとXを押すことを意味します．
+`M-X'は`META'キーとXキーを押すことを意味します．多く
+の端末で`META'キーは`ALT'キーとして知られています．`SPC'キー
+はスペースバーです．他のキーは，通常それらに表示されている名前で呼ばれま
+す．
+
+   (2) `M-x'もコマンドです．それは
+`execute-extended-command'を呼び出します．詳細は，*Note Executing an
+extended command: (emacs)M-x.
+
+
+File: info-stnd-ja.info,  Node: Scrolling Commands,  Next: Node Commands,  Prev: Cursor Commands,  Up: Top
+
+ウィンドウでのテキストの移動
+****************************
+
+画面いっぱいのテキストを見ているときもあり，現在読んでいる段落の一部のみ
+が画面で見ていることがあります．このセクションで詳述されるコマンドは，画
+面で見えている現在のノードの部分をシフトするために使用されます．
+
+   `--vi-keys'オペレーションが効果があるとき，スクロールコマンドは異な
+るバインドがなされています．これらのキーバインドは，"vi-like
+operation"で設計されています．
+
+<SPC> (`scroll-forward')
+     このウィンドウでテキストを上にシフトします．すなわち，現在ウィンドウの下
+     にあるノードをより多く表示します．数字の引数を用いた場合，ウィンドウの下
+     にある，さらに多くの行を表示します．数字の引数が4の場合，ウィンドウの全
+     てのテキストは4行上に移動し(上の4行は削除し)，ウィンドウの下に新しい4行
+     を表示します．数字の引数が無い場合，<SPC>は，ウィンドウの下の2行をウ
+     インドウの上に持っていき，画面全体をほとんど新しい行で完全に再表示します．
+     ノードの終りにいる場合，繰り返し<SPC>を押すことでマニュアル全体の最
+     初から最後まで読むことができるように，<SPC>で"next(次の)"ノードへ
+     移動します．
+
+     デフォルトのスクロールサイズは1画面ですが，数字の引数を用いた，
+     (`scroll-forward-page-only-set-window')コマンドで，`--vi-keys'
+     では`z'の呼び出しで変更することが可能です．
+
+<NEXT> (an arrow key) (`scroll-forward-page-only')
+<C-v>
+<C-f>, vi-like operation
+<f>, vi-like operation
+<M-SPC>, vi-like operation
+     このウィンドウのテキストを上に移動します．これは，現在のノードの終りを越
+     えてまでスクロールしない以外，上記の<SPC>の処理と同じです．
+
+     <NEXT>キーは<PageDown>キーとして知られているキーボードもあります．
+
+<z> (`scroll-forward-page-only-set-window', vi-like operation)
+     <NEXT>のように前方にスクロールしますが，数字の引数が指定されている場
+     合，それは次の`scroll-forward'と`scroll-backward'コマンド，そ
+     してそれと同等のコマンドのデフォルトスクロールサイズとなります．
+
+<DEL> (`scroll-backward')
+     このウィンドウのテキストを下に移動します．<DEL>を繰り返すことでマニュ
+     アル全体の最後から最初まで読むことが可能になるように，<DEL>では
+     "previous"のノードに移動します．デフォルトのスクロールサイズは，数字の
+     引数を用いた，`scroll-backward-set-window'コマンドで，
+     `--vi-keys'では`w'の呼び出しで変更可能です．
+
+<PREVIOUS> (arrow key) (`scroll-backward-page-only')
+<PRIOR> (arrow key)
+<M-v>
+<b>, vi-like operation
+<C-b>, vi-like operation
+     このウィンドウのテキストを下に移動します．`scroll-forward'の逆です．
+     現在のノードの最初を越えてまでスクロールしません．デフォルトのスクロール
+     サイズは，数字の引数を用いた，
+     `scroll-backward-page-only-set-window'コマンドで，`--vi-keys'
+     では`w'の呼び出しで変更可能です．
+
+<w> (`scroll-backward-page-only-set-window', vi-like operation)
+     <PREVIOUS>のように後方にスクロールしますが，数字の引数が指定される場
+     合，それはそれ以降の`scroll-forward'と`scroll-backward'コマン
+     ドのデフォルトスクロールサイズになります．
+
+<C-n> (`down-line', vi-like operation)
+<C-e>, vi-like operation
+<RET>, vi-like operation
+<LFD>, vi-like operation
+<DOWN>, vi-like operation
+     1行前方にスクロールします．数字の引数を用いた場合，複数行前方にスクロー
+     ルします．
+
+<C-p> (`up-line', vi-like operation)
+<UP>, vi-like operation
+<y>, vi-like operation
+<k>, vi-like operation
+<C-k>, vi-like operation
+<C-y>, vi-like operation
+     1行後方にスクロールします．数字の引数を用いた場合，複数行後方にスクロー
+     ルします．
+
+<d> (`scroll-half-screen-down', vi-like operation)
+<C-d>, vi-like operation
+     画面の半分のサイズを前方にスクロールします．数字の引数を用いた場合，複数
+     行スクロールします．引数が指定された場合，それは，それ以降の`d'と
+     `u'コマンドに対する，新しいデフォルトの行数になります．
+
+<u> (`scroll-half-screen-up', vi-like operation)
+<C-u>, vi-like operation
+     画面の半分のサイズ後方にスクロールします．数字の引数を用いた場合，複数行
+     スクロールします．引数が指定された場合，それは，それ以降の`d'と
+     `u'コマンドに対する，新しいデフォルトの行数になります．
+
+   `scroll-forward'と`scroll-backward'コマンドは，ファイルのノー
+ド構造を通じて前方にも後方にも移動可能です．ノードの終りを見ているときに
+<SPC>を押した場合や，ノードの始め見ているときに<DEL>押した場合は，
+変数`scroll-behavior'で制御されるようになります．詳細は， *Note
+`scroll-behavior': Variables.
+
+   `scroll-forward-page-only'と`scroll-backward-page-only'コマン
+ドは，現在のノードを越えてまでスクロールしません．
+
+   <PREVIOUS>キーは，多くのキーボードでは<PageUp>キーです．Emacsは
+名前<PRIOR>でそれを参照します．<PRIOR>や<PageUp>をスクロール
+に使用するとき，Infoは現在のノードの最初までしかスクロールしません．
+
+   <DEL>キーが無い場合，<BS>，または，同じ機能を実行する，左矢印で
+デザインされていることもある`BackSpace'を探してください．
+
+<C-l> (`redraw-display')
+     最初から画面を再描画したり，カーソルを含む行を指定した位置にシフトします．
+     数字の引数が無い場合，`C-l'は画面を消去し，内容全体を再描画します．
+     数字の引数Nが与えられている場合，カーソルを含む行がウィンドウの N
+     番目の行になるようにシフトされます．
+
+`C-x <w>' (`toggle-wrap')
+     現在のウィンドウで行の折り返しの状態を変更します．通常は画面より長い行を
+     "折り返し"，すなわち，次の行に続きます．折り返された行は，画面の右端
+     の列に`\'が現われます．`C-x w'を用いてウィンドウの行の折り返し
+     の状態を変更することで，そのような行を右端の列で終端させることができます．
+     表示するための1画面の幅より多くの空間を必要とする行を表示するとき，画面
+     の右端の列に`$'が現われ，行の残りは見えません．長い行が切り取られる
+     とき，モードラインの左端付近に`$'文字を表示します．
+
+
+File: info-stnd-ja.info,  Node: Node Commands,  Next: Searching Commands,  Prev: Scrolling Commands,  Up: Top
+
+ノードの選択
+************
+
+このセクションでは，現在のウィンドウで閲覧する新しいノードを選択するため
+の，数多くのInfoコマンドを詳述します．
+
+   最も基本的なノードコマンドは，`n'，`p'，`u'と`l'です．
+ノードを選択するコマンドは，`--vi-keys'が効果があるとき異なったマッ
+ピングをされていることに注意してください．これらのキーバインドは
+"vi-like operation"を基にして設計されています．
+
+ノードを見ているとき，ノードのトップ行は，next，previous，そしてupノード
+の場所を記述する，Info"ポインタ"も含んでいます．以下のコマンドを使用
+するとき，ファイルのノード構造に関連して移動するため，Infoはこの行を使用
+します．
+
+<n> (`next-node')
+`C-<NEXT>' (on DOS/Windows only)
+`C-x <n>', vi-like operation
+     `Next'ノードを選択します．
+
+     <NEXT>キーは<PgDn>キーとして知られているキーボードもあります．
+
+<p> (`prev-node')
+`C-<PREVIOUS>' (on DOS/Windows only)
+     `Prev'のノードを選択します．
+
+     <PREVIOUS>キーは<PgUp>キーとして知られているキーボードもあります．
+
+<u> (`up-node')
+`C-<UP>' (an arrow key on DOS/Windows only)
+`C-x <u>', vi-like operation
+     `Up'ノードを選択します．
+
+   `l'コマンド - この名前は"last"を意味します - を使用することで，こ
+のウィンドウで既に見たノードを簡単に選択することが可能で，このウィンドウ
+で閲覧したノードの履歴を通じて，実際に前に戻ります．おそらく関係する記述
+を読むために他のノードへの参照をたどり，移動を開始したのと同じ場所を再び
+読みたいときこれは役に立つでしょう．
+
+   `l'を押したとき，それぞれのノードは履歴を削除します．このため，ウィ
+ンドウで最初に訪れたノードに戻ったとき，ウィンドウのすべての履歴が削除さ
+れます．
+
+<l> (`history-node')
+<C-<CENTER>> (on DOS/Windows only)
+<'>, vi-like operation
+     このウィンドウのノードの履歴から，最も最近選択したノードを引き出します．
+
+2つの追加のコマンドで，最も一般的に選択されるノードの選択が簡単になりま
+す．それらは`t'と`d'です．
+
+<t> (`top-node')
+<M-t>, vi-like operation
+     現在のInfoファイルで，ノード`Top'を選択します．
+
+<d> (`dir-node')
+<M-d>, vi-like operation
+     ディレクトリノード(すなわち，ノード`(dir)')を選択します．
+
+現在のウィンドウで，異なるノードの選択を結果がすぐさま得られるその他のコ
+マンドもあり，それらは以下のものです．
+
+<<> (`first-node')
+<g>, vi-like operation
+     このファイルで最初に現われるノードを選択します．このノードは，`Top'
+     が最も多くなっていますが，そうである必要はありません．数字の引数N
+     を用いた場合，(最初のノードを1として)N番目のノードを選択します．0
+     の引数は1の引数と同じです．
+
+<>> (`last-node')
+<G>, vi-like operation
+     このファイルので最後に現われるノードを選択します．数字の引数Nを用
+     いた場合，(最初のノードを1として)N番目のノードを選択します．ゼロの
+     引数は引数が無いものと同じで，すなわち，最後のノードを選択します．
+
+<]> (`global-next-node')
+     ノード構造を進める，または下に移動します．現在見ているノードに
+     `Next'
+     ポインタがある場合，そのノードが選択されます．それ以外の場合，
+     このノードにメニューがある場合は，最初のメニュー項目が選択されます．
+     `Next'とメニューが無い場合，このノードの`Up'ノードで同じ処理を
+     試みます．
+
+<[> (`global-prev-node')
+     ノード構造を戻る，または上に移動します．現在見ているノードに`Prev'
+     ポインタがある場合，そのノードが選択されます．それ以外の場合，`Up'
+     ポインタがある場合はそのノードが選択され，メニューがある場合は，メニュー
+     の最後の項目が選択されます．
+
+   ファイルを通じて，<SPC>と<DEL>で単純にスクロールしている間，
+`global-next-node'と`global-prev-node'で同じ動作を行なうことが
+可能です．詳細は，*Note `scroll-behavior': Variables.
+
+<g> (`goto-node')
+`C-x <g>', vi-like operation
+     ノード名を読み込みそれを選択します．ノード名を読み込んでいるとき，現在の
+     InfoセクションでロードされているInfoファイルのに存在しているノードに対し
+     てのみ補完が行われます(*note completion: The Echo
+     Area.)．他のファイル
+     に存在するノードが必要な場合，そのInfoファイルに存在するノードを正確に入
+     力し，他のファイルのInfoファイルを含める必要があります．例えば以下のよう
+     にします．
+
+          `g(emacs)Buffers'
+
+     これでInfoファイル`emacs'で`Buffers'を探します．
+
+<O> (`goto-invocation'
+<I>
+     プログラム名を読み込み，現在のInfoファイルで，プログラムの呼び出しとコマ
+     ンドラインオプションを記述しているノードを探します．デフォルトプログラム
+     名は現在のInfoファイル名から得られます．このコマンドは
+     `--show-options'コマンドラインオプションと同じですが，それは常にプ
+     ログラム名を指定することが可能です．これは，複数のプログラムを記述してい
+     るマニュアルに対して重要です．
+
+     他のInfoファイルのプログラムの呼び出しのノードを見つける必要がある場合，
+     `I'を呼び出す前に，そのファイルに移動する必要があります．例えば，
+     Emacsマニュアルを読んでいて，`makeinfo'プログラムのコマンドラインオ
+     プションを見たい場合，`g (texinfo) <RET>'とし，その後で`I makeinfo
+     <RET>'を入力する必要があります．そのコマンドを説明している
+     Infoファイルを知らない場合，(`d'コマンドを使用して)`(dir)' ノー
+     ドへ行き，そこで`I'を呼び出してください．
+
+<G> (`menu-sequence')
+     メニュー項目の順番を読み込み，それをたどります．Infoは，カンマで分けられ
+     たメニュー項目を順番にプロンプトを出します．(カンマはノード名で許可され
+     ていないので，それらはメニュー項目のリストでのデリミタとして当然の選択で
+     す．)Infoは，ノード`(dir)'のメニューで最初の項目を調べます
+     (`(dir)'ノードが見つからない場合，Infoは`Top'を使用します)．そ
+     のような項目が見つかった場合，Infoはそれが指し示すノードへ行き，そのノー
+     ドのメニュー項目の2番目の項目を調べる等のようにします．言い換えると，
+     `(dir)'ノードで開始する，特定のInfoファイルのメニュー階層を通じて伝
+     わる，完全なパスを指定することができます．これは，Infoのコマンドラインで，
+     メニュー項目の順序を入力したのと同じ効果があります．*Note Info
+     command-line arguments processing: command-line menu
+     itemsを参照してください． 例えば，以下のようにします．
+
+           G Texinfo,Overview,Reporting Bugs <RET>
+
+     これは，Texinfoマニュアルのノード`Reporting Bugs'を表示します．(メ
+     ニュー項目の全部，または大文字小文字を正確に区別して，メニュー項目を実際
+     に入力する必要はありません．しかし，正確にメニュー項目を入力した場合，見
+     つけるのが速くなります．)
+
+     入力したメニュー項目が見つからない場合，Infoは見つかった最後の項目で停止
+     し，エラーを報告します．
+
+`C-x <k>' (`kill-node')
+     ノードをキルします．デフォルトとして現在のノードを用いて，ノード名がエコー
+     エリアにプロンプトとして出力されます．"キルする"とは，ノードが見つかっ
+     たウィンドウに対して記録してある，Infoに忘れさせることが難しいノードの履
+     歴のリストから，それを削除することを意味します．キルされたノードを含んで
+     いるウィンドウに別のノードが選択されます．
+
+`C-x C-f' (`view-file')
+     ファイル名を読み込み，ファイル全体を選択します．そのコマンドは，以下のよ
+     うにします．
+          `C-x C-f FILENAME'
+     これは以下の入力と同じです．
+          `g(FILENAME)*'
+
+`C-x C-b' (`list-visited-nodes')
+     現在訪問している全てのノードのメニューを含んでいるウィンドウを作成します．
+     このウィンドウが選択されたウィンドウになり，そこで標準的なInfoコマンドを
+     使用してもかまいません．
+
+`C-x <b>' (`select-visited-node')
+     訪問しているウィンドウで前回訪問したノードを選択します．`C-x C-b'に
+     `m'を続けたものに似ていますが，ウィンドウは作成されません．
+
+
+File: info-stnd-ja.info,  Node: Searching Commands,  Next: Xref Commands,  Prev: Node Commands,  Up: Top
+
+Infoファイルを探す
+******************
+
+   GNU
+Infoで，Infoファイルの項目を通して文字の順番で検索したり，Infoファイ
+ルの索引を通して検索したり，特定のトピックを議論しているInfoファイル内の
+領域を見つけたりすることが可能になります．
+
+<s> (`search')
+</>
+     エコーエリアの文字列を読み込み，それを検索します．大文字を含む文字列の場
+     合，Infoファイルは大文字小文字を識別します．それ以外の場合は，大文字小文
+     字を無視します．数字Nの引数を用いた場合，文字列でN番目に発生
+     したものを検索します．負の引数は後方検索します．
+
+<?> (`search-backward', vi-like operation)
+     エコーエリアの文字列を読み込み，Infoファイルを通して後方に文字列を検索し
+     ます．大文字を含む文字列の場合，Infoファイルは大文字小文字を識別します．
+     それ以外の場合は，大文字小文字を無視します．数字Nの引数を用いた場
+     合，文字列でN番目に発生したものを検索します．負の引数は前方検索し
+     ます．
+
+<S> (`search-case-sensitively'
+     エコーエリアの文字列を読み込み，文字列が小文字しか含まない場合でも，大文
+     字小文字を識別してそれを検索します．数字Nの引数を用いた場合，文字
+     列でN番目に発生したものを検索します．負の引数は後方検索します．
+
+`C-x <n>' (`search-next')
+<n>, vi-like operation
+     前回検索コマンドで使用したのと同じ文字列を，同じ方向で，同じ大文字小文字
+     識別オプションで検索します．数字Nの引数を用いた場合，文字列で
+     N番目に発生したものを検索します．
+
+`C-x <N>' (`search-previous')
+<N>, vi-like operation
+     前回検索コマンドで使用したのと同じ文字列を，同じ大文字小文字識別オプショ
+     ンで，逆方向に検索します．数字Nの引数を用いた場合，文字列でN
+     番目に発生したものを検索します．
+
+<C-s> (`isearch-forward')
+     入力している文字列を，Infoファイルを通して対話的に前方に検索します．大文
+     字を含む文字列の場合，Infoファイルは大文字小文字を識別します．それ以外の
+     場合は，大文字小文字を無視します．
+
+<C-r> (`isearch-backward')
+     入力している文字列を，Infoファイルを通して対話的に後方に検索します．大文
+     字を含む文字列の場合，Infoファイルは大文字小文字を識別します．それ以外の
+     場合は，大文字小文字を無視します．
+
+<i> (`index-search')
+     Infoファイルの索引で文字列を調べ，見つかった索引項目が指し示しているノー
+     ドを選択します．
+
+<,> (`next-index-match')
+     前回の`i'コマンドから，次に一致している索引項目を含むノードに移動し
+     ます．
+
+`M-x index-apropos'
+     文字列に対し，システム上の既知のInfoファイルすべての索引から，可能な限り
+     一致したメニューを構築します．
+
+   最も基本的な検索コマンドは，`s'や`/'(`search')です．
+`s'コマンドはエコーエリアに文字列の入力を促すプロンプトを表示し，そ
+れ以降のInfoファイルでその文字列を探します．文字列が見つかった場合，含ま
+れているノードが選択され，カーソルは見つかった文字列の最初に位置します．
+次の`s'コマンドは，`['と`]'の間にデフォルトの検索文字列を
+表示します．新しい文字列の代わりに<RET>を押すと，検索文字列にデフォ
+ルトを使用します．`--vi-keys' (*note --vi-keys::)では，`n'や
+`N')コマンドを使用すると，同じ文字列をより速く検索します．
+
+   "インクリメンタル検索"は，基本的な検索に似ていますが，検索文字列を完
+全に指定されるまで待つ代わりに，文字列が入力している間に調査されます．
+
+インクリメンタルと非インクリメンタル検索の両方で，Infoファイルのテキスト
+と検索文字列を比較しているとき，デフォルトで大文字小文字を無視します．し
+かし，検索文字列に大文字を使用すると，検索は大文字小文字を識別します．小
+文字のみの入力の場合でも，大文字小文字の識別を非インクリメンタル検索で行
+いたい場合，`S'コマンド(`search-case-sensitively')を使用してく
+ださい)．`n'と`N'コマンドは，前回の検索コマンドが`S'の場
+合，大文字小文字を識別した操作を行います．
+
+   マニュアルで素早く何かを見つける最も効果的な方法は`i'コマンド
+(`index-search')です．このコマンドは，文字列の入力を促すプロンプト
+を表示し，その文字列を現在のInfoマニュアルのすべての索引で探します．索引
+の項目で一致するものが見つかった場合，項目が参照しているノードを表示し，
+エコーエリアに項目の完全なテキストを出力します．更に一致するものを探すた
+め`,' (`next-index-match')を入力することも可能です．優れたInfo
+マニュアルには，概念の索引に重要なものがすべて存在しているので，`i'
+コマンドで，マニュアルをリファレンスとして使用できるようになります．
+
+   説明しているマニュアルが何か分からない場合は，`M-x index-apropos'を
+試してみてください．それで文字列の入力を促すプロンプトが表示され，その文
+字列をシステムにインストールされているすべてのInfoドキュメントのすべての
+索引で探します．コマンドラインで呼び出すことも可能です．*Note
+--apropos:: を参照してください．
+
+
+File: info-stnd-ja.info,  Node: Xref Commands,  Next: Window Commands,  Prev: Searching Commands,  Up: Top
+
+相互参照の選択
+**************
+
+   ノードのトップに現われる`Next'，`Prev'，`Up'ポインタに関
+しては，既に議論してきました．これらのポインタに以外に，ノードには，おそ
+らく他のInfoファイルの他のノードを参照する，他のポインタを含んでいるかも
+しれません．そのようなポインタは，"相互参照"，または短く"xrefs"
+と呼ばれています．
+
+* Menu:
+
+* Parts of an Xref::            What a cross reference is made of.
+* Selecting Xrefs::             Commands for selecting menu or note items.
+
+
+File: info-stnd-ja.info,  Node: Parts of an Xref,  Next: Selecting Xrefs,  Up: Xref Commands
+
+Xrefの一部
+==========
+
+   相互参照には，2つの主要な部分があります．最初の部分は，"ラベル"と呼
+ばれます．それは相互参照で使用する名前です．2番目の部分は"ターゲット"
+です．それは，相互参照が示す完全な名前です．
+
+   ターゲットはコロン`:'でラベルと分けられています．最初にラベルが現わ
+れ，その後にターゲットが現われます．例えば，以下の簡単なメニューの相互参
+照では，1つのコロンがラベルとターゲットを分けています．
+
+     * Foo Label: Foo Target.        More information about Foo.
+
+   ターゲットの名前の終りの`.'に注意してください．`.'はターゲット
+の一部ではありません．それはInfoにターゲットの終りの位置を教えるためだけ
+に与えられています．
+
+参照を指定する短い方法は，ラベル名と同じターゲット名を意味する2つの隣接
+したコロンで可能です．
+
+     * Foo Commands::                Commands pertaining to Foo.
+
+   上記の例では，ターゲットの名前はラベルの名前と同じで，この場合は
+`Foo Commands'です．
+
+ノードを見ているとき，通常2つの形式の相互参照を見ることになるでしょう．
+"menu"参照と"note"参照です．menu参照はノードのメニューに現われま
+す．それらは行頭の`*'で始まり，ラベル，ターゲット，そして指し示して
+いるポインタの内容を記述しているコメントを含みます．
+
+   note参照は，ノードテキストの本体に現われます．それらは`*Note'で始ま
+り，ラベルとターゲットを含みます．
+
+   `Next'，`Prev'，そして`Up'ポインタのように，相互参照はあ
+らゆる有効なノードを指し示しています．それらは，より詳細な情報を見つける
+ことが可能な特定のサブジェクトの位置を参照するために使用されます．
+Texinfoドキュメントのノードを指し示す相互参照は以下のものです．相互参照
+を作成する詳細は，*Note Writing an Xref: (texinfo-ja)xref.
+
+
+File: info-stnd-ja.info,  Node: Selecting Xrefs,  Prev: Parts of an Xref,  Up: Xref Commands
+
+Xrefの選択
+==========
+
+   以下の表で，メニュー項目を操作するInfoコマンドをリストアップします．
+
+<1> (`menu-digit')
+<2> ... <9>
+<M-1>, vi-like operation
+<M-2> ... <M-9>, vi-like operation
+     Infoウィンドウ内部で，(`1'のような)単一の数字を押すと，メニュー項目
+     を選択し，現在のウィンドウをそのノードへ移動します．便利にするため，1つ
+     の例外があります．`0'を押すと，ノードのメニューの_最後の_項目
+     を選択します．`--vi-keys'が効果がある場合，数字は数の引数を設定し，
+     そのためこれらのコマンドは`M-'の種類に再配置されます．例えば，最後
+     のメニュー項目を選択するため，<M-0>を押してください．
+
+<0> (`last-menu-item')
+<M-0>, vi-like operation
+     現在のノードのメニューで，最後の項目を選択します．
+
+<m> (`menu-item')
+     エコーエリアでメニュー項目の名前を読み込み，そのノードを選択します．補完
+     はメニューラベルを読んでいるとき，利用可能です．*Note completion:
+     The Echo Area.
+
+`M-x find-menu'
+     カーソルをノードのメニューの最初に移動します．
+
+   以下の表で，相互参照を操作するInfoコマンドをリストアップします．
+
+<f> (`xref-item')
+<r>
+
+<M-f>, vi-like operation
+`C-x <r>', vi-like operation
+     エコーエリアで，相互参照のメモの名前を読み込み，そのノードを選択します．
+     補完は相互参照ラベルを読んでいるとき，利用可能です．*Note
+     completion: The Echo Area.
+
+終りに，次のいくつかのコマンドは，menuやnote参照のようなものを処理します．
+
+<TAB> (`move-to-next-xref')
+     カーソルを次の最隣のメニュー項目やこのノードのnote参照の最初に移動します．
+     メニューやnote参照を選択するため，それから<RET>
+     (`select-reference-this-line')を使用することが可能です．
+
+<M-TAB> (`move-to-prev-xref')
+<Shift-<TAB>> (on DOS/Windows only)
+     カーソルを，最隣の前のメニュー項目やこのノードのnote参照に移動します．
+
+     DOS/Windowsのみで，`Shift-<TAB>'キーは`M-<TAB>'の代用と
+     なります．このキーは`BackTab'と呼ばれることもあります．
+
+<RET> (`select-reference-this-line')
+<M-g>, vi-like operation
+     この行に現われる，メニュー項目やnote参照を選択します．
+
+
+File: info-stnd-ja.info,  Node: Window Commands,  Next: Printing Nodes,  Prev: Xref Commands,  Up: Top
+
+複数のウィンドウの操作
+**********************
+
+   "ウィンドウ"は，ノードのテキストを表示する場所です．ウィンドウはノー
+ドのテキストを表示するビューエリアと，関連付けられた"モード行"があり，
+それは見ているノードの短い記述です．
+
+   GNU
+Infoは，単一画面上での複数のウィンドウの表示をサポートします．それぞ
+れのウィンドウは，モード行で次のものと分けられています．"アクティブ"
+なウィンドウは常に1つだけあり，それはカーソルがあるウィンドウです．ウィ
+ンドウの作成，ウィンドウサイズの変更，アクティブにするウィンドウの選択，
+そしてウィンドウの削除のため，利用可能なコマンドがあります．
+
+* Menu:
+
+* The Mode Line::               What appears in the mode line?
+* Basic Windows::               Manipulating windows in Info.
+* The Echo Area::               Used for displaying errors and reading input.
+
+
+File: info-stnd-ja.info,  Node: The Mode Line,  Next: Basic Windows,  Up: Window Commands
+
+モード行
+========
+
+   "モード行"とは，Infoウィンドウの下の方に現われる反転表示の行です．そ
+れは，その直前のウィンドウの内容を説明します．この情報は，ファイルとウィ
+ンドウに現われているノードの名前，ノードを表示するため消費している画面の
+行数，そして，ウィンドウの上にあるテキストの百分率表示を含んでいます．そ
+れは，このInfoファイルに対する間接的なタグ表を更新する必要があるかどうか
+と，ディスク保存時にInfoファイルが圧縮されていたかどうかを伝えます．
+
+   ノード`Top'を表示している，`dir'と名付けられた圧縮されていない
+ファイルを含んでいるウィンドウのモード行の例は以下のようになります．
+
+     -----Info: (dir)Top, 40 lines --Top-------------------------------------
+                 ^^   ^   ^^^        ^^
+               (file)Node #lines    where
+
+ノードがディスク上の圧縮されているファイルにあるとき，モード行に2つの小
+さい`z'が示されます．さらに，ノードを含んでいるInfoファイルがサブファ
+イルに分けられている場合，ノードを含むサブファイルの名前も，同様にモード
+行に現われます．
+
+     --zz-Info: (emacs)Top, 291 lines --Top-- Subfile: emacs-1.Z-------------
+
+   長い行の折り返し(同様に次の行折り返されるもの，*note toggle-wrap:
+Scrolling Commands.)は，モード行の左端に`$'で示されます．
+
+     --$--Info: (texinfo)Top, 480 lines --Top-- Subfile: texinfo-1-----------
+
+ディスク上に対応するInfoファイルが無いように，Infoが内部にノードを作成す
+る場合，ノード名は周りにアスタリスク(`*')が付きます．名前自身はウィ
+ンドウの内容を伝えます．以下のモード行の見本は，おそらく完了を示している
+内部に構成されているノードを表示しています．
+
+     -----Info: *Completions*, 7 lines --All---------------------------------
+
+
+File: info-stnd-ja.info,  Node: Basic Windows,  Next: The Echo Area,  Prev: The Mode Line,  Up: Window Commands
+
+ウィンドウコマンド
+==================
+
+1度に1つ以上のノードが見れると便利なはずです．こうするため，Infoは1つ以
+上の"ウィンドウ"を表示することが可能です．それぞれのウィンドウには，
+独自のモード行(*note The Mode Line::)があり，そのウィンドウで見たノード
+の履歴があります(*note `history-node': Node Commands.)．
+
+`C-x <o>' (`next-window')
+     画面の次のウィンドウを選択します．現在使用中かつ一時的にそのままにしてい
+     る場合のみ，エコーエリアが選択可能だということに注意してください．通常，
+     `C-x o'では，画面の次のウィンドウにカーソルを移動し，最後のウィンド
+     ウに既にいる場合は画面の最初のウィンドウにカーソルを移動します．数字の引
+     数を与えた場合，`C-x o'は複数のウィンドウを移動します．負の引数で，
+     `C-x o'は画面の前のウィンドウを選択します．
+
+`M-x prev-window'
+     画面の前のウィンドウを選択します．これは，負の引数での`C-x o'と同じ
+     です．
+
+`C-x <2>' (`split-window')
+     現在のウィンドウを2つに分け，両方とも同じノードを表示します．それぞれの
+     ウィンドウは元のウィンドウの半分の大きさになり，カーソルは元のウィンドウ
+     に残ります．変数`automatic-tiling'で，画面の全てのウィンドウの大き
+     さを自動的に変更します．詳細は，*Note automatic-tiling:
+     Variablesを参 照してください．
+
+`C-x <0>' (`delete-window')
+     現在のウィンドウを画面から削除します．余りに多くのウィンドウを作成し画面
+     がバラバラになった場合，これはそのいくつかを取り除く方法です．
+
+`C-x <1>' (`keep-one-window')
+     現在のウィンドウ以外全てを削除します．
+
+`ESC <C-v>' (`scroll-other-window')
+     現在のウィンドウを`C-v'でスクロールするのと同じように，他のウィンド
+     ウをスクロールします．負の引数を与えた場合，他のウィンドウは後方にスクロー
+     ルします．
+
+`C-x <^>' (`grow-window')
+     現在のウィンドウを大きく(または小さく)します．数字の引数の場合，現在のウィ
+     ンドウを複数行大きくします．負の引数の場合，代わりにウィンドウを小さくし
+     ます．
+
+`C-x <t>' (`tile-windows')
+     表示されている全てのウィンドウの利用可能な空間を分割します．それぞれのウィ
+     ンドウは，画面で均等に分割され内容を表示します．変数
+     `automatic-tiling'で，ウィンドウを作成したり削除したりしたとき
+     `tile-windows'は呼び出されます．*Note `automatic-tiling':
+     Variables.
+
+
+File: info-stnd-ja.info,  Node: The Echo Area,  Prev: Basic Windows,  Up: Window Commands
+
+エコーエリア
+============
+
+   "エコーエリア"は，画面の底に現われる1行のウィンドウです．それは情報
+やエラーのメッセージの表示と，入力が必要なときそれを読み込むために使用さ
+れます．エコーエリアで利用可能なコマンドのほとんど全ては，Emacsでそれに
+対応する物と同じなので，テキストの行の編集の概念をより深く説明しているド
+キュメントを参照してください．以下の表は，エコーエリアで入力が読み込まれ
+るとき，利用可能なコマンドの短いリストです．
+
+<C-f> (`echo-area-forward')
+<RIGHT> (an arrow key)
+<M-h>, vi-like operation
+     1文字先に進めます．
+
+<C-b> (`echo-area-backward')
+<LEFT> (an arrow key)
+<M-l>, vi-like operation
+     1文字後に戻します．
+
+<C-a> (`echo-area-beg-of-line')
+<M-0>, vi-like operation
+     入力行の最初に移動します．
+
+<C-e> (`echo-area-end-of-line')
+<M-$>, vi-like operation
+     入力行の最後に移動します．
+
+<M-f> (`echo-area-forward-word')
+<C-<RIGHT>> (DOS/Windows only)
+<M-w>, vi-like operation
+     1語先に進めます．
+
+     DOS/Windowsで，`C-<RIGHT>'は1語づつ先に進めます．
+
+<M-b> (`echo-area-backward-word')
+<C-<LEFT>> (DOS/Windows only)
+     1語後に戻します．
+
+     DOS/Windowsで，`C-<LEFT>'は1語づつ後に戻します．
+
+<C-d> (`echo-area-delete')
+<M-x>, vi-like operation
+     カーソルの下の文字を削除します．
+
+<DEL> (`echo-area-rubout')
+     カーソルの前の文字を削除します．
+
+     同じキーボードで，このキーは`BackSpace'に対する<BS>として設計さ
+     れています．これらのキーボードは，通常，<DEL>をエコーエリアでの
+     `echo-area-delete'に結びつけられています．
+
+<C-g> (`echo-area-abort')
+<C-u>, vi-like operation
+     現在の処理を中止または終了します．補完が読み込まれている場合，このコマン
+     ドは補完に一致しない入力行のテキストを削除します．入力行が空の場合，呼び
+     出している機能を中止します．
+
+<RET> (`echo-area-newline')
+     現在の入力行を受け入れ(または強制補完し)ます．
+
+<C-q> (`echo-area-quoted-insert')
+<C-v>, vi-like operation
+     次の文字をそのまま挿入します．これは例えば，検索文字列に制御文字や，Info
+     が補完を促しているときの`?'文字の入力を可能にする方法です．
+
+PRINTING CHARACTER (`echo-area-insert')
+     文字を挿入します．8ビットセットで，`M-'コマンドに結び付かない文字も，
+     そのまま挿入されます．これはラテンスクリプトをサポートしている端末で，役
+     に立ちます．
+
+<M-TAB> (`echo-area-tab-insert')
+<Shift-<TAB>> (on DOS/Windows only)
+     タブ文字を挿入します．
+
+     DOS/Windowsのみで，`Shift-<TAB>'は`M-<TAB>'の代わりにな
+     ります．このキーは，`BackTab'と呼ばれることもあります．
+
+<C-t> (`echo-area-transpose-chars')
+     カーソルの文字を置き換えます．
+
+   次のコマンドのグループは，テキストの"キル"と"ヤンク"に対応します
+(1)． キルとヤンクの詳細は，*Note Killing and Deleting: (emacs)Killing.
+
+<M-d> (`echo-area-kill-word')
+<M-X>, vi-like operation
+     カーソルに続く単語をキルします．
+
+<M-DEL> (`echo-area-backward-kill-word')
+<M-<BS>>
+     カーソルの前の単語をキルします．
+
+     キーボードによっては，`Backspace'キーが`DEL'の代わりに使用され
+     ているので，`M-<Backspace>'は`M-<DEL>'と同じ効果があり ます．
+
+<C-k> (`echo-area-kill-line')
+     カーソルから行末までのテキストをキルします．
+
+`C-x <DEL>' (`echo-area-backward-kill-line')
+     カーソルから行頭までのテキストをキルします．
+
+<C-y> (`echo-area-yank')
+     最後にキルした内容をヤンクします．
+
+<M-y> (`echo-area-yank-pop')
+     前にキルしたものをヤンクし，最後にヤンクしたテキストを最初に移動します．
+
+エコーエリアで入力を読み込んでいるとき，入力が必要なコマンドがいくつかの
+選択リストの中から1つだけ受け入れる場合もあります．選択は"可能な補完"
+を表し，その中の1つを返答する必要があります．作成可能な返答には多くのリ
+ストがあるので，Infoで入力を省略することを可能になり，唯一に識別するのに
+必要な量だけ返答を入力します．さらに，Infoに可能性のある返答を補充するよ
+うに要求することも可能です．これは"補完"と呼ばれます．
+
+   以下のコマンドは，エコーエリアでの補完を可能にします．
+
+<TAB> (`echo-area-complete')
+<SPC>
+     可能な限り補完を挿入します．
+
+<?> (`echo-area-possible-completions')
+     今まで入力したものの可能な補完のリストを含むウィンドウを表示します．例え
+     ば，利用可能な選択が以下の場合を考えます．
+
+          bar
+          foliate
+          food
+          forget
+
+     `f'に続けて`?'を入力すると，Infoは，以下のような可能な補完をリ
+     ストアップする，`*Completions*'と呼ばれるノードを表示するウィンドウ
+     を表示します．
+
+          3 completions:
+          foliate         food
+          forget
+
+     すなわち，`f'で始まる選択の全てです．<SPC>や<TAB>を押すと，
+     選択の全ては`f'で始まり`o'が続くので，エコーエリアに`fo'
+     が結果として現われます．今，`TAB'に続けて`l'を入力すると，
+     `fol'で始まる選択は`foliate'だけなので，それが結果としてエコー
+     エリアに現われます．
+
+<ESC C-v> (`echo-area-scroll-completions-window')
+     補完ウィンドウを，それが見えていて"他の"ウィンドウが見えない場合，スクロー
+     ルします．
+
+   ---------- Footnotes ----------
+
+   (1) これらの処理を"カット"と"ペースト"と呼ぶ人もいます．
+
+
+File: info-stnd-ja.info,  Node: Printing Nodes,  Next: Miscellaneous Commands,  Prev: Window Commands,  Up: Top
+
+ノードの印刷
+************
+
+   一般に，我々はドキュメントを書式化しそのセクションを印刷するため，
+Texinfoソースファイルで`tex'を実行するように，TeXを使用すること
+を勧めます．しかし，後で使用するためのクイックリファレンスドキュメントと
+してノードの内容を出力したり，TeXがインストールされていない場合もあり
+ます．Infoはこうするためのコマンドを提供します．
+
+`M-x print-node'
+     現在のノードの内容を，環境変数`INFO_PRINT_COMMAND'のコマンドにパイ
+     プで渡します．変数が定義されていない場合，ノードは単に`lpr'にパイプ
+     で渡します(DOS/Windowsではデフォルトで，ノードを印刷するローカルプリンタ
+     デバイス`PRN'です)．
+
+     文字で始めてもかまわず，その場合Infoはフィルタやデバイスの名前として残り
+     を扱います．パイプコマンドの代わりに，OSで印刷されるファイルのためにテキ
+     ストを書いているという仮定の元で，Infoはファイルを開き，ノードの内容を書
+     き込みファイルを閉じます．
+
+
+File: info-stnd-ja.info,  Node: Miscellaneous Commands,  Next: Variables,  Prev: Printing Nodes,  Up: Top
+
+雑多なコマンド
+**************
+
+   GNU Infoは，GNU
+Infoそれ自身を説明するコマンドをいくつか含んでいます．
+
+`M-x describe-command'
+     エコーエリアのInfoコマンドの名前を読み込み，そのコマンドが行うことの短い
+     説明を表示します．
+
+`M-x describe-key'
+     エコーエリアのキーの並びを読み込み，それから，そのキーの並びが呼び出す
+     Infoコマンドの名前とドキュメントを表示します．
+
+`M-x describe-variable'
+     エコーエリアの変数を読み込み，それから変数が影響を与えるものの短いドキュ
+     メントを表示します．
+
+`M-x where-is'
+     エコーエリアのInfoコマンドを読み込み，それから，そのコマンドを呼び出すた
+     めに入力するキーの順番を表示します．
+
+<C-h> (`get-help-window')
+<?>
+<F1> (on DOS/Windows only)
+h, vi-like operation
+     `*Help*'を表示するウィンドウを作成(または移動)し，その中のクイック
+     リファレンスカードを含むノードに移動します．このウィンドウは，GNU
+     Infoが 利用可能なもっとも簡潔な情報を表示します．
+
+<h> (`get-info-help-node')
+<M-h>, vi-like operation
+     ノード`(info)Help'を訪問するため，懸命に試行します．GNU Infoで配布
+     されるInfoファイル`info.texi'は，このノードを含んでいます．もちろん，
+     最初にファイルを`makeinfo'で処理する必要があり，Infoディレクトリの
+     位置にそれを置く必要があります．
+
+   数字の引数を作成するコマンドには以下のものがあります．
+
+<C-u> (`universal-argument')
+     現在の数字の引数を開始(または4倍)します．`C-u'は，カーソル移動やス
+     クロールコマンドへ，小さな数字の引数を与える良い方法です．`C-u C-v'
+     は4行画面をスクロールし，`C-u C-u C-n'は16行カーソルを下に移動しま
+     す．数字のキーが続く`C-u'は，以下のように入力された数字を数字の引数
+     として設定します．`C-u 1 2 0'は引数を120に設定します．
+
+<M-1> (`add-digit-to-numeric-arg')
+<1>, vi-like operation
+<M-2> ... <M-9>
+<2> ... <9>, vi-like operation
+<M-0>
+<0>, vi-like operation
+     現在の数字の引数に呼び出したキーの数値を加えます．一度Infoが数字の引数を
+     読み込むと，メタキー無しで引数の数字を入力してもかまいません．例えば，
+     `C-l'に32を数字の引数として与える場合，以下のようにします．
+
+          C-u 3 2 C-l
+
+     または
+
+          M-3 2 C-l
+
+<M-> (`add-digit-to-numeric-arg'
+<->
+     負の引数を作成するため，`-'を入力してください．単独の`-'の入力は，
+     -1の値の負の引数を作成します．`-'の後に数字やメタキーと数字を続けた場
+     合，結果はそれらの数字を負の数字にして生成されます．
+
+     `-'文字自身を挿入可能にする必要があるので，エコーエリアで入力すると
+     き`-'は動作しません．エコーエリアで負の引数を指定する必要がある場合，
+     代わりに`M--'を使用してください．
+
+   `C-g'は，複数の文字の並びの読み込みを中止するため，(複数ファイルの
+検索のような)長い処理をキャンセルするため，そして，エコーエリアの有力を
+キャンセルするために使用されます．
+
+<C-g> (`abort-key')
+<C-u>, vi-like operation
+     現在の処理をキャンセルします．
+
+   Infoの`q'コマンドは，単にInfoの実行を終了します．`--vi-keys' (*note
+--vi-keys::)の元では，`:q'や`ZZ'でも終了可能です．
+
+<q> (`quit')
+`C-x C-c'
+`:q', vi-like operation
+`ZZ', vi-like operation
+     GNU Infoを終了します．
+
+   オペレーティングシステムが，画面の高さが60行だとGNU
+Infoに伝え，実際には
+高さが40行しかない場合，オペレーティングシステムが正しいということをInfo
+に伝える方法は以下のものです．
+
+`M-x set-screen-height'
+     エコーエリアの高さの値を読み込んで，表示される画面の高さをその値に設定し
+     ます．
+
+MS-DOS/MS-Windowsでは，このコマンドは，実際に見ている画面の大きさを，エ
+コーエリアに入力した値に変更しようとします．
+
+終りに，現在見ているノードに関連する脚注を表示するための便利な方法を，
+Infoは供給します．
+
+<ESC C-f> (`show-footnotes')
+     現在のノードに関連する脚注を(存在する場合は)もう1つのウィンドウに表示し
+     ます．変数`automatic-footnotes'を設定することで，ノードを選択したと
+     きノードに関連した脚注を，Infoに自動的に表示させることが可能です．
+
+
+File: info-stnd-ja.info,  Node: Variables,  Next: Custom Key Bindings,  Prev: Miscellaneous Commands,  Up: Top
+
+変数の操作
+**********
+
+   GNU Infoは，様々なInfoコマンドがその値を調べる，いくつかの"変数"を含
+んでいます．それらの変数の値を変更することが可能で，このため，環境やInfo
+ファイルの読み込み方をより適切にするため，Infoの動作を変更することが可能
+です．
+
+変数の値を変更する方法は２つあります．対話的なものとして，以下で記述する
+`set-variable'コマンドを使用するか，`.infokey'ファイルの
+`#var'のセクションを使用します．
+
+`M-x set-variable'
+     エコーエリアで変数名とその値を読み込み，そして，変数にその値を設定します．
+     変数名を読み込んでいるとき，補完が利用可能です(*note completion:
+     The Echo
+     Area.)．変数に与える値の読み込みで，補完が利用可能なことも多いので
+     すが，それは変数自身に依存します．変数が，完全に完了するための複数の選択
+     を供給_しない_場合，それは数字の値を期待します．
+
+`M-x describe-variable'
+     エコーエリアの変数名を読み込み，その変数が影響を与えるものの短い記述を表
+     示します．
+
+   Infoで設定可能な変数のリストは以下のようになります．
+
+`automatic-footnotes'
+     `On'に設定したとき，脚注は自動的に表示されたり消えたりします．この
+     変数は`On'がデフォルトです．ノードが選択されたとき，ノードにある脚
+     注を含んでいるウィンドウが作成され，脚注はその新しいウィンドウに表示され
+     ます．脚注を含めるためにInfoが作成したウィンドウは，`*Footnotes*'
+     と呼ばれます．脚注を含まないノードが選択され，`*Footnotes*'ウィンド
+     ウが画面にある場合，`*Footnotes*'ウィンドウは削除されます．この流儀
+     で作成された脚注のウィンドウは，表示をできるだけ小さくして使用することを
+     可能にするため，自動的に並べ換えされません．
+
+`automatic-tiling'
+     `On'に設定したとき，ウィンドウの作成と削除で，他のウィンドウの大き
+     さを変更します．この変数は`Off'がデフォルトです．通常，`C-x 2'
+     の入力で現在のウィンドウを均等に2分割します．`automatic-tiling'が
+     `On'に設定されているとき，全てのウィンドウは自動的にリサイズされ，
+     それぞれのウィンドウの表示行数が同じに保たれます．自動的な並べ換えには例
+     外があります．特に，ウィンドウ`*Completions*'と`*Footnotes*'は
+     自動的に並べ換え_されません_．それらは元の大きさのままです．
+
+`errors-ring-bell'
+     `On'に設定したとき，エラー時にベルをならします．この変数のデフォル
+     ト設定は`On'です．
+
+`gc-compressed-files'
+     `On'に設定したとき，Infoは解凍する必要があったファイルのガベージコ
+     レクションを実行します．この値のデフォルト値は`Off'です．Infoでノー
+     ドを訪問するときはいつでも，ノードを含むInfoファイルはコア部分に読み込ま
+     れ，Infoはそのファイルに含まれているタグとノードに関する情報を読み込みま
+     す．Infoが一度タグ情報を読み込むと，それを決して忘れません．しかし，ノー
+     ドの実際のテキストは，特定のInfoウィンドウが必要としない限り，コア部分に
+     残す必要はありません．圧縮されていないファイルに対して，ノードのテキスト
+     が使用されなくなった時点でコア部分に残されません．しかし，ファイルの圧縮
+     解除は時間がかかる処理なので，Infoは再び行おうとはしません．
+     `gc-compressed-files'で，ディスク上の圧縮されたファイルのノードのテ
+     キストをガベージコレクションしてもいいことをInfoに伝えます．
+
+`ISO-Latin'
+     `On'に設定したとき，InfoはISOラテン文字を表示しようとします．デフォ
+     ルトで，InfoはASCII文字セットだと考えます．`ISO-Latin'はInfoに，ヨー
+     ロッパ標準文字セットが使用されている環境だと伝え，Infoにそのような文字を
+     入力することを許可し，また表示も同様に許可されます．
+
+`scroll-behavior'
+     前方スクロールがノードの終りを告げたときや，後方スクロールがノードの最初
+     を告げたときに生じることを制御します．この変数のデフォルト値は
+     `Continuous'です．この変数には，3つの利用可能な値があります．
+
+    `Continuous'
+          このノードのメニューの最初の項目に行こうとし，失敗すると`Next'，失
+          敗すると`Up'の`Next'に行こうとします．この動作は，`]'
+          (`global-next-node')と`[' (`global-prev-node')コマンドと
+          同じです．
+
+    `Next Only'
+          `Next'ノードに行こうとするだけです．
+
+    `Page Only'
+          単にギブアップし，何も変更しません．`scroll-behavior'が`Page
+          Only'の場合，スクロールコマンドは見ているノードを変更できません．
+
+`scroll-step'
+     カーソルがウィンドウの外に移動したとき，スクロールする行数です．ノードの
+     テキストを表示するとき，それが見える位置の外にカーソルが移動した場合，自
+     動的にスクロールされます．通常スクロールは，カーソルを現在のウィンドウの
+     真中にカーソルがあるように行われます．しかし，変数`scroll-step'が0
+     ではない値を持つ場合，Infoはノードのテキストのスクロールを何行も試みます．
+     スクロールがカーソルをウィンドウの中にもたらすのに十分な場合，そのように
+     スクロールされます．変数のデフォルト値は0で，このためカーソル(と，対応す
+     るテキストは)はウィンドウの真中に置かれます．この変数を1に設定すると，そ
+     れが好きな人もいる"スムーズスクロール"のようなものになります．
+
+`show-index-match'
+     `On'に設定したとき，検索文字に一致した部分は，検索した文字の一致が
+     見つかったところで，それを説明するメッセージを強調します．この変数のデフォ
+     ルト値は`On'です．Infoが索引の一致を見つけたところを表示するとき
+     (*note `next-index-match': Searching Commands.)，入力した文字の
+     部分は周りの文字の反転表示で強調されます．
+
+`visible-bell'
+     `On'に設定したとき，GNU Infoはベルをならす代わりに，画面を点滅させ
+     ようとします．この変数は，`Off'がデフォルトです．もちろん，Infoは端
+     末が許す場合のみ，画面を点滅させることが可能です．端末でそれが不可能な場
+     合，この変数の設定は効果がありません．しかし，`errors-ring-bell'変
+     数を`Off'に設定することで，Infoに静かに動作させることが可能です．
+
+
+File: info-stnd-ja.info,  Node: Custom Key Bindings,  Next: Copying This Manual,  Prev: Variables,  Up: Top
+
+キーバインドと変数のカスタマイズ
+********************************
+
+   Emacs以外のエディタやページャを選択していて，`--vi-keys'オプション
+(*note --vi-keys::)で完全には満足しない人々のために，GNU
+Infoはこのドキュ
+メントで記述されているものとは異なるキーバインドの定義と変数の設定を行な
+う方法を提供しています．
+
+   開始時に，GNU Infoは呼び出しを行なっている人の`HOME'ディレクトリで
+`.info'(1)と呼ばれるファ
+イルを探します．存在する場合で，Infoのコンフィグレーションデータが含まれ
+ていて，現在のバージョンの`infokey'コマンドで作成されている場合，
+Infoはキーバインドと変数の設定としてそこにあるものを適用します．
+
+   `.info'は効率をあげるため，そしてその設計をGNU Lessプログラムから大
+量に持ってきているため，同じようにコンパクトな，テキストではないデータを
+含んでいます．それは，`infokey'コマンドを使用して，テキストのソース
+ファイルをコンパイルして作成する必要があります．
+
+* Menu:
+
+* Invoking infokey::
+* infokey source format::
+
+   ---------- Footnotes ----------
+
+   (1) DOSのファイルシステムの制限のため，MS-DOSバージョ
+ンのInfoでは，代わりに`_info'ファイルを探します．`HOME'変数が定
+義されていない場合，Infoは現在のディレクトリでも探します．
+
+
+File: info-stnd-ja.info,  Node: Invoking infokey,  Next: infokey source format,  Up: Custom Key Bindings
+
+`infokey'の呼び出し
+===================
+
+   `infokey'は，Infoのカスタマイズ方法を含んでいるソースファイル(デ
+フォルトは`$HOME/.infokey'(1))を，バイナリフォーマット(デフォルトは
+`$HOME/.info')にコンパイルします．デフォルトのキーバインドと変数定
+義に優先させるため，GNU Infoは開始時にバイナリファイルを読み込みます．構
+文は以下のとおりです．
+
+     infokey [OPTION...] [INPUT-FILE]
+
+   標準的な`--help'と`--version'以外では，唯一のオプションと
+して`--output FILE'があります．これで`infokey'にバ
+イナリデータを書き込む`$HOME/.info'の代わりのFILEを伝えます．
+
+   ---------- Footnotes ----------
+
+   (1) MS-DOSバージョンではこのファイ
+ルは`_infokey'と命名されていて，`HOME'が定義されていない場合は，
+カレントディレクトリで探します．
+
+
+File: info-stnd-ja.info,  Node: infokey source format,  Prev: Invoking infokey,  Up: Custom Key Bindings
+
+`infokey'のソースの書式
+=======================
+
+   `infokey'で読み込まれるソースファイルの書式は，例で説明するのが
+最も簡単です．例えば，`vi'や`less'の愛好者に適しているサ
+ンプルの`.infokey'のソースファイルは以下のようになります．
+
+     #info
+     j       next-line
+     k       prev-line
+     l       forward-char
+     h       backward-char
+     \kd     next-line
+     \ku     prev-line
+     \kr     forward-char
+     \kl     backward-char
+     \       scroll-forward
+     \kD     scroll-forward-page-only
+     b       scroll-backward
+     \kU     scroll-backward-page-only
+     g       beginning-of-node
+     \kh     beginning-of-node
+     G       end-of-node
+     \ke     end-of-node
+     \t      select-reference-this-line
+     -       history-node
+     n       next-node
+     p       prev-node
+     u       up-node
+     t       top-node
+     d       dir-node
+     #var
+     scroll-step=1
+
+   ソースファイルは一つ以上の"セクション"から成り立ちます．それぞれのセ
+クションはセクションのタイプを識別する行で開始します．利用可能なセクショ
+ンは以下のとおりです．
+
+`#info'
+     Infoウィンドウに対するキーバインドです．このセクションの始めは，
+     `#info'のみの単独行で示されています．これがソースファイルの最初のセ
+     クションの場合，`#info'行は省略可能です．このセクションの残りは，以
+     下の形式の行から成り立っています．
+
+          STRING whitespace ACTION [ whitespace [ # comment ] ] newline
+
+     空白は，一つ以上のスペースそして/またはタブです．コメントは，改行以外の
+     文字列です．STRINGは動作を呼び出すキーの順序です．STRING内の
+     文字は，そのまま解釈されるか，コントロール文字を示すキャレット(`^')
+     が前置されているものとして解釈されます．特定の文字が続いているバックスラッ
+     シュは，以下のキーストロークを指定します．
+
+    `\b'
+          バックスペース
+
+    `\e'
+          エスケープ(ESC)
+
+    `\n'
+          改行
+
+    `\r'
+          リターン
+
+    `\t'
+          タブ
+
+    `\ku'
+          上矢印
+
+    `\kd'
+          下矢印
+
+    `\kl'
+          左矢印
+
+    `\kr'
+          右矢印
+
+    `\kU'
+          Page Up
+
+    `\kD'
+          Page Down
+
+    `\kh'
+          HOME
+
+    `\ke'
+          END
+
+    `\kx'
+          Delete (DEL)
+
+    `\mX'
+          Meta-Xで，Xは上で記述されている文字．
+
+     それ以外の文字が続いているバックスラッシュは，その文字そのものを示します．
+     バックスラッシュを前置する必要がある文字には，キャレット，スペース，タブ，
+     そしてバックスラッシュ自身が含まれます．
+
+`#echo-area'
+     エコーエリアに対するキーバインドです．このセクションの始めは，
+     `#echo-area'のみの単独行で示されます．このセクションの残りには，上
+     で記述したInfoエリアに対するキーの定義と同一の構文があります．
+
+`#var'
+     変数の初期化です．このセクションの始めは，`#var'のみの単独行で示さ
+     れます．これに続く行は，一行ごとに値を割り当てるリストです．それぞれの行
+     は，変数名(*note Variables::)，それに続く`='，それに続く値から成り
+     立ちます．変数名と`='の間の空白は書かなくてもよく，`='に続くす
+     べての文字列は，空白を含めて値に含まれます．
+
+   空白行と`#'で始まる行は，特殊なセクションヘッダ行以外は無視されます．
+
+   `.info'ファイルで定義されたキーバインドは，GNU Infoのデフォルトに優
+先され，それは`--vi-keys'が使用されているかどうかによりません．デフォ
+ルトのキーバインドは，アクション`invalid'を用いている`.info'ファ
+イルで優先することで利用不可能にしてもかまいません．さらに，_すべて の_
+デフォルトのキーバインドは，関連するセクションの_どこかに_以下
+の行を追加することで，利用不可能にすることができます．
+
+     #stop
+
+   これでGNU
+Infoは，そのセクションに対するすべてのデフォルトキーコマンドを
+無視します．
+
+   注意：`#stop'は危険です．それはすべてのデフォルトのキーバインドを利
+用不可能にするので，必要なすべての動作を利用可能にするために，新しいキー
+バインドを十分に提供する必要があります．例えば，`quit'コマンドのキー
+バインドに失敗するとどうにもなりません．
+
+   `get-help-window'コマンドで生成されるコマンドの概要が，それぞれのコ
+マンドにバインドされている_最初の_キーしか表示しないこと以外，
+`.info'ファイルでキーバインドを定義する順番は重要ではありません．
+
+
+File: info-stnd-ja.info,  Node: Copying This Manual,  Next: Index,  Prev: Custom Key Bindings,  Up: Top
+
+このマニュアルのコピー
+**********************
+
+* Menu:
+
+* GNU Free Documentation License::  License for copying this manual.
+
+
+File: info-stnd-ja.info,  Node: GNU Free Documentation License,  Up: Copying This Manual
+
+GNU Free Documentation License
+==============================
+
+                        Version 1.1, March 2000
+     Copyright (C) 2000 Free Software Foundation, Inc.
+     59 Temple Place, Suite 330, Boston, MA  02111-1307, USA
+     
+     Everyone is permitted to copy and distribute verbatim copies
+     of this license document, but changing it is not allowed.
+
+  0. PREAMBLE
+
+     The purpose of this License is to make a manual, textbook, or other
+     written document "free" in the sense of freedom: to assure everyone
+     the effective freedom to copy and redistribute it, with or without
+     modifying it, either commercially or noncommercially.  Secondarily,
+     this License preserves for the author and publisher a way to get
+     credit for their work, while not being considered responsible for
+     modifications made by others.
+
+     This License is a kind of "copyleft", which means that derivative
+     works of the document must themselves be free in the same sense.
+     It complements the GNU General Public License, which is a copyleft
+     license designed for free software.
+
+     We have designed this License in order to use it for manuals for
+     free software, because free software needs free documentation: a
+     free program should come with manuals providing the same freedoms
+     that the software does.  But this License is not limited to
+     software manuals; it can be used for any textual work, regardless
+     of subject matter or whether it is published as a printed book.
+     We recommend this License principally for works whose purpose is
+     instruction or reference.
+
+  1. APPLICABILITY AND DEFINITIONS
+
+     This License applies to any manual or other work that contains a
+     notice placed by the copyright holder saying it can be distributed
+     under the terms of this License.  The "Document", below, refers to
+     any such manual or work.  Any member of the public is a licensee,
+     and is addressed as "you".
+
+     A "Modified Version" of the Document means any work containing the
+     Document or a portion of it, either copied verbatim, or with
+     modifications and/or translated into another language.
+
+     A "Secondary Section" is a named appendix or a front-matter
+     section of the Document that deals exclusively with the
+     relationship of the publishers or authors of the Document to the
+     Document's overall subject (or to related matters) and contains
+     nothing that could fall directly within that overall subject.
+     (For example, if the Document is in part a textbook of
+     mathematics, a Secondary Section may not explain any mathematics.)
+     The relationship could be a matter of historical connection with
+     the subject or with related matters, or of legal, commercial,
+     philosophical, ethical or political position regarding them.
+
+     The "Invariant Sections" are certain Secondary Sections whose
+     titles are designated, as being those of Invariant Sections, in
+     the notice that says that the Document is released under this
+     License.
+
+     The "Cover Texts" are certain short passages of text that are
+     listed, as Front-Cover Texts or Back-Cover Texts, in the notice
+     that says that the Document is released under this License.
+
+     A "Transparent" copy of the Document means a machine-readable copy,
+     represented in a format whose specification is available to the
+     general public, whose contents can be viewed and edited directly
+     and straightforwardly with generic text editors or (for images
+     composed of pixels) generic paint programs or (for drawings) some
+     widely available drawing editor, and that is suitable for input to
+     text formatters or for automatic translation to a variety of
+     formats suitable for input to text formatters.  A copy made in an
+     otherwise Transparent file format whose markup has been designed
+     to thwart or discourage subsequent modification by readers is not
+     Transparent.  A copy that is not "Transparent" is called "Opaque".
+
+     Examples of suitable formats for Transparent copies include plain
+     ASCII without markup, Texinfo input format, LaTeX input format,
+     SGML or XML using a publicly available DTD, and
+     standard-conforming simple HTML designed for human modification.
+     Opaque formats include PostScript, PDF, proprietary formats that
+     can be read and edited only by proprietary word processors, SGML
+     or XML for which the DTD and/or processing tools are not generally
+     available, and the machine-generated HTML produced by some word
+     processors for output purposes only.
+
+     The "Title Page" means, for a printed book, the title page itself,
+     plus such following pages as are needed to hold, legibly, the
+     material this License requires to appear in the title page.  For
+     works in formats which do not have any title page as such, "Title
+     Page" means the text near the most prominent appearance of the
+     work's title, preceding the beginning of the body of the text.
+
+  2. VERBATIM COPYING
+
+     You may copy and distribute the Document in any medium, either
+     commercially or noncommercially, provided that this License, the
+     copyright notices, and the license notice saying this License
+     applies to the Document are reproduced in all copies, and that you
+     add no other conditions whatsoever to those of this License.  You
+     may not use technical measures to obstruct or control the reading
+     or further copying of the copies you make or distribute.  However,
+     you may accept compensation in exchange for copies.  If you
+     distribute a large enough number of copies you must also follow
+     the conditions in section 3.
+
+     You may also lend copies, under the same conditions stated above,
+     and you may publicly display copies.
+
+  3. COPYING IN QUANTITY
+
+     If you publish printed copies of the Document numbering more than
+     100, and the Document's license notice requires Cover Texts, you
+     must enclose the copies in covers that carry, clearly and legibly,
+     all these Cover Texts: Front-Cover Texts on the front cover, and
+     Back-Cover Texts on the back cover.  Both covers must also clearly
+     and legibly identify you as the publisher of these copies.  The
+     front cover must present the full title with all words of the
+     title equally prominent and visible.  You may add other material
+     on the covers in addition.  Copying with changes limited to the
+     covers, as long as they preserve the title of the Document and
+     satisfy these conditions, can be treated as verbatim copying in
+     other respects.
+
+     If the required texts for either cover are too voluminous to fit
+     legibly, you should put the first ones listed (as many as fit
+     reasonably) on the actual cover, and continue the rest onto
+     adjacent pages.
+
+     If you publish or distribute Opaque copies of the Document
+     numbering more than 100, you must either include a
+     machine-readable Transparent copy along with each Opaque copy, or
+     state in or with each Opaque copy a publicly-accessible
+     computer-network location containing a complete Transparent copy
+     of the Document, free of added material, which the general
+     network-using public has access to download anonymously at no
+     charge using public-standard network protocols.  If you use the
+     latter option, you must take reasonably prudent steps, when you
+     begin distribution of Opaque copies in quantity, to ensure that
+     this Transparent copy will remain thus accessible at the stated
+     location until at least one year after the last time you
+     distribute an Opaque copy (directly or through your agents or
+     retailers) of that edition to the public.
+
+     It is requested, but not required, that you contact the authors of
+     the Document well before redistributing any large number of
+     copies, to give them a chance to provide you with an updated
+     version of the Document.
+
+  4. MODIFICATIONS
+
+     You may copy and distribute a Modified Version of the Document
+     under the conditions of sections 2 and 3 above, provided that you
+     release the Modified Version under precisely this License, with
+     the Modified Version filling the role of the Document, thus
+     licensing distribution and modification of the Modified Version to
+     whoever possesses a copy of it.  In addition, you must do these
+     things in the Modified Version:
+
+       A. Use in the Title Page (and on the covers, if any) a title
+          distinct from that of the Document, and from those of
+          previous versions (which should, if there were any, be listed
+          in the History section of the Document).  You may use the
+          same title as a previous version if the original publisher of
+          that version gives permission.
+
+       B. List on the Title Page, as authors, one or more persons or
+          entities responsible for authorship of the modifications in
+          the Modified Version, together with at least five of the
+          principal authors of the Document (all of its principal
+          authors, if it has less than five).
+
+       C. State on the Title page the name of the publisher of the
+          Modified Version, as the publisher.
+
+       D. Preserve all the copyright notices of the Document.
+
+       E. Add an appropriate copyright notice for your modifications
+          adjacent to the other copyright notices.
+
+       F. Include, immediately after the copyright notices, a license
+          notice giving the public permission to use the Modified
+          Version under the terms of this License, in the form shown in
+          the Addendum below.
+
+       G. Preserve in that license notice the full lists of Invariant
+          Sections and required Cover Texts given in the Document's
+          license notice.
+
+       H. Include an unaltered copy of this License.
+
+       I. Preserve the section entitled "History", and its title, and
+          add to it an item stating at least the title, year, new
+          authors, and publisher of the Modified Version as given on
+          the Title Page.  If there is no section entitled "History" in
+          the Document, create one stating the title, year, authors,
+          and publisher of the Document as given on its Title Page,
+          then add an item describing the Modified Version as stated in
+          the previous sentence.
+
+       J. Preserve the network location, if any, given in the Document
+          for public access to a Transparent copy of the Document, and
+          likewise the network locations given in the Document for
+          previous versions it was based on.  These may be placed in
+          the "History" section.  You may omit a network location for a
+          work that was published at least four years before the
+          Document itself, or if the original publisher of the version
+          it refers to gives permission.
+
+       K. In any section entitled "Acknowledgments" or "Dedications",
+          preserve the section's title, and preserve in the section all
+          the substance and tone of each of the contributor
+          acknowledgments and/or dedications given therein.
+
+       L. Preserve all the Invariant Sections of the Document,
+          unaltered in their text and in their titles.  Section numbers
+          or the equivalent are not considered part of the section
+          titles.
+
+       M. Delete any section entitled "Endorsements".  Such a section
+          may not be included in the Modified Version.
+
+       N. Do not retitle any existing section as "Endorsements" or to
+          conflict in title with any Invariant Section.
+
+     If the Modified Version includes new front-matter sections or
+     appendices that qualify as Secondary Sections and contain no
+     material copied from the Document, you may at your option
+     designate some or all of these sections as invariant.  To do this,
+     add their titles to the list of Invariant Sections in the Modified
+     Version's license notice.  These titles must be distinct from any
+     other section titles.
+
+     You may add a section entitled "Endorsements", provided it contains
+     nothing but endorsements of your Modified Version by various
+     parties--for example, statements of peer review or that the text
+     has been approved by an organization as the authoritative
+     definition of a standard.
+
+     You may add a passage of up to five words as a Front-Cover Text,
+     and a passage of up to 25 words as a Back-Cover Text, to the end
+     of the list of Cover Texts in the Modified Version.  Only one
+     passage of Front-Cover Text and one of Back-Cover Text may be
+     added by (or through arrangements made by) any one entity.  If the
+     Document already includes a cover text for the same cover,
+     previously added by you or by arrangement made by the same entity
+     you are acting on behalf of, you may not add another; but you may
+     replace the old one, on explicit permission from the previous
+     publisher that added the old one.
+
+     The author(s) and publisher(s) of the Document do not by this
+     License give permission to use their names for publicity for or to
+     assert or imply endorsement of any Modified Version.
+
+  5. COMBINING DOCUMENTS
+
+     You may combine the Document with other documents released under
+     this License, under the terms defined in section 4 above for
+     modified versions, provided that you include in the combination
+     all of the Invariant Sections of all of the original documents,
+     unmodified, and list them all as Invariant Sections of your
+     combined work in its license notice.
+
+     The combined work need only contain one copy of this License, and
+     multiple identical Invariant Sections may be replaced with a single
+     copy.  If there are multiple Invariant Sections with the same name
+     but different contents, make the title of each such section unique
+     by adding at the end of it, in parentheses, the name of the
+     original author or publisher of that section if known, or else a
+     unique number.  Make the same adjustment to the section titles in
+     the list of Invariant Sections in the license notice of the
+     combined work.
+
+     In the combination, you must combine any sections entitled
+     "History" in the various original documents, forming one section
+     entitled "History"; likewise combine any sections entitled
+     "Acknowledgments", and any sections entitled "Dedications".  You
+     must delete all sections entitled "Endorsements."
+
+  6. COLLECTIONS OF DOCUMENTS
+
+     You may make a collection consisting of the Document and other
+     documents released under this License, and replace the individual
+     copies of this License in the various documents with a single copy
+     that is included in the collection, provided that you follow the
+     rules of this License for verbatim copying of each of the
+     documents in all other respects.
+
+     You may extract a single document from such a collection, and
+     distribute it individually under this License, provided you insert
+     a copy of this License into the extracted document, and follow
+     this License in all other respects regarding verbatim copying of
+     that document.
+
+  7. AGGREGATION WITH INDEPENDENT WORKS
+
+     A compilation of the Document or its derivatives with other
+     separate and independent documents or works, in or on a volume of
+     a storage or distribution medium, does not as a whole count as a
+     Modified Version of the Document, provided no compilation
+     copyright is claimed for the compilation.  Such a compilation is
+     called an "aggregate", and this License does not apply to the
+     other self-contained works thus compiled with the Document, on
+     account of their being thus compiled, if they are not themselves
+     derivative works of the Document.
+
+     If the Cover Text requirement of section 3 is applicable to these
+     copies of the Document, then if the Document is less than one
+     quarter of the entire aggregate, the Document's Cover Texts may be
+     placed on covers that surround only the Document within the
+     aggregate.  Otherwise they must appear on covers around the whole
+     aggregate.
+
+  8. TRANSLATION
+
+     Translation is considered a kind of modification, so you may
+     distribute translations of the Document under the terms of section
+     4.  Replacing Invariant Sections with translations requires special
+     permission from their copyright holders, but you may include
+     translations of some or all Invariant Sections in addition to the
+     original versions of these Invariant Sections.  You may include a
+     translation of this License provided that you also include the
+     original English version of this License.  In case of a
+     disagreement between the translation and the original English
+     version of this License, the original English version will prevail.
+
+  9. TERMINATION
+
+     You may not copy, modify, sublicense, or distribute the Document
+     except as expressly provided for under this License.  Any other
+     attempt to copy, modify, sublicense or distribute the Document is
+     void, and will automatically terminate your rights under this
+     License.  However, parties who have received copies, or rights,
+     from you under this License will not have their licenses
+     terminated so long as such parties remain in full compliance.
+
+ 10. FUTURE REVISIONS OF THIS LICENSE
+
+     The Free Software Foundation may publish new, revised versions of
+     the GNU Free Documentation License from time to time.  Such new
+     versions will be similar in spirit to the present version, but may
+     differ in detail to address new problems or concerns.  See
+     `http://www.gnu.org/copyleft/'.
+
+     Each version of the License is given a distinguishing version
+     number.  If the Document specifies that a particular numbered
+     version of this License "or any later version" applies to it, you
+     have the option of following the terms and conditions either of
+     that specified version or of any later version that has been
+     published (not as a draft) by the Free Software Foundation.  If
+     the Document does not specify a version number of this License,
+     you may choose any version ever published (not as a draft) by the
+     Free Software Foundation.
+
+ADDENDUM: How to use this License for your documents
+----------------------------------------------------
+
+   To use this License in a document you have written, include a copy of
+the License in the document and put the following copyright and license
+notices just after the title page:
+
+       Copyright (C)  YEAR  YOUR NAME.
+       Permission is granted to copy, distribute and/or modify this document
+       under the terms of the GNU Free Documentation License, Version 1.1
+       or any later version published by the Free Software Foundation;
+       with the Invariant Sections being LIST THEIR TITLES, with the
+       Front-Cover Texts being LIST, and with the Back-Cover Texts being LIST.
+       A copy of the license is included in the section entitled ``GNU
+       Free Documentation License''.
+
+   If you have no Invariant Sections, write "with no Invariant Sections"
+instead of saying which ones are invariant.  If you have no Front-Cover
+Texts, write "no Front-Cover Texts" instead of "Front-Cover Texts being
+LIST"; likewise for Back-Cover Texts.
+
+   If your document contains nontrivial examples of program code, we
+recommend releasing these examples in parallel under your choice of
+free software license, such as the GNU General Public License, to
+permit their use in free software.
+
+
+File: info-stnd-ja.info,  Node: Index,  Prev: Copying This Manual,  Up: Top
+
+索引
+****
+
+* Menu:
+
+* ', vi-like operation:                  Node Commands.
+* ,:                                     Searching Commands.
+* -:                                     Miscellaneous Commands.
+* --subnodes, command line option:       Invoking Info.
+* .info:                                 Custom Key Bindings.
+* .infokey:                              Custom Key Bindings.
+* .infokey source format:                infokey source format.
+* /:                                     Searching Commands.
+* 0 ... 9, vi-like operation:            Miscellaneous Commands.
+* 0, in Info windows:                    Selecting Xrefs.
+* 1 ... 9, in Info windows:              Selecting Xrefs.
+* <:                                     Node Commands.
+* >:                                     Node Commands.
+* ?, in Info windows:                    Miscellaneous Commands.
+* ?, in the echo area:                   The Echo Area.
+* ?, vi-like operation:                  Searching Commands.
+* [:                                     Node Commands.
+* ]:                                     Node Commands.
+* _info file (MS-DOS):                   Custom Key Bindings.
+* _infokey file (MS-DOS):                Invoking infokey.
+* abort-key:                             Miscellaneous Commands.
+* add-digit-to-numeric-arg:              Miscellaneous Commands.
+* ANSI escape sequences in man pages:    Invoking Info.
+* Apropos, in Info files:                Invoking Info.
+* arguments, command line:               Invoking Info.
+* arguments, negative:                   Miscellaneous Commands.
+* automatic-footnotes:                   Variables.
+* automatic-tiling:                      Variables.
+* b, in Info windows:                    Cursor Commands.
+* b, vi-like operation:                  Scrolling Commands.
+* BackTab, in Info windows:              Selecting Xrefs.
+* BackTab, in the echo area:             The Echo Area.
+* backward-char:                         Cursor Commands.
+* backward-word:                         Cursor Commands.
+* beginning-of-line:                     Cursor Commands.
+* beginning-of-node:                     Cursor Commands.
+* BS (backspace):                        Scrolling Commands.
+* C-a, in Info windows:                  Cursor Commands.
+* C-a, in the echo area:                 The Echo Area.
+* C-b, in Info windows:                  Cursor Commands.
+* C-b, in the echo area:                 The Echo Area.
+* C-b, vi-like operation:                Scrolling Commands.
+* C-CENTER:                              Node Commands.
+* C-d, in the echo area:                 The Echo Area.
+* C-d, vi-like operation:                Scrolling Commands.
+* C-e, in Info windows:                  Cursor Commands.
+* C-e, in the echo area:                 The Echo Area.
+* C-e, vi-like operation:                Scrolling Commands.
+* C-End:                                 Cursor Commands.
+* C-f, in Info windows:                  Cursor Commands.
+* C-f, in the echo area:                 The Echo Area.
+* C-f, vi-like operation:                Scrolling Commands.
+* C-g, in Info windows:                  Miscellaneous Commands.
+* C-g, in the echo area:                 The Echo Area.
+* C-h:                                   Miscellaneous Commands.
+* C-Home:                                Cursor Commands.
+* C-k, in the echo area:                 The Echo Area.
+* C-k, vi-like operation:                Scrolling Commands.
+* C-l:                                   Scrolling Commands.
+* C-LEFT:                                Cursor Commands.
+* C-LEFT, in the echo area:              The Echo Area.
+* C-n:                                   Cursor Commands.
+* C-n, vi-like operation:                Scrolling Commands.
+* C-NEXT:                                Node Commands.
+* C-p:                                   Cursor Commands.
+* C-p, vi-like operation:                Scrolling Commands.
+* C-PgDn:                                Node Commands.
+* C-PgUp:                                Node Commands.
+* C-PREVIOUS:                            Node Commands.
+* C-q, in the echo area:                 The Echo Area.
+* C-r:                                   Searching Commands.
+* C-RIGHT:                               Cursor Commands.
+* C-RIGHT, in the echo area:             The Echo Area.
+* C-s:                                   Searching Commands.
+* C-t, in the echo area:                 The Echo Area.
+* C-u:                                   Miscellaneous Commands.
+* C-u cancels typeahead, vi-like operation: Miscellaneous Commands.
+* C-u, in the echo area, vi-like operation: The Echo Area.
+* C-u, vi-like operation:                Scrolling Commands.
+* C-UP:                                  Node Commands.
+* C-v:                                   Scrolling Commands.
+* C-v, in the echo area, vi-like operation: The Echo Area.
+* C-w:                                   Scrolling Commands.
+* C-x 0:                                 Basic Windows.
+* C-x 1:                                 Basic Windows.
+* C-x 2:                                 Basic Windows.
+* C-x ^:                                 Basic Windows.
+* C-x b:                                 Node Commands.
+* C-x C-b:                               Node Commands.
+* C-x C-c:                               Miscellaneous Commands.
+* C-x C-f:                               Node Commands.
+* C-x DEL, in the echo area:             The Echo Area.
+* C-x g, vi-like operation:              Node Commands.
+* C-x k:                                 Node Commands.
+* C-x n:                                 Searching Commands.
+* C-x N:                                 Searching Commands.
+* C-x n, vi-like operation:              Node Commands.
+* C-x o:                                 Basic Windows.
+* C-x r, vi-like operation:              Selecting Xrefs.
+* C-x t:                                 Basic Windows.
+* C-x u, vi-like operation:              Node Commands.
+* C-y, in the echo area:                 The Echo Area.
+* C-y, vi-like operation:                Scrolling Commands.
+* cancelling the current operation:      Miscellaneous Commands.
+* cancelling typeahead:                  Miscellaneous Commands.
+* case-sensitive search:                 Searching Commands.
+* case-sensitivity, and search:          Searching Commands.
+* colors in man pages:                   Invoking Info.
+* command line options:                  Invoking Info.
+* command-line options, how to find:     Invoking Info.
+* commands, describing:                  Miscellaneous Commands.
+* completion:                            The Echo Area.
+* compressed Info files:                 Invoking Info.
+* cursor, moving:                        Cursor Commands.
+* customizing key bindings:              Custom Key Bindings.
+* d:                                     Node Commands.
+* d, vi-like operation:                  Scrolling Commands.
+* default key bindings, overriding:      Custom Key Bindings.
+* DEL, in Info windows:                  Scrolling Commands.
+* DEL, in the echo area:                 The Echo Area.
+* delete-window:                         Basic Windows.
+* describe-command:                      Miscellaneous Commands.
+* describe-key:                          Miscellaneous Commands.
+* describe-variable:                     Variables.
+* dir-node:                              Node Commands.
+* directory path:                        Invoking Info.
+* DOWN (an arrow key):                   Cursor Commands.
+* DOWN, vi-like operation:               Scrolling Commands.
+* down-line:                             Scrolling Commands.
+* e, in Info windows:                    Cursor Commands.
+* echo area:                             The Echo Area.
+* echo-area-abort:                       The Echo Area.
+* echo-area-backward:                    The Echo Area.
+* echo-area-backward-kill-line:          The Echo Area.
+* echo-area-backward-kill-word:          The Echo Area.
+* echo-area-backward-word:               The Echo Area.
+* echo-area-beg-of-line:                 The Echo Area.
+* echo-area-complete:                    The Echo Area.
+* echo-area-delete:                      The Echo Area.
+* echo-area-end-of-line:                 The Echo Area.
+* echo-area-forward:                     The Echo Area.
+* echo-area-forward-word:                The Echo Area.
+* echo-area-insert:                      The Echo Area.
+* echo-area-kill-line:                   The Echo Area.
+* echo-area-kill-word:                   The Echo Area.
+* echo-area-newline:                     The Echo Area.
+* echo-area-possible-completions:        The Echo Area.
+* echo-area-quoted-insert:               The Echo Area.
+* echo-area-rubout:                      The Echo Area.
+* echo-area-scroll-completions-window:   The Echo Area.
+* echo-area-tab-insert:                  The Echo Area.
+* echo-area-transpose-chars:             The Echo Area.
+* echo-area-yank:                        The Echo Area.
+* echo-area-yank-pop:                    The Echo Area.
+* End:                                   Cursor Commands.
+* end-of-line:                           Cursor Commands.
+* end-of-node:                           Cursor Commands.
+* errors-ring-bell:                      Variables.
+* ESC C-f:                               Miscellaneous Commands.
+* ESC C-v, in Info windows:              Basic Windows.
+* ESC C-v, in the echo area:             The Echo Area.
+* f:                                     Selecting Xrefs.
+* f, vi-like operation:                  Scrolling Commands.
+* F1:                                    Miscellaneous Commands.
+* FDL, GNU Free Documentation License:   GNU Free Documentation License.
+* file names, relative:                  Invoking Info.
+* file, outputting to:                   Invoking Info.
+* files, compressed:                     Invoking Info.
+* find-menu:                             Selecting Xrefs.
+* finding the Invocation node:           Node Commands.
+* first-node:                            Node Commands.
+* footnotes, displaying:                 Miscellaneous Commands.
+* format of .infokey source:             infokey source format.
+* forward-char:                          Cursor Commands.
+* forward-word:                          Cursor Commands.
+* functions, describing:                 Miscellaneous Commands.
+* G:                                     Node Commands.
+* g:                                     Node Commands.
+* G, vi-like operation:                  Node Commands.
+* g, vi-like operation:                  Node Commands.
+* gc-compressed-files:                   Variables.
+* get-help-window:                       Miscellaneous Commands.
+* get-info-help-node:                    Miscellaneous Commands.
+* global-next-node:                      Node Commands.
+* global-prev-node:                      Node Commands.
+* goto-invocation:                       Node Commands.
+* goto-node:                             Node Commands.
+* grow-window:                           Basic Windows.
+* h:                                     Miscellaneous Commands.
+* h, vi-like operation:                  Miscellaneous Commands.
+* history-node:                          Node Commands.
+* Home:                                  Cursor Commands.
+* I:                                     Node Commands.
+* i:                                     Searching Commands.
+* incremental search:                    Searching Commands.
+* index search, selecting from the command line: Invoking Info.
+* index, searching:                      Searching Commands.
+* index-apropos:                         Searching Commands.
+* index-search:                          Searching Commands.
+* Info file, selecting:                  Invoking Info.
+* Info files, compressed:                Invoking Info.
+* Info files, relative:                  Invoking Info.
+* Info files, searching all indices:     Invoking Info.
+* Info, invoking:                        Invoking Info.
+* INFO_PRINT_COMMAND, environment variable: Printing Nodes.
+* infokey:                               Custom Key Bindings.
+* infokey source format:                 infokey source format.
+* infokey, invoking:                     Invoking infokey.
+* invocation description, how to find:   Invoking Info.
+* invoking Info:                         Invoking Info.
+* invoking infokey:                      Invoking infokey.
+* isearch-backward:                      Searching Commands.
+* isearch-forward:                       Searching Commands.
+* ISO Latin characters:                  Variables.
+* ISO-Latin:                             Variables.
+* k, vi-like operation:                  Scrolling Commands.
+* keep-one-window:                       Basic Windows.
+* key bindings, customizing:             Custom Key Bindings.
+* keys, describing:                      Miscellaneous Commands.
+* keystrokes, recording:                 Invoking Info.
+* kill-node:                             Node Commands.
+* l:                                     Node Commands.
+* last-menu-item:                        Selecting Xrefs.
+* last-node:                             Node Commands.
+* LEFT (an arrow key):                   Cursor Commands.
+* LEFT, in the echo area:                The Echo Area.
+* Less-like key bindings:                Invoking Info.
+* LFD, vi-like operation:                Scrolling Commands.
+* list-visited-nodes:                    Node Commands.
+* local printer device:                  Printing Nodes.
+* m:                                     Selecting Xrefs.
+* M-$, vi-like operation:                The Echo Area.
+* M--:                                   Miscellaneous Commands.
+* M-0 ... M-9:                           Miscellaneous Commands.
+* M-0, in the echo area, vi-like operation: The Echo Area.
+* M-0, vi-like operation:                Selecting Xrefs.
+* M-1 ... M-9, vi-like operation:        Selecting Xrefs.
+* M-<:                                   Cursor Commands.
+* M->:                                   Cursor Commands.
+* M-b, in Info windows:                  Cursor Commands.
+* M-b, in the echo area:                 The Echo Area.
+* M-b, vi-like operation:                Cursor Commands.
+* M-BS, in the echo area:                The Echo Area.
+* M-d, in the echo area:                 The Echo Area.
+* M-d, vi-like operation:                Node Commands.
+* M-DEL, in the echo area:               The Echo Area.
+* M-f, in Info windows:                  Cursor Commands.
+* M-f, in the echo area:                 The Echo Area.
+* M-f, vi-like operation:                Selecting Xrefs.
+* M-g, vi-like operation:                Selecting Xrefs.
+* M-h, in the echo area, vi-like operation: The Echo Area.
+* M-h, vi-like operation:                Miscellaneous Commands.
+* M-l, in the echo area, vi-like operation: The Echo Area.
+* M-r:                                   Cursor Commands.
+* M-SPC, vi-like operation:              Scrolling Commands.
+* M-t, vi-like operation:                Node Commands.
+* M-TAB, in Info windows:                Selecting Xrefs.
+* M-TAB, in the echo area:               The Echo Area.
+* M-v:                                   Scrolling Commands.
+* M-w, in the echo area, vi-like operation: The Echo Area.
+* M-X, in the echo area, vi-like operation: The Echo Area.
+* M-x, in the echo area, vi-like operation: The Echo Area.
+* M-y, in the echo area:                 The Echo Area.
+* menu, following:                       Invoking Info.
+* menu, following, from inside Info:     Node Commands.
+* menu-digit:                            Selecting Xrefs.
+* menu-item:                             Selecting Xrefs.
+* menu-sequence:                         Node Commands.
+* move-to-next-xref:                     Selecting Xrefs.
+* move-to-prev-xref:                     Selecting Xrefs.
+* move-to-window-line:                   Cursor Commands.
+* moving the cursor:                     Cursor Commands.
+* n:                                     Node Commands.
+* n, vi-like operation:                  Searching Commands.
+* negative arguments:                    Miscellaneous Commands.
+* NEXT:                                  Scrolling Commands.
+* next-index-match:                      Searching Commands.
+* next-line:                             Cursor Commands.
+* next-node:                             Node Commands.
+* next-window:                           Basic Windows.
+* node, selecting from the command line: Invoking Info.
+* nodes, selection of:                   Node Commands.
+* numeric arguments:                     Miscellaneous Commands.
+* numeric arguments, negative:           Miscellaneous Commands.
+* O:                                     Node Commands.
+* online help, using Info as:            Invoking Info.
+* options, command line:                 Invoking Info.
+* outputting to a file:                  Invoking Info.
+* overriding default key bindings:       Custom Key Bindings.
+* p:                                     Node Commands.
+* PageDown:                              Scrolling Commands.
+* PageUp:                                Scrolling Commands.
+* prev-line:                             Cursor Commands.
+* prev-node:                             Node Commands.
+* prev-window:                           Basic Windows.
+* PREVIOUS:                              Scrolling Commands.
+* print-node:                            Printing Nodes.
+* printing:                              Printing Nodes.
+* printing characters, in the echo area: The Echo Area.
+* printing nodes to the local printer:   Printing Nodes.
+* q:                                     Miscellaneous Commands.
+* quit:                                  Miscellaneous Commands.
+* quitting:                              Miscellaneous Commands.
+* r:                                     Selecting Xrefs.
+* redraw-display:                        Scrolling Commands.
+* relative Info file names:              Invoking Info.
+* remembering user keystrokes:           Invoking Info.
+* repeated search:                       Searching Commands.
+* replaying recorded keystrokes:         Invoking Info.
+* RET, in Info windows:                  Selecting Xrefs.
+* RET, in the echo area:                 The Echo Area.
+* RET, vi-like operation:                Scrolling Commands.
+* RIGHT (an arrow key):                  Cursor Commands.
+* RIGHT, in the echo area:               The Echo Area.
+* S:                                     Searching Commands.
+* s:                                     Searching Commands.
+* screen, changing the height of:        Miscellaneous Commands.
+* scroll-backward:                       Scrolling Commands.
+* scroll-backward-page-only:             Scrolling Commands.
+* scroll-backward-page-only-set-window:  Scrolling Commands.
+* scroll-behavior:                       Variables.
+* scroll-forward:                        Scrolling Commands.
+* scroll-forward-page-only:              Scrolling Commands.
+* scroll-forward-page-only-set-window:   Scrolling Commands.
+* scroll-half-screen-down:               Scrolling Commands.
+* scroll-half-screen-up:                 Scrolling Commands.
+* scroll-other-window:                   Basic Windows.
+* scroll-step:                           Variables.
+* scrolling:                             Scrolling Commands.
+* scrolling through node structure:      Scrolling Commands.
+* search:                                Searching Commands.
+* search, and case-sensitivity:          Searching Commands.
+* search, case-sensitive:                Searching Commands.
+* search-backward:                       Searching Commands.
+* search-case-sensitively:               Searching Commands.
+* search-next:                           Searching Commands.
+* search-previous:                       Searching Commands.
+* searching:                             Searching Commands.
+* Searching all indices:                 Invoking Info.
+* searching, in the indices:             Searching Commands.
+* select-reference-this-line:            Selecting Xrefs.
+* select-visited-node:                   Node Commands.
+* set-screen-height:                     Miscellaneous Commands.
+* set-variable:                          Variables.
+* Shift-TAB, in Info windows:            Selecting Xrefs.
+* Shift-TAB, in the echo area:           The Echo Area.
+* show-footnotes:                        Miscellaneous Commands.
+* show-index-match:                      Variables.
+* SPC, in Info windows:                  Scrolling Commands.
+* SPC, in the echo area:                 The Echo Area.
+* speech synthesizers:                   Invoking Info.
+* split-window:                          Basic Windows.
+* t:                                     Node Commands.
+* TAB, in Info windows:                  Selecting Xrefs.
+* TAB, in the echo area:                 The Echo Area.
+* tile-windows:                          Basic Windows.
+* tiling:                                Basic Windows.
+* toggle-wrap:                           Scrolling Commands.
+* top-node:                              Node Commands.
+* u:                                     Node Commands.
+* u, vi-like operation:                  Scrolling Commands.
+* universal-argument:                    Miscellaneous Commands.
+* UP (an arrow key):                     Cursor Commands.
+* UP, vi-like operation:                 Scrolling Commands.
+* up-line:                               Scrolling Commands.
+* up-node:                               Node Commands.
+* variables, describing:                 Variables.
+* variables, setting:                    Variables.
+* version information:                   Invoking Info.
+* vi-like key bindings:                  Invoking Info.
+* view-file:                             Node Commands.
+* visible-bell:                          Variables.
+* w, vi-like operation:                  Scrolling Commands.
+* where-is:                              Miscellaneous Commands.
+* windows, creating:                     Basic Windows.
+* windows, deleting:                     Basic Windows.
+* windows, manipulating:                 Window Commands.
+* windows, selecting:                    Basic Windows.
+* xref-item:                             Selecting Xrefs.
+* y, vi-like operation:                  Scrolling Commands.
+* z, vi-like operation:                  Scrolling Commands.
+* ZZ, vi-like operation:                 Miscellaneous Commands.
+
+
+
+
+Tag table:
+Node: Top1155
+Node: What is Info3372
+Node: Invoking Info3732
+Node: Cursor Commands9408
+Node: Scrolling Commands11469
+Node: Node Commands15323
+Node: Searching Commands20056
+Node: Xref Commands22797
+Node: Parts of an Xref23247
+Node: Selecting Xrefs24301
+Node: Window Commands25775
+Node: The Mode Line26412
+Node: Basic Windows27573
+Node: The Echo Area29101
+Node: Printing Nodes32630
+Node: Miscellaneous Commands33272
+Node: Variables35869
+Node: Custom Key Bindings39378
+Node: Invoking infokey40213
+Node: infokey source format40821
+Node: Copying This Manual43724
+Node: GNU Free Documentation License43946
+Node: Index63818
+
+End tag table

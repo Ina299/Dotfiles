@@ -1,0 +1,1304 @@
+Info file: hurd-ja.info,    -*-Text-*-
+produced by `texinfo-format-buffer'
+from file `hurd-ja.texi'
+using `texinfmt.el' version 2.38 of 3 July 1998.
+
+
+
+
+INFO-DIR-SECTION Kernel
+START-INFO-DIR-ENTRY
+* Hurd: (hurd).                 Using and programming the Hurd kernel servers.
+END-INFO-DIR-ENTRY
+
+
+Copyright (C) 1994-1998 Free Software Foundation, Inc.
+
+Permission is granted to make and distribute verbatim copies of this
+manual provided the copyright notice and this permission notice are
+preserved on all copies.
+
+
+Permission is granted to copy and distribute modified versions of this
+manual under the conditions for verbatim copying, provided also that the
+entire resulting derived work is distributed under the terms of a
+permission notice identical to this one.
+
+Permission is granted to copy and distribute translations of this manual
+into another language, under the above conditions for modified versions.
+
+
+
+
+
+File: hurd-ja.info, Node: Port References, Next: RPC Management, Prev: Port Metadata, Up: Ports Library
+
+portの参照
+----------
+
+これらの関数はport情報構造体がもはや必要とされていないときに限り解放され
+るように、portへの参照を管理する。`libports'にいつportへの参照が変化する
+かを教えるのは、あなたの責任である。
+
+ -- Function: void ports_port_ref (void *PORT)
+     PORTへの強い参照を割り当てる。
+
+ -- Function: void ports_port_deref (void *PORT)
+     PORTへの強い参照を減少させる。
+
+ -- Function: void ports_no_senders (void *PORT, mach_port_mscount_t MSCOUNT)
+     ユーザは送信元不在通知を受け取ろうとすることに責任がある。やって来
+     たときには、そのメッセージが送られたPORTに対して、その通知からの
+     MSCOUNTを与えてこのルーチンを呼び出しなさい。
+
+ -- Function: int ports_count_class (struct port_class *CLASS)
+     CLASSに新しいportを生成するのを妨げる。現在CLASSにあるportの数を返
+     す。
+
+ -- Function: int ports_count_bucket (struct port_bucket *BUCKET)
+     BUCKETに新しいportを生成するのを妨げる。現在BUCKETにあるport の数を
+     返す。
+
+ -- Function: void ports_enable_class (struct port_class *CLASS)
+     (`ports_count_class'によって妨げられた)中断されたport生成を続けるこ
+     とを許可する。
+
+ -- Function: void ports_enable_bucket (struct port_bucket *BUCKET)
+     (`ports_count_bucket'によって妨げられた)中断されたport生成を続ける
+     ことを許可する。
+
+弱い参照はDROPWEAK_ROUTINEがnullであるport classでは強い参照を同じなので、
+それほど使用されない。*Note Buckets and Classes::。
+
+ -- Function: void ports_port_ref_weak (void *PORT)
+     PORTへの弱い参照を割り当てる。
+
+ -- Function: void ports_port_deref_weak (void *PORT)
+     PORTへの弱い参照を減少させる。
+
+
+
+
+File: hurd-ja.info, Node: RPC Management, Prev: Port References, Up: Ports Library
+
+RPCの操作
+---------
+
+`libports'関数の残りはRPC操作を制御することにささげられる。これらの関数
+は頑健なサーバを構築するために必要とされるlockingやthread cancellationを
+全て行うのに役立つ。
+
+ -- Typedef: typedef int (* ports_demuxer_type ) (mach_msg_header_t *INP, mach_msg_header_t *OUTP)
+     MiGのdemuxerルーチンの型。
+
+ -- Function: error_t ports_begin_rpc (void *PORT, mach_msg_id_t MSG_ID, struct rpc_info *INFO)
+     RPCがPORT上で開始しているときにこれを呼び出す。INFOは呼び出し元で割
+     り当てられるべきで、動的な状態を保持するのに使われるだろう。このRPC
+     が放棄されれば、`EDIED'を返す。そうでなければゼロを返す。
+
+ -- Function: void ports_end_rpc (void *PORT, struct rpc_info *INFO)
+     RPCが終えられているときにこれを呼び出す。引数は対になる
+     `ports_begin_rpc'の呼び出しに渡されたものと一致しなければならない。
+
+ -- Function: void ports_manage_port_operations_one_thread (struct port_bucket *BUCKET, ports_demuxer_type DEMUXER, int TIMEOUT)
+     BUCKETのportへの操作を処理し始め、それぞれのやって来るメッセージに
+     対しDEMUXERを呼び出す。TIMEOUTが非ゼロでTIMEOUTミリ秒の間メッセージ
+     が受け取られないと返る。たった一つのスレッドだけ(呼び出しスレッド)
+     を使う。
+
+ -- Function: void ports_manage_port_operations_multithread (struct port_bucket *BUCKET, ports_demuxer_type DEMUXER, int THREAD_TIMEOUT, int GLOBAL_TIMEOUT, void (*HOOK) (void))
+     BUCKETのportへの操作を処理し始め、それぞれのやって来るメッセージに
+     対しDEMUXERを呼び出す。GLOBAL_TIMEOUTが非ゼロでGLOBAL_TIMEOUTミリ秒
+     の間メッセージを受け取られないと返る。他のport での緩慢さが原因でど
+     のportも飢餓状態にならないように、やって来るメッセージを処理するの
+     に必要なだけスレッドを生成する。もしTHREAD_TIMEOUTが非ゼロなら、個々
+     のスレッドはTHREAD_TIMEOUT (1) (*Note RPC Management-Footnotes::)ミ
+     リ秒の間やって来るメッセージを処理しなかったら死んでいくだろう。も
+     しnullでないなら、HOOKは、新しいスレッドが作られる後にすぐ、それぞ
+     れに対して呼び出されるだろう。
+
+ -- Function: error_t ports_inhibit_port_rpcs (void *PORT)
+     PORTへのどの未処理のRPCにも割り込む。全ての未処理のRPCが終わるのを
+     待ち、そしてこのportで始まるどの新しいRPCでも妨げる。
+
+ -- Function: error_t ports_inhibit_class_rpcs (struct port_class *CLASS)
+     `ports_inhibit_port_rpcs'に似ているが、CLASSの全てのportに影響する。
+
+ -- Function: error_t ports_inhibit_bucket_rpcs (struct port_bucket *BUCKET)
+     `ports_inhibit_port_rpcs'に似ているが、BUCKETの全てのportに影響する。
+
+ -- Function: error_t ports_inhibit_all_rpcs (void)
+     `ports_inhibit_port_rpcs'に似しているが、ありとあらゆるportに影響す
+     る。
+
+ -- Function: void ports_resume_port_rpcs (void *PORT)
+     このPORTに対する以前の`ports_inhibit_port_rpcs'の効果を元に戻し、妨
+     げられたRPCを続けることを許可する。
+
+ -- Function: void ports_resume_class_rpcs (struct port_class *CLASS)
+     このCLASSに対する以前の`ports_inhibit_class_rpcs'の効果を元に戻す。
+
+ -- Function: void ports_resume_bucket_rpcs (struct port_bucket *BUCKET)
+     このBUCKETに対する以前の`ports_inhibit_bucket_rpcs'の効果を元に戻す。
+
+ -- Function: void ports_resume_all_rpcs (void)
+     以前の`ports_inhibit_all_rpcs'の効果を元に戻す。
+
+ -- Function: void ports_interrupt_rpcs (void *PORT)
+     PORTで進行中のどのRPCも(`thread_cancel'を使って)中止する。
+
+ -- Function: int ports_self_interrupted (void)
+     もし現在のスレッドのRPCが`ports_interrupt_rpcs'で割り込まれたなら、
+     非ゼロを返し、割り込みフラグを取り除く。
+
+ -- Function: error_t ports_interrupt_rpc_on_notification (void *OBJECT, struct rpc_info *RPC, mach_port_t PORT, mach_msg_id_t WHAT)
+     WHATにあるもののいづれかがPORTに対して起きたなら、`hurd_cancel'が
+     RPCのスレッド上で呼ばれるように手配する。RPCはOBJECT上のRPCであるべ
+     きだ。
+
+ -- Function: error_t ports_interrupt_self_on_notification (void *OBJECT, mach_port_t PORT, mach_msg_id_t WHAT)
+     もしPORTがWHATという条件で通知を受けたら、`hurd_cancel' が、それは
+     OBJECT上のRPCであるべきだが、現在のスレッド上で呼ばれるように手配す
+     る。
+
+ -- Function: error_t ports_interrupt_self_on_port_death (void *OBJECT, mach_port_t PORT)
+     WHATが`MACH_NOTIFY_DEAD_NAME'に設定されて
+     `ports_interrupt_self_on_notification'を呼ぶのと同じである。
+
+ -- Function: void ports_interrupt_notified_rpcs (void *OBJECT, mach_port_t PORT, mach_msg_id_t WHAT)
+     そのようにリクエストしているOBJECT上のどのRPCにも割り込む。
+
+ -- Function: void ports_dead_name (void *OBJECT, mach_port_t PORT)
+     WHATが`MACH_NOTIFY_DEAD_NAME'に設定されて
+     `ports_interrupt_notified_rpcs'を呼ぶのと同じである。
+
+
+
+File: hurd-ja.info  Node: RPC Management-Footnotes, Up: RPC Management
+
+(1) 訳注: 原文ではLOCAL_TIMEOUTとなっているが間違いだと思われ
+る。要確認。
+
+
+
+File: hurd-ja.info, Node: Integer Hash Library, Next: Misc Library, Prev: Ports Library, Up: Foundations
+
+整数ハッシュ・ライブラリ
+========================
+
+`libihash'は任意の要素データ型に対して、整数を鍵としたハッシュ表を提供す
+る。この種のハッシュ表は疎らな配列やバッファ・キャッシュを実装するときに
+頻繁に使われる。
+
+以下の関数は`<hurd/ihash.h>'で宣言されている。
+
+ -- Function: error_t ihash_create (ihash_t *HT)
+     整数ハッシュ表を生成し、それをHTに返す。もしメモリ割り当てエラーが
+     起きれば、`ENOMEM'が返され、そうでなければゼロである。
+
+ -- Function: void ihash_free (ihash_t HT)
+     HTとそれが消費している全ての資源を解放する。
+
+ -- Function: void ihash_set_cleanup (ihash_t HT, void (*CLEANUP) (void *VALUE, void *ARG), void *ARG)
+     HTの要素を後始末する関数をCLEANUPに設定し、その二つ目の引数をARGに
+     設定する。その後上書きされたり削除される、あらゆる要素VALUEに対して、
+     ARGを二番目の引数としてCLEANUPが呼び出されるだろう。
+
+ -- Function: error_t ihash_add (ihash_t HT, int ID, void *ITEM, void ***LOCP)
+     整数鍵IDの下にITEMをハッシュ表HTに加える。LOCPはITEMに位置するポイ
+     ンタのアドレスである。もしnullでなければ、LOCPは`void **'型の変数を
+     指しているべきで、`ihash_locp_remove'の引数として使われて良いポイン
+     タで埋められるだろう。LOCPによって指された変数はこの呼び出しとその
+     要素が削除されるときの間のいつかに上書きされるかもしれない。だから
+     その値を他の場所に隠しておき、その隠しておいた値を
+     `ihash_locp_remove'で使おうと考えることはできない。もしメモリ割り当
+     てエラーが起きると、`ENOMEM'が返され、そうでなければゼロが返る。
+
+ -- Function: void * ihash_find (ihash_t HT, int ID)
+     ハッシュ表HTで鍵IDで項目を探して返す。指定された項目が存在しなけれ
+     ばnullを返す。
+
+ -- Function: error_t ihash_iterate (ihash_t HT, error_t (*FUN) (void *VALUE))
+     HTのあらゆる要素に関数FUNを呼び出す。FUNの唯一の引数、VALUEはそのハッ
+     シュ表に収められている値へのポインタである。もしFUNが非ゼロをいつか
+     返せば、繰り返すのを止め、`ihash_iterate' はその値を返し、そうでな
+     ければそれは(最後には)0を返す。
+
+ -- Function: int ihash_remove (ihash_t HT, int ID)
+     HTからIDの鍵に伴う項目を削除する。もしそのような要素がなかったら、
+     ゼロを返し、そうでなければ非ゼロを返す。
+
+ -- Function: void ihash_locp_remove (ihash_t HT, void **HT_LOCP)
+     ハッシュ表HTからLOCPにある項目を削除する。LOCPは`ihash_add'への以前
+     の呼び出しから返されたのと同じものである。この呼び出しは
+     `ihash_remove'より速いはずだ。その呼び出しが成功するのに、後始末が
+     行われていない場合には、HTがnullで良い。
+
+
+
+
+File: hurd-ja.info, Node: Misc Library, Next: Bug Address Library, Prev: Integer Hash Library, Up: Foundations
+
+雑多なライブラリ
+================
+
+GNU CライブラリはHurdの必要性を満たすように絶えず発展している。しかしな
+がら、Cライブラリは非常に安定している必要があるので、新しい関数のインター
+フェースを注意深く指定し、完全にそれらを試験することなく、それらを加える
+のは無責任である。
+
+Hurdの配布には`libshouldbeinlibc'と呼ばれるライブラリが含まれ、それはGNU
+Cライブラリへ追加するための試験をする基盤として役に立つ。関数の一部は
+Hurd開発者によってそれに加えられ、それ以外は公式のCライブラリに移動する
+というように、このライブラリは流動的である。
+
+これらの関数は(それらのヘッダ・ファイル以外は)現在解説されていないが、こ
+れらの関数がGNU Cライブラリの一部となるときに、完全な解説が*Note The GNU
+C Library Reference Manual: (libc)Top, に加えられるだろう。
+
+
+
+
+File: hurd-ja.info, Node: Bug Address Library, Prev: Misc Library, Up: Foundations
+
+バグの宛先ライブラリ
+====================
+
+`libhurdbugaddr'は単一の変数を定義するためだけに存在する。
+
+ -- Variable: char * argp_program_bug_address
+     `argp_program_bug_address'はデフォルトのHurdバグ報告用e-mailアドレ
+     スで、bug-hurd@gnu.orgである。この宛先は標準的なHurdサーバやユーティ
+     リティのいづれかが`--help'オプションを使って起動されたときにユーザ
+     に示される。
+
+
+
+
+File: hurd-ja.info, Node: Input and Output, Next: Files, Prev: Foundations, Up: Top
+
+入力と出力
+**********
+
+GNU Hurdのほとんど全てのサーバで相互に作用するために使われているので、
+I/Oサブシステムに伴う特定のプログラムやサーバはない。それはI/Oチャネルを
+読んだり書いたりするための能力を提供しており、I/OチャネルはGNU Cライブラ
+リにおけるファイルやソケットの記述子の土台となる実装である。
+
+* Menu:
+
+* Iohelp Library::              I/Oの認証とロックの管理。
+* Pager Library::               マルチスレッド化された外部ページャの実装。
+* I/O Interface::               RPCに基く入出力チャネル。
+
+
+
+File: hurd-ja.info, Node: Iohelp Library, Next: Pager Library, Prev: Input and Output, Up: Input and Output
+
+iohelpライブラリ
+================
+
+`<hurd/iohelp.h>'ファイルは低水準のI/Oの実装に役立つ、いくつかの関数を宣
+言している。ほとんどのHurdサーバはこれらの関数を直接呼び出さないが、それ
+らはHurdのファイルシステムやネットワーキング支援ライブラリのいくらかで使
+われている。`libiohelp'は`libthreads'を必要とする。
+
+* Menu:
+
+* I/O Users::                   ユーザ認証の管理。
+* Conch Management::            非難された共有I/Oの実装。
+
+
+
+File: hurd-ja.info, Node: I/O Users, Next: Conch Management, Prev: Iohelp Library, Up: Iohelp Library
+
+I/Oのユーザ
+-----------
+
+ほとんどのI/Oサーバはある種のユーザ認証確認を実装する必要がある。その過
+程を容易にするために、単一の`struct iouser'にidvecの組(FIXME: xref to C
+library)を要約するいくつかの関数を持つ。
+
+ -- Function: struct iouser * iohelp_create_iouser (struct idvec *UIDS, struct idvec *GIDS)
+     指定されたUIDSとGIDSに対し新しいIOUSERを生成する。
+
+ -- Function: struct iouser * iohelp_dup_iouser (struct iouser *IOUSER)
+     IOUSERの複製を返す。
+
+ -- Function: void iohelp_free_iouser (struct iouser *IOUSER)
+     IOUSERへの参照を解放する。
+
+I/O再認証は信頼される第三者として認証サーバを伴ういくぶん複雑なプロトコ
+ルである (*Note Auth Protocol::)。駄目な実装の危険性を減らすために、I/O
+再認証は`iohelp_reauth'関数に要約されている。
+
+ -- Function: struct iouser * iohelp_reauth (auth_t AUTHSERVER, mach_port_t REND_PORT, mach_port_t NEWRIGHT, int PERMIT_FAILURE)
+     再認証の処理を管理し、新しいIOUSERを返す。AUTHSERVERはI/Oサーバの認
+     証portである。ユーザによって提供される待ち合わせのportはREND_PORTで
+     ある。
+
+     もし処理が完了できなければ、PERMIT_FAILUREが非ゼロでなければゼロを
+     返す。もしPERMIT_FAILUREが非ゼロで、処理が失敗したなら、識別子を持
+     たないIOUSERを返す。ユーザに送られる新しいportはNEWRIGHTである。
+
+
+
+
+File: hurd-ja.info, Node: Conch Management, Prev: I/O Users, Up: Iohelp Library
+
+conchの管理
+-----------
+
+"conch"は共有メモリI/Oサブシステムの心臓部にある。いくつかのHurdライブラ
+リは共有I/Oを実装し、だから`libiohelp'はconch管理を容易にする関数を含む。
+
+共有I/Oに関するものはどれでも解説されていない。なぜなら、それは十分な性
+能には必要なく、RPCインターフェースはもっと単純だからだ (*Note I/O
+Interface::)。新しいライブラリやサーバが共有I/Oを実装するのは役に立たな
+い。
+
+
+
+
+File: hurd-ja.info, Node: Pager Library, Next: I/O Interface, Prev: Iohelp Library, Up: Input and Output
+
+ページャ・ライブラリ
+====================
+
+"外部ページャ" ("XP")マイクロカーネル・インターフェースはハードウェアの
+ページ・フォールトをRPCリクエストに変換することによって、アプリケーショ
+ンがメモリ・オブジェクトにbacking storeを提供できるようにする。外部ペー
+ジャはmemory-mapped I/O(*Note Mapped Data::)とstored filesystem (*Note
+Stored Filesystems::)に必要とされる。
+
+外部ページャのインターフェースは非常に複雑なので、Hurdページャ・ライブラ
+リはマルチスレッド化された外部ページャを作ることを目的とする関数を含む。
+`libpager'は`<hurd/pager.h>'で宣言され、スレッドとportライブラリだけを必
+要とする。
+
+* Menu:
+
+* Pager Management::            外部ページャへの高水準なインターフェース。
+* Pager Callbacks::             ユーザが定義しなければならない関数。
+
+
+
+
+File: hurd-ja.info, Node: Pager Management, Next: Pager Callbacks, Prev: Pager Library, Up: Pager Library
+
+ページャの管理
+--------------
+
+ページャ・ライブラリはマルチスレッド化されたページャを実現するために
+`struct pager'データ型を定義する。ページャを生成するための一般的な手続き
+は、*Note Pager Callbacks::で列挙される関数を定義し、ページャがアクセス
+するportのための`libports' bucketを確保し、少なくとも一つの新しい`struct
+pager'を`pager_create'で生成することである。
+
+ -- Function: struct pager * pager_create (struct user_pager_info *U_PAGER, struct port_bucket *BUCKET, boolean_t MAY_CACHE, memory_object_copy_strategy_t COPY_STRATEGY)
+     新しいページャを生成する。ページャは(`libports'を使って、BUCKETに)
+     それのために生成されたportを持つようになり、直ちにリクエストを受け
+     付ける準備が整うだろう。U_PAGERはその後の`pager_find_address'への呼
+     び出しに提供されるだろう。ページャは一つのユーザ参照を生成させるだ
+     ろう。MAY_CACHEとCOPY_STRATEGYはMEMORY_OBJECT_READYに対するものと同
+     じ、これらの属性の元の値である。ユーザは関連したportのライブラリ関
+     数を使用してページャへの参照を生成してよい。エラーでnullを返し、
+     `errno'を設定する。
+
+制御をページャ・ライブラリに引き渡す準備が整うと、`pager_demuxer'をport
+のDEMUXERとして使ってBUCKET上で
+`ports_manage_port_operations_multithread'を呼び出すべきだ。これは全ての
+外部ページャRPCを処理し、必要なとき、あなたのページャコールバックを起動
+するだろう。
+
+ -- Function: int pager_demuxer (mach_msg_header_t *INP, mach_msg_header_t *OUTP)
+     ページャのportにやって来る`libports'メッセージをdemultiplexする。
+
+以下の関数はページャ・ライブラリの本体であり、ページャの機能へのすっきり
+したインターフェースを提供する。
+
+ -- Function: void pager_sync (struct pager *PAGER, int WAIT)
+ -- Function: void pager_sync_some (struct pager *PAGER, vm_address_t START, vm_size_t LEN, int WAIT)
+     ページャPAGERからそのbacking storeへデータを書き込む。WAITが設定さ
+     れている場合に限り、その全ての書き込みが完了するまで待つ。
+
+     `pager_sync'は全てのデータを書き込む。`pager_sync_some'はSTARTで始
+     まるデータをLENバイトだけ書き込む。
+
+ -- Function: void pager_flush (struct pager *PAGER, int WAIT)
+ -- Function: void pager_flush_some (struct pager *PAGER, vm_address_t START, vm_size_t LEN, int WAIT)
+     カーネルからページャPAGERのデータをフラッシュし、未処理の遅らされた
+     コピーを強制する。WAITが設定されている場合に限り、全てのページがフ
+     ラッシュされるまで待つ。
+
+     `pager_flush'は全てのデータをフラッシュする。`pager_flush_some'は
+     STARTで始まるデータをLENバイトだけフラッシュする。
+
+ -- Function: void pager_return (struct pager *PAGER, int WAIT)
+ -- Function: void pager_return_some (struct pager *PAGER, vm_address_t START, vm_size_t LEN, int WAIT)
+     カーネルからページャPAGERのデータをフラッシュし、未処理の遅らされた
+     コピーを強制する。WAITが設定されている場合に限り、全てのページがフ
+     ラッシュされるまで待つ。カーネルに修正をwrite backさせる。
+
+     `pager_return'は全てのデータをフラッシュして復元する。
+     `pager_return_some'はSTARTで始まるデータをLENバイトだけフラッシュし
+     て復元する。
+
+ -- Function: void pager_offer_page (struct pager *PAGER, int PRECIOUS, int WRITELOCK, vm_offset_t PAGE, vm_address_t BUF)
+     データのページをカーネルに提供する。PRECIOUSが設定されていると、こ
+     のページはいつか将来にページ・アウトされ、そうでなければカーネルに
+     よって外されるかもしれない。もしそのページが現在コアにあると、カー
+     ネルはこの呼び出しを無視するかもしれない。
+
+ -- Function: void pager_change_attributes (struct pager *PAGER, boolean_t MAY_CACHE, memory_object_copy_strategy_t COPY_STRATEGY, int WAIT)
+     ページャPAGERの土台となるメモリ・オブジェクトの属性を変更する。
+     MAY_CACHEとCOPY_STRATEGY引数は`memory_object_change_attributes'に対
+     するものと同様である。WAITが設定されている場合に限り、カーネルが完
+     了を報告するまで待つ。
+
+ -- Function: void pager_shutdown (struct pager *PAGER)
+     ページャの終了を強制する。これが返った後、ページャへのページング・
+     リクエストはもはや受理されず、ページャは解放されるだろう。最初に完
+     了する現在未処理のページング・リクエストがあるなら、本当の解放は非
+     同期的に起きるだろう (1) (*Note Pager Management-Footnotes::)。
+
+
+ -- Function: error_t pager_get_error (struct pager *P, vm_address_t ADDR)
+     Return the error code of the last page error for pager P at address
+     ADDR. (2) (*Note Pager Management-Footnotes::)
+
+ -- Function: error_t pager_memcpy (struct pager *PAGER, memory_object_t MEMOBJ, vm_offset_t OFFSET, void *OTHER, size_t *SIZE, vm_prot_t PROT)
+     Try to copy `*SIZE' bytes between the region OTHER points to and
+     the region at OFFSET in the pager indicated by PAGER and MEMOBJ.
+     If PROT is `VM_PROT_READ', copying is from the pager to OTHER; if
+     PROT contains `VM_PROT_WRITE', copying is from OTHER into the
+     pager.  `*SIZE' is always filled in the actual number of bytes
+     successfully copied.  Returns an error code if the pager-backed
+     memory faults; if there is no fault, returns zero and `*SIZE' will
+     be unchanged.
+
+These functions allow you to recover the internal `struct pager' state,
+in case the `libpager' interface doesn't provide an operation you need:
+
+ -- Function: struct user_pager_info * pager_get_upi (struct pager *P)
+     Return the `struct user_pager_info' associated with a pager.
+
+ -- Function: mach_port_t pager_get_port (struct pager *PAGER)
+     Return the port (receive right) for requests to the pager.  It is
+     absolutely necessary that a new send right be created from this
+     receive right.
+
+
+
+File: hurd-ja.info  Node: Pager Management-Footnotes, Up: Pager Management
+
+(1) 訳注: XXX
+
+(2) Note that this function will be deleted when the Mach pager
+interface is fixed to provide this information.
+
+
+
+File: hurd-ja.info, Node: Pager Callbacks, Prev: Pager Management, Up: Pager Library
+
+Pager Callbacks
+---------------
+
+Like several other Hurd libraries, `libpager' depends on you to
+implement application-specific callback functions.  You *must* define
+the following functions:
+
+ -- Function: error_t pager_read_page (struct user_pager_info *PAGER, vm_offset_t PAGE, vm_address_t *BUF, int *WRITE_LOCK)
+     For pager PAGER, read one page from offset PAGE.  Set `*BUF' to be
+     the address of the page, and set `*WRITE_LOCK' if the page must be
+     provided read-only.  The only permissable error returns are `EIO',
+     `EDQUOT', and `ENOSPC'.
+
+ -- Function: error_t pager_write_page (struct user_pager_info *PAGER, vm_offset_t PAGE, vm_address_t BUF)
+     For pager PAGER, synchronously write one page from BUF to offset
+     PAGE.  In addition, `vm_deallocate' (or equivalent) BUF.  The only
+     permissable error returns are `EIO', `EDQUOT', and `ENOSPC'.
+
+ -- Function: error_t pager_unlock_page (struct user_pager_info *PAGER, vm_offset_t ADDRESS)
+     A page should be made writable.
+
+ -- Function: error_t pager_report_extent (struct user_pager_info *PAGER, vm_address_t *OFFSET, vm_size_t *SIZE)
+     This function should report in `*OFFSET' and `*SIZE' the minimum
+     valid address the pager will accept and the size of the object.
+
+ -- Function: void pager_clear_user_data (struct user_pager_info *PAGER)
+     This is called when a pager is being deallocated after all extant
+     send rights have been destroyed.
+
+ -- Function: void pager_dropweak (struct user_pager_info *P)
+     This will be called when the ports library wants to drop weak
+     references.  The pager library creates no weak references itself,
+     so if the user doesn't either, then it is alright for this function
+     to do nothing.
+
+
+
+
+File: hurd-ja.info, Node: I/O Interface, Prev: Pager Library, Up: Input and Output
+
+I/O Interface
+=============
+
+The I/O interface facilities are described in `<hurd/io.defs>'.  This
+section discusses only RPC-based I/O operations. (1) (*Note I/O
+Interface-Footnotes::)
+
+* Menu:
+
+* I/O Object Ports::            How ports to I/O objects work.
+* Simple Operations::           Read, write, and seek.
+* Open Modes::                  State bits that affect pieces of operation.
+* Asynchronous I/O::            How to be notified when I/O is possible.
+* Information Queries::         How to implement `io_stat' and
+                                  `io_server_version'.
+* Mapped Data::                 Getting memory objects referring to the
+                                  data of an I/O object.
+
+
+File: hurd-ja.info  Node: I/O Interface-Footnotes, Up: I/O Interface
+
+(1) The latter portion of `<hurd/io.defs>' and all of
+`<hurd/shared.h>' describe how to implement shared-memory I/O
+operations.  However, shared I/O has been deprecated.  *Note Conch Management::, for more details.
+
+
+
+File: hurd-ja.info, Node: I/O Object Ports, Next: Simple Operations, Prev: I/O Interface, Up: I/O Interface
+
+I/O Object Ports
+----------------
+
+The I/O server must associate each I/O port with a particular set of
+uids and gids, identifying the user who is responsible for operations on
+the port.  Every port to an I/O server should also support either the
+file protocol (*Note File Interface::) or the socket protocol (*Note
+Socket Interface::); naked I/O ports are not allowed.
+
+In addition, the server associates with each port a default file
+pointer, a set of open mode bits, a pid (called the "owner"), and some
+underlying object which can absorb data (for write) or provide data (for
+read).
+
+The uid and gid sets associated with a port may not be visibly shared
+with other ports, nor may they ever change.  The server must fix the
+identification of a set of uids and gids with a particular port at the
+moment of the port's creation.  The other characteristics of an I/O port
+may be shared with other users.  The I/O server interface does not
+generally specify in what way servers may share these other
+characteristics are shared (with the exception of the deprecated
+`O_ASYNC' interface); however, the file and socket interfaces make
+further requirements about what sharing is expected and prohibited from
+occurring.
+
+In general, users get send rights to I/O ports by some mechanism that is
+external to the I/O protocol.  (For example fileservers give out I/O
+ports in response to the `dir_lookup' and `fsys_getroot' calls.  Socket
+servers give out ports in response to the `socket_create' and
+`socket_accept' calls.)  However, the I/O protocol provides methods of
+obtaining new ports that refer to the same underlying object as another
+port.  In response to all of these calls, all underlying state
+(including, but not limited to, the default file pointer, open mode
+bits, and underlying object) must be shared between the old and new
+ports.  In the following descriptions of these calls, the term
+"identical" means this kind of sharing.  All these calls must return
+send rights to a newly-constructed Mach port.
+
+The `io_duplicate' call simply returns another port which is identical
+to an existing port and has the same uid and gid set.
+
+The `io_restrict_auth' call returns another port, identical to the
+provided port, but which has a smaller associated uid and gid set.  The
+uid and gid sets of the new port are the intersection of the set on the
+existing port and the lists of uids and gids provided in the call.
+
+Users use the `io_reauthenticate' call when they wish to have an
+entirely new set of uids or gids associated with a port.  In response to
+the `io_reauthenticate' call, the server must create a new port, and
+then make the call `auth_server_authenticate' to the auth server.  The
+rendezvous port for the `auth_server_authenticate' call is the I/O port
+to which was made the `io_reauthenticate' call.  The server provides the
+REND_INT parameter to the auth server as a copy from the corresponding
+parameter in the `io_reauthenticate' call.  The I/O server also gives
+the auth server a new port; this must be a newly created port identical
+to the old port.  The authserver will return the set of uids and gids
+associated with the user, and guarantees that the new port will go
+directly to the user that possessed the associated authentication port.
+The server then identifies the new port given out with the specified
+ID's.
+
+
+
+File: hurd-ja.info, Node: Simple Operations, Next: Open Modes, Prev: I/O Object Ports, Up: I/O Interface
+
+Simple Operations
+-----------------
+
+Users write to I/O ports by calling the `io_write' RPC.  They specify an
+OFFSET parameter; if the object supports writing at arbitrary offsets,
+the server should honour this parameter.  If -1 is passed as the offset,
+then the server should use the default file pointer.  The server should
+return the amount of data which was successfully written.  If the
+operation was interrupted after some but not all of the data was
+written, then it is considered to have succeeded and the server should
+return the amount written.  If the port is not an I/O port at all, the
+server should reply with the error `EOPNOTSUPP'.  If the port is an I/O
+port, but does not happen to support writing, then the correct error is
+`EBADF'.
+
+Users read from I/O ports by calling the `io_read' RPC.  They specify
+the amount of data they wish to read and the offset.  The offset has the
+same meaning as for `io_write' above.  The server should return the data
+that was read.  If the call is interrupted after some data has been read
+(and the operation is not idempotent) then the server should return the
+amount read, even if less than the amount requested.  The server should
+return as much data as possible, but never more than requested by the
+user.  If there is no data, but there might be later, the call should
+block until data becomes available.  Indicate end-of-file conditions by
+returning zero bytes.  If the call is interrupted after some data has
+been read, but the call is idempotent, then the server may return
+`EINTR' rather than actually filling the buffer (taking care that any
+modifications of the default file pointer have been reversed).
+Preferably, however, servers should return data.
+
+There are two categories of objects: seekable and non-seekable.
+Seekable objects must accept arbitrary offset parameters in the
+`io_read' and `io_write' calls, and to implement the `io_seek' call.
+Nonseekable objects must ignore the offset parameters to `io_read' and
+`io_write', and should return `ESPIPE' to the `io_seek' call.
+
+On seekable objects, `io_seek' changes the default file pointer for
+reads and writes.  (*Note File Positioning: (libc)File Positioning, for
+the interpretation of the WHENCE and OFFSET arguments.)  It returns the
+new offset as modified by `io_seek'.
+
+The `io_readable' interface returns the amount of data which can be
+immediately read.  For the special technical meaning of "immediately",
+see *Note Asynchronous I/O::.
+
+
+
+File: hurd-ja.info, Node: Open Modes, Next: Asynchronous I/O, Prev: Simple Operations, Up: I/O Interface
+
+Open Modes
+----------
+
+The server associates each port with a set of bits that affect its
+operation.  The `io_set_all_openmodes' call modifies these bits and the
+`io_get_openmodes' call returns them.  In addition, the
+`io_set_some_openmodes' and `io_clear_some_openmodes' do an atomic
+read/modify/write of the openmodes.
+
+The `O_APPEND' bit, when set, changes the behaviour of `io_write' when
+it uses the default file pointer on seekable objects.  When `io_write'
+is done on a port with the `O_APPEND' bit set, is must set the file
+pointer to the current file size before doing the write (which would
+then increment the file pointer as usual).  The "current file size" is
+the smallest offset which returns end-of-file when provided to
+`io_read'.  The server must atomically bind this update to the actual
+data write with respect to other users of `io_read', `io_write', and
+`io_seek'.
+
+The `O_FSYNC' bit, when set, guarantees that `io_write' will not return
+until data is fully written to the underlying medium.
+
+The `O_NONBLOCK' bit, when set, prevents read and write from blocking.
+They should copy such data as is immediately available.  If no data is
+immediately available they should return `EWOULDBLOCK'.
+
+The definition of "immediately" is more-or-less server-dependent.  Some
+servers, notably stored filesystem servers (*Note Stored Filesystems::),
+regard all data as immediately available.  The one criterion is that
+something which must happen "immediately" may not wait for any
+user-synchronizable event.
+
+The `O_ASYNC' bit is deprecated; its use is documented in the following
+section.  This bit must be shared between all users of the same
+underlying object.
+
+
+
+
+File: hurd-ja.info, Node: Asynchronous I/O, Next: Information Queries, Prev: Open Modes, Up: I/O Interface
+
+Asynchronous I/O
+----------------
+
+Users may wish to be notified when I/O can be done without blocking;
+they use the `io_async' call to indicate this to the server.  In the
+`io_async' call the user provides a port on which will the server should
+send `sig_post' messages as I/O becomes possible.  The server must
+return a port which will be the reference port in the `sig_post'
+messages.  Each `io_async' call should generate a new reference port.
+(FIXME: xref the C library manual for information on how to send
+sig_post messages.)
+
+The server then sends one `SIGIO' signal to each registered async user
+everytime I/O becomes possible.  I/O is possible if at least one byte
+can be read or written immediately.  The definition of "immediately"
+must be the same as for the implementation of the `O_NONBLOCK' flag
+(*Note Open Modes::).  In addition, every time a user calls io_read or
+io_write on a non-seekable object, or at the default file pointer on a
+seekable object, another signal should be sent to each user if I/O is
+still possible.
+
+Some objects may also define "urgent" conditions.  Such servers should
+send the `SIGURG' signal to each registered async user anytime an urgent
+condition appears.  After any RPC that has the possibility of clearing
+the urgent condition, the server should again send the signal to all
+registered users if the urgent condition is still present.
+
+A more fine-grained mechanism for doing async I/O is the `io_select'
+call.  The user specifies the kind of access desired, and a send-once
+right.  If I/O of the kind the user desires is immediately possible,
+then the server should return so indicating, and destroy the send-once
+right.  If I/O is not immediately possible, the server should save the
+send-once right, and send a `select_done' message as soon as I/O becomes
+immediately possible.  Again, the definition of "immediately" must be
+the same for `io_select', `io_async', and `O_NONBLOCK' (*Note Open
+Modes::).
+
+For compatibility with 4.2 and 4.3 BSD, the I/O interface provides a
+deprecated feature (known as "icky async I/O").  The calls
+`io_mod_owner' and `io_get_owner' to set the "owner" of the object,
+providing either a pid or a pgrp (if the value is negative).  This
+implies that only one process at a time can do icky I/O on a given
+object.  Whenever the I/O server is sending `sig_post' messages to all
+the `io_async' users, if the `O_ASYNC' bit is set, the server should
+also send a signal to the owning pid/pgrp.  The ID port for this call
+should be different from all the `io_async' ID ports given to users.
+Users may find out what ID port the server uses for this by calling
+`io_get_icky_async_id'.
+
+
+
+File: hurd-ja.info, Node: Information Queries, Next: Mapped Data, Prev: Asynchronous I/O, Up: I/O Interface
+
+Information Queries
+-------------------
+
+Users may call `io_stat' to find out information about the I/O object.
+Most of the fields of a `struct stat' are meaningful only for files.
+All objects, however, must support the fields `st_fstype', ST_FSID,
+ST_INO, ST_ATIME, ST_ATIME_USEC, ST_MTIME_USER, ST_CTIME, ST_CTIME_USEC,
+and ST_BLKSIZE.
+
+ST_FSTYPE, ST_FSID, and ST_INO must be unique for the underlying object
+across the entire system.
+
+ST_ATIME and ST_ATIME_USEC hold the seconds and microseconds,
+respectively, of the system clock at the last time the object was read
+with `io_read'.
+
+ST_MTIME and ST_MTIME_USEC hold the second and microseconds,
+respectively, of the system clock at the last time the object was
+written with `io_write'.
+
+Other appropriate operations may update the ATIME and the MTIME as well;
+both the file and socket interfaces specify such operations.
+
+ST_CTIME and ST_CTIME_USEC hold the seconds and microseconds,
+respectively, of the system clock at the last time permanent meta-data
+associated with the object was changed.  The exact operations which
+couse such an update are server-dependent, but must include the creation
+of the object.
+
+The server is permitted to delay the actual update of these times until
+stat is called; before the server stores the times on permanent media
+(if it ever does so) it should update them if necessary.
+
+ST_BLKSIZE gives the optimal I/O size in bytes for `io_read' and
+`io_write'; users should endeavor to read and write amounts which are
+multiples of the optimal size, and to use offsets which are multiples of
+the optimal size
+
+In addition, objects which are seekable should set ST_SIZE to the
+current file size as in the description of the `O_APPEND' flag (*Note
+Open Modes::).
+
+The ST_UID and ST_GID fields are unrelated to the "owner" as described
+above for icky async I/O.
+
+Users may find out the version of the server they are talking to by
+calling `io_server_version'; this should return strings and integers
+describing the version number of the server, as well as its name.
+
+
+
+File: hurd-ja.info, Node: Mapped Data, Prev: Information Queries, Up: I/O Interface
+
+Mapped Data
+-----------
+
+Servers may optionally implement the `io_map' call.  The ports returned
+by `io_map' must implement the external pager kernel interface (*Note
+Pager Library::) and be suitable as arguments to `vm_map'.
+
+Seekable objects must allow access from zero up to (but not including)
+the current file size as described for `O_APPEND' (*Note Open Modes::).
+Whether they provide access beyond such a point is server-dependent; in
+addition, the meaning of accessing a non-seekable object is
+server-dependent.
+
+
+
+
+File: hurd-ja.info, Node: Files, Next: Special Files, Prev: Input and Output, Up: Top
+
+Files
+*****
+
+A file is traditionally thought of as a quantity of disk storage.  In
+the Hurd, files are an extension of the I/O interface, but they do not
+necessarily correspond to disk storage.
+
+Every file in the Hurd is represented by a port, which is connected to
+the server that manages the file.  When a client wants to operate on a
+file, it makes RPC requests via a file port to its server process, which
+is commonly called a "translator".
+
+* Menu:
+
+* Translators::                 Extending the Hurd filesystem hierarchy.
+* Trivfs Library::              Implementing single-file translators.
+* Fshelp Library::              Miscellaneous generic filesystem routines.
+* File Interface::              File ports implement the file interface.
+* Filesystem Interface::        Translator control interface.
+
+
+
+
+File: hurd-ja.info, Node: Translators, Next: Trivfs Library, Prev: Files, Up: Files
+
+Translators
+===========
+
+The Hurd filesystem allows you to set translators on any file or
+directory that you own.  A "translator" is any Hurd server which
+provides the basic filesystem interface.  Translated nodes are somewhat
+like a cross between Unix symbolic links and mount points.
+
+Whenever a program tries to access the contents of a translated node,
+the filesystem server redirects the request to the appropriate
+translator (starting it if necessary).  Then, the new translator
+services the client's request.  The GNU C library makes this behaviour
+seamless from the client's perspective, so that standard Unix programs
+behave correctly under the Hurd.
+
+Translators run with the priviledges of the translated node's *owner*,
+so they cannot be used to compromise the security of the system.  This
+also means that *any* user can write their own translators, and provide
+other users with arbitrary filesystem-structured data, regardless of the
+data's actual source.  Other chapters in this manual describe existing
+translators, and how you can modify them or write your own.
+
+The standard Hurd filesystem servers are constantly evolving to provide
+innovative features that users want.  Here are a few examples of
+existing translators:
+
+   * Disk-based filesystem formats, such as `ext2fs', `ufs', and `isofs'
+     (*Note Stored Filesystems::).
+
+   * Network filesystems, such as `nfs' and `ftpfs' (*Note Distributed
+     Filesystems::).
+
+   * Single files with dynamic content, such as a `~/.plan' which is
+     automatically updated every time somebody fingers your account.
+
+   * Filesystem nodes can serve as naming points for standard Hurd
+     servers, even if they are unrelated to the filesystem.  For
+     example, `pflocal' implements the filesystem interfaces, but it
+     also provides a special Unix-domain socket RPC interface (FIXME
+     xref).  Programs can fetch a port to this translator simply by
+     calling `file_name_lookup' (FIXME xref) on `/servers/socket/1' (1)
+     (*Note Translators-Footnotes::) then use Unix socket-specific RPC's
+     on that port.
+
+This section focuses on the generic programs that need to be understood
+in order to use existing translators.  Many other parts of this manual
+describe how you can write your own translators.
+
+* Menu:
+
+* Invoking settrans::           Declaring how a node should be translated.
+* Invoking showtrans::          Displaying how nodes are translated.
+* Invoking mount::              Unix-compatible active filesystem translators.
+* Invoking fsysopts::           Modifying translation parameters at runtime.
+
+
+
+File: hurd-ja.info  Node: Translators-Footnotes, Up: Translators
+
+(1) The number 1 corresponds to the `PF_LOCAL' C library
+socket domain constant.
+
+
+
+File: hurd-ja.info, Node: Invoking settrans, Next: Invoking showtrans, Prev: Translators, Up: Translators
+
+Invoking `settrans'
+-------------------
+
+The `settrans' program allows you to set a translator on a file or
+directory.  By default, the passive translator is set (see the
+`--passive' option).
+
+The `settrans' program has the following synopsis:
+
+     settrans [OPTION]... NODE [TRANSLATOR ARG...]
+
+where TRANSLATOR is the absolute filename of the new translator program.
+Each ARG is passed to TRANSLATOR when it starts.  If TRANSLATOR is not
+specified, then `settrans' clears the existing translator rather than
+setting a new one.
+
+`settrans' accepts the following options:
+
+`-a'
+`--active'
+     Set NODE's active translator.  "Active translators" are started
+     immediately and are not persistent: if the system is rebooted then
+     they are lost.
+
+`-c'
+`--create'
+     Create NODE as a zero-length file if it doesn't already exist.
+
+`-L'
+`--dereference'
+     If NODE is already translated, stack the new translator on top of
+     it (rather than replacing the existing translator).
+
+`--help'
+     Display a brief usage message, then exit.
+
+`-p'
+`--passive'
+     Set NODE's passive translator.  "Passive translators" are only
+     activated by the underlying filesystem when clients try to use the
+     NODE, and they shut down automatically after they are no longer
+     active in order to conserve system resources.
+
+     Passive translators are stored on the underlying filesystem media,
+     and so they persist between system reboots.  Not all filesystems
+     support passive translators, due to limitations in their underlying
+     media...  consult the filesystem-specific documentation to see if
+     they are supported.
+
+     If you are setting the passive translator, and NODE already has an
+     active translator, then the following options apply:
+
+     `-g'
+     `--goaway'
+          Tell the active translator to go away.  In this case, the
+          following additional options apply:
+
+          `-f'
+          `--force'
+               If the active translator doesn't go away, then force it.
+
+          `-S'
+          `--nosync'
+               Don't flush its contents to disk before terminating.
+
+          `-R'
+          `--recursive'
+               Shut down all of the active translator's children, too.
+
+
+     `-k'
+     `--keep-active'
+          Leave the existing active translator running.  The new
+          translator will not be started unless the active translator
+          has stopped.
+
+`-P'
+`--pause'
+     When starting an active translator, prompt and wait for a newline
+     on standard input before completing the startup handshake.  This is
+     useful when debugging a translator, as it gives you time to start
+     the debugger.
+
+`-t SEC'
+`--timeout=SEC'
+     If the translator does not start up in SEC seconds (the default is
+     60), then return an error; if SEC is 0, then never timeout.
+
+`--version'
+     Output program version information and exit.
+
+`-x'
+`--exclusive'
+     Only set the translator if there is none already.
+
+
+FIXME: finish
+
+
+File: hurd-ja.info, Node: Invoking showtrans, Next: Invoking fsysopts, Prev: Invoking settrans, Up: Translators
+
+Invoking `showtrans'
+--------------------
+
+
+File: hurd-ja.info, Node: Invoking mount, Prev: Invoking showtrans, Up: Translators
+
+Invoking `mount'
+----------------
+
+
+File: hurd-ja.info, Node: Invoking fsysopts, Prev: Invoking mount, Up: Translators
+
+Invoking `fsysopts'
+-------------------
+
+
+
+
+File: hurd-ja.info, Node: Trivfs Library, Next: Fshelp Library, Prev: Translators, Up: Files
+
+Trivfs Library
+==============
+
+Certain translators do not need to be very complex, because they
+represent a single file rather than an entire directory hierarchy.  The
+trivfs library, which is declared in `<hurd/trivfs.h>', does most of the
+work of implementing this kind of translator.  This library requires the
+iohelp and ports libraries.
+
+* Menu:
+
+* Trivfs Startup::              Writing a simple trivfs-based translator.
+* Trivfs Callbacks::            Mandatory user-defined trivfs functions.
+* Trivfs Options::              Optional user-defined trivfs functions.
+* Trivfs Ports::                Managing control and protid ports.
+
+
+
+File: hurd-ja.info, Node: Trivfs Startup, Next: Trivfs Callbacks, Prev: Trivfs Library, Up: Trivfs Library
+
+Trivfs Startup
+--------------
+
+In order to use the trivfs library, you will need to define the
+appropriate callbacks (*Note Trivfs Callbacks::).  As with all Hurd
+servers, your trivfs-based translator should first parse any
+command-line options, in case the user is just asking for help.  Trivfs
+uses argp (*Note Argp: (libc)Argp.)  for parsing command-line arguments.
+
+Your translator should redefine the following functions and variables as
+necessary, and then call `argp_parse' with the relevant arguments:
+
+ -- Variable: extern struct argp * trivfs_runtime_argp
+     If this is defined or set to an argp structure, it will be used by
+     the default `trivfs_set_options' to handle runtime options parsing.
+     Redefining this is the normal way to add option parsing to a trivfs
+     program.
+
+ -- Function: error_t trivfs_set_options (struct trivfs_control *FSYS, char *ARGZ, size_t ARGZ_LEN)
+     Set runtime options for FSYS to ARGZ and ARGZ_LEN.  The default
+     definition for this routine simply uses TRIVFS_RUNTIME_ARGP
+     (supplying FSYS as the argp input field).
+
+ -- Function: error_t trivfs_append_args (struct trivfs_control *FSYS, char **ARGZ, size_t *ARGZ_LEN)
+     Append to the malloced string `*ARGZ' of length `*ARGZ_LEN' a
+     NUL-separated list of the arguments to this translator.
+
+After your translator parses its command-line arguments, it should fetch
+its bootstrap port by using `task_get_bootstrap_port'.  If this port is
+`MACH_PORT_NULL', then your program wasn't started as a translator.
+Otherwise, you can use the bootstrap port to create a new control
+structure (and advertise its port) with `trivfs_startup':
+
+ -- Function: error_t trivfs_startup (mach_port_t BOOTSTRAP, int FLAGS, struct port_class *CONTROL_CLASS, struct port_bucket *CONTROL_BUCKET, struct port_class *PROTID_CLASS, struct port_bucket *PROTID_BUCKET, struct trivfs_control **CONTROL)
+ -- Function: error_t trivfs_create_control (mach_port_t BOOTSTRAP, struct port_class *CONTROL_CLASS, struct port_bucket *CONTROL_BUCKET, struct port_class *PROTID_CLASS, struct port_bucket *PROTID_BUCKET, struct trivfs_control **CONTROL)
+     `trivfs_startup' creates a new trivfs control port, advertises it
+     to the underlying node BOOTSTRAP with `fsys_startup', returning the
+     results of this call, and places its control structure in
+     `*CONTROL'.  `trivfs_create_control' does the same thing, except it
+     doesn't advertise the control port to the underlying node.
+     CONTROL_CLASS and CONTROL_BUCKET are passed to `libports' to create
+     the control port, and PROTID_CLASS and PROTID_BUCKET are used when
+     creating ports representing opens of this node; any of these may be
+     zero, in which case an appropriate port class/bucket is created.
+     If CONTROL is non-null, the trivfs control port is returned in it.
+     FLAGS (a bitmask of the appropriate `O_*' constants) specifies how
+     to open the underlying node.
+
+If you did not supply zeros as the class and bucket arguments to
+`trivfs_startup', you will probably need to use the trivfs port
+management functions (*Note Trivfs Ports::).
+
+Once you have successfully called `trivfs_startup', and have a pointer
+to the control structure stored in, say, the FSYS variable, you are
+ready to call one of the `ports_manage_port_operations_*' functions
+using `FSYS->pi.bucket' and `trivfs_demuxer'.  This will handle any
+incoming filesystem requests, invoking your callbacks when necessary.
+
+ -- Function: int trivfs_demuxer (mach_msg_header_t *INP, mach_msg_header_t *OUTP)
+     Demultiplex incoming `libports' messages on trivfs ports.
+
+The following functions are not usually necessary, but they allow you to
+use the trivfs library even when it is not possible to turn
+message-handling over to `trivfs_demuxer' and `libports':
+
+ -- Function: struct trivfs_control * trivfs_begin_using_control (mach_port_t PORT)
+ -- Function: struct trivfs_protid * trivfs_begin_using_protid (mach_port_t PORT)
+     These functions can be used as `intran' functions for a MiG port
+     type to have the stubs called with either the control or protid
+     pointer.
+
+ -- Function: void trivfs_end_using_control (struct trivfs_control *PORT)
+ -- Function: void trivfs_end_using_protid (struct trivfs_protid *PORT)
+     These can be used as `destructor' functions for a MiG port type, to
+     have the stubs called with the control or protid pointer.
+
+ -- Function: error_t trivfs_open (struct trivfs_control *FSYS, struct iouser *USER, unsigned FLAGS, mach_port_t REALNODE, struct trivfs_protid **CRED)
+     Return a new protid (that is, a port representing an open of this
+     node) pointing to a new peropen in CRED, with REALNODE as the
+     underlying node reference, with the given identity, and open flags
+     in FLAGS.  CNTL is the trivfs control object.
+
+ -- Function: error_t trivfs_protid_dup (struct trivfs_protid *CRED, struct trivfs_protid **DUP)
+     Return a duplicate of CRED in DUP, sharing the same peropen and
+     hook.  A non-null protid HOOK indicates that
+     TRIVFS_PEROPEN_CREATE_HOOK created this protid (*Note Trivfs
+     Options::).
+
+ -- Function: error_t trivfs_set_atime (struct trivfs_control *CNTL)
+ -- Function: error_t trivfs_set_mtime (struct trivfs_control *CNTL)
+     Call these to set atime or mtime for the node to the current time.
+
+
+
+
+File: hurd-ja.info, Node: Trivfs Callbacks, Next: Trivfs Options, Prev: Trivfs Startup, Up: Trivfs Library
+
+Trivfs Callbacks
+----------------
+
+Like several other Hurd libraries, `libtrivfs' requires that you define
+a number of application-specific callback functions and configuration
+variables.  You *must* define the following variables and functions:
+
+ -- Variable: extern int trivfs_fstype
+ -- Variable: extern int trivfs_fsid
+     These variables are returned in the ST_FSTYPE and ST_FSID fields of
+     `struct stat'.  TRIVFS_FSTYPE should be chosen from the `FSTYPE_*'
+     constants found in `<hurd/hurd_types.h>'.
+
+ -- Variable: extern int trivfs_allow_open
+     Set this to some bitwise OR combination of `O_READ', `O_WRITE', and
+     `O_EXEC'; trivfs will only allow opens of the specified modes.
+
+ -- Variable: extern int trivfs_support_read
+ -- Variable: extern int trivfs_support_write
+ -- Variable: extern int trivfs_support_exec
+     Set these to nonzero if trivfs should allow read, write, or execute
+     of the file.  These variables are necessary because
+     TRIVFS_ALLOW_OPEN is used only to validate opens, not actual
+     operations.
+
+ -- Function: void trivfs_modify_stat (struct trivfs_protid *CRED, struct stat *STBUF)
+     This should modify a `struct stat' (as returned from the underlying
+     node) for presentation to callers of `io_stat'.  It is permissable
+     for this function to do nothing, but it must still be defined.
+
+ -- Function: error_t trivfs_goaway (struct trivfs_control *CNTL, int FLAGS)
+     This function is called when someone wants the filesystem CNTL to
+     go away.  FLAGS are from the set `FSYS_GOAWAY_*' found in
+     `<hurd/hurd_types.h>'.
+
+
+
+
+File: hurd-ja.info, Node: Trivfs Options, Next: Trivfs Ports, Prev: Trivfs Callbacks, Up: Trivfs Library
+
+Trivfs Options
+--------------
+
+The functions and variables described in this subsection already have
+default definitions in `libtrivfs', so you are not forced to define
+them; rather, they may be redefined on a case-by-case basis.
+
+ -- Variable: extern struct port_class * trivfs_protid_portclasses[]
+ -- Variable: extern int trivfs_protid_nportclasses
+ -- Variable: extern struct port_class * trivfs_cntl_portclasses[]
+ -- Variable: extern int trivfs_cntl_nportclasses
+     If you define these, they should be vectors (and the associated
+     sizes) of port classes that will be translated into control and
+     protid pointers for passing to RPCs, in addition to those passed to
+     or created by `trivfs_create_control' (or `trivfs_startup') will
+     automatically be recognized.
+
+ -- Variable: error_t (* trivfs_check_open_hook ) (struct trivfs_control *CNTL, struct iouser *USER, int FLAGS)
+     If this variable is set, it is called every time an open happens.
+     USER and FLAGS are from the open; CNTL identifies the node being
+     opened.  This call need not check permissions on the underlying
+     node.  This call can block as necessary, unless `O_NONBLOCK' is set
+     in FLAGS.  Any desired error can be returned, which will be
+     reflected to the user and prevent the open from succeeding.
+
+ -- Variable: error_t (* trivfs_protid_create_hook ) (struct trivfs_protid *PROT)
+ -- Variable: error_t (* trivfs_peropen_create_hook ) (struct trivfs_peropen *PEROP)
+     If these variables are set, they is called every time a new protid
+     or peropen structure is created and initialized.
+
+ -- Variable: void (* trivfs_protid_destroy_hook ) (struct trivfs_protid *PROT)
+ -- Variable: void (* trivfs_peropen_destroy_hook ) (struct trivfs_peropen *PEROP)
+     If these variables is set, they are called every time a protid or
+     peropen structure is about to be destroyed.
+
+ -- Variable: error_t (* trivfs_getroot_hook ) (struct trivfs_control *CNTL, mach_port_t REPLY_PORT, mach_msg_type_name_t REPLY_PORT_TYPE, mach_port_t DOTDOT, uid_t *UIDS, u_int NUIDS, uid_t *GIDS, u_int NGIDS, int FLAGS, retry_type *DO_RETRY, char *RETRY_NAME, mach_port_t *NODE, mach_msg_type_name_t *NODE_TYPE)
+     If this variable is set, it is called by `trivfs_S_fsys_getroot'
+     before any other processing takes place; if the return value is
+     `EAGAIN', normal trivfs getroot processing continues, otherwise the
+     RPC returns with that return value.
+
+
+
+
+File: hurd-ja.info, Node: Trivfs Ports, Prev: Trivfs Options, Up: Trivfs Library
+
+Trivfs Ports
+------------
+
+If you choose to allocate your own trivfs port classes and buckets, the
+following functions may come in handy:
+
+ -- Function: error_t trivfs_add_port_bucket (struct port_bucket **BUCKET)
+     Add the port bucket `*BUCKET' to the list of dynamically allocated
+     port buckets; if `*BUCKET' is zero, an attempt is made to allocate
+     a new port bucket, which is then stored in `*BUCKET'.
+
+ -- Function: void trivfs_remove_port_bucket (struct port_bucket *BUCKET)
+     Remove the previously added dynamic port bucket BUCKET, freeing it
+     if it was allocated by `trivfs_add_port_bucket'.
+
+ -- Function: error_t trivfs_add_control_port_class (struct port_class **CLASS)
+ -- Function: error_t trivfs_add_protid_port_class (struct port_class **CLASS)
+     Add the port class `*CLASS' to the list of control or protid port
+     classes recognized by trivfs; if `*CLASS' is zero, an attempt is
+     made to allocate a new port class, which is stored in `*CLASS'.
+
+ -- Function: void trivfs_remove_control_port_class (struct port_class *CLASS)
+ -- Function: void trivfs_remove_protid_port_class (struct port_class *CLASS)
+     Remove the previously added dynamic control or protid port class
+     CLASS, freeing it if it was allocated by
+     `trivfs_add_control_port_class' or `trivfs_add_protid_port_class'.
+
+Even if you do not use the above allocation functions, you may still be
+able to use the default trivfs cleanroutines:
+
+ -- Function: void trivfs_clean_cntl (void *PORT)
+ -- Function: void trivfs_clean_protid (void *PORT)
+     These functions should be installed as `libports' cleanroutines for
+     control port classes and protid port classes, respectively.
+
+
+
+

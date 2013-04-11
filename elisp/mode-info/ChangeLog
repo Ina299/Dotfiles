@@ -1,0 +1,409 @@
+2007-11-03  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
+
+	* mode-info.el (mode-info-version): Release 0.8.5.
+
+2007-11-02  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
+
+	* mi-util.el (mode-info-save-syntax-table): New macro, which is
+	introduced to avoid breaking the syntax table in the current
+	buffer.
+
+	* mi-libc.el (mode-info-libc-word-at-point): Use
+	`mode-info-save-syntax-table'.
+
+	* mi-perl.el (mode-info-perl-word-at-point): Use
+	`mode-info-save-syntax-table'.
+
+	* mi-ruby.el (mode-info-ruby-word-at-point): Use
+	`mode-info-save-syntax-table'.
+
+2007-05-23  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
+
+	* mode-info.el (mode-info-version): Release 0.8.4.
+
+2007-05-22  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
+
+	* mi-index.el (make-index-file): Don't call `insert-buffer' to
+	suppress a byte-compile warning.
+
+	* mi-fontify.el: Changes to support fancy Info pages provided by
+	Emacs22.
+	(mode-info-fontify-references): New variable.
+	(mode-info-fontify-keywords): Move several rules into the above.
+	(mode-info-fontify-node): Follow the above changes.
+
+2007-05-21  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
+
+	* mi-fontify.el: Changes to avoid stricten checking on
+	font-lock.el of Emacs-22.0.95.
+	(mode-info-fontify-keywords): Don't compile keywords when
+	byte-complation.
+	(mode-info-fontify-node): Call `font-lock-set-defaults'.
+
+2007-04-28  Takashi Masuda  <masutaka@nifty.com>
+
+	* mi-elisp.el (toplevel): Require `help-mode' even when loading
+	this module, in order to avoid byte-compile error of mi-emacs.el.
+
+2007-02-02  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
+
+	* mode-info.el (mode-info-version): Release 0.8.3.
+
+2007-01-31  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
+
+	* mode-info.el (mode-info-default-class-name): Follow parent major
+	modes when a derived major mode is used as the current major mode,
+	to select a default mode-info class.
+
+2006-12-07  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
+
+	* mi-elisp.el: Changes to keep compatibility between a file
+	byte-compiled by Emacs21 and a file byte-compiled by Emacs22.
+	(mode-info-define-button-type): Define when this file is loaded.
+	(mode-info-button-type-get): Ditto.
+	(mode-info-insert-button): Ditto.
+
+2004-11-21  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
+
+	* mode-info.el (mode-info-version): Release 0.8.2.
+
+	* mi-elisp.el (toplevel): Load help-mode.el instead of help.el, in
+	order to avoid overwriting key bindings.  Quote colon-keywords in
+	button definitions.
+
+	* mi-emacs.el (toplevel): Quote a colon-keyword in a button
+	definition.
+
+2004-11-21  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
+
+	* mode-info.el (mode-info-version): Release 0.8.1.
+	(mode-info-goto-info-entry-1): When a line number is equal to
+	zero, search the concerend name instead of using line numbers.
+
+	* mi-elisp.el (mode-info-insert-button): Simplified.
+	(mode-info-elisp-add-function-button): Follow the change of
+	`mode-info-insert-button'.
+	(mode-info-elisp-add-variable-button): Ditto.
+
+	* mi-emacs.el (mode-info-emacs-add-function-button): Follow the
+	change of `mode-info-insert-button'.
+
+	* mi-gauche.el (toplevel): Use `scheme' as its parent class,
+	instead of `guile'.
+	(process-index-node): Follow the upsteram changes.
+
+2004-11-20  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
+
+	* mi-config.el (toplevel): Move button definitions to mi-elisp.el
+	and mi-emacs.el.
+
+	* mi-elisp.el (toplevel): Require help.el.  Import buttons.
+	(mode-info-define-button-type): New function.
+	(mode-info-button-type-get): Ditto.
+	(mode-info-insert-button): Simplified.  Renamed from
+	`mode-info-elisp-insert-button'.
+	(mode-info-elisp-add-function-button): Follow the change of
+	`mode-info-insert-button'.
+	(mode-info-elisp-add-variable-button): Ditto.
+
+	* mi-emacs.el (toplevel): Import a button.
+	(mode-info-emacs-add-function-button): Follow the change of
+	`mode-info-insert-button'.
+
+2004-11-14  Hiroya Murata  <lapis-lazuli@pop06.odn.ne.jp>
+
+	* mi-util.el (mode-info-static-when): New macro.
+
+	* mi-elisp.el (mode-info-elisp-insert-button): Use
+	insert-text-button if it is bound.
+
+	* mi-config.el (mode-info-advise-describe-commands): Enable for
+	emacsen with `define-button-type', such as Emacs-21.3.50.
+	(toplevel): Define buttons for help-mode if define-button-type is
+	bound.
+
+2004-01-03  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
+
+	* mode-info.el (mode-info-version): Release 0.8.
+	(mode-info-show-document): Not activate the mark which is moved to
+	the top of the specified document.
+
+2003-12-14  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
+
+	* mi-elisp.el (describe-variable-internal): Treat buffer-local
+	variable.
+
+2003-02-09  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
+
+	* mi-config.el (mode-info-advise-describe-commands): Disable for
+	emacsen with `define-button-type', such as Emacs-21.3.50.
+
+	* elisp-comp.in (elisp-comp-target): Exclude `mi-fontify.el' from
+	target files for Mule2.
+
+2003-01-13  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
+
+	* mode-info.el (mode-info-version): Release 0.1.4.
+	(mode-info-class-alist): Add make.
+
+	* mi-make.el: New file.
+
+	* mi-index.el (make-index-file): Only when the entry regular
+	expression is defined, `process-node' method is called.
+	(mode-info-process-index-node-1): Strict checking the type of
+	`line'.
+
+	* mi-emacs.el (process-node): Abolished.
+
+	* mi-gauche.el (process-node): Abolished.
+
+2002-09-25  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
+
+	* mi-util.el (mode-info-obarray, mode-info-method-obarray): Use 0
+	instead of nil as the initial value for the new obarray.
+
+2002-08-30  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
+
+	* mode-info.el (mode-info-version): Release 0.1.3.
+
+	* mi-index.el (mode-info-make-index): Fix the bug that misses
+	candidate titles.
+
+2002-07-30  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
+
+	* mode-info.el (mode-info-version): Release 0.1.2.
+	(mode-info-class-alist): Add guile and scheme.
+
+	* mi-index.el (make-index-file): When Emacs is running without
+	interactive terminal, do not load a generated index.
+	(write-index-file): Call `save-buffer' instead of `write-region'
+	in order to make a backup.
+
+	* mi-scheme.el, mi-guile.el: New file.
+
+	* mi-gauche.el: Reimplemented.
+
+	* mi-fontify.el (mode-info-fontify-keywords): Relaxed.
+	(retry-japanese-node-name): New advice.
+
+2002-07-25  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
+
+	* mode-info.el (mode-info-version): Release 0.1.1.
+	(mode-info-class-alist): Add `gauche'.
+	(mode-info-available-classes): New internal variable.
+	(mode-info-read-class-name): Refer the above.
+
+	* mi-index.el (mode-info-make-all-indices): Refer
+	`mode-info-available-classes'.
+	(mode-info-index-node-regexp): New constant.
+	(make-index-file): Refer the above.
+	(mode-info-index-entry-regexp): Relaxed.
+
+	* mi-gauche.el: New file.
+
+2002-07-22  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
+
+	* mi-index.el (mode-info-dump-symbols): Write `indexer-version'.
+
+	* mode-info.el (mode-info-indexer-version): New macro.
+	(load-index): Set `indexer-version'.
+
+	* mi-config.el (mode-info-key-or-menu-binding): Export to
+	mi-util.el.
+
+	* mi-util.el (mode-info-key-or-menu-binding): Import from
+	mi-config.el.
+
+2002-07-21  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
+
+	* Release 0.1.
+
+	* mi-fontify.el (mode-info-fontify-node): Make info buffer as
+	unmodified at the end of fontify process.
+
+	* mi-util.el (line-beginning-position): Defined to avoid
+	byte-compile warning in XEmacs.
+
+	* mi-emacs.el (toplevel): Require `mi-config'.
+	(function-document, variable-document): Use
+	`mode-info-with-help-buffer'.
+	(mode-info-emacs-add-function-button): Use
+	`mode-info-elisp-insert-button'.
+	(mode-info-emacs-add-variable-button): Ditto.
+
+	* mi-elisp.el (toplevel): Require `mi-config'.
+	(function-document, variable-document): Use
+	`mode-info-with-help-buffer'.
+	(mode-info-elisp-insert-button): New function.
+	(mode-info-elisp-add-function-button): Use the above function.
+	(mode-info-elisp-add-variable-button): Ditto.
+	(mode-info-elisp-info-ref): New function.
+
+	* mi-config.el (toplevel): Add autoload for
+	'mode-info-elisp-info-ref'.
+	(mode-info-advise-describe-commands): New option.
+	(mode-info-elisp-add-function-button): Refer the above option.
+	(mode-info-elisp-add-variable-button): Ditto.
+	(mode-info-key-or-menu-binding): New function.
+	(mode-info-elisp-add-command-button): Use the above function and
+	refer the above option.
+	(mode-info-advise-info-commands): Renamed from
+	`mode-info-emacs-command-node'.
+	(mode-info-emacs-command-node): Follow the above renaming.
+	(mode-info-elisp-info-ref): New advise.
+
+2002-07-20  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
+
+	* mi-util.el (mode-info-static-if): Add edebug form spec.
+
+	* mi-config.el (mode-info-elisp-add-command-button): Advised for
+	only FSF Emacs.
+
+	* mode-info.el (mode-info-default-class): New option.
+	(mode-info-new): Argument spec is changed.  Refer
+	`mode-info-default-class'.
+	(read-tag): Print the class name in prompt.
+	(mode-info-find-tag): Reimplemented.
+
+	* mi-index.el (mode-info-search-info-files): Check whether
+	directory exists before `directory-files' is called.
+	(mode-info-regexp-opt): Install workaround to avoid shy-grouping.
+
+	* mi-emacs.el (mode-info-emacs-titles): Change its default.
+
+	* mi-elisp.el (mode-info-elisp-titles): Change its default.
+
+2002-07-20  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
+
+	* mode-info.el (mode-info-index-coding-system): Abolished.
+
+	* mi-ruby.el (mode-info-ruby-titles): Change its default.
+
+	* mi-perl.el (mode-info-perl-titles): Change its default.
+
+	* mi-octave.el (mode-info-octave-titles): Change its default.
+
+	* mi-libc.el (mode-info-libc-titles): Change its default.
+
+	* mi-index.el (mode-info-read-coding-system): Renamed from
+	`mode-info-coding-system'.
+	(mode-info-write-coding-system): New option.
+	(mode-info-make-all-indices): If an error occurs, print its
+	message.
+	(mode-info-node-top-regexp): Relaxed.
+	(make-index-file): Follow the above change.  Refer
+	`mode-info-read-coding-system' instead of
+	`mode-info-coding-system'.
+	(mode-info-dump-symbols): Refer `mode-info-write-coding-system'
+	instead of `mode-info-index-coding-system'.
+	(mode-info-regexp-opt): New function.
+
+	* Makefile.in (clean, distclean): Modified.
+
+2002-07-20  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
+
+	* mode-info.el (mode-info-class-alist): Add `emacs'.
+	(mode-info-show-document): Return the specified position if
+	success.
+
+	* mi-util.el (mode-info-titles-type): New constant.
+	(mode-info-method-next): New function.
+
+	* mi-ruby.el (mode-info-ruby-titles): Refer
+	`mode-info-title-types' as its type.
+
+	* mi-perl.el (mode-info-perl-titles): Refer
+	`mode-info-title-types' as its type.
+
+	* mi-octave.el (mode-info-octave-titles): Refer
+	`mode-info-title-types' as its type.
+
+	* mi-libc.el (mode-info-libc-titles): Refer
+	`mode-info-title-types' as its type.
+
+	* mi-index.el (mode-info-make-index): Follow the type change of
+	`mode-info-*-titles'.
+	(mode-info-search-info-files): Search files have `.info' suffix.
+
+	* mi-emacs.el: New file.
+
+	* mi-elisp.el (toplevel): Add autoload for
+	`find-function-search-for-symbol'.  Remove useless autoloads.
+	(mode-info-elisp-titles): Change default value.  Refer
+	`mode-info-title-types' as its type.
+	(mode-info-elisp-function-document-1): Use
+	`find-function-search-for-symbol' instead
+	of`find-function-noselect'.
+	(mode-info-elisp-variable-document-1): Removed.
+	(variable-document): Not call the above function.
+	(read-tag, find-tag-noselect): Reimplemented.
+	(mode-info-elisp-add-function-button): Relax the regular
+	expression to detect other buttons.
+	(mode-info-elisp-add-variable-button): Ditto.
+
+	* mi-config.el (toplevel): Add autoloads.
+	(mode-info-with-help-buffer): New macro.
+	(mode-info-elisp-add-function-button): Use the above macro.
+	(mode-info-elisp-add-variable-button): Ditto.
+	(mode-info-elisp-add-command-button): New advice.
+	(mode-info-emacs-command-node): New option.
+	(mode-info-emacs-command-node): New advice.
+
+2002-07-19  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
+
+	* mode-info.el (toplevel): Add autoload for functions defined in
+	etags.el.
+	(function-document, variable-document): Changed the spec of its
+	return value.
+	(mode-info-show-document): Follow the above change.
+	(mode-info-goto-info-entry-1): Ditto.
+	(read-tag, find-tag-noselect, find-tag-internal): New method.
+	(mode-info-find-tag): New command.
+
+	* mi-util.el (mode-info-defgeneric): Changed error signal.
+
+	* mi-elisp.el (toplevel): Add autoload for functions of
+	find-func.el.
+	(mode-info-elisp-function-document-1): New inline function.
+	(function-document): Call the above function.
+	(mode-info-elisp-variable-document-1): New inline function.
+	(variable-document): Call the above function.
+	(read-tag, find-tag-noselect): New method.
+
+	* mi-config.el (toplevel): Add autoload for `mode-info-find-tag'.
+
+	* elisp-comp.in (toplevel): Install workaround to suppress
+	byte-compile warnings for XEmacs and Mule.  This change is
+	suggested by Katsumi Yamaoka <yamaoka@jpl.org>.
+
+	* aclocal.m4 (AC_ADD_LOAD_PATH): Fix typo.
+
+2002-07-18  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
+
+	* mode-info.el (describe-function-internal): New method.
+	(mode-info-describe-function): Call it.
+	(describe-variable-internal): New method.
+	(mode-info-describe-variable): Call it.
+
+	* mi-ruby.el (mode-info-ruby-make-index): Enlarge
+	`max-specpdl-size' to avoid error.
+
+	* mi-elisp.el (describe-variable-internal): New method to display
+	VARIABLES's value.
+	(mode-info-elisp-add-function-button): Small modified.
+	(mode-info-elisp-add-variable-button): Ditto.
+
+	* mode-info.el (mode-info-describe-function): Accept the 3rd
+	optional argument, keep-window.
+	(mode-info-describe-variable): Ditto.
+	(mode-info-show-document): Ditto.
+
+	* mi-elisp.el (mode-info-elisp-add-function-button): Call
+	`mode-info-describe-function' with keep-window option.
+	(mode-info-elisp-add-variable-button): Call
+	`mode-info-describe-variable' with keep-window option.
+
+2002-07-16  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
+
+	* Start project.
+

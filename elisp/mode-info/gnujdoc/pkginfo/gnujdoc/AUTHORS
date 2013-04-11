@@ -1,0 +1,17 @@
+Kazuhisa Ichikawa contributed and maintains Japanese translations of
+GDB and flex manuals.
+
+OKUJI Yoshinori originally designed the package, contributed the GNU
+Coding Standards, the GNU Automake manual and the GNU Hurd Reference
+manual, and was the maintainer.
+
+YAMASHITA Takao was the maintainer.
+
+Yoshiki Hayashi maintains Japanese translation of CVS manual.
+
+Nishio Futoshi contributed sed, findutils, fileutils, grep, libtool,
+sh-utils, texinfo, textutils, wget, and binutils-ja.texi.
+
+Yuji Minejima contributed Japanese translation of m4 manual.
+
+IIDA Yosiaki is the current maintainer.

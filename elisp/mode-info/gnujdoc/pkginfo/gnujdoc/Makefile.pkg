@@ -1,0 +1,114 @@
+#######################################################
+# $Id: Makefile.pkg,v 1.1 2002/11/17 09:49:30 kose Exp $
+#
+# Copyright (C) 2002 The Meadow Team
+# Author: KOSEKI Yoshinori <kose@meadowy.org>
+#
+
+# makefile for pakage.
+# (original lisp version)-(pkg version)-pkg.tar.gz
+
+# make install
+# make uninstall
+# make pkg
+# make maintainer-clean
+
+# 
+PKG=gnujdoc-20021112
+BASE=gnujdoc
+PKG_VERSION=1
+PKG_URL=http://openlab.ring.gr.jp/gnujdoc/snapshot
+PKG_PATCH=
+PKG_PKGINFO="URL: "$(PKG_URL)"/"
+TARGET=
+
+###
+PKGINFO_URL=http://www.meadowy.org/meadow/dists/1.15/pkginfo
+
+###
+MEADOW_VERSION=1.15
+PREFIX=c:/Meadow
+DESTDIR=$(PREFIX)/site-lisp
+EMACS=$(PREFIX)/$(MEADOW_VERSION)/bin/MeadowNT.exe
+MAKE_OPTIONS=LISPDIR=$(DESTDIR) EMACS=$(EMACS) PWD=
+PKGINFO=$(PREFIX)/pkginfo
+
+PWD=
+
+###
+PREARG=-batch -q -no-site-file -eval "(set-language-environment \"Japanese\")" -eval "(setq default-buffer-file-coding-system 'iso-2022-7bit-unix)"
+POSTARG=-eval "(texinfo-format-buffer)" -eval "(save-buffer)" 
+
+install: $(PREFIX)/$(MEADOW_VERSION)/info/emacs-ja.info
+
+$(PKG) :
+	wget $(PKG_URL)/$@.tar.gz
+	tar zxf $@.tar.gz
+	mv gnujdoc $@
+
+SUBDIRS="autoconf-2.54 automake-1.7 binutils-2.13 bison-1.28 cvs-1.11 diffutils-2.8.1 elisp-manual-20-2.5 emacs-20.6 fileutils-4.1 findutils-4.1 flex-2.5.4 gdb-4.18 grep-2.5 gzip-1.2.4 hurd-0.2 libtool-1.4.2 m4-1.4 sed-3.02 sh-utils-2.0 standards-19981118 texinfo-4.2 textutils-2.0 wget-1.8.1"
+
+$(PREFIX)/$(MEADOW_VERSION)/info/emacs-ja.info: $(PKG)
+	(cd $(PKG) ; ./configure --with-emacs=$(EMACS) ; \
+	make install PWD= MAKEINFO=echo infodir=$(PREFIX)/$(MEADOW_VERSION)/info SUBDIRS=$(SUBDIRS))
+
+uninstall:
+	rm -rf $(addprefix $(PREFIX)/, $(PKG_INFO))
+
+pkg: $(PKG)-$(PKG_VERSION)-pkg.tar.gz
+
+$(PKG)-$(PKG_VERSION)-pkg.tar.gz : $(PREFIX)/$(MEADOW_VERSION)/info/emacs-ja.info
+	rm -rf $(PKGINFO)/$(BASE)
+	if test ! -d $(PKGINFO)/$(BASE); then mkdir -p $(PKGINFO)/$(BASE); fi
+	(cd $(PKGINFO)/$(BASE) ; \
+	wget $(PKGINFO_URL)/$(BASE)/Makefile.pkg \
+		$(PKGINFO_URL)/$(BASE)/install-info.bat; \
+	echo $(PKG_PKGINFO) > _pkginfo; \
+	echo "packaged: $(SUBDIRS)" >> _pkginfo)
+	for F in AUTHORS COPYING README THANKS TODO ; do \
+	  cp -p $(PKG)/$$F $(PKGINFO)/$(BASE); \
+    done
+	tar -C $(PREFIX) -cf $(basename $@) pkginfo/$(BASE) $(PKG_INFO)
+	echo pkginfo/$(BASE)/MANIFEST > $(PKGINFO)/$(BASE)/MANIFEST
+	tar tf $(basename $@) >> $(PKGINFO)/$(BASE)/MANIFEST
+	tar -C $(PREFIX) -uf $(basename $@) pkginfo/$(BASE)/MANIFEST
+	rm -f $(basename $@).gz
+	gzip --best $(basename $@)
+
+PKG_INFO=$(addprefix $(MEADOW_VERSION)/info/, $(notdir \
+	$(wildcard $(PREFIX)/$(MEADOW_VERSION)/info/autoconf-ja.info*) \
+	$(wildcard $(PREFIX)/$(MEADOW_VERSION)/info/automake-ja.info*) \
+	$(wildcard $(PREFIX)/$(MEADOW_VERSION)/info/binutils-ja.info*) \
+	$(wildcard $(PREFIX)/$(MEADOW_VERSION)/info/bison-ja.info*) \
+	$(wildcard $(PREFIX)/$(MEADOW_VERSION)/info/cvs-ja.info*) \
+	$(wildcard $(PREFIX)/$(MEADOW_VERSION)/info/diff-ja.info*) \
+	$(wildcard $(PREFIX)/$(MEADOW_VERSION)/info/elisp-ja.info*) \
+	$(wildcard $(PREFIX)/$(MEADOW_VERSION)/info/emacs-ja.info*) \
+	$(wildcard $(PREFIX)/$(MEADOW_VERSION)/info/fileutils-ja.info*) \
+	$(wildcard $(PREFIX)/$(MEADOW_VERSION)/info/find-ja.info*) \
+	$(wildcard $(PREFIX)/$(MEADOW_VERSION)/info/flex-ja.info*) \
+	$(wildcard $(PREFIX)/$(MEADOW_VERSION)/info/gdb-ja.info*) \
+	$(wildcard $(PREFIX)/$(MEADOW_VERSION)/info/grep-ja.info*) \
+	$(wildcard $(PREFIX)/$(MEADOW_VERSION)/info/gzip-ja.info*) \
+	$(wildcard $(PREFIX)/$(MEADOW_VERSION)/info/hurd-ja.info*) \
+	$(wildcard $(PREFIX)/$(MEADOW_VERSION)/info/info-ja.info*) \
+	$(wildcard $(PREFIX)/$(MEADOW_VERSION)/info/info-stnd-ja.info*) \
+	$(wildcard $(PREFIX)/$(MEADOW_VERSION)/info/libtool-ja.info*) \
+	$(wildcard $(PREFIX)/$(MEADOW_VERSION)/info/m4-ja.info*) \
+	$(wildcard $(PREFIX)/$(MEADOW_VERSION)/info/emacs-ja.info*) \
+	$(wildcard $(PREFIX)/$(MEADOW_VERSION)/info/sh-utils-ja.info*) \
+	$(wildcard $(PREFIX)/$(MEADOW_VERSION)/info/standards-ja.info*) \
+	$(wildcard $(PREFIX)/$(MEADOW_VERSION)/info/texinfo-ja.info*) \
+	$(wildcard $(PREFIX)/$(MEADOW_VERSION)/info/textutils-ja.info*) \
+	$(wildcard $(PREFIX)/$(MEADOW_VERSION)/info/wget-ja.info*)))
+
+maintainer-clean:
+	rm -f $(PKG).tar.gz
+	rm -rf $(PKG)
+#	rm -f $(PKG_PATCH)
+
+ddskk-skip-pkg.tar.gz:
+	cp /dev/null ddskk-skip-pkg.tar
+	gzip ddskk-skip-pkg.tar
+
+# end

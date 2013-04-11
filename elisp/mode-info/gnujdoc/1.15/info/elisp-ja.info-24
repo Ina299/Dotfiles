@@ -1,0 +1,4409 @@
+Info file: elisp-ja.info,    -*-Text-*-
+produced by `texinfo-format-buffer'
+from file `elisp-ja.texi'
+using `texinfmt.el' version 2.38 of 3 July 1998.
+
+
+INFO-DIR-SECTION Editors
+START-INFO-DIR-ENTRY
+* Elisp: (elisp-ja).	The Emacs Lisp Reference Manual.
+END-INFO-DIR-ENTRY
+
+
+
+Emacs Lispリファレンスマニュアル2.5版であり、Emacs 20.3版に対応します。
+
+Published by the Free Software Foundation 59 Temple Place, Suite 330
+Boston, MA 02111-1307 USA
+
+Copyright (C) 1990, 1991, 1992, 1993, 1994, 1995, 1996, 1998 Free
+Software Foundation, Inc.
+
+Permission is granted to make and distribute verbatim copies of this
+manual provided the copyright notice and this permission notice are
+preserved on all copies.
+
+Permission is granted to copy and distribute modified versions of this
+manual under the conditions for verbatim copying, provided that the
+entire resulting derived work is distributed under the terms of a
+permission notice identical to this one.
+
+Permission is granted to copy and distribute translations of this manual
+into another language, under the above conditions for modified versions,
+except that this permission notice may be stated in a translation
+approved by the Foundation.
+
+Permission is granted to copy and distribute modified versions of this
+manual under the conditions for verbatim copying, provided also that the
+section entitled "GNU General Public License" is included exactly as in
+the original, and provided that the entire resulting derived work is
+distributed under the terms of a permission notice identical to this
+one.
+
+Permission is granted to copy and distribute translations of this manual
+into another language, under the above conditions for modified versions,
+except that the section entitled "GNU General Public License" may be
+included in a translation approved by the Free Software Foundation
+instead of in the original English.
+
+
+
+
+
+
+File: elisp-ja.info, Node: Comment Tips, Next: Library Headers, Prev: Documentation Tips, Up: Tips
+
+コメントの書き方のヒント
+========================
+
+コメントを置く場所とそれらの字下げ方法については以下のような慣習を推奨し
+ます。
+
+`;'
+     1つのセミコロン`;'で始まるコメントは、ソースコードの右側で同じコラ
+     ム位置に揃えること。そのようなコメントは、その行のコードの動作を説
+     明する。lispモードやその関連するモードでは、コマンド`M-;'
+     （`indent-for-comment'）で自動的に右側の正しい位置に`;'を挿入したり、
+     そのようなコメントが既存ならば整列できる。
+
+     つぎとその下の例は、Emacsのソースから持ってきたものである。
+
+          (setq base-version-list                 ; there was a base
+                (assoc (substring fn 0 start-vn)  ; version to which
+                       file-version-assoc-list))  ; this looks like
+                                                  ; a subversion
+
+`;;'
+     2つのセミコロン`;;'で始まるコメントは、その部分のコードの字下げに揃
+     えること。そのようなコメントは、その後続の行の目的やその箇所でのプ
+     ログラムの状態を記述する。
+
+          (prog1 (setq auto-fill-function
+                       ...
+                       ...
+            ;; update mode line
+            (force-mode-line-update)))
+
+     説明文字列を持たない各関数（所属するパッケージで内部向けにのみ使用
+     される関数）では、関数が行うことと正しい呼び出し方を記述した2つのセ
+     ミコロンで始まるコメントを関数のまえに書くこと。各引数の意味とその
+     可能な値を関数がどのように解釈するかを正確に説明すること。
+
+`;;;'
+     3つのセミコロン`;;;'で始まるコメントは、左端に揃えること。そのよう
+     なコメントは、関数定義の外側で使い、プログラムの設計原理を説明する
+     一般的な表明である。たとえばつぎのとおり。
+
+          ;;; This Lisp code is run in Emacs
+          ;;; when it is to operate as a server
+          ;;; for other processes.
+
+     3つのセミコロンで始まるコメントの別の使い方は、関数内の行をコメント
+     にする場合である。そのような行が左端に留まるように3つのセミコロンを
+     使うのである。
+
+          (defun foo (a)
+          ;;; This is no longer necessary.
+          ;;;  (force-mode-line-update)
+            (message "Finished with %s" a))
+
+`;;;;'
+     4つのセミコロン`;;;;'で始まるコメントは、左端に揃えて、プログラムの
+     主要な部分のヘッダに使う。たとえばつぎのとおり。
+
+          ;;;; The kill ring
+
+`M-;'（`indent-for-comment'）やTAB（`lisp-indent-line'）などのEmacsの
+lispモードの字下げコマンドは、これらの慣習にしたがって自動的にコメントを
+字下げします。*Note コメントの操作: (emacs)Comments。
+
+
+
+File: elisp-ja.info, Node: Library Headers, Next: Building Emacs, Prev: Comment Tips, Up: Tips
+
+Emacsライブラリのヘッダの慣習
+=============================
+
+Emacsには、コメントをいくつかの部分に分けて作者などの情報を与えるために、
+Lispライブラリの特別なコメントに対する慣習があります。本節ではそれらの慣
+習について述べます。まず、例を示します。
+
+     ;;; lisp-mnt.el -- minor mode for Emacs Lisp maintainers
+
+     ;; Copyright (C) 1992 Free Software Foundation, Inc.
+
+     ;; Author: Eric S. Raymond <esr@snark.thyrsus.com>
+     ;; Maintainer: Eric S. Raymond <esr@snark.thyrsus.com>
+     ;; Created: 14 Jul 1992
+     ;; Version: 1.2
+     ;; Keywords: docs
+
+     ;; This file is part of GNU Emacs.
+     ...
+     ;; Free Software Foundation, Inc., 59 Temple Place - Suite 330,
+     ;; Boston, MA 02111-1307, USA.
+
+最初の行はつぎの形式であるべきです。
+
+     ;;; FILENAME -- DESCRIPTION
+
+この記述は1行で完全になるようにします。
+
+著作権表示のあとには、`;; HEADER-NAME:'で始まるいくつかの"ヘッダコメント
+"（header comment）行が続きます。HEADER-NAMEに使う可能性のある慣習の一覧
+を以下に示します。
+
+`Author'
+     この行では、少なくともライブラリの主作者の氏名とネットワークアドレ
+     スを明記する。
+
+     複数の作者がいる場合には、以下のように、`;;'とタブ文字で始めた継続
+     行にその人達を列挙する。
+
+          ;; Author: Ashwin Ram <Ram-Ashwin@cs.yale.edu>
+          ;;      Dave Sill <de5@ornl.gov>
+          ;;      Dave Brennan <brennan@hal.com>
+          ;;      Eric Raymond <esr@snark.thyrsus.com>
+
+`Maintainer'
+     この行には、作者行（`Author'）のように1人の氏名とアドレス、アドレス
+     のみ、文字列`FSF'のいずれかを書く。保守者行（`Maintainer'）がない場
+     合には、作者行の人達が保守していると仮定する。上の例は、保守者行が
+     冗長であり、少々いんちきである。
+
+     作者行（`Author'）と保守者行（`Maintainer'）の考えは、手作業で名前
+     を探さずに『保守者にメイルを送る』ようなLisp関数を作れるようにする
+     ためである。
+
+     ネットワークアドレスに加えて人の氏名も書く場合には、ネットワークア
+     ドレスを`<...>'で必ず囲むこと。
+
+`Created'
+     この行は省略できるが、ファイルの作成日時を書く。歴史的な意味だけで
+     ある。
+
+`Version'
+     各Lispプログラムの版番号を記録しておきたい場合に、この行に版番号を
+     書く。
+
+`Adapted-By'
+     このヘッダ行では、（たとえば、スタイルの慣習に適合するように変更し
+     たなどの）インストールのためにライブラリを受理した人の名前を書く。
+
+`Keywords'
+     この行には、ヘルプコマンド`finder-by-keyword'向けのキーワードを書く。
+     意味のあるキーワードを理解するためにこのコマンドを試してほしい。
+
+     この部分は重要である。人々が特定の話題で探して読者のパッケージをみ
+     つけるであろう。キーワードは空白やカンマで区切る。
+
+ほとんどのLispライブラリには、`Author'と`Keywords'のヘッダコメント行が必
+要です。残りのものは必要に応じて使います。別の名前のヘッダ行があってもか
+まいません。それらには標準的な意味はありませんが、害になることもありませ
+ん。
+
+ライブラリファイルの内容を分割するために形式を定めたコメントも使います。
+それらを以下に示します。
+
+`;;; Commentary:'
+     ライブラリの動作を説明する入門的なコメントを始める。著作権表示の直
+     後にきて、`Change Log'、`History'、`Code'のいずれかのコメント行で終
+     る。このテキストはパッケージfinderが使うので、その文脈で意味がある
+     ようにすること。
+
+`;;; Documentation'
+     `;;; Commentary:'のかわりに使っているファイルもあるが、`;;;
+     Commentary:'のほうが好ましい。
+
+`;;; Change Log:'
+     （変更履歴をライブラリに収める場合の）ライブラリファイルに収めた変
+     更記録情報を始める。Emacsで配布されるほとんどのLispファイルでは、変
+     更履歴はファイル`ChangeLog'に収めてあり、ソースファイルには収めない。
+     それらのファイルには`;;; Change Log:'行はない。
+
+`;;; Code:'
+     プログラムの実際のコードを始める。
+
+`;;; FILENAME ends here'
+     これは"最終行"（footer line）であり、ファイルの末尾に現れる。その目
+     的は、最終行が欠如していることでファイルが切り詰められていることが
+     わかるようにするのである。
+
+
+File: elisp-ja.info, Node: GNU Emacs Internals, Next: Standard Errors, Prev: Tips, Up: Top
+
+GNU Emacsの内部
+***************
+
+本章では、Lispライブラリをあらかじめロードした実用的なEmacsの実行形式の
+ダンプ方法、メモリ領域の割り当て方、Cプログラマに興味があるようなGNU
+Emacsの内部について述べます。
+
+* Menu:
+
+* Building Emacs::      How to the dumped Emacs is made.
+* Pure Storage::        A kludge to make preloaded Lisp functions sharable.
+* Garbage Collection::  Reclaiming space for Lisp objects no longer used.
+* Memory Usage::        Info about total size of Lisp objects made so far.
+* Writing Emacs Primitives::   Writing C code for Emacs.
+* Object Internals::    Data formats of buffers, windows, processes.
+
+
+
+File: elisp-ja.info, Node: Building Emacs, Next: Pure Storage, Prev: Library Headers, Up: GNU Emacs Internals
+
+Emacsの構築方法
+===============
+
+本節では、Emacsの実行形式を構築する手順を説明します。メイクファイルが自
+動的にこれらすべてを行うので、Emacsを構築してインストールするために本節
+のことがらを読者が知っている必要はありません。本節の内容は、Emacsの保守
+者向けです。
+
+ディレクトリ`src'のCソースファイル群をコンパイルすると、`temacs'と呼ばれ
+る実行形式ファイルが作られます。これは"裸のインピュアEmacs"（bare impure
+Emacs）とも呼びます。これには、Emacs Lispインタープリタと入出力ルーティ
+ンが含まれますが、編集コマンドは入っていません。
+
+コマンド`temacs -l loadup'で、
+実用的なEmacsの実行形式を作るために`temacs'を使います。
+これらの引数は、`temacs'に対して
+ファイル`loadup.el'で指定したLispファイル群を評価するように指示します。
+これらのファイルはEmacsの通常の編集環境を作り上げ、
+その結果、Emacsは裸ではありませんがまだインピュアです。
+
+標準のLispファイル群をロードするにはかなり時間が必要です。しかし、読者が
+Emacsを実行するたびにこれを行う必要はありません。`temacs'は、必要なファ
+イルをあらかじめロードした`emacs'という実行形式プログラムとしてダンプで
+きます。`emacs'はファイル群をロードする必要がないので素早く起動します。
+これが通常インストールされるEmacsの実行形式です。
+
+`emacs'を作るにはコマンド`temacs -batch -l loadup dump'を使います。ここ
+での`-batch'の目的は、`temacs'が端末に関するデータを初期化しないようにす
+るためです。これにより、ダンプしたEmacsでは端末情報の表が空であることを
+保証できます。引数`dump'は、`emacs'という名前の新たな実行形式をダンプす
+るように`loadup.el'に指示します。
+
+ダンプできないオペレーティングシステムもあります。そのようなシステムでは、
+Emacsを使うたびにコマンド`temacs -l loadup'でEmacsを起動する必要がありま
+す。これにはかなり時間がかかりますが、多くても1日に1回、あるいは、ログア
+ウトしなのであれば週に1回Emacsを起動する必要があるだけでしょうから、余分
+な時間は重大問題にはならないでしょう。
+
+あらかじめロードしておく追加のファイルは、それらをロードする
+`site-load.el'という名前のライブラリを書くことで指定できます。追加データ
+のための領域を確保するために`src/puresize.h'の`PURESIZE'の値を増やす必要
+があるかもしれません。（十分な大きさになるまで20000ずつ増やして試すこと。）
+しかし、マシンが速くなればなるほど、あらかじめロードしておくファイルを追
+加することの利点は減少します。最近のマシンでは、このようにする必要はない
+でしょう。
+
+`loadup.el'が`site-load.el'を読み終えると、`Snarf-documentation'（*Note
+Accessing Documentation::）を呼び出して、基本関数やあらかじめロードした
+関数（および変数）の説明文字列をそれらの説明文字列を格納したファイル
+`etc/DOC'から探します。
+
+ダンプする直前に実行すべきList式を指定するには、`site-init.el'という名前
+のライブラリにそれらのLisp式を入れておきます。このファイルは、説明文字列
+を探し終えてから実行されます。
+
+関数定義や変数定義をあらかじめロードしたいときには、それを行ってあとで
+Emacsを実行したときにそれらの説明文字列を参照できるようにする方法が3つあ
+ります。
+
+   * ファイル`etc/DOC'を作成するときにそれらのファイルが走査されるように
+     しておき、`site-load.el'でそれらのファイルをロードする。
+
+   * `site-init.el'でファイルをロードし、Emacsをインストールするときにそ
+     れらのファイルをLispファイル向けのインストールディレクトリへコピー
+     する。
+
+   * それらの各ファイルでローカル変数として
+     `byte-compile-dynamic-docstrings'の値に`nil'以外を指定し、
+     `site-load.el'か`site-init.el'でそれらのファイルをロードする。（こ
+     れには、それらの説明文字列がつねにEmacsの領域を占めてしまう欠点があ
+     る。）
+
+無変更の普通のEmacsにユーザーが期待する機能を変更するようなものを
+`site-load.el'や`site-init.el'に入れることは勧められません。読者のサイト
+では普通の機能に優先させるべきであると思うときには、`default.el'でそれを
+行います。そうすれば、ユーザーは好みに応じて読者が行った変更を無効にでき
+ます。*Note Start-up Summary::。
+
+ -- Function: dump-emacs TO-FILE FROM-FILE
+     この関数は、Emacsの現在の状態を実行形式ファイルTO-FILEへダンプする。
+     FROM-FILE（これは普通は実行形式ファイル`temacs'）からシンボルを取り
+     出す。
+
+     すでにダンプしたEmacsでこの関数を使うときには、`-batch'を指定して
+     Emacsを実行すること。
+
+
+
+File: elisp-ja.info, Node: Pure Storage, Next: Garbage Collection, Prev: Building Emacs, Up: GNU Emacs Internals
+
+ピュアメモリ
+============
+
+Emacs Lispでは、ユーザーが作成したLispオブジェクト向けに2種類のメモリ、"
+普通メモリ"（normal storage）と"ピュアメモリ"（pure storage）を使います。
+普通メモリは、Emacsセッション中に新たに作成されるすべてのデータを置く場
+所です。普通メモリに関する情報は以下の節を参照してください。ピュアメモリ
+は、あらかじめロードした標準Lispファイル群の特定のデータ、つまり、Emacs
+の実行中にけっして変化しないデータを収めるために使います。
+
+ピュアメモリは、`temacs'があらかじめロードする標準Lispライブラリをロード
+している最中にのみ割り当てられます。ファイル`emacs'では読み出し専用（こ
+れができるオペレーティングシステムでは）と印が付けられ、当該マシンで同時
+に実行されているすべてのEmacsのジョブでメモリ領域を共有できるようにしま
+す。ピュアメモリは拡張できません。Emacsをコンパイルしたときに固定サイズ
+が割り当てられ、あらかじめロードするライブラリに対して十分な大きさがない
+と`temacs'はクラッシュします。その場合には、ファイル`src/puresize.h'のコ
+ンパイルパラメータ`PURESIZE'を増やす必要があります。あらかじめロードする
+ライブラリを追加したり標準機能に機能を追加しなければ、そのようなことは普
+通は起こらないはずです。
+
+ -- Function: purecopy OBJECT
+     この関数は、ピュアメモリ内にOBJECTをコピーしそれを返す。文字列のコ
+     ピーでは、ピュアメモリ内に同じ文字の新たな文字列を単純に作る。ベク
+     トルやコンスセルの内容は再帰的にコピーする。シンボルなどの他のオブ
+     ジェクトはコピーせずに無変更でそれらを返す。マーカをコピーしようと
+     するとエラーを通知する。
+
+     この関数は、Emacsを構築してダンプするとき以外ではなにもしない。普通
+     はファイル`emacs/lisp/loaddefs.el'でのみ呼び出されるが、あらかじめ
+     ロードするとこれを呼び出すようなパッケージも少数だがある。
+
+ -- Variable: pure-bytes-used
+     この変数の値は、割り当て済みのピュアメモリのバイト数である。典型的
+     には、ダンプしたEmacsではこの値は利用可能なピュアメモリの総量にとて
+     も近い。そうでない場合には、あらかじめロードしたライブラリが少ない
+     のであろう。
+
+ -- Variable: purify-flag
+     この変数は、`defun'が関数定義をピュアメモリにコピーすべきかどうかを
+     決定する。`nil'以外であると、関数定義をピュアメモリにコピーする。
+
+     Emacsを構築中の初期段階ですべての基本的な関数をロード中には（これら
+     の関数を共有してガベッジコレクションの対象にしないように）、このフ
+     ラグは`t'である。実行形式としてEmacsをダンプするときには、ダンプ前
+     後の実際の値には関係なくこの変数には`nil'を書く。
+
+     実行中のEmacsでこのフラグを変更するべきではない。
+
+
+
+File: elisp-ja.info, Node: Garbage Collection, Next: Memory Usage, Prev: Pure Storage, Up: GNU Emacs Internals
+
+ガベッジコレクション
+====================
+
+プログラムがリストを作成したり、（ライブラリをロードするなどして）ユーザー
+が新たに関数を定義すると、それらのデータは普通メモリへ置かれます。普通メ
+モリが足りなくなると、Emacsはオペレーティングシステムに1kバイトの倍数の
+ブロックでメモリ割り当てを要求します。各ブロックは1つの種類のLispオブジェ
+クトに使いますから、シンボル、コンスセル、マーカなどはメモリの異なるブロッ
+クに分離されます。（ベクトル、長い文字列、バッファ、特定の編集向けデータ
+型などの比較的大きなものは各オブジェクトごとに独立のブロックを割り当てる
+が、短い文字列は8kバイトのブロックに詰め込む。）
+
+あるメモリ部分をしばらく使ってから、（たとえば）バッファを削除したりオブ
+ジェクトに対する最後の参照を削除するなどして当該メモリを解放することはよ
+くあることです。Emacsには、このような放置されたメモリを回収する"ガベッジ
+コレクタ"（garbage collector）があります。（この名前は伝統的だが、『ガベッ
+ジリサイクル』のほうがこの機能を直観的に表すかもしれない。）
+
+ガベッジコレクタは、Lispプログラムから現時点で参照可能なすべてのLispオブ
+ジェクトを探して印を付けることで動作します。まず、すべてのシンボル、それ
+らの値、それらに関連付けられた関数定義、および、スタック上の任意のデータ
+は参照可能であると仮定します。参照可能なオブジェクトから間接的に辿れる任
+意のオブジェクトも参照可能です。
+
+印付けが終ったときには、無印であるすべてのオブジェクトはゴミ（ガベッジ）
+です。Lispプログラムやユーザーがなにをしようと、無印のオブジェクトに辿り
+着く方法はないのでそれらを参照することは不可能です。無印のオブジェクトを
+使っているものはいないので、それらのメモリ領域は再利用できます。ガベッジ
+コレクタの2段目の動作（『掃く』（sweep））は、無印のオブジェクトのメモリ
+領域を再利用できるようにすることです。
+
+掃き作業では、未使用のコンスセルを"自由リスト"（free list）に入れて、将
+来の割り当てに備えます。シンボルやマーカについても同様です。参照可能な文
+字列は8kバイトのブロックより小さな領域を占めるように詰め込み、不要になっ
+た8kバイトのブロックは解放します。ベクトル、バッファ、ウィンドウ、他の大
+きなオブジェクトは、`malloc'や`free'を使って個別に割り当てたり解放します。
+
+     Common Lispに関した注意：` ' 他のLispと異なり、GNU Emacs Lispでは、
+     自由リストが空になってもガベッジコレクタを呼び出さない。そのかわり
+     に、オペレーティングシステムにメモリ割り当てを単純に要求し、
+     `gc-cons-threshold'バイトを使い尽くすまでは処理を継続する。
+
+     つまり、ガベッジコレクタを明示的に呼び出した直後のLispプログラムの
+     部分では、（プログラムのその部分で2度目にガベッジコレクタを呼び出す
+     ほど多くのメモリを使わないと仮定すれば）その部分を実行中にはガベッ
+     ジコレクタが呼ばれないことを保証できるのである。
+
+ -- コマンド: garbage-collect
+     このコマンドはガベッジコレクタを実行し、使用中のメモリ量に関する情
+     報を返す。（まえのガベッジコレクタの起動後に`gc-cons-threshold'バイ
+     ト以上のLispデータを使うと自発的なガベッジコレクタの起動を引き起こ
+     す。）
+
+     `garbage-collect'が返すリストにはつぎの情報が含まれる。
+
+          ((USED-CONSES . FREE-CONSES)
+           (USED-SYMS . FREE-SYMS)
+           (USED-MISCS . FREE-MISCS)
+           USED-STRING-CHARS 
+           USED-VECTOR-SLOTS
+           (USED-FLOATS . FREE-FLOATS)
+           (USED-INTERVALS . FREE-INTERVALS))
+
+     例を示す。
+
+          (garbage-collect)
+               => ((106886 . 13184) (9769 . 0)
+                          (7731 . 4651) 347543 121628
+                          (31 . 94) (1273 . 168))
+
+     各要素の意味はつぎのとおりである。
+
+     USED-CONSES
+          使用中のコンスセルの個数。
+
+     FREE-CONSES
+          オペレーティングシステムから得たメモリであるが現在未使用なコン
+          スセルの個数。
+
+     USED-SYMS
+          使用中のシンボルの個数。
+
+     FREE-SYMS
+          オペレーティングシステムから得たメモリであるが現在未使用なシン
+          ボルの個数。
+
+     USED-MISCS
+          その他の使用中のオブジェクトの個数。マーカ、オーバレイ、ユーザー
+          に見えないある種のオブジェクトを含む。
+
+     FREE-MISCS
+          オペレーティングシステムから得たメモリであるが現在未使用なその
+          他のオブジェクトの個数。
+
+     USED-STRING-CHARS
+          使用中の文字列の総文字数。
+
+     USED-VECTOR-SLOTS
+          存在するベクトルの要素の総個数。
+
+     USED-FLOATS
+          使用中の浮動小数点数の個数。
+
+     FREE-FLOATS
+          オペレーティングシステムから得たメモリであるが現在未使用な浮動
+          小数点数の個数。
+
+     USED-INTERVALS
+          使用中のインターバルの個数。インターバルとはテキスト属性を表現
+          するために使う内部データ構造である。
+
+     FREE-INTERVALS
+          オペレーティングシステムから得たメモリであるが現在未使用なイン
+          ターバルの個数。
+
+ -- User Option: garbage-collection-messages
+     この変数が`nil'以外であると、Emacsはガベッジコレクションの始まりと
+     終りにメッセージを表示する。デフォルト値は`nil'であり、そのようなメッ
+     セージを表示しない。
+
+ -- User Option: gc-cons-threshold
+     この変数の値は、ガベッジコレクションのあとでつぎにガベッジコレクショ
+     ンを起こすまでにLispオブジェクトに割り当てるべきメモリバイト数であ
+     る。コンスセルは8バイト、文字列は1文字1バイトと数バイトのオーバヘッ
+     ドといった具合である。バッファの内容に割り当てたメモリ量は数えない。
+     この閾値を越えてもただちにつぎのガベッジコレクションは起こらず、つ
+     ぎにLispのエバリュエータが呼ばれときに起きる。
+
+     最初の閾値は400,000である。より大きな値を指定すると、ガベッジコレク
+     ションの起動回数が少なくなる。ガベッジコレクションに費す時間を減少
+     できるが、全体のメモリ使用量を増加させる。大量のLispデータを作成す
+     るようなプログラムを実行するときに設定する。
+
+     10,000までの小さな値を指定すると、ガベッジコレクションの回数を増や
+     せる。10,000未満の値が意味を持つのはつぎにガベッジコレクションが起
+     きるまでである。`garbage-collect'は閾値を10,000に戻す。
+
+`garbage-collect'が返す値は、データ型ごとのLispデータのメモリ使用量です。
+対照的に、関数`memory-limit'は、Emacsが現在使用中のメモリ総量に関する情
+報を与えます。
+
+ -- Function: memory-limit
+     この関数は、Emacsが最後に割り当てた最終バイトのアドレスを1024で割っ
+     たものを返す。値を1024で割るのは、Lispの整数に収めるためである。
+
+     読者の操作がメモリ使用量にどのように影響するかを調べるのに使える。
+
+
+
+File: elisp-ja.info, Node: Memory Usage, Next: Writing Emacs Primitives, Prev: Garbage Collection, Up: GNU Emacs Internals
+
+メモリ使用量
+============
+
+これらの変数は、Emacsが割り当てたデータ型ごとのメモリ総量に関する情報を
+与えます。これらと`(garbage-collect)'が返す値との違いに注意してください。
+`(garbage-collect)'の値は現存するオブジェクトを数えますが、これらの変数
+は、すでに解放したオブジェクトを含めて割り当てたオブジェクトの個数やサイ
+ズを数えます。
+
+ -- Variable: cons-cells-consed
+     このEmacsセッションでこれまでに割り当てたコンスセルの総数。
+
+ -- Variable: floats-consed
+     このEmacsセッションでこれまでに割り当てた浮動小数点数の総数。
+
+ -- Variable: vector-cells-consed
+     このEmacsセッションでこれまでに割り当てたベクトルセルの総数。
+
+ -- Variable: symbols-consed
+     このEmacsセッションでこれまでに割り当てたシンボルの総数。
+
+ -- Variable: string-chars-consed
+     このEmacsセッションでこれまでに割り当てた文字列の総文字数。
+
+ -- Variable: misc-objects-consed
+     このEmacsセッションでこれまでに割り当てたその他のオブジェクトの総数。
+     マーカやオーバレイ、ユーザーに見えないある種のオブジェクトを含む。
+
+ -- Variable: intervals-consed
+     このEmacsセッションでこれまでに割り当てたインターバルの総数。
+
+
+
+File: elisp-ja.info, Node: Writing Emacs Primitives, Next: Object Internals, Prev: Memory Usage, Up: GNU Emacs Internals
+
+Emacs基本関数の書き方
+=====================
+
+Lisp基本関数は、Cで実装したLisp関数です。Lispから呼び出すためのCの関数と
+のインターフェイスの詳細は、数個のCのマクロで処理しています。新たにCのコー
+ドを書く方法をほんとうに理解する唯一の方法は、ソースを読むことですが、こ
+こではその一部を説明します。
+
+スペシャルフォームの例は、`eval.c'から引用した`or'の定義です。（普通の関
+数も同じように見える。）
+
+     DEFUN ("or", For, Sor, 0, UNEVALLED, 0,
+       "Eval args until one of them yields non-nil; return that value.\n\
+     The remaining args are not evalled at all.\n\
+     If all args return nil, return nil.")
+       (args)
+          Lisp_Object args;
+     {
+       register Lisp_Object val;
+       Lisp_Object args_left;
+       struct gcpro gcpro1;
+
+       if (NULL (args))
+         return Qnil;
+
+       args_left = args;
+       GCPRO1 (args_left);
+
+       do
+         {
+           val = Feval (Fcar (args_left));
+           if (!NULL (val))
+             break;
+           args_left = Fcdr (args_left);
+         }
+       while (!NULL (args_left));
+
+       UNGCPRO;
+       return val;
+     }
+
+マクロ`DEFUN'の引数の詳しい説明から始めます。その雛型はつぎのとおりです。
+
+     DEFUN (LNAME, FNAME, SNAME, MIN, MAX, INTERACTIVE, DOC)
+
+LNAME
+     関数名として定義するLispシンボルの名前である。上の例では、`or'であ
+     る。
+
+FNAME
+     この関数のCの関数としての名前である。この関数をCのコードから呼び出
+     すときに使う名前である。慣習により、Lispでの名前のまえに`F'を付ける
+     が、Lispでの名前のダッシュ（`-'）はすべて下線に置き換える。したがっ
+     て、Cのコードからこの関数を呼び出すには、`For'を呼び出す。引数は
+     `Lisp_Object'型である必要があることに注意してほしい。ファイル
+     `lisp.h'では、`Lisp_Object'型の値を作成するためのさまざまなマクロや
+     関数を宣言してある。
+
+SNAME
+     これは、Lispでの関数を表現するsubrオブジェクト向けのデータを保持す
+     る構造体に使うCの変数名である。この構造体は、シンボルを作成しその定
+     義としてsubrオブジェクトを保存する初期化ルーティンへLispのシンボル
+     名を運ぶ構造体である。慣習により、この名前はつねにFNAMEの`F'を`S'に
+     置き換えたものである。
+
+MIN
+     関数が必要とする引数の最小の個数である。関数`or'は最小0個の引数を許
+     す。
+
+MAX
+     関数が許す引数の最大の個数に制限があるときの引数の最大の個数である。
+     あるいは、評価していない引数を受け取るスペシャルフォームであること
+     を表す`UNEVALLED'、評価済みの引数を何個でも受け取ることを表す`MANY' 
+     （`&rest'に等価）でもよい。`UNEVALLED'も`MANY'もマクロである。MAXが
+     数であるときには、それはMINより小さくなく、かつ、7より大きくないこ
+     と。
+
+INTERACTIVE
+     この関数の対話指定であり、Lisp関数において`interactive'の引数に使う
+     文字列である。`or'の場合には0（空ポインタ）であり、`or'は対話的に呼
+     び出せないことを表す。値`""'は、対話的に呼び出されるとこの関数は引
+     数を受け取らないことを表す。
+
+DOC
+     説明文字列である。各行末に`\n\'と書く必要があることを除けば、Lispで
+     定義する関数の説明文字列のように書く。特に、最初の行は1つの文である
+     こと。
+
+マクロ`DEFUN'の呼び出しのあとには、
+Cの関数に必須な引数名の並びを書き、引数に対する普通のCの宣言を続けます。
+引数の最大個数が固定されている関数では、
+各Lisp引数向けにCの引数宣言を書き、
+それらをすべて`Lisp_Object'型にします。
+Lisp関数に引数の個数に上限がないとき、
+それを実装するCの関数は実際には2つの引数を受け取ります。
+第1引数はLisp引数の個数であり、
+第2引数はそれらの値を収めたブロックのアドレスです。
+引数の型は`int'と`Lisp_Object *'です。
+
+関数`For'自身の内側では、マクロ`GCPRO1'と`UNGCPRO'を使っていることに注意
+してください。`GCPRO1'は、ガベッジコレクションから変数を『保護』するため
+に使います。つまり、ガベッジコレクタに対してこの変数を調べてその内容を参
+照可能なオブジェクトとみなすように指示します。`Feval'や`Feval'を直接／間
+接的に呼び出すものを呼ぶときには、このようにする必要があります。そのよう
+な場面では、再度参照する意図がある任意のLispオブジェクトは保護する必要が
+あります。`UNGCPRO'は、この関数での変数の保護を取り消します。これは明示
+的に行う必要があります。
+
+ほとんどのデータ型では、少なくともそのオブジェクトへの1つのポインタを保
+護すれば十分であり、そのオブジェクトに循環がない限り、そのオブジェクトへ
+のすべてのポインタは正しく保たれます。文字列にはこれはあてはまりません。
+ガベッジコレクタがそれらを移動するからです。ガベッジコレクタが文字列を移
+動すると、それに対する既知のポインタをすべて再配置し、それ以外のポインタ
+は不正になります。したがって、ガベッジコレクタが動く可能性のある任意の部
+分では、文字列へのすべてのポインタを保護する必要があります。
+
+マクロ`GCPRO1'は1つのローカル変数のみを保護します。2つ保護したい場合には
+かわりに`GCPRO2'を使います。`GCPRO1'を繰り返しても働きません。`GCPRO3'や
+`GCPRO4'のマクロもあります。
+
+これらのマクロは`gcpro1'などのローカル変数を暗黙のうちに使いますが、読者
+はこれらを型`struct gcpro'で明示的に宣言する必要があります。したがって、
+`GCPRO2'を使う場合には、`gcpro1'と`gcpro2'を宣言する必要があります。残念
+ですが、ここではすべての詳細は説明しきれません。
+
+Emacsをいったんダンプしたあとでも静的やグローバルな変数に書き込むのであ
+れば、それらの変数にはCの初期化構文を使ってはいけません。初期化構文を伴
+うそれらの変数は、Emacsをダンプすると（オペレーティングシステムによって
+は）その結果として読み出し専用のメモリ領域に割り当てられます。*Note Pure
+Storage::。
+
+関数の内側では静的変数を使わずに、すべての静的変数はファイルのトップレベ
+ルに置きます。オペレーティングシステムによってはEmacsはキーワード
+`static'を空のマクロと定義することもあるので、これは必要なことなのです。
+（このような定義を使うのは、そのようなシステムは、初期化構文があろうとな
+かろうと静的と宣言した変数をダンプ後には読み出し専用にしてしまうからであ
+る。）
+
+Cの関数を定義しただけではLisp基本関数としては使えません。基本関数に対す
+るLispシンボルを作成し、その関数セルに適切なsubrオブジェクトを保存する必
+要があります。そのコードはつぎのようになります。
+
+     defsubr (&SUBR-STRUCTURE-NAME);
+
+ここで、SUBR-STRUCTURE-NAMEは`DEFUN'の第3引数に使った名前です。
+
+すでにLisp基本関数が定義されているファイルに新たな基本関数を追加するとき
+には、（ファイルの末尾近くで）`syms_of_SOMETHING'という名前の関数を探し、
+それに`defsubr'の呼び出しを追加します。ファイルにこの関数がなかったり、
+新たなファイルを作成した場合には、`syms_of_FILENAME'（たとえば
+`syms_of_myfile'）を追加します。そして、ファイル`emacs.c'でこれらの関数
+を呼び出している箇所を探して、そこに`syms_of_FILENAME'の呼び出しを追加し
+ます。
+
+関数`syms_of_FILENAME'は、Lisp変数として見える任意のCの変数を定義する場
+所でもあります。`DEFVAR_LISP'は、Lispから見える`Lisp_Object'型のCの変数
+を作ります。`DEFVAR_INT'は、Lispからはつねに整数を値として見える`int'型
+のCの変数を作ります。`DEFVAR_BOOL'は、Lispからは`t'か`nil'を値として見え
+る`int'型のCの変数を作ります。
+
+ファイルだけに有効な`Lisp_Object'型のCの変数を定義した場合には、つぎのよ
+うにして、`syms_of_FILENAME'の中で`staticpro'を呼び出してその変数をガベッ
+ジコレクションから保護する必要があります。
+
+     staticpro (&VARIABLE);
+
+つぎは、少々複雑な引数を取る別の関数の例です。これは`window.c'から取った
+もので、マクロとLispオブジェクトを操作する関数の使い方を例示します。
+
+     DEFUN ("coordinates-in-window-p", Fcoordinates_in_window_p,
+       Scoordinates_in_window_p, 2, 2,
+       "xSpecify coordinate pair: \nXExpression which evals to window: ",
+       "Return non-nil if COORDINATES is in WINDOW.\n\  
+     COORDINATES is a cons of the form (X . Y), X and Y being distances\n\
+     ...
+     If they are on the border between WINDOW and its right sibling,\n\
+        `vertical-line' is returned.")
+       (coordinates, window)
+          register Lisp_Object coordinates, window;
+     {
+       int x, y;
+
+       CHECK_LIVE_WINDOW (window, 0);
+       CHECK_CONS (coordinates, 1);
+       x = XINT (Fcar (coordinates));
+       y = XINT (Fcdr (coordinates));
+
+       switch (coordinates_in_window (XWINDOW (window), &x, &y))
+         {
+         case 0:			/* NOT in window at all. */
+           return Qnil;
+
+         case 1:			/* In text part of window. */
+           return Fcons (make_number (x), make_number (y));
+
+         case 2:			/* In mode line of window. */
+           return Qmode_line;
+
+         case 3:			/* On right border of window.  */
+           return Qvertical_line;
+
+         default:
+           abort ();
+         }
+     }
+
+Cのコードでは、関数がCで定義されていない限り、関数をその名前で呼び出せな
+いことに注意してください。Lispで書かれた関数を呼び出す方法は、Lispの関数
+`funcall'を内蔵する`Ffuncall'を使うことです。Lisp関数`funcall'は任意個数
+の引数を受け付けるので、Cでは2つの引数、Lispレベルの引数の個数とそれらの
+値を収めた一次元の配列を受け取ります。Lispレベルの最初の引数は呼び出すべ
+きLisp関数であり、残りはそれに渡す引数です。`Ffuncall'はエバリュエータを
+呼び出すので、`Ffuncall'を呼び出す周りでは、ガベッジコレクションからポイ
+ンタを保護する必要があります。
+
+Cの関数、`call0'、`call1'、`call2'などは、固定個数の引数を受け取るLisp関
+数を簡便に呼び出す手軽な方法です。これらは`Ffuncall'を呼び出して動作しま
+す。
+
+`eval.c'は例を調べるにはとてもよいファイルです。`lisp.h'には重要なマクロ
+や関数の定義が入っています。
+
+
+
+File: elisp-ja.info, Node: Object Internals, Prev: Writing Emacs Primitives, Up: GNU Emacs Internals
+
+オブジェクトの内部
+==================
+
+GNU Emacs Lispは、さまざまな型のデータを扱います。実際のデータはヒープに
+保存されていて、プログラムはポインタを介してそれらを参照します。ほとんど
+の実装では、ポインタは32ビット長です。Emacsをコンパイルしたオペレーティ
+ングシステムやマシンの種類に依存しますが、オブジェクトのアドレスには28ビッ
+トを使い、残りのビットはガベッジコレクションの印やオブジェクトの型を表す
+識別子であるタグに使います。
+
+Lispオブジェクトはタグ付ポインタとして表現しますから、任意のオブジェクト
+のLispデータ型を判定することが可能です。Cのデータ`Lisp_Object'は、任意の
+データ型のLispオブジェクトを保持できます。普通の変数は`Lisp_Object'型で
+すから、Lispの任意の値の任意の型を保持できます。実際のデータ型は、実行中
+にのみ判定できます。関数引数についても同じことがいえます。特定の型の引数
+のみを受け付る関数が必要な場合には、適切な述語（*Note Type Predicates::）
+を使って型を明示的に検査する必要があります。
+
+* Menu:
+
+* Buffer Internals::    Components of a buffer structure.
+* Window Internals::    Components of a window structure.
+* Process Internals::   Components of a process structure.
+
+
+
+File: elisp-ja.info, Node: Buffer Internals, Next: Window Internals, Prev: Object Internals, Up: Object Internals
+
+バッファの内部
+--------------
+
+バッファには、Lispプログラマが直接には参照できないフィールドがあります。
+それらをCのコードで使っている名前で以下に述べます。多くはLisp基本関数を
+介してLispプログラムから間接的に参照できます。
+
+`name'
+     バッファ名はバッファを指名する文字列である。これは一意であることが
+     保証される。*Note Buffer Names::。
+
+`save_modified'
+     このフィールドは、バッファが最後に保存された時刻を整数で保持する。
+     *Note Buffer Modification::。
+
+`modtime'
+     このフィールドは、訪問しているファイルの更新時刻を保持している。こ
+     れはファイルを読み書きしたときに設定される。バッファをファイルに書
+     き込むたびに、このフィールドとファイルの更新時刻を比較する。*Note
+     Buffer Modification::。
+
+`auto_save_modified'
+     このフィールドは、バッファを最後に自動保存した時刻を保持する。
+
+`last_window_start'
+     このフィールドは、バッファをウィンドウに最後に表示したときのバッファ
+     の`window-start'（表示開始）位置を保持する。
+
+`undo_list'
+     このフィールドは、バッファのアンドゥリストを保持する。*Note Undo::。
+
+`syntax_table_v'
+     このフィールドは、バッファの構文テーブルを保持する。*Note Syntax
+     Tables::。
+
+`downcase_table'
+     このフィールドは、テキストを小文字に変換するための変換表を保持する。
+     *Note Case Tables::。
+
+`upcase_table'
+     このフィールドは、テキストを大文字に変換するための変換表を保持する。
+     *Note Case Tables::。
+
+`case_canon_table'
+     このフィールドは、大文字小文字を区別しない探索のためにテキストを正
+     則にするための変換表を保持する。*Note Case Tables::。
+
+`case_eqv_table'
+     このフィールドは、大文字小文字を区別しない探索のための同値テーブル
+     を保持する。*Note Case Tables::。
+
+`display_table'
+     このフィールドは、バッファの表示テーブルを保持する。表示テーブルが
+     なければ`nil'である。*Note Display Tables::。
+
+`markers'
+     このフィールドは、バッファを現在指しているすべてのマーカの連鎖を保
+     持している。バッファからテキストを削除したり、バッファのギャップが
+     移動すると、これらのマーカのおのおのを検査し更新する必要がある。
+     *Note Markers::。
+
+`backed_up'
+     このフィールドは、このバッファで訪問しているファイルのバックアップ
+     ファイルを作成したかどうかを表すフラグである。
+
+`mark'
+     このフィールドは、バッファのマークを保持する。マークはマーカであり、
+     そのためリスト`markers'にも含まれている。*Note The Mark::。
+
+`mark_active'
+     バッファのマークが活性であれば、このフィールドは`nil'以外である。
+
+`local_var_alist'
+     このフィールドは、このバッファにバッファローカルな変数を記述した連
+     想リストを保持している。バッファオブジェクトに特別な場所がある組み
+     込みのバッファローカルな変数は含まない。（それらはこの一覧では省い
+     た。）*Note Buffer-Local Variables::。
+
+`base_buffer'
+     このフィールドは、（間接バッファであれば）バッファの基底バッファ、
+     あるいは、`nil'を保持する。
+
+`keymap'
+     このフィールドは、バッファのローカルキーマップを保持する。*Note
+     Keymaps::。
+
+`overlay_center'
+     このフィールドは、現在のオーバレイの中央位置を保持する。*Note
+     Overlays::。
+
+`overlays_before'
+     このフィールドは、バッファの現在のオーバレイの中央位置かそれよりま
+     えで終るこのバッファのオーバレイのリストを保持している。それらは終
+     了位置が減る順に並んでいる。
+
+`overlays_after'
+     このフィールドは、バッファの現在のオーバレイの中央位置よりうしろで
+     終るこのバッファのオーバレイのリストを保持している。それらは開始位
+     置が増える順に並んでいる。
+
+`enable_multibyte_characters'
+     このフィールドは、`enable-multibyte-characters'のバッファローカルな
+     値を保持しており、`t'か`nil'である。
+
+
+
+File: elisp-ja.info, Node: Window Internals, Next: Process Internals, Prev: Buffer Internals, Up: Object Internals
+
+ウィンドウの内部
+----------------
+
+ウィンドウには以下のような参照可能なフィールドがあります。
+
+`frame'
+     このウィンドウがあるフレーム。
+
+`mini_p'
+     このウィンドウがミニバッファ用ウィンドウであれば`nil'以外。
+
+`buffer'
+     このウィンドウで表示しているバッファ。これはウィンドウの生存期間中
+     にしばしば変化する。
+
+`dedicated'
+     このウィンドウがそのバッファ専用であると`nil'以外である。
+
+`pointm'
+     これは、このウィンドウが選択されていたときのカレントバッファのポイ
+     ント値である。選択されていないときには、まえの値が保持される。
+
+`start'
+     ウィンドウに表示する最初の文字のバッファ内位置である。
+
+`force_start'
+     このフラグが`nil'以外であると、Lispプログラムが明示的にウィンドウを
+     スクロールしたことを表す。ポイントがスクリーンからはみ出していると
+     つぎの再表示の動作に影響する。ポイントの周りのテキストをウィンドウ
+     に表示するようにスクロールするかわりに、スクリーン上に位置するよう
+     にポイントを移動する。
+
+`last_modified'
+     このウィンドウの最後の再表示が完了した時点でのウィンドウのバッファ
+     のフィールド`modified'である。
+
+`last_point'
+     このウィンドウの最後の再表示が完了した時点でのバッファのポイント値
+     である。
+
+`left'
+     コラム数で数えたウィンドウの左端である。
+     （スクリーンの最左端コラムは0コラム目。）
+
+`top'
+     行数で数えたウィンドウの上端である。
+     （スクリーンの最上端行は0行目。）
+
+`height'
+     行数で数えたウィンドウの高さ。
+
+`width'
+     コラム数で数えたウィンドウの幅。
+
+`next'
+     これは、兄弟関係でつぎのウィンドウである。兄弟関係で最右端か最下端
+     であるウィンドウでは`nil'である。
+
+`prev'
+     これは、兄弟関係でまえのウィンドウである。兄弟関係で最左端か最上端
+     であるウィンドウでは`nil'である。
+
+`parent'
+     内部的にはEmacsはウィンドウを木に並べている。兄弟関係の各グループに
+     は親ウィンドウがあり、親ウィンドウの領域はその兄弟すべての領域を含
+     む。このフィールドはウィンドウの親を指す。
+
+     親ウィンドウはバッファを表示せず、その子ウィンドウの形以外には、表
+     示に関してはなんの役割も持たない。Emacs Lispプログラムでは親ウィン
+     ドウを参照せず、バッファを実際に表示する木の葉にあるウィンドウを操
+     作する。
+
+`hscroll'
+     これは、ウィンドウの表示を水平方向左向きにスクロールしているコラム
+     数。これは普通は0である。
+
+`use_time'
+     これは、このウィンドウが選択されていた最後の時刻。関数
+     `get-lru-window'がこのフィールドを使う。
+
+`display_table'
+     ウィンドウの表示テーブル。指定されていなければ`nil'である。
+
+`update_mode_line'
+     `nil'以外であると、ウィンドウのモード行を更新する必要があることを表
+     す。
+
+`base_line_number'
+     バッファの特定の位置の行番号である。あるいは`nil'。これは、モード行
+     にポイント位置の行番号を表示するために使われる。
+
+`base_line_pos'
+     行番号が既知のバッファ内位置。既知でなければ`nil'である。
+
+`region_showing'
+     このウィンドウでリージョン（やその一部）を強調表示しているときには、
+     このフィールドは、当該リージョンの一方の端を表すマーク位置を保持し
+     ている。さもなければこのフィールドは`nil'である。
+
+
+
+File: elisp-ja.info, Node: Process Internals, Prev: Window Internals, Up: Object Internals
+
+プロセスの内部
+--------------
+
+プロセスにはつぎのようなフィールドがあります。
+
+`name'
+     プロセスの名前である文字列。
+
+`command'
+     このプロセスを開始するために使用されたコマンド引数から成るリスト。
+
+`filter'
+     バッファのかわりにプロセスからの出力を受け取るために使用する関数。
+     あるいは`nil'。
+
+`sentinel'
+     プロセスがシグナルを受け取るたびに呼ばれる関数。あるいは`nil'。
+
+`buffer'
+     プロセスに対応付けられたバッファ。
+
+`pid'
+     UNIXのプロセスIDである整数。
+
+`childp'
+     フラグであり、これが実際に子プロセスであると`nil'以外である。ネット
+     ワーク接続であると`nil'以外。
+
+`mark'
+     プロセスからの最後の出力をバッファに挿入した箇所の末尾位置を表すマー
+     カ。これはしばしばバッファの末尾であるが、つねにではない。
+
+`kill_without_query'
+     これが`nil'以外であると、このプロセスが動作中にEmacsを終了しようと
+     してもプロセスをキルすることに関して確認を求めない。
+
+`raw_status_low'
+`raw_status_high'
+     これらの2つのフィールドは、システムコール`wait'で返されるプロセス状
+     態の各16ビットを記録する。
+
+`status'
+     `process-status'が返すべきプロセス状態。
+
+`tick'
+`update_tick'
+     この2つのフィールドが等しくないと、番兵を実行するかプロセスのバッファ
+     にメッセージを挿入するかして、プロセスの状態変化を報告する必要があ
+     る。
+
+`pty_flag'
+     サブプロセスとの通信にPTY（疑似端末）を使用している場合には`nil'以
+     外であり、パイプを使用している場合には`nil'である。
+
+`infd'
+     このプロセスからの入力用ファイル記述子。
+
+`outfd'
+     このプロセスへの出力用ファイル記述子。
+
+`subtty'
+     サブプロセスが使用している端末のファイル記述子。（これを記録する必
+     要のないシステムもあり、その場合には値は`nil'である。）
+
+`tty_name'
+     サブプロセスが使用している端末の名前。パイプを使用しているときには
+     `nil'である。
+
+
+File: elisp-ja.info, Node: Standard Errors, Next: Standard Buffer-Local Variables, Prev: GNU Emacs Internals, Up: Top
+
+標準のエラー
+************
+
+以下は、概念ごとにまとめた標準Emacsのエラーシンボルの完全な一覧です。一
+覧には、各シンボルの（シンボルの属性`error-message'にある）メッセージと
+そのようなエラーが生起する場面の記述への相互参照を示しました。
+
+各エラーシンボルには、属性`error-conditions'があり、これはシンボルのリス
+トです。通常、このリストは、エラーシンボルそのものとシンボル`error'を含
+みます。しばしば、追加のシンボルも含みます。それらは中間的な分類種別であ
+り、`error'より細分化したものですが、エラーシンボルそのものよりは大分類
+です。たとえば、ファイル参照に関するすべてのエラーには、条件`file-error'
+が入っています。以下で、特定のエラーシンボルにおいて追加のシンボルを言及
+していないときには、そのエラーには追加シンボルがないことを意味します。
+
+特別な例外ですが、エラーシンボル`quit'には条件`error'がありません。これ
+は、中断（quit）をエラーとみなさないからです。
+
+エラーが生起する場面とその処理方法については、*Note Errors::。
+
+`シンボル'
+     文字列; 参照。
+
+`error'
+     `"error"' *Note Errors::。
+
+`quit'
+     `"Quit"' *Note Quitting::。
+
+`args-out-of-range'
+     `"Args out of range"' *Note Sequences Arrays Vectors::。
+
+`arith-error'
+     `"Arithmetic error"' *Note Numbers::の`/'と`%'を参照。
+
+`beginning-of-buffer'
+     `"Beginning of buffer"' *Note Motion::。
+
+`buffer-read-only'
+     `"Buffer is read-only"' *Note Read Only Buffers::。
+
+`cyclic-function-indirection'
+     `"Symbol's chain of function indirections\ contains a loop"' *Note
+     Function Indirection::。
+
+`end-of-buffer'
+     `"End of buffer"' *Note Motion::。
+
+`end-of-file'
+     `"End of file during parsing"'
+     これはファイル入出力ではなくLispリーダに関連することなので、
+     `file-error'ではないことに注意。
+     *Note Input Functions::。
+
+`file-already-exists'
+     これは`file-error'。
+     *Note Writing to Files::。
+
+`file-date-error'
+     これは`file-error'の小分類。
+     `copy-file'で、
+     出力ファイルの最終更新日付の設定に失敗すると生起する。
+     *Note Changing Files::。
+
+`file-error'
+     このエラーとその小分類にはエラー文字列がない。
+     エラー条件`file-error'があると、
+     データ項目のみからエラーメッセージを作るからである。
+     *Note Files::。
+
+`file-locked'
+     これは`file-error'。
+     *Note File Locks::。
+
+`file-supersession'
+     これは`file-error'。
+     *Note Modification Time::。
+
+`invalid-function'
+     `"Invalid function"' *Note Classifying Lists::。
+
+`invalid-read-syntax'
+     `"Invalid read syntax"' *Note Input Functions::。
+
+`invalid-regexp'
+     `"Invalid regexp"' *Note Regular Expressions::。
+
+`mark-inactive'
+     `"Mark inactive"' *Note The Mark::。
+
+`no-catch'
+     `"No catch for tag"' *Note Catch and Throw::。
+
+`scan-error'
+     `"Scan error"'
+     これは、構文解析関数が不正な構文や対応していない括弧を
+     みつけると生起する。
+     *Note List Motion::、および、*Note Parsing Expressions::。
+
+`search-failed'
+     `"Search failed"' *Note Searching and Matching::。
+
+`setting-constant'
+     `"Attempt to set a constant symbol"'
+ 
+     シンボル`nil'や`t'、および、
+     `:'で始まる任意のシンボルは変更できない。
+     *Note Variables that Never Change: Constant Variables.。
+
+`undefined-color'
+     `"Undefined color"' *Note Color Names::。
+
+`void-function'
+     `"Symbol's function definition is void"' *Note Function Cells::。
+
+`void-variable'
+     `"Symbol's value as variable is void"' *Note Accessing Variables::。
+
+`wrong-number-of-arguments'
+     `"Wrong number of arguments"' *Note Classifying Lists::。
+
+`wrong-type-argument'
+     `"Wrong type argument"' *Note Type Predicates::。
+
+`arith-error'の特別な場合に分類された以下の種類のエラーは、数学関数を不
+正に使ったときに特定のシステムで生起します。
+
+`domain-error'
+     `"Arithmetic domain error"' *Note Math Functions::。
+
+`overflow-error'
+     `"Arithmetic overflow error"' *Note Math Functions::。
+
+`range-error'
+     `"Arithmetic range error"' *Note Math Functions::。
+
+`singularity-error'
+     `"Arithmetic singularity error"' *Note Math Functions::。
+
+`underflow-error'
+     `"Arithmetic underflow error"' *Note Math Functions::。
+
+
+File: elisp-ja.info, Node: Standard Buffer-Local Variables, Next: Standard Keymaps, Prev: Standard Errors, Up: Top
+
+バッファローカルな変数
+**********************
+
+以下は、各バッファにおいて、自動的にバッファローカルになるEmacsの汎用目
+的の変数一覧です。ほとんどのものは、設定したときにだけバッファローカルに
+なります。これらのごく少数は、各バッファでつねにローカルになります。多く
+のLispパッケージで内部使用向けにこのような変数を定義しますが、それらすべ
+てをここに示すことはしていません。
+
+`abbrev-mode'
+     *Note Abbrevs::。
+
+`auto-fill-function'
+     *Note Auto Filling::。
+
+`buffer-auto-save-file-name'
+     *Note Auto-Saving::。
+
+`buffer-backed-up'
+     *Note Backup Files::。
+
+`buffer-display-count'
+     *Note Displaying Buffers::。
+
+`buffer-display-table'
+     *Note Display Tables::。
+
+`buffer-file-format'
+     *Note Format Conversion::。
+
+`buffer-file-name'
+     *Note Buffer File Name::。
+
+`buffer-file-number'
+     *Note Buffer File Name::。
+
+`buffer-file-truename'
+     *Note Buffer File Name::。
+
+`buffer-file-type'
+     *Note MS-DOS File Types::。
+
+`buffer-invisibility-spec'
+     *Note Invisible Text::。
+
+`buffer-offer-save'
+     *Note Saving Buffers::。
+
+`buffer-read-only'
+     *Note Read Only Buffers::。
+
+`buffer-saved-size'
+     *Note Point::。
+
+`buffer-undo-list'
+     *Note Undo::。
+
+`cache-long-line-scans'
+     *Note Text Lines::。
+
+`case-fold-search'
+     *Note Searching and Case::。
+
+`ctl-arrow'
+     *Note Usual Display::。
+
+`comment-column'
+     *Note コメントの操作: (emacs)Comments.。
+
+`default-directory'
+     *Note System Environment::。
+
+`defun-prompt-regexp'
+     *Note List Motion::。
+
+`enable-multibyte-characters'
+     *Note Non-ASCII Characters::。
+
+`fill-column'
+     *Note Auto Filling::。
+
+`goal-column'
+     *Note ポイント位置を移動する: (emacs)Moving Point.。
+
+`left-margin'
+     *Note Indentation::。
+
+`local-abbrev-table'
+     *Note Abbrevs::。
+
+`local-write-file-hooks'
+     *Note Saving Buffers::。
+
+`major-mode'
+     *Note Mode Help::。
+
+`mark-active'
+     *Note The Mark::。
+
+`mark-ring'
+     *Note The Mark::。
+
+`minor-modes'
+     *Note Minor Modes::。
+
+`mode-line-buffer-identification'
+     *Note Mode Line Variables::。
+
+`mode-line-format'
+     *Note Mode Line Data::。
+
+`mode-line-modified'
+     *Note Mode Line Variables::。
+
+`mode-line-process'
+     *Note Mode Line Variables::。
+
+`mode-name'
+     *Note Mode Line Variables::。
+
+`overwrite-mode'
+     *Note Insertion::。
+
+`paragraph-separate'
+     *Note Standard Regexps::。
+
+`paragraph-start'
+     *Note Standard Regexps::。
+
+`point-before-scroll'
+     マウスコマンドとスクロールコマンドの通信に使う。
+
+`require-final-newline'
+     *Note Insertion::。
+
+`selective-display'
+     *Note Selective Display::。
+
+`selective-display-ellipses'
+     *Note Selective Display::。
+
+`tab-width'
+     *Note Usual Display::。
+
+`truncate-lines'
+     *Note Truncation::。
+
+`vc-mode'
+     *Note Mode Line Variables::。
+
+
+File: elisp-ja.info, Node: Standard Keymaps, Next: Standard Hooks, Prev: Standard Buffer-Local Variables, Up: Top
+
+標準のキーマップ
+****************
+
+以下のシンボルは、さまざまなキーマップの名前として使われています。これら
+の一部はEmacsの始動時に存在しますが、他のものは関連するモードを使ったと
+きにのみロードされます。以下は、完全な一覧ではありません。
+
+これらのマップのほとんどすべては、ローカルマップとして使われます。もちろ
+ん、存在するモードの中で、グローバルキーマップを変更するのはVipモードと
+端末（terminal）モードだけです。
+
+`Buffer-menu-mode-map'
+     バッファメニュー（buffer-menu）モードで使う完全なキーマップ。
+
+`c-mode-map'
+     Cモードで使う疎なキーマップ。
+
+`command-history-map'
+     コマンド履歴（command-history）モードで使う完全なキーマップ。
+
+`ctl-x-4-map'
+     プレフィックス`C-x 4'の下位コマンド用の疎なキーマップ。
+
+`ctl-x-5-map'
+     プレフィックス`C-x 5'の下位コマンド用の疎なキーマップ。
+
+`ctl-x-map'
+     `C-x'コマンド用の完全なキーマップ。
+
+`debugger-mode-map'
+     デバッガモードで使う完全なキーマップ。
+
+`dired-mode-map'
+     `dired-mode'バッファで使う完全なキーマップ。
+
+`edit-abbrevs-map'
+     `edit-abbrevs'で使う疎なキーマップ。
+
+`edit-tab-stops-map'
+     `edit-tab-stops'で使う疎なキーマップ。
+
+`electric-buffer-menu-mode-map'
+     エレクトリックバッファメニュー（electric-buffer-menu）モードで使う
+     完全なキーマップ。
+
+`electric-history-map'
+     エレクトリックコマンド履歴（electric-command-history）モードで使う
+     完全なキーマップ。
+
+`emacs-lisp-mode-map'
+     emacs-lispモードで使う疎なキーマップ。
+
+`facemenu-menu'
+     テキスト属性メニューを表示するキーマップ。
+
+`facemenu-background-menu'
+     テキスト属性メニューのBackground Colorサブメニューを表示するキーマッ
+     プ。
+
+`facemenu-face-menu'
+     テキスト属性メニューのFaceサブメニューを表示するキーマップ。
+
+`facemenu-foreground-menu'
+     テキスト属性メニューのForeground Colorを表示するキーマップ。
+
+`facemenu-indentation-menu'
+     テキスト属性メニューのIndentaionサブメニューを表示するキーマップ。
+
+`facemenu-justification-menu'
+     テキスト属性メニューのJustificationサブメニューを表示するキーマップ。
+
+`facemenu-special-menu'
+     テキスト属性メニューのSpecial Propsサブメニューを表示するキーマップ。
+
+`function-key-map'
+     キーパッドやファンクションキーの変換用のキーマップ。
+     それらがなければ、この変数は空の疎なキーマップである。
+     *Note Translating Input::。
+
+`fundamental-mode-map'
+     基本（fundamental）モード用のローカルキーマップ。
+     これは空であり、変更すべきでない。
+
+`Helper-help-map'
+     ヘルプユーティリティパッケージが使う完全なキーマップ。
+     この変数の値セルと関数セルには同一のキーマップが入っている。
+
+`Info-edit-map'
+     infoの`e'コマンドで使う疎なキーマップ。
+
+`Info-mode-map'
+     infoコマンドを収めた疎なキーマップ。
+
+`isearch-mode-map'
+     インクリメンタルサーチ中に打鍵できる文字を定義するキーマップ。
+
+`key-translation-map'
+     キー変換用のキーマップ。これは、`function-key-map'と違って、もとの
+     キーバインディングに優先する。*Note Translating Input::。
+
+`lisp-interaction-mode-map'
+     Lispモードで使う疎なキーマップ。
+
+`lisp-mode-map'
+     Lispモードで使う疎なキーマップ。
+
+`menu-bar-edit-menu'
+     メニューバーのEditメニューを表示するキーマップ。
+
+`menu-bar-files-menu'
+     メニューバーのFilesメニューを表示するキーマップ。
+
+`menu-bar-help-menu'
+     メニューバーのHelpメニューを表示するキーマップ。
+
+`menu-bar-mule-menu'
+     メニューバーのMuleメニューを表示するキーマップ。
+
+`menu-bar-search-menu'
+     メニューバーのSearchメニューを表示するキーマップ。
+
+`menu-bar-tools-menu'
+     メニューバーのToolsメニューを表示するキーマップ。
+
+`mode-specific-map'
+     `C-c'に続く文字用のキーマップ。これはグローバルマップの中にあること
+     に注意。このマップは実際にはモード固有ではない。プレフィックスキー
+     `C-c'の主要な使い方を記述する`C-h b'（`display-bindings'）において、
+     ユーザーに有益なようにこの名前を選んだ。
+
+`occur-mode-map'
+     出現（occur）モードで使うローカルキーマップ。
+
+`query-replace-map'
+     `query-replace'やその関連コマンドの応答用に使うキーマップ。
+     `y-or-n-p'や`map-y-or-n-p'もこれを使う。このマップを使う関数は、プ
+     レフィックスキーを使わない。一度に1つのイベントを探す。
+
+`text-mode-map'
+     テキスト（text）モードで使う疎なキーマップ。
+
+`view-mode-map'
+     閲覧（view）モードで使う完全なキーマップ。
+
+
+File: elisp-ja.info, Node: Standard Hooks, Next: Index, Prev: Standard Keymaps, Up: Top
+
+標準のフック
+************
+
+以下は、Emacsから適切な場面に呼び出される関数を読者が指定するためのフッ
+ク変数の一覧です。
+
+これらのほとんどの変数の名前は`-hook'で終ります。これらは、`run-hooks'で
+実行される"ノーマルフック"（normal hooks）です。そのようなフックの値は関
+数のリストです。関数は引数なしで呼び出され、その値は完全に無視します。こ
+のようなフックに新たな関数を追加する推奨方法は、`add-hook'を呼び出すこと
+です。フックの使い方について詳しくは、*Note Hooks::。
+
+`-hooks'や`-functions'で終る名前の変数は、普通、"アブノーマルフック"
+（abnormal hooks）です。それらの値も関数のリストですが、それらの関数は特
+別な方法（引数を渡したり、戻り値を使用したり）で呼び出されます。これらの
+変数のごく少数は実際にはノーマルフックですが、ノーマルフックの名前を
+`-hook'で終えるという慣行を確立するまえに命名したものです。
+
+`-function'で終る名前の変数では、その値は1つの関数です。（Emacsの旧版で
+は、ノーマルフックでないにも関わらず、`-hook'で終る名前の変数があった。
+しかしながら、それらはすべて改名した。）
+
+
+`activate-mark-hook'
+`after-change-function'
+`after-change-functions'
+`after-init-hook'
+`after-insert-file-functions'
+`after-make-frame-hook'
+`after-revert-hook'
+`after-save-hook'
+`auto-fill-function'
+`auto-save-hook'
+`before-change-function'
+`before-change-functions'
+`before-init-hook'
+`before-make-frame-hook'
+`before-revert-hook'
+`blink-paren-function'
+`buffer-access-fontify-functions'
+`c-mode-hook'
+`calendar-load-hook'
+`change-major-mode-hook'
+`command-history-hook'
+`command-line-functions'
+`comment-indent-function'
+`deactivate-mark-hook'
+`diary-display-hook'
+`diary-hook'
+`dired-mode-hook'
+`disabled-command-hook'
+`echo-area-clear-hook'
+`edit-picture-hook'
+`electric-buffer-menu-mode-hook'
+`electric-command-history-hook'
+`electric-help-mode-hook'
+`emacs-lisp-mode-hook'
+`find-file-hooks'
+`find-file-not-found-hooks'
+`first-change-hook'
+`fortran-comment-hook'
+`fortran-mode-hook'
+`ftp-setup-write-file-hooks'
+`ftp-write-file-hook'
+`indent-mim-hook'
+`initial-calendar-window-hook'
+`kill-buffer-hook'
+`kill-buffer-query-functions'
+`kill-emacs-hook'
+`kill-emacs-query-functions'
+`LaTeX-mode-hook'
+`ledit-mode-hook'
+`lisp-indent-function'
+`lisp-interaction-mode-hook'
+`lisp-mode-hook'
+`list-diary-entries-hook'
+`local-write-file-hooks'
+`m2-mode-hook'
+`mail-mode-hook'
+`mail-setup-hook'
+`mark-diary-entries-hook'
+`medit-mode-hook'
+`menu-bar-update-hook'
+`minibuffer-setup-hook'
+`minibuffer-exit-hook'
+`news-mode-hook'
+`news-reply-mode-hook'
+`news-setup-hook'
+`nongregorian-diary-listing-hook'
+`nongregorian-diary-marking-hook'
+`nroff-mode-hook'
+`outline-mode-hook'
+`plain-TeX-mode-hook'
+`post-command-hook'
+`pre-abbrev-expand-hook'
+`pre-command-hook'
+`print-diary-entries-hook'
+`prolog-mode-hook'
+`protect-innocence-hook'
+`redisplay-end-trigger-functions'
+`rmail-edit-mode-hook'
+`rmail-mode-hook'
+`rmail-summary-mode-hook'
+`scheme-indent-hook'
+`scheme-mode-hook'
+`scribe-mode-hook'
+`shell-mode-hook'
+`shell-set-directory-error-hook'
+`suspend-hook'
+`suspend-resume-hook'
+`temp-buffer-show-function'
+`term-setup-hook'
+`terminal-mode-hook'
+`terminal-mode-break-hook'
+`TeX-mode-hook'
+`text-mode-hook'
+`today-visible-calendar-hook'
+`today-invisible-calendar-hook'
+`vi-mode-hook'
+`view-hook'
+`window-configuration-change-hook'
+`window-scroll-functions'
+`window-setup-hook'
+`window-size-change-functions'
+`write-contents-hooks'
+`write-file-hooks'
+`write-region-annotate-functions'
+
+
+
+
+
+
+
+
+
+File: elisp-ja.info, Node: Index, Next: New Symbols, Prev: Standard Hooks, Up: Top
+
+索引
+****
+
+
+
+* Menu:
+
+* view-mode-map:                Standard Keymaps.       184.
+* text-mode-map:                Standard Keymaps.       180.
+* occur-mode-map:               Standard Keymaps.       170.
+* menu-bar-tools-menu:          Standard Keymaps.       159.
+* menu-bar-search-menu:         Standard Keymaps.       155.
+* menu-bar-mule-menu:           Standard Keymaps.       151.
+* menu-bar-help-menu:           Standard Keymaps.       147.
+* menu-bar-files-menu:          Standard Keymaps.       143.
+* menu-bar-edit-menu:           Standard Keymaps.       139.
+* lisp-mode-map:                Standard Keymaps.       135.
+* lisp-interaction-mode-map:    Standard Keymaps.       131.
+* isearch-mode-map:             Standard Keymaps.       122.
+* Info-mode-map:                Standard Keymaps.       118.
+* Info-edit-map:                Standard Keymaps.       114.
+* Helper-help-map:              Standard Keymaps.       109.
+* fundamental-mode-map:         Standard Keymaps.       104.
+* facemenu-special-menu:        Standard Keymaps.       94.
+* facemenu-justification-menu:  Standard Keymaps.       90.
+* facemenu-indentation-menu:    Standard Keymaps.       86.
+* facemenu-foreground-menu:     Standard Keymaps.       82.
+* facemenu-face-menu:           Standard Keymaps.       78.
+* facemenu-background-menu:     Standard Keymaps.       73.
+* facemenu-menu:                Standard Keymaps.       69.
+* emacs-lisp-mode-map:          Standard Keymaps.       65.
+* electric-history-map:         Standard Keymaps.       60.
+* electric-buffer-menu-mode-map: Standard Keymaps.      55.
+* edit-tab-stops-map:           Standard Keymaps.       51.
+* edit-abbrevs-map:             Standard Keymaps.       47.
+* dired-mode-map:               Standard Keymaps.       43.
+* debugger-mode-map:            Standard Keymaps.       39.
+* command-history-map:          Standard Keymaps.       23.
+* c-mode-map:                   Standard Keymaps.       19.
+* Buffer-menu-mode-map:         Standard Keymaps.       15.
+* プロセスの内部:               Process Internals.      4.
+* 内部、プロセス:               Process Internals.      4.
+* ウィンドウの内部ポイント:     Window Internals.       26.
+* ウィンドウの内部:             Window Internals.       4.
+* 内部、ウィンドウ:             Window Internals.       4.
+* バッファの内部:               Buffer Internals.       4.
+* 内部、バッファ:               Buffer Internals.       4.
+* 型検査の内部:                 Object Internals.       19.
+* オブジェクトの内部:           Object Internals.       4.
+* ガベッジコレクションを抑制する: Writing Emacs Primitives.  13.
+* 基本関数の内部:               Writing Emacs Primitives.  4.
+* memory-limit:                 Garbage Collection.     145.
+* garbage-collect:              Garbage Collection.     51.
+* CLに関した注意−−メモリ領域の追加: Garbage Collection.  39.
+* 自由リスト:                   Garbage Collection.     33.
+* メモリ割り当て:               Garbage Collection.     5.
+* ガベッジコレクション:         Garbage Collection.     4.
+* purecopy:                     Pure Storage.           25.
+* ピュアメモリ:                 Pure Storage.           4.
+* unexec:                       Building Emacs.         82.
+* dump-emacs:                   Building Emacs.         82.
+* `site-init.el':               Building Emacs.         53.
+* `site-load.el':               Building Emacs.         40.
+* `loadup.el':                  Building Emacs.         15.
+* temacs:                       Building Emacs.         4.
+* Emacsの構築方法:              Building Emacs.         4.
+* ライブラリヘッダコメント:     Library Headers.        4.
+* ヘッダコメント:               Library Headers.        4.
+* checkdoc-minor-mode:          Documentation Tips.     5.
+* `elp.el':                     Compilation Tips.       8.
+* `profile.el':                 Compilation Tips.       8.
+* プログラムを計時する:         Compilation Tips.       8.
+* プロファイル:                 Compilation Tips.       8.
+* 速度向上:                     Compilation Tips.       4.
+* 実行速度:                     Compilation Tips.       4.
+* キー、予約済み:               Coding Conventions.     76.
+* 予約済みキー:                 Coding Conventions.     76.
+* コーディングスタイル:         Tips.                   4.
+* コーディングスタイルの標準:   Tips.                   4.
+* ヒント:                       Tips.                   4.
+* appt-delete-window-function:  Appt Customizing.       8.
+* appt-disp-window-function:    Appt Customizing.       8.
+* appt-display-duration:        Appt Customizing.       8.
+* appt-msg-window:              Appt Customizing.       8.
+* appt-display-mode-line:       Appt Customizing.       8.
+* appt-visible:                 Appt Customizing.       8.
+* appt-audible:                 Appt Customizing.       8.
+* appt-message-warning-time:    Appt Customizing.       8.
+* diary-yahrzeit:               Sexp Diary Entries.     125.
+* 追悼記念祭:                   Sexp Diary Entries.     125.
+* diary-omer:                   Sexp Diary Entries.     125.
+* オーメル（過ぎ越しの祝い）の回数: Sexp Diary Entries.  125.
+* diary-sabbath-candles:        Sexp Diary Entries.     125.
+* たそがれの時刻:               Sexp Diary Entries.     125.
+* diary-parasha:                Sexp Diary Entries.     125.
+* パラシャ、毎週:               Sexp Diary Entries.     125.
+* diary-rosh-hodesh:            Sexp Diary Entries.     125.
+* 月始めの特別礼拝:             Sexp Diary Entries.     125.
+* diary-mayan-date:             Sexp Diary Entries.     92.
+* diary-french-date:            Sexp Diary Entries.     92.
+* diary-islamic-date:           Sexp Diary Entries.     92.
+* diary-hebrew-date:            Sexp Diary Entries.     92.
+* diary-astro-day-number:       Sexp Diary Entries.     92.
+* diary-julian-date:            Sexp Diary Entries.     92.
+* diary-iso-date:               Sexp Diary Entries.     92.
+* diary-day-of-year:            Sexp Diary Entries.     92.
+* diary-phases-of-moon:         Sexp Diary Entries.     92.
+* diary-sunrise-sunset:         Sexp Diary Entries.     92.
+* diary-float:                  Sexp Diary Entries.     56.
+* diary-date:                   Sexp Diary Entries.     45.
+* diary-remind:                 Sexp Diary Entries.     40.
+* diary-cyclic:                 Sexp Diary Entries.     28.
+* diary-anniversary:            Sexp Diary Entries.     11.
+* S式日誌項目:                  Sexp Diary Entries.     4.
+* mark-included-diary-files:    Fancy Diary Display.    45.
+* include-other-diary-files:    Fancy Diary Display.    45.
+* mark-diary-entries-hook:      Fancy Diary Display.    45.
+* list-diary-entries-hook:      Fancy Diary Display.    45.
+* sort-diary-entries:           Fancy Diary Display.    29.
+* 日誌項目のソート:             Fancy Diary Display.    26.
+* diary-list-include-blanks:    Fancy Diary Display.    22.
+* fancy-diary-display:          Fancy Diary Display.    10.
+* 日誌用バッファ:               Fancy Diary Display.    10.
+* simple-diary-display:         Fancy Diary Display.    4.
+* diary-display-hook:           Fancy Diary Display.    4.
+* insert-yearly-islamic-diary-entry: Hebrew/Islamic Entries.  59.
+* insert-monthly-islamic-diary-entry: Hebrew/Islamic Entries.  59.
+* insert-islamic-diary-entry:   Hebrew/Islamic Entries.  59.
+* insert-yearly-hebrew-diary-entry: Hebrew/Islamic Entries.  59.
+* insert-monthly-hebrew-diary-entry: Hebrew/Islamic Entries.  59.
+* insert-hebrew-diary-entry:    Hebrew/Islamic Entries.  59.
+* mark-islamic-diary-entries:   Hebrew/Islamic Entries.  16.
+* list-islamic-diary-entries:   Hebrew/Islamic Entries.  16.
+* mark-hebrew-diary-entries:    Hebrew/Islamic Entries.  11.
+* list-hebrew-diary-entries:    Hebrew/Islamic Entries.  11.
+* nongregorian-diary-marking-hook: Hebrew/Islamic Entries.  11.
+* nongregorian-diary-listing-hook: Hebrew/Islamic Entries.  11.
+* diary-date-forms:             Diary Customizing.      28.
+* print-diary-entries:          Diary Customizing.      20.
+* print-diary-entries-hook:     Diary Customizing.      20.
+* number-of-diary-entries:      Diary Customizing.      11.
+* holidays-in-diary-buffer:     Diary Customizing.      5.
+* calendar-daylight-savings-ends-time: Daylight Savings.  54.
+* calendar-daylight-savings-starts-time: Daylight Savings.  54.
+* calendar-daylight-time-offset: Daylight Savings.      51.
+* calendar-daylight-savings-ends: Daylight Savings.     16.
+* calendar-daylight-savings-starts: Daylight Savings.   16.
+* 夏時間:                       Daylight Savings.       4.
+* calendar-time-display-form:   Time Display Format.    4.
+* calendar-date-display-form:   Date Display Format.    4.
+* 祝祭日形式:                   Holiday Customizing.    31.
+* other-holidays:               Holiday Customizing.    28.
+* all-islamic-calendar-holidays: Holiday Customizing.   19.
+* all-hebrew-calendar-holidays: Holiday Customizing.    19.
+* all-christian-calendar-holidays: Holiday Customizing.  19.
+* local-holidays:               Holiday Customizing.    16.
+* general-holidays:             Holiday Customizing.    13.
+* islamic-holidays:             Holiday Customizing.    5.
+* hebrew-holidays:              Holiday Customizing.    5.
+* christian-holidays:           Holiday Customizing.    5.
+* calendar-holidays:            Holiday Customizing.    5.
+* today-invisible-calendar-hook: Calendar Customizing.  61.
+* calendar-today-marker:        Calendar Customizing.   57.
+* calendar-mark-today:          Calendar Customizing.   54.
+* calendar-star-date:           Calendar Customizing.   49.
+* today-visible-calendar-hook:  Calendar Customizing.   44.
+* initial-calendar-window-hook: Calendar Customizing.   39.
+* calendar-load-hook:           Calendar Customizing.   36.
+* diary-entry-marker:           Calendar Customizing.   28.
+* calendar-holiday-marker:      Calendar Customizing.   28.
+* mark-holidays-in-calendar:    Calendar Customizing.   25.
+* mark-diary-entries-in-calendar: Calendar Customizing.  19.
+* view-calendar-holidays-initially: Calendar Customizing.  15.
+* view-diary-entries-initially: Calendar Customizing.   4.
+* Xウィンドウシステム:          Window Systems.         17.
+* beep:                         Beeping.                18.
+* キーボードマクロの終了:       Beeping.                13.
+* ding:                         Beeping.                13.
+* ベルを鳴らす:                 Beeping.                4.
+* 字形テーブル:                 Glyphs.                 8.
+* 字形:                         Glyphs.                 5.
+* set-window-display-table:     Active Display Table.   17.
+* window-display-table:         Active Display Table.   13.
+* 活性な表示テーブル:           Active Display Table.   4.
+* set-display-table-slot:       Display Table Format.   59.
+* display-table-slot:           Display Table Format.   53.
+* make-display-table:           Display Table Format.   10.
+* 表示テーブル:                 Display Tables.         5.
+* コントロール文字の表示:       Usual Display.          43.
+* 強調表示:                     Inverse Video.          7.
+* 反転表示:                     Inverse Video.          4.
+* blink-matching-open:          Blinking.               26.
+* 閉じ括弧:                     Blinking.               4.
+* 釣り合った括弧:               Blinking.               4.
+* 括弧:                         Blinking.               4.
+* 対応する括弧:                 Blinking.               4.
+* frame-update-face-colors:     Face Functions.         121.
+* face-differs-from-default-p:  Face Functions.         106.
+* face-equal:                   Face Functions.         103.
+* face-documentation:           Face Functions.         100.
+* face-id:                      Face Functions.         97.
+* face-underline-p:             Face Functions.         94.
+* face-italic-p:                Face Functions.         91.
+* face-bold-p:                  Face Functions.         88.
+* face-font:                    Face Functions.         85.
+* face-stipple:                 Face Functions.         81.
+* face-background:              Face Functions.         78.
+* face-foreground:              Face Functions.         77.
+* invert-face:                  Face Functions.         69.
+* set-face-underline-p:         Face Functions.         65.
+* set-face-italic-p:            Face Functions.         61.
+* set-face-bold-p:              Face Functions.         57.
+* set-face-font:                Face Functions.         50.
+* set-face-stipple:             Face Functions.         42.
+* set-face-background:          Face Functions.         36.
+* set-face-foreground:          Face Functions.         35.
+* copy-face:                    Face Functions.         19.
+* face-list:                    Face Functions.         16.
+* make-face:                    Face Functions.         12.
+* defface:                      Defining Faces.         12.
+* bold-italic （フェイス名）:   Standard Faces.         46.
+* italic （フェイス名）:        Standard Faces.         41.
+* bold （フェイス名）:          Standard Faces.         34.
+* underline （フェイス名）:     Standard Faces.         30.
+* highlight （フェイス名）:     Standard Faces.         26.
+* secondary-selection （フェイス名）: Standard Faces.   22.
+* region （フェイス名）:        Standard Faces.         17.
+* modeline （フェイス名）:      Standard Faces.         13.
+* default （フェイス名）:       Standard Faces.         9.
+* facep:                        Faces.                  15.
+* フェイス識別子:               Faces.                  9.
+* フェイス:                     Faces.                  4.
+* truncate-string-to-width:     Width.                  19.
+* string-width:                 Width.                  15.
+* char-width:                   Width.                  11.
+* previous-overlay-change:      Managing Overlays.      64.
+* next-overlay-change:          Managing Overlays.      60.
+* overlays-in:                  Managing Overlays.      53.
+* overlays-at:                  Managing Overlays.      47.
+* move-overlay:                 Managing Overlays.      36.
+* delete-overlay:               Managing Overlays.      28.
+* overlay-buffer:               Managing Overlays.      25.
+* overlay-end:                  Managing Overlays.      22.
+* overlay-start:                Managing Overlays.      19.
+* make-overlay:                 Managing Overlays.      10.
+* overlay-put:                  Overlay Properties.     123.
+* overlay-get:                  Overlay Properties.     117.
+* local-map （オーバレイ属性）: Overlay Properties.     125.
+* 文字のキーマップ（オーバレイ属性）: Overlay Properties.  125.
+* evaporate （オーバレイ属性）: Overlay Properties.     120.
+* after-string （オーバレイ属性）: Overlay Properties.  113.
+* before-string （オーバレイ属性）: Overlay Properties.  106.
+* intangible （オーバレイ属性）: Overlay Properties.    90.
+* invisible （オーバレイ属性）: Overlay Properties.     85.
+* insert-behind-hooks （オーバレイ属性）: Overlay Properties.  79.
+* insert-in-front-hooks （オーバレイ属性）: Overlay Properties.  73.
+* modification-hooks （オーバレイ属性）: Overlay Properties.  55.
+* mouse-face （オーバレイ属性）: Overlay Properties.    50.
+* face （オーバレイ属性）:      Overlay Properties.     39.
+* category （オーバレイ属性）:  Overlay Properties.     33.
+* window （オーバレイ属性）:    Overlay Properties.     28.
+* priority （オーバレイ属性）:  Overlay Properties.     17.
+* オーバレイ:                   Overlays.               4.
+* momentary-string-display:     Temporary Displays.     59.
+* with-output-to-temp-buffer:   Temporary Displays.     10.
+* オーバレイ矢印:               Overlay Arrow.          4.
+* 選択表示:                     Selective Display.      4.
+* line-move-ignore-invisible:   Invisible Text.         76.
+* remove-from-invisibility-spec: Invisible Text.        58.
+* add-to-invisibility-spec:     Invisible Text.         54.
+* 不可視なテキスト:             Invisible Text.         5.
+* current-message:              The Echo Area.          58.
+* message-box:                  The Echo Area.          52.
+* message-or-box:               The Echo Area.          40.
+* message:                      The Echo Area.          18.
+* エコー領域:                   The Echo Area.          4.
+* エコー表示:                   The Echo Area.          4.
+* 画面表示の`\':                Truncation.             4.
+* `\'、画面表示:                Truncation.             4.
+* 画面表示の`$':                Truncation.             4.
+* `$'、画面表示:                Truncation.             4.
+* 継続行:                       Truncation.             4.
+* 行の折り返し:                 Truncation.             4.
+* 再開（`no-redraw-on-reenter'を参照 ）: Refresh Screen.  27.
+* 停止（`no-redraw-on-reenter'を参照 ）: Refresh Screen.  27.
+* redraw-display:               Refresh Screen.         15.
+* redraw-frame:                 Refresh Screen.         10.
+* 非対話的使用:                 Batch Mode.             4.
+* バッチモード:                 Batch Mode.             4.
+* CBREAK:                       Flow Control.           56.
+* enable-flow-control-on:       Flow Control.           49.
+* enable-flow-control:          Flow Control.           41.
+* `C-q':                        Flow Control.           11.
+* `C-s':                        Flow Control.           11.
+* フロー制御文字:               Flow Control.           4.
+* タームスクリプトファイル:     Terminal Output.        43.
+* open-termscript:              Terminal Output.        43.
+* send-string-to-terminal:      Terminal Output.        31.
+* baud-rate:                    Terminal Output.        28.
+* 端末出力:                     Terminal Output.        4.
+* ドリブルファイル:             Recording Input.        16.
+* open-dribble-file:            Recording Input.        16.
+* recent-keys:                  Recording Input.        7.
+* キー変換関数:                 Translating Input.      119.
+* keyboard-translate:           Translating Input.      66.
+* フロー制御の例:               Translating Input.      49.
+* 入力イベントの変換:           Translating Input.      4.
+* current-input-mode:           Input Modes.            33.
+* set-input-mode:               Input Modes.            7.
+* 端末入力:                     Input Modes.            4.
+* 入力方式:                     Input Modes.            4.
+* 端末入力:                     Terminal Input.         4.
+* cancel-timer:                 Timers.                 106.
+* アイドル状態:                 Timers.                 85.
+* run-with-idle-timer:          Timers.                 75.
+* with-timeout:                 Timers.                 56.
+* run-at-time:                  Timers.                 16.
+* タイマ:                       Timers.                 4.
+* encode-time:                  Time Conversion.        134.
+* decode-time:                  Time Conversion.        104.
+* format-time-string:           Time Conversion.        21.
+* current-time-zone:            Time of Day.            35.
+* current-time:                 Time of Day.            24.
+* current-time-string:          Time of Day.            9.
+* user-uid:                     User Identification.    63.
+* user-real-uid:                User Identification.    57.
+* user-login-name:              User Identification.    49.
+* user-real-login-name:         User Identification.    49.
+* user-full-name:               User Identification.    49.
+* user-full-name:               User Identification.    40.
+* user-real-login-name:         User Identification.    36.
+* user-login-name:              User Identification.    25.
+* setprv:                       System Environment.     167.
+* emacs-pid:                    System Environment.     160.
+* load-average:                 System Environment.     143.
+* setenv:                       System Environment.     107.
+* 参照、環境変数:               System Environment.     93.
+* 環境変数の参照:               System Environment.     93.
+* getenv:                       System Environment.     93.
+* system-name:                  System Environment.     75.
+* オペレーティングシステム環境: System Environment.     4.
+* suspend-emacs:                Suspending Emacs.       22.
+* 休止、Emacs:                  Suspending Emacs.       4.
+* Emacsの休止:                  Suspending Emacs.       4.
+* kill-emacs:                   Killing Emacs.          11.
+* 終了、Emacs:                  Killing Emacs.          4.
+* Emacsの終了:                  Killing Emacs.          4.
+* 終了、Emacs:                  Getting Out.            4.
+* Emacsの終了:                  Getting Out.            4.
+* オプション、コマンド行:       Command Line Arguments.  32.
+* コマンド行のオプション:       Command Line Arguments.  32.
+* command-line:                 Command Line Arguments.  20.
+* コマンド行引数:               Command Line Arguments.  4.
+* 環境変数`TERM':               Terminal-Specific.      34.
+* `TERM'、環境変数:             Terminal-Specific.      34.
+* Termcap:                      Terminal-Specific.      16.
+* 端末固有の初期化:             Terminal-Specific.      4.
+* デフォルトの初期化ファイル:   Init File.              13.
+* `.emacs':                     Init File.              4.
+* 初期化ファイル:               Init File.              4.
+* `default.el':                 Start-up Summary.       45.
+* `site-start.el':              Start-up Summary.       35.
+* `startup.el':                 Start-up Summary.       4.
+* 始動、Emacs:                  Start-up Summary.       4.
+* Emacsの始動:                  Start-up Summary.       4.
+* 初期化:                       Start-up Summary.       4.
+* open-network-stream:          Network.                21.
+* TCP:                          Network.                4.
+* ネットワーク接続:             Network.                4.
+* tq-close:                     Transaction Queues.     31.
+* tq-enqueue:                   Transaction Queues.     18.
+* tq-create:                    Transaction Queues.     12.
+* トランザクションキュー:       Transaction Queues.     4.
+* waiting-for-user-input-p:     Sentinels.              70.
+* process-sentinel:             Sentinels.              66.
+* set-process-sentinel:         Sentinels.              51.
+* 番兵:                         Sentinels.              4.
+* プロセスの番兵:               Sentinels.              4.
+* accept-process-output:        Accepting Output.       12.
+* process-filter:               Filter Functions.       82.
+* set-process-filter:           Filter Functions.       78.
+* プロセスフィルタ:             Filter Functions.       4.
+* フィルタ関数:                 Filter Functions.       4.
+* get-buffer-process:           Process Buffers.        49.
+* set-process-buffer:           Process Buffers.        45.
+* process-mark:                 Process Buffers.        27.
+* process-buffer:               Process Buffers.        21.
+* 出力、プロセス:               Output from Processes.  4.
+* プロセスの出力:               Output from Processes.  4.
+* signal-process:               Signals to Processes.   77.
+* continue-process:             Signals to Processes.   73.
+* stop-process:                 Signals to Processes.   64.
+* quit-process:                 Signals to Processes.   59.
+* kill-process:                 Signals to Processes.   54.
+* interrupt-process:            Signals to Processes.   47.
+* シグナル:                     Signals to Processes.   4.
+* シグナルを送る:               Signals to Processes.   4.
+* プロセスシグナル:             Signals to Processes.   4.
+* process-send-eof:             Input to Processes.     51.
+* process-send-region:          Input to Processes.     42.
+* process-send-string:          Input to Processes.     23.
+* 入力、プロセス:               Input to Processes.     4.
+* プロセスの入力:               Input to Processes.     4.
+* set-process-coding-system:    Process Information.    102.
+* process-coding-system:        Process Information.    95.
+* process-tty-name:             Process Information.    90.
+* process-exit-status:          Process Information.    85.
+* process-status:               Process Information.    49.
+* process-contact:              Process Information.    45.
+* process-name:                 Process Information.    42.
+* process-id:                   Process Information.    36.
+* process-command:              Process Information.    28.
+* get-process:                  Process Information.    21.
+* process-list:                 Process Information.    15.
+* list-processes:               Process Information.    10.
+* process-kill-without-query:   Deleting Processes.     31.
+* delete-process:               Deleting Processes.     23.
+* プロセスの削除:               Deleting Processes.     4.
+* 疑似端末PTY:                  Asynchronous Processes.  63.
+* パイプ:                       Asynchronous Processes.  63.
+* start-process-shell-command:  Asynchronous Processes.  50.
+* start-process:                Asynchronous Processes.  15.
+* プロセス、非同期:             Asynchronous Processes.  4.
+* 非同期プロセス:               Asynchronous Processes.  4.
+* shell-command-to-string:      Synchronous Processes.  152.
+* call-process-region:          Synchronous Processes.  106.
+* call-process:                 Synchronous Processes.  26.
+* サブプロセス、同期:           Synchronous Processes.  4.
+* 同期サブプロセス:             Synchronous Processes.  4.
+* shell-quote-argument:         Shell Arguments.        13.
+* プログラムを探すディレクトリ: Subprocess Creation.    58.
+* movemail:                     Subprocess Creation.    48.
+* サブプロセスの環境変数:       Subprocess Creation.    43.
+* 環境変数、サブプロセス:       Subprocess Creation.    43.
+* 引数、プログラム:             Subprocess Creation.    31.
+* プログラムの引数:             Subprocess Creation.    31.
+* `HOME'、環境変数:             Subprocess Creation.    14.
+* 環境変数`HOME':               Subprocess Creation.    14.
+* `PATH'、環境変数:             Subprocess Creation.    14.
+* 環境変数`PATH':               Subprocess Creation.    14.
+* 実行、:                       Subprocess Creation.    14.
+* プログラムの実行:             Subprocess Creation.    14.
+* processp:                     Processes.              23.
+* プロセス:                     Processes.              4.
+* サブプロセス:                 Processes.              4.
+* 親プロセス:                   Processes.              4.
+* 子プロセス:                   Processes.              4.
+* abbrev-prefix-mark:           Abbrev Expansion.       28.
+* expand-abbrev:                Abbrev Expansion.       23.
+* abbrev-expansion:             Abbrev Expansion.       18.
+* abbrev-symbol:                Abbrev Expansion.       11.
+* write-abbrev-file:            Abbrev Files.           37.
+* quietly-read-abbrev-file:     Abbrev Files.           19.
+* define-abbrev:                Defining Abbrevs.       20.
+* add-abbrev:                   Defining Abbrevs.       11.
+* insert-abbrev-table-description: Abbrev Tables.       27.
+* define-abbrev-table:          Abbrev Tables.          17.
+* clear-abbrev-table:           Abbrev Tables.          13.
+* make-abbrev-table:            Abbrev Tables.          9.
+* 略語表:                       Abbrevs.                4.
+* 略語:                         Abbrevs.                4.
+* modify-category-entry:        Categories.             93.
+* category-set-mnemonics:       Categories.             86.
+* char-category-set:            Categories.             77.
+* make-category-set:            Categories.             68.
+* set-category-table:           Categories.             64.
+* copy-category-table:          Categories.             59.
+* standard-category-table:      Categories.             56.
+* category-table-p:             Categories.             52.
+* category-table:               Categories.             49.
+* get-unused-category:          Categories.             44.
+* category-docstring:           Categories.             35.
+* define-category:              Categories.             28.
+* カテゴリ、文字:               Categories.             4.
+* 文字のカテゴリ:               Categories.             4.
+* 構文テーブルの内部:           Syntax Table Internals.  4.
+* standard-syntax-table:        Standard Syntax Tables.  10.
+* forward-comment:              Parsing Expressions.    112.
+* コメントを飛び越える:         Parsing Expressions.    100.
+* scan-sexps:                   Parsing Expressions.    89.
+* scan-lists:                   Parsing Expressions.    72.
+* 括弧による字下げ:             Parsing Expressions.    68.
+* クォート文字:                 Parsing Expressions.    59.
+* コメントの内側:               Parsing Expressions.    56.
+* 文字列の内側:                 Parsing Expressions.    51.
+* まえの完全な部分式:           Parsing Expressions.    48.
+* もっとも内側の括弧式:         Parsing Expressions.    44.
+* 解析状態:                     Parsing Expressions.    33.
+* 括弧の深さ:                   Parsing Expressions.    23.
+* parse-partial-sexp:           Parsing Expressions.    13.
+* backward-prefix-chars:        Motion and Syntax.      23.
+* skip-syntax-backward:         Motion and Syntax.      16.
+* skip-syntax-forward:          Motion and Syntax.      10.
+* syntax-table （テキスト属性）: Syntax Properties.     4.
+* syntax-table:                 Syntax Table Functions.  86.
+* set-syntax-table:             Syntax Table Functions.  82.
+* char-syntax:                  Syntax Table Functions.  58.
+* modify-syntax-entry:          Syntax Table Functions.  21.
+* copy-syntax-table:            Syntax Table Functions.  16.
+* make-syntax-table:            Syntax Table Functions.  9.
+* 構文フラグ:                   Syntax Flags.           4.
+* 汎用文字列区切り（generic:    Syntax Class Table.     123.
+* 汎用コメント区切り（generic:  Syntax Class Table.     111.
+* 継承（inherit）:              Syntax Class Table.     107.
+* コメントの構文:               Syntax Class Table.     99.
+* コメント終了（comment:        Syntax Class Table.     99.
+* コメント開始（comment:        Syntax Class Table.     98.
+* 式前置子（expression:         Syntax Class Table.     92.
+* 対になった区切り（paired:     Syntax Class Table.     86.
+* 文字クォート（character:      Syntax Class Table.     76.
+* エスケープ（escape）:         Syntax Class Table.     67.
+* 文字列クォート（string:       Syntax Class Table.     50.
+* 括弧の構文:                   Syntax Class Table.     37.
+* 閉じ括弧文字（close:          Syntax Class Table.     37.
+* 開き括弧文字（open:           Syntax Class Table.     36.
+* 句読点文字（punctuation:      Syntax Class Table.     29.
+* シンボル構成文字（symbol:     Syntax Class Table.     21.
+* 単語構成文字（word:           Syntax Class Table.     16.
+* 白文字（whitespace:           Syntax Class Table.     10.
+* 構文記述子:                   Syntax Descriptors.     19.
+* 構文クラス:                   Syntax Descriptors.     4.
+* syntax-table-p:               Syntax Basics.          38.
+* テキストの解析:               Syntax Tables.          4.
+* 構文テーブル:                 Syntax Tables.          4.
+* 構文解析:                     Syntax Tables.          4.
+* 標準的な正規表現:             Standard Regexps.       4.
+* 編集に用いられる標準的な正規表現: Standard Regexps.   4.
+* 探索と大文字小文字:           Searching and Case.     4.
+* save-match-data:              Saving Match Data.      21.
+* store-match-data:             Entire Match Data.      37.
+* set-match-data:               Entire Match Data.      31.
+* match-data:                   Entire Match Data.      10.
+* match-end:                    Simple Match Data.      51.
+* match-beginning:              Simple Match Data.      40.
+* match-string-no-properties:   Simple Match Data.      36.
+* match-string:                 Simple Match Data.      24.
+* 置換の`\':                    Replacing Match.        48.
+* `\'、置換:                    Replacing Match.        48.
+* 置換の`\N':                   Replacing Match.        42.
+* `\N'、置換:                   Replacing Match.        42.
+* 置換の`&':                    Replacing Match.        38.
+* `&'、置換:                    Replacing Match.        38.
+* replace-match:                Replacing Match.        9.
+* 置換時の大文字小文字:         Replacing Match.        7.
+* マッチデータ:                 Match Data.             4.
+* perform-replace:              Search and Replace.     7.
+* 置換:                         Search and Replace.     4.
+* posix-string-match:           POSIX Regexps.          30.
+* posix-looking-at:             POSIX Regexps.          26.
+* posix-search-backward:        POSIX Regexps.          22.
+* posix-search-forward:         POSIX Regexps.          18.
+* looking-at:                   Regexp Search.          96.
+* string-match:                 Regexp Search.          69.
+* re-search-backward:           Regexp Search.          52.
+* re-search-forward:            Regexp Search.          16.
+* 探索、正規表現:               Regexp Search.          4.
+* 正規表現の探索:               Regexp Search.          4.
+* regexp-opt-depth:             Syntax of Regexps.      292.
+* regexp-opt:                   Syntax of Regexps.      274.
+* regexp-quote:                 Syntax of Regexps.      259.
+* invalid-regexp:               Syntax of Regexps.      252.
+* 正規表現の`\>':               Syntax of Regexps.      256.
+* `\>'、正規表現:               Syntax of Regexps.      256.
+* 正規表現の`\<':               Syntax of Regexps.      251.
+* `\<'、正規表現:               Syntax of Regexps.      251.
+* 正規表現の`\B':               Syntax of Regexps.      247.
+* `\B'、正規表現:               Syntax of Regexps.      247.
+* 正規表現の`\b':               Syntax of Regexps.      238.
+* `\b'、正規表現:               Syntax of Regexps.      238.
+* 正規表現の`\=':               Syntax of Regexps.      233.
+* `\='、正規表現:               Syntax of Regexps.      233.
+* 正規表現の`\'':               Syntax of Regexps.      229.
+* `\''、正規表現:               Syntax of Regexps.      229.
+* 正規表現の`\`':               Syntax of Regexps.      225.
+* `\`'、正規表現:               Syntax of Regexps.      225.
+* 正規表現の`\S':               Syntax of Regexps.      225.
+* `\S'、正規表現:               Syntax of Regexps.      225.
+* 正規表現の`\s':               Syntax of Regexps.      217.
+* `\s'、正規表現:               Syntax of Regexps.      217.
+* 正規表現の`\W':               Syntax of Regexps.      213.
+* `\W'、正規表現:               Syntax of Regexps.      213.
+* 正規表現の`\w':               Syntax of Regexps.      208.
+* `\w'、正規表現:               Syntax of Regexps.      208.
+* 正規表現のグループ化:         Syntax of Regexps.      171.
+* 正規表現の`)':                Syntax of Regexps.      171.
+* `)'、正規表現:                Syntax of Regexps.      171.
+* 正規表現の`(':                Syntax of Regexps.      171.
+* `('、正規表現:                Syntax of Regexps.      171.
+* 正規表現の選択肢:             Syntax of Regexps.      157.
+* 正規表現の`|':                Syntax of Regexps.      157.
+* `|'、正規表現:                Syntax of Regexps.      157.
+* 正規表現の`\':                Syntax of Regexps.      141.
+* `\'、正規表現:                Syntax of Regexps.      141.
+* 正規表現の`$':                Syntax of Regexps.      133.
+* `$'、正規表現:                Syntax of Regexps.      133.
+* 正規表現による行頭:           Syntax of Regexps.      124.
+* 行頭、正規表現:               Syntax of Regexps.      124.
+* 正規表現の`^':                Syntax of Regexps.      110.
+* `^'、正規表現:                Syntax of Regexps.      110.
+* 正規表現の`]':                Syntax of Regexps.      71.
+* `]'、正規表現:                Syntax of Regexps.      71.
+* 正規表現の`[':                Syntax of Regexps.      71.
+* `['、正規表現:                Syntax of Regexps.      71.
+* 文字選択（正規表現）:         Syntax of Regexps.      71.
+* 正規表現の`?':                Syntax of Regexps.      65.
+* `?'、正規表現:                Syntax of Regexps.      65.
+* 正規表現の`+':                Syntax of Regexps.      59.
+* `+'、正規表現:                Syntax of Regexps.      59.
+* 正規表現の`*':                Syntax of Regexps.      31.
+* `*'、正規表現:                Syntax of Regexps.      31.
+* 正規表現の`.':                Syntax of Regexps.      25.
+* `.'、正規表現:                Syntax of Regexps.      25.
+* regexp（正規表現）:           Regular Expressions.    4.
+* 正規表現:                     Regular Expressions.    4.
+* word-search-backward:         String Search.          95.
+* 単語の探索:                   String Search.          57.
+* word-search-forward:          String Search.          57.
+* search-backward:              String Search.          52.
+* search-failed:                String Search.          39.
+* search-forward:               String Search.          16.
+* 文字列探索:                   String Search.          4.
+* 探索:                         Searching and Matching.  4.
+* read-input-method-name:       Input Methods.          32.
+* set-input-method:             Input Methods.          27.
+* 入力方式:                     Input Methods.          4.
+* バイナリファイルとテキストファイル: MS-DOS File Types.  4.
+* テキストファイルとバイナリファイル: MS-DOS File Types.  4.
+* ファイル型、MS-DOSとWindows:  MS-DOS File Types.      4.
+* Windowsのファイル型:          MS-DOS File Types.      4.
+* MS-DOSのファイル型:           MS-DOS File Types.      4.
+* DOSのファイル型:              MS-DOS File Types.      4.
+* set-terminal-coding-system:   Terminal I/O Encoding.  25.
+* terminal-coding-system:       Terminal I/O Encoding.  21.
+* set-keyboard-coding-system:   Terminal I/O Encoding.  16.
+* keyboard-coding-system:       Terminal I/O Encoding.  12.
+* decode-coding-string:         Explicit Encoding.      54.
+* decode-coding-region:         Explicit Encoding.      48.
+* encode-coding-string:         Explicit Encoding.      43.
+* encode-coding-region:         Explicit Encoding.      37.
+* 生のバイト:                   Explicit Encoding.      9.
+* テキストの復号化:             Explicit Encoding.      4.
+* テキストの符号化:             Explicit Encoding.      4.
+* find-operation-coding-system: Default Coding Systems.  71.
+* read-non-nil-coding-system:   User-Chosen Coding Systems.  32.
+* read-coding-system:           User-Chosen Coding Systems.  26.
+* select-safe-coding-system:    User-Chosen Coding Systems.  7.
+* detect-coding-string:         Lisp and Coding Systems.  64.
+* detect-coding-region:         Lisp and Coding Systems.  51.
+* find-coding-systems-for-charsets: Lisp and Coding Systems.  47.
+* find-coding-systems-string:   Lisp and Coding Systems.  41.
+* find-coding-systems-region:   Lisp and Coding Systems.  33.
+* coding-system-change-text-conversion: Lisp and Coding Systems.  28.
+* coding-system-change-eol-conversion: Lisp and Coding Systems.  22.
+* check-coding-system:          Lisp and Coding Systems.  17.
+* coding-system-p:              Lisp and Coding Systems.  14.
+* coding-system-list:           Lisp and Coding Systems.  9.
+* coding-system-get:            Coding System Basics.   40.
+* 変種コーディングシステム:     Coding System Basics.   21.
+* 基底コーディングシステム:     Coding System Basics.   21.
+* 行末変換:                     Coding System Basics.   16.
+* 文字コード変換:               Coding System Basics.   5.
+* コーディングシステム:         Coding Systems.         5.
+* make-translation-table:       Translation of Characters.  12.
+* 変換表:                       Translation of Characters.  4.
+* 文字変換表:                   Translation of Characters.  4.
+* find-charset-string:          Scanning Charsets.      20.
+* find-charset-region:          Scanning Charsets.      11.
+* 汎用文字:                     Splitting Characters.   49.
+* make-char:                    Splitting Characters.   42.
+* split-char:                   Splitting Characters.   27.
+* char-bytes:                   Splitting Characters.   11.
+* charset-dimension:            Chars and Bytes.        15.
+* 次元（文字集合）:             Chars and Bytes.        5.
+* 導入列:                       Chars and Bytes.        5.
+* バイトと文字:                 Chars and Bytes.        4.
+* char-charset:                 Character Sets.         25.
+* charset-list:                 Character Sets.         22.
+* charsetp:                     Character Sets.         18.
+* 文字集合:                     Character Sets.         4.
+* char-valid-p:                 Character Codes.        15.
+* 文字コード:                   Character Codes.        4.
+* string-as-multibyte:          Selecting a Representation.  30.
+* string-as-unibyte:            Selecting a Representation.  24.
+* set-buffer-multibyte:         Selecting a Representation.  10.
+* string-make-multibyte:        Converting Representations.  63.
+* string-make-unibyte:          Converting Representations.  58.
+* multibyte-string-p:           Text Representations.   48.
+* トレイリングコード:           Text Representations.   17.
+* マルチバイトテキスト:         Text Representations.   17.
+* リーディングコード:           Text Representations.   17.
+* ユニバイトテキスト:           Text Representations.   12.
+* テキスト表現:                 Text Representations.   4.
+* 非ASCII文字:                  Non-ASCII Characters.   4.
+* マルチバイト文字:             Non-ASCII Characters.   4.
+* combine-after-change-calls:   Change Hooks.           31.
+* テキスト変更向けのフック:     Change Hooks.           4.
+* 変更フック:                   Change Hooks.           4.
+* transpose-regions:            Transposition.          9.
+* insert-register:              Registers.              65.
+* view-register:                Registers.              61.
+* set-register:                 Registers.              56.
+* get-register:                 Registers.              53.
+* レジスタ:                     Registers.              4.
+* translate-region:             Substitution.           31.
+* アンドゥの抑制:               Substitution.           13.
+* アウトライン（outline）モード: Substitution.          13.
+* 置換、文字:                   Substitution.           10.
+* 文字の置換:                   Substitution.           10.
+* subst-char-in-region:         Substitution.           10.
+* 範囲:                         Not Intervals.          4.
+* クリック可能なテキスト:       Clickable Text.         4.
+* 保存、テキスト属性:           Saving Properties.      4.
+* テキスト属性の保存:           Saving Properties.      4.
+* テキスト属性、ファイル内:     Saving Properties.      4.
+* ファイル内のテキスト属性:     Saving Properties.      4.
+* insert-before-markers-and-inherit: Sticky Properties.  51.
+* insert-and-inherit:           Sticky Properties.      47.
+* テキスト属性の継承:           Sticky Properties.      4.
+* スティッキテキスト属性:       Sticky Properties.      4.
+* point-left （テキスト属性）:  Special Properties.     106.
+* point-entered （テキスト属性）: Special Properties.   106.
+* ポイント移動に対するフック:   Special Properties.     106.
+* insert-behind-hooks （テキスト属性）: Special Properties.  93.
+* insert-in-front-hooks （テキスト属性）: Special Properties.  93.
+* modification-hooks （テキスト属性）: Special Properties.  83.
+* 文字変更に対するフック:       Special Properties.     83.
+* 文字に対する変更フック:       Special Properties.     83.
+* intangible （テキスト属性）:  Special Properties.     72.
+* invisible （テキスト属性）:   Special Properties.     67.
+* read-only （テキスト属性）:   Special Properties.     51.
+* 読み出し専用文字:             Special Properties.     51.
+* local-map （テキスト属性）:   Special Properties.     38.
+* キーマップ、文字:             Special Properties.     38.
+* 文字のキーマップ:             Special Properties.     38.
+* mouse-face （テキスト属性）:  Special Properties.     31.
+* face （テキスト属性）:        Special Properties.     18.
+* テキストのフェイスコード:     Special Properties.     18.
+* category （テキスト属性）:    Special Properties.     10.
+* テキスト文字のカテゴリ:       Special Properties.     10.
+* text-property-not-all:        Property Search.        89.
+* text-property-any:            Property Search.        80.
+* previous-char-property-change: Property Search.       76.
+* next-char-property-change:    Property Search.        71.
+* previous-single-property-change: Property Search.     65.
+* previous-property-change:     Property Search.        60.
+* next-single-property-change:  Property Search.        47.
+* next-property-change:         Property Search.        23.
+* set-text-properties:          Changing Properties.    60.
+* remove-text-properties:       Changing Properties.    41.
+* add-text-properties:          Changing Properties.    22.
+* put-text-property:            Changing Properties.    17.
+* text-properties-at:           Examining Properties.   35.
+* get-char-property:            Examining Properties.   23.
+* get-text-property:            Examining Properties.   15.
+* 属性、テキスト:               Text Properties.        4.
+* テキスト属性:                 Text Properties.        4.
+* upcase-word:                  Case Changes.           68.
+* downcase-word:                Case Changes.           61.
+* capitalize-word:              Case Changes.           48.
+* upcase-region:                Case Changes.           41.
+* downcase-region:              Case Changes.           34.
+* capitalize-region:            Case Changes.           12.
+* バッファ内での大文字小文字変換: Case Changes.         4.
+* forward-to-indentation:       Motion by Indent.       18.
+* backward-to-indentation:      Motion by Indent.       14.
+* back-to-indentation:          Motion by Indent.       10.
+* tab-to-tab-stop:              Indent Tabs.            15.
+* 字下げのためのタブストップ:   Indent Tabs.            4.
+* indent-relative-maybe:        Relative Indent.        47.
+* indent-relative:              Relative Indent.        10.
+* indent-code-rigidly:          Region Indent.          56.
+* indent-rigidly:               Region Indent.          42.
+* indent-region:                Region Indent.          10.
+* reindent-then-newline-and-indent: Mode-Specific Indent.  41.
+* newline-and-indent:           Mode-Specific Indent.   32.
+* indent-for-tab-command:       Mode-Specific Indent.   26.
+* indent-according-to-mode:     Mode-Specific Indent.   22.
+* indent-to:                    Primitive Indent.       16.
+* current-indentation:          Primitive Indent.       11.
+* 字下げ:                       Indentation.            4.
+* move-to-column:               Columns.                27.
+* current-column:               Columns.                19.
+* 水平位置:                     Columns.                4.
+* コラムを数える:               Columns.                4.
+* コラム:                       Columns.                4.
+* sort-columns:                 Sorting.                177.
+* sort-numeric-fields:          Sorting.                170.
+* sort-fields:                  Sorting.                164.
+* sort-pages:                   Sorting.                160.
+* sort-paragraphs:              Sorting.                156.
+* sort-lines:                   Sorting.                152.
+* sort-regexp-fields:           Sorting.                99.
+* sort-subr:                    Sorting.                11.
+* ソート、テキスト:             Sorting.                4.
+* テキストのソート:             Sorting.                4.
+* 自動詰め込み（auto-filling）モード: Auto Filling.     4.
+* 詰め込み、自動:               Auto Filling.           4.
+* fill-context-prefix:          Adaptive Fill.          14.
+* 適応型詰め込み（adaptive-fill）モード: Adaptive Fill.  4.
+* indent-to-left-margin:        Margins.                67.
+* delete-to-left-margin:        Margins.                62.
+* move-to-left-margin:          Margins.                54.
+* current-fill-column:          Margins.                49.
+* current-left-margin:          Margins.                44.
+* set-right-margin:             Margins.                39.
+* set-left-margin:              Margins.                34.
+* current-justification:        Filling.                108.
+* justify-current-line:         Filling.                85.
+* fill-region-as-paragraph:     Filling.                70.
+* fill-individual-paragraphs:   Filling.                50.
+* fill-region:                  Filling.                38.
+* 詰め込み、段落:               Filling.                32.
+* 段落の詰め込み:               Filling.                32.
+* fill-paragraph:               Filling.                32.
+* 詰め込み、明示的:             Filling.                4.
+* アンドゥのオフ:               Maintaining Undo.       26.
+* buffer-flush-undo:            Maintaining Undo.       26.
+* buffer-disable-undo:          Maintaining Undo.       25.
+* buffer-enable-undo:           Maintaining Undo.       16.
+* primitive-undo:               Undo.                   78.
+* undo-boundary:                Undo.                   58.
+* リドゥ:                       Undo.                   4.
+* kill-append:                  Low-Level Kill Ring.    30.
+* kill-new:                     Low-Level Kill Ring.    25.
+* current-kill:                 Low-Level Kill Ring.    12.
+* yank-pop:                     Yank Commands.          23.
+* キルされたテキストの挿入:     Yank Commands.          10.
+* yank:                         Yank Commands.          10.
+* copy-region-as-kill:          Kill Functions.         31.
+* kill-region:                  Kill Functions.         14.
+* キルリング:                   The Kill Ring.          4.
+* delete-blank-lines:           User-Level Deletion.    93.
+* just-one-space:               User-Level Deletion.    89.
+* fixup-whitespace:             User-Level Deletion.    61.
+* delete-indentation:           User-Level Deletion.    33.
+* 白文字の削除:                 User-Level Deletion.    10.
+* delete-horizontal-space:      User-Level Deletion.    10.
+* タブの削除:                   Deletion.               54.
+* backward-delete-char-untabify: Deletion.              54.
+* 直前の文字を削除:             Deletion.               42.
+* delete-backward-char:         Deletion.               42.
+* delete-char:                  Deletion.               30.
+* delete-region:                Deletion.               24.
+* erase-buffer:                 Deletion.               14.
+* 削除とキル:                   Deletion.               5.
+* split-line:                   Commands for Insertion.  51.
+* 改行と自動詰め込み（auto-fill）モード: Commands for Insertion.  38.
+* newline:                      Commands for Insertion.  35.
+* 自己挿入:                     Commands for Insertion.  15.
+* 文字の挿入:                   Commands for Insertion.  15.
+* self-insert-command:          Commands for Insertion.  15.
+* insert-buffer:                Commands for Insertion.  10.
+* insert-buffer-substring:      Insertion.              62.
+* insert-char:                  Insertion.              50.
+* insert-before-markers:        Insertion.              39.
+* insert:                       Insertion.              33.
+* 挿入、ポイントのまえ:         Insertion.              5.
+* ポイントのまえへ挿入:         Insertion.              5.
+* 挿入、テキスト:               Insertion.              4.
+* テキストの挿入:               Insertion.              4.
+* compare-buffer-substrings:    Comparing Text.         10.
+* バッファテキストの比較:       Comparing Text.         4.
+* thing-at-point:               Buffer Contents.        54.
+* buffer-string:                Buffer Contents.        39.
+* buffer-substring-no-properties: Buffer Contents.      35.
+* buffer-substring:             Buffer Contents.        10.
+* eolp:                         Near Point.             68.
+* bolp:                         Near Point.             64.
+* eobp:                         Near Point.             59.
+* bobp:                         Near Point.             54.
+* preceding-char:               Near Point.             49.
+* following-char:               Near Point.             28.
+* char-before:                  Near Point.             22.
+* char-after:                   Near Point.             11.
+* バッファの内容:               Text.                   19.
+* テキスト:                     Text.                   4.
+* region-end:                   The Region.             17.
+* region-beginning:             The Region.             11.
+* リージョン:                   The Region.             4.
+* deactivate-mark:              The Mark.               127.
+* 暫定マーク（transient-mark）モード: The Mark.         108.
+* pop-mark:                     The Mark.               101.
+* push-mark:                    The Mark.               91.
+* set-mark:                     The Mark.               69.
+* mark-marker:                  The Mark.               51.
+* カレントバッファのマーク:     The Mark.               44.
+* mark:                         The Mark.               44.
+* マークリング:                 The Mark.               4.
+* マーク:                       The Mark.               4.
+* move-marker:                  Moving Markers.         32.
+* set-marker:                   Moving Markers.         12.
+* marker-insertion-type:        Marker Insertion Types.  19.
+* set-marker-insertion-type:    Marker Insertion Types.  14.
+* マーカの挿入型:               Marker Insertion Types.  5.
+* marker-buffer:                Information from Markers.  13.
+* marker-position:              Information from Markers.  9.
+* copy-marker:                  Creating Markers.       47.
+* バッファの末尾のマーカ:       Creating Markers.       27.
+* point-max-marker:             Creating Markers.       27.
+* point-min-marker:             Creating Markers.       22.
+* point-marker:                 Creating Markers.       17.
+* make-marker:                  Creating Markers.       11.
+* number-or-marker-p:           Predicates on Markers.  20.
+* integer-or-marker-p:          Predicates on Markers.  16.
+* markerp:                      Predicates on Markers.  11.
+* マーカ、数:                   Overview of Markers.    30.
+* 数としてのマーカ:             Overview of Markers.    30.
+* マーカのガベッジコレクション: Overview of Markers.    23.
+* マーカの再配置:               Overview of Markers.    17.
+* マーカ:                       Markers.                4.
+* save-restriction:             Narrowing.              47.
+* ワイドニング:                 Narrowing.              40.
+* widen:                        Narrowing.              40.
+* narrow-to-page:               Narrowing.              31.
+* narrow-to-region:             Narrowing.              24.
+* 参照可能部分（バッファ）:     Narrowing.              4.
+* 制限（バッファ）:             Narrowing.              4.
+* ナロイング:                   Narrowing.              4.
+* ウィンドウのエクスカージョン: Excursions.             29.
+* カレントバッファのエクスカージョン: Excursions.       16.
+* ポイントのエクスカージョン:   Excursions.             16.
+* マーカのエクスカージョン:     Excursions.             16.
+* save-excursion:               Excursions.             16.
+* エクスカージョン:             Excursions.             4.
+* skip-chars-backward:          Skipping Characters.    46.
+* skip-chars-forward:           Skipping Characters.    11.
+* 文字群の飛び越し:             Skipping Characters.    4.
+* end-of-defun:                 List Motion.            55.
+* beginning-of-defun:           List Motion.            50.
+* backward-sexp:                List Motion.            47.
+* forward-sexp:                 List Motion.            31.
+* down-list:                    List Motion.            27.
+* up-list:                      List Motion.            23.
+* backward-list:                List Motion.            19.
+* forward-list:                 List Motion.            15.
+* 移動、リスト単位:             List Motion.            4.
+* リスト単位の移動:             List Motion.            4.
+* 移動、Lisp式:                 List Motion.            4.
+* Lisp式単位の移動:             List Motion.            4.
+* 移動、S式単位:                List Motion.            4.
+* S式単位の移動:                List Motion.            4.
+* compute-motion:               Screen Lines.           59.
+* move-to-window-line:          Screen Lines.           40.
+* vertical-motion:              Screen Lines.           29.
+* リージョン内の行数:           Text Lines.             63.
+* count-lines:                  Text Lines.             63.
+* 行頭:                         Text Lines.             47.
+* forward-line:                 Text Lines.             47.
+* end-of-line:                  Text Lines.             40.
+* beginning-of-line:            Text Lines.             33.
+* goto-line:                    Text Lines.             13.
+* 行:                           Text Lines.             4.
+* end-of-buffer:                Buffer End Motion.      30.
+* beginning-of-buffer:          Buffer End Motion.      19.
+* backward-word:                Word Motion.            22.
+* forward-word:                 Word Motion.            10.
+* backward-char:                Character Motion.       36.
+* forward-char:                 Character Motion.       26.
+* goto-char:                    Character Motion.       10.
+* buffer-size:                  Point.                  49.
+* buffer-end:                   Point.                  45.
+* point-max:                    Point.                  39.
+* point-min:                    Point.                  34.
+* カレントバッファ内の位置:     Point.                  28.
+* point:                        Point.                  28.
+* ナロイング中のポイント:       Point.                  14.
+* ポイント:                     Point.                  4.
+* 位置（バッファ内）:           Positions.              4.
+* x-display-color-cells:        Server Data.            56.
+* x-display-color-p:            Server Data.            53.
+* x-display-grayscale-p:        Server Data.            50.
+* x-display-visual-class:       Server Data.            45.
+* x-display-planes:             Server Data.            42.
+* x-display-save-under:         Server Data.            39.
+* x-display-backing-store:      Server Data.            35.
+* x-display-mm-width:           Server Data.            32.
+* x-display-pixel-width:        Server Data.            29.
+* x-display-mm-height:          Server Data.            26.
+* x-display-pixel-height:       Server Data.            23.
+* x-server-vendor:              Server Data.            20.
+* x-server-version:             Server Data.            17.
+* x-display-screens:            Server Data.            14.
+* x-get-resource:               Resources.              7.
+* x-color-values:               Color Names.            26.
+* x-color-defined-p:            Color Names.            7.
+* create-fontset-from-fontset-spec: Fontsets.           15.
+* x-list-font:                  Font Names.             7.
+* x-set-cut-buffer:             Window System Selections.  50.
+* x-get-cut-buffer:             Window System Selections.  47.
+* カットバッファ:               Window System Selections.  40.
+* x-get-selection:              Window System Selections.  29.
+* x-set-selection:              Window System Selections.  13.
+* セレクション（Xウィンドウシステム）: Window System Selections.  4.
+* x-sensitive-text-pointer-shape: Pointer Shapes.       14.
+* x-pointer-shape:              Pointer Shapes.         10.
+* マウスポインタの形状:         Pointer Shapes.         4.
+* ポインタの形状:               Pointer Shapes.         4.
+* x-popup-dialog:               Dialog Boxes.           14.
+* 対話ボックス:                 Dialog Boxes.           4.
+* x-popup-menu:                 Pop-Up Menus.           10.
+* set-mouse-pixel-position:     Mouse Position.         25.
+* mouse-pixel-position:         Mouse Position.         21.
+* set-mouse-position:           Mouse Position.         15.
+* mouse-position:               Mouse Position.         10.
+* 位置、マウス:                 Mouse Position.         4.
+* マウスの位置:                 Mouse Position.         4.
+* track-mouse:                  Mouse Tracking.         18.
+* 追跡、マウス:                 Mouse Tracking.         4.
+* マウスの追跡:                 Mouse Tracking.         4.
+* set-frame-configuration:      Frame Configurations.   15.
+* current-frame-configuration:  Frame Configurations.   11.
+* フレーム構成:                 Frame Configurations.   4.
+* lower-frame:                  Raising and Lowering.   27.
+* raise-frame:                  Raising and Lowering.   23.
+* フレームを奥に置く:           Raising and Lowering.   12.
+* フレームを手前に置く:         Raising and Lowering.   12.
+* frame-visible-p:              Visibility of Frames.   27.
+* iconify-frame:                Visibility of Frames.   23.
+* make-frame-invisible:         Visibility of Frames.   19.
+* make-frame-visible:           Visibility of Frames.   15.
+* フレームの可視性:             Visibility of Frames.   4.
+* アイコンにしたフレーム:       Visibility of Frames.   4.
+* 不可視なフレーム:             Visibility of Frames.   4.
+* 可視なフレーム:               Visibility of Frames.   4.
+* redirect-frame-focus:         Input Focus.            48.
+* handle-switch-frame:          Input Focus.            41.
+* select-frame:                 Input Focus.            30.
+* selected-frame:               Input Focus.            11.
+* 選択されているフレーム:       Input Focus.            4.
+* 入力フォーカス:               Input Focus.            4.
+* frame-selected-window:        Frames and Windows.     27.
+* frame-top-window:             Frames and Windows.     18.
+* window-frame:                 Frames and Windows.     10.
+* previous-frame:               Finding All Frames.     37.
+* next-frame:                   Finding All Frames.     18.
+* visible-frame-list:           Finding All Frames.     13.
+* frame-list:                   Finding All Frames.     7.
+* frame-live-p:                 Deleting Frames.        17.
+* delete-frame:                 Deleting Frames.        13.
+* 削除、フレーム:               Deleting Frames.        4.
+* フレームの削除:               Deleting Frames.        4.
+* ジオメトリ指定:               Size and Position.      73.
+* x-parse-geometry:             Size and Position.      73.
+* set-screen-width:             Size and Position.      66.
+* set-screen-height:            Size and Position.      66.
+* set-frame-width:              Size and Position.      64.
+* set-frame-height:             Size and Position.      52.
+* set-frame-size:               Size and Position.      45.
+* frame-char-width:             Size and Position.      41.
+* frame-char-height:            Size and Position.      40.
+* frame-pixel-width:            Size and Position.      36.
+* frame-pixel-height:           Size and Position.      35.
+* screen-width:                 Size and Position.      30.
+* screen-height:                Size and Position.      29.
+* frame-width:                  Size and Position.      25.
+* frame-height:                 Size and Position.      24.
+* set-frame-position:           Size and Position.      13.
+* リサイズ、フレーム:           Size and Position.      4.
+* フレームのリサイズ:           Size and Position.      4.
+* サイズ、スクリーン:           Size and Position.      4.
+* スクリーンサイズ:             Size and Position.      4.
+* サイズ、フレーム:             Size and Position.      4.
+* フレームサイズ:               Size and Position.      4.
+* modify-frame-parameters:      Parameter Access.       13.
+* frame-parameters:             Parameter Access.       9.
+* x-close-connection:           Multiple Displays.      53.
+* x-open-connection:            Multiple Displays.      38.
+* x-display-list:               Multiple Displays.      34.
+* make-frame-on-display:        Multiple Displays.      29.
+* ディスプレイ、複数:           Multiple Displays.      4.
+* 複数のXディスプレイ:          Multiple Displays.      4.
+* make-frame:                   Creating Frames.        9.
+* framep:                       Frames.                 22.
+* ウィンドウフレーム:           Frames.                 14.
+* 端末フレーム:                 Frames.                 10.
+* フレーム:                     Frames.                 4.
+* window-redisplay-end-trigger: Window Hooks.           58.
+* set-window-redisplay-end-trigger: Window Hooks.       55.
+* compare-window-configurations: Window Configurations.  76.
+* window-configuration-p:       Window Configurations.  73.
+* save-window-excursion:        Window Configurations.  47.
+* set-window-configuration:     Window Configurations.  24.
+* current-window-configuration: Window Configurations.  15.
+* 保存、ウィンドウ情報:         Window Configurations.  4.
+* ウィンドウ情報の保存:         Window Configurations.  4.
+* ウィンドウ構成:               Window Configurations.  4.
+* coordinates-in-window-p:      Coordinates and Windows.  16.
+* window-at:                    Coordinates and Windows.  9.
+* ウィンドウの最小サイズ:       Resizing Windows.       61.
+* shrink-window-if-larger-than-buffer: Resizing Windows.  54.
+* shrink-window-horizontally:   Resizing Windows.       47.
+* shrink-window:                Resizing Windows.       38.
+* enlarge-window-horizontally:  Resizing Windows.       32.
+* enlarge-window:               Resizing Windows.       12.
+* 変更、ウィンドウサイズ:       Resizing Windows.       4.
+* ウィンドウサイズの変更:       Resizing Windows.       4.
+* ウィンドウのリサイズ:         Resizing Windows.       4.
+* window-edges:                 Size of Window.         39.
+* window-width:                 Size of Window.         28.
+* window-height:                Size of Window.         13.
+* サイズ、ウィンドウ:           Size of Window.         4.
+* 大きさ、ウィンドウ:           Size of Window.         4.
+* ウィンドウサイズ:             Size of Window.         4.
+* set-window-hscroll:           Horizontal Scrolling.   56.
+* window-hscroll:               Horizontal Scrolling.   40.
+* scroll-right:                 Horizontal Scrolling.   30.
+* scroll-left:                  Horizontal Scrolling.   24.
+* 水平スクロール:               Horizontal Scrolling.   4.
+* ポイントを中央に揃える:       Vertical Scrolling.     105.
+* recenter:                     Vertical Scrolling.     105.
+* scroll-other-window:          Vertical Scrolling.     52.
+* scroll-down:                  Vertical Scrolling.     41.
+* scroll-up:                    Vertical Scrolling.     30.
+* スクロール、垂直:             Vertical Scrolling.     4.
+* 垂直スクロール:               Vertical Scrolling.     4.
+* pos-visible-in-window-p:      Window Start.           100.
+* set-window-start:             Window Start.           48.
+* window-end:                   Window Start.           33.
+* ウィンドウの先頭行:           Window Start.           13.
+* window-start:                 Window Start.           13.
+* set-window-point:             Window Point.           44.
+* window-point:                 Window Point.           32.
+* ポイント、ウィンドウ:         Window Point.           4.
+* 位置、ウィンドウ内:           Window Point.           4.
+* ウィンドウのポイント:         Window Point.           4.
+* ウィンドウ内位置:             Window Point.           4.
+* set-window-dedicated-p:       Choosing Window.        161.
+* window-dedicated-p:           Choosing Window.        157.
+* 専用ウィンドウ:               Choosing Window.        151.
+* special-display-popup-frame:  Choosing Window.        117.
+* display-buffer:               Choosing Window.        12.
+* replace-buffer-in-windows:    Displaying Buffers.     92.
+* pop-to-buffer:                Displaying Buffers.     54.
+* switch-to-buffer-other-window: Displaying Buffers.    40.
+* switch-to-buffer:             Displaying Buffers.     20.
+* バッファの表示:               Displaying Buffers.     4.
+* バッファの切り替え:           Displaying Buffers.     4.
+* get-buffer-window-list:       Buffers and Windows.    47.
+* get-buffer-window:            Buffers and Windows.    30.
+* window-buffer:                Buffers and Windows.    23.
+* set-window-buffer:            Buffers and Windows.    14.
+* バッファ、ウィンドウで制御される: Buffers and Windows.  4.
+* ウィンドウ、正確に制御する:   Buffers and Windows.    4.
+* ウィンドウを調べる:           Buffers and Windows.    4.
+* walk-windows:                 Cyclic Window Ordering.  86.
+* other-window:                 Cyclic Window Ordering.  77.
+* previous-window:              Cyclic Window Ordering.  72.
+* ミニバッファ用ウィンドウ:     Cyclic Window Ordering.  21.
+* next-window:                  Cyclic Window Ordering.  21.
+* 巡回順序、ウィンドウ:         Cyclic Window Ordering.  4.
+* 順序、ウィンドウ:             Cyclic Window Ordering.  4.
+* ウィンドウの巡回順序:         Cyclic Window Ordering.  4.
+* get-largest-window:           Selecting Windows.      59.
+* get-lru-window:               Selecting Windows.      39.
+* ウィンドウを探す:             Selecting Windows.      35.
+* save-selected-window:         Selecting Windows.      25.
+* select-window:                Selecting Windows.      14.
+* selected-window:              Selecting Windows.      10.
+* ウィンドウの選択:             Selecting Windows.      4.
+* delete-windows-on:            Deleting Windows.       37.
+* delete-other-windows:         Deleting Windows.       30.
+* delete-window:                Deleting Windows.       25.
+* window-live-p:                Deleting Windows.       18.
+* ウィンドウの削除:             Deleting Windows.       4.
+* one-window-p:                 Splitting Windows.      120.
+* split-window-horizontally:    Splitting Windows.      107.
+* split-window-vertically:      Splitting Windows.      93.
+* split-window:                 Splitting Windows.      15.
+* 分割、ウィンドウ:             Splitting Windows.      4.
+* ウィンドウの分割:             Splitting Windows.      4.
+* windowp:                      Basic Windows.          75.
+* タイル型ウィンドウ:           Basic Windows.          62.
+* スクリーン、端末:             Basic Windows.          62.
+* 端末スクリーン:               Basic Windows.          62.
+* 複数のウィンドウ:             Basic Windows.          50.
+* 選択されているウィンドウ:     Basic Windows.          4.
+* ウィンドウ:                   Basic Windows.          4.
+* buffer-base-buffer:           Indirect Buffers.       37.
+* make-indirect-buffer:         Indirect Buffers.       30.
+* 基底バッファ:                 Indirect Buffers.       4.
+* 間接バッファ:                 Indirect Buffers.       4.
+* kill-buffer:                  Killing Buffers.        32.
+* 削除、バッファ:               Killing Buffers.        4.
+* バッファの削除:               Killing Buffers.        4.
+* generate-new-buffer:          Creating Buffers.       32.
+* get-buffer-create:            Creating Buffers.       17.
+* 作成、バッファ:               Creating Buffers.       4.
+* バッファの作成:               Creating Buffers.       4.
+* bury-buffer:                  The Buffer List.        80.
+* other-buffer:                 The Buffer List.        57.
+* buffer-list:                  The Buffer List.        22.
+* バッファリスト:               The Buffer List.        4.
+* barf-if-buffer-read-only:     Read Only Buffers.      50.
+* toggle-read-only:             Read Only Buffers.      43.
+* バッファ、読み出し専用:       Read Only Buffers.      4.
+* 読み出し専用バッファ:         Read Only Buffers.      4.
+* file-supersession:            Modification Time.      53.
+* 廃れたバッファ:               Modification Time.      46.
+* ask-user-about-supersession-threat: Modification Time.  46.
+* set-visited-file-modtime:     Modification Time.      35.
+* visited-file-modtime:         Modification Time.      30.
+* clear-visited-file-modtime:   Modification Time.      22.
+* verify-visited-file-modtime:  Modification Time.      13.
+* 更新時刻の比較:               Modification Time.      4.
+* 比較、更新時刻:               Modification Time.      4.
+* buffer-modified-tick:         Buffer Modification.    45.
+* not-modified:                 Buffer Modification.    37.
+* set-buffer-modified-p:        Buffer Modification.    27.
+* buffer-modified-p:            Buffer Modification.    22.
+* 変更フラグ、バッファ:         Buffer Modification.    4.
+* バッファの変更:               Buffer Modification.    4.
+* set-visited-file-name:        Buffer File Name.       65.
+* get-file-buffer:              Buffer File Name.       52.
+* buffer-file-name:             Buffer File Name.       13.
+* ファイル名、バッファ:         Buffer File Name.       4.
+* バッファのファイル名:         Buffer File Name.       4.
+* バッファファイル名:           Buffer File Name.       4.
+* 訪問しているファイル:         Buffer File Name.       4.
+* generate-new-buffer-name:     Buffer Names.           65.
+* get-buffer:                   Buffer Names.           50.
+* rename-buffer:                Buffer Names.           37.
+* buffer-name:                  Buffer Names.           18.
+* バッファ名:                   Buffer Names.           4.
+* with-temp-buffer:             Current Buffer.         118.
+* with-current-buffer:          Current Buffer.         111.
+* save-current-buffer:          Current Buffer.         100.
+* set-buffer:                   Current Buffer.         91.
+* current-buffer:               Current Buffer.         85.
+* カレントバッファ:             Current Buffer.         4.
+* 切り替え、バッファ:           Current Buffer.         4.
+* 別のバッファへ切り替える:     Current Buffer.         4.
+* バッファを選ぶ:               Current Buffer.         4.
+* bufferp:                      Buffer Basics.          37.
+* バッファ:                     Buffers.                4.
+* revert-buffer:                Reverting.              11.
+* rename-auto-save-file:        Auto-Saving.            141.
+* delete-auto-save-file-if-necessary: Auto-Saving.      130.
+* do-auto-save:                 Auto-Saving.            119.
+* set-buffer-auto-saved:        Auto-Saving.            96.
+* recent-auto-save-p:           Auto-Saving.            92.
+* make-auto-save-file-name:     Auto-Saving.            54.
+* auto-save-file-name-p:        Auto-Saving.            29.
+* auto-save-mode:               Auto-Saving.            22.
+* 自動保存:                     Auto-Saving.            4.
+* file-newest-backup:           Backup Names.           81.
+* find-backup-file-name:        Backup Names.           64.
+* make-backup-file-name:        Backup Names.           35.
+* backup-file-name-p:           Backup Names.           11.
+* 作成方法、バックアップファイル: Rename or Copy.       4.
+* バックアップファイルの作成方法: Rename or Copy.       4.
+* backup-buffer:                Making Backups.         7.
+* バックアップファイル:         Backup Files.           4.
+* format-insert-file:           Format Conversion.      109.
+* format-find-file:             Format Conversion.      100.
+* format-write-file:            Format Conversion.      95.
+* 書式定義:                     Format Conversion.      13.
+* ファイル書式の復号化:         Format Conversion.      5.
+* ファイル書式の符号化:         Format Conversion.      5.
+* ファイル書式変換:             Format Conversion.      5.
+* unhandled-file-name-directory: Magic File Names.      125.
+* file-local-copy:              Magic File Names.       114.
+* find-file-name-handler:       Magic File Names.       108.
+* マジックファイル名:           Magic File Names.       4.
+* delete-directory:             Create/Delete Dirs.     15.
+* make-directory:               Create/Delete Dirs.     12.
+* insert-directory:             Contents of Directories.  41.
+* file-name-all-versions:       Contents of Directories.  37.
+* directory-files:              Contents of Directories.  14.
+* ディレクトリ内のファイル名:   Contents of Directories.  4.
+* ディレクトリ向け関数:         Contents of Directories.  4.
+* convert-standard-filename:    Standard File Names.    21.
+* file-name-completion:         File Name Completion.   31.
+* file-name-all-completions:    File Name Completion.   10.
+* 補完、ファイル名:             File Name Completion.   4.
+* ファイル名の補完サブルーティン: File Name Completion.  4.
+* 環境変数`TMP':                Unique File Names.      34.
+* `TMP'、環境変数:              Unique File Names.      34.
+* 環境変数`TMPDIR':             Unique File Names.      34.
+* `TMPDIR'、環境変数:           Unique File Names.      34.
+* make-temp-name:               Unique File Names.      21.
+* substitute-in-file-name:      File Name Expansion.    64.
+* file-relative-name:           File Name Expansion.    37.
+* expand-file-name:             File Name Expansion.    13.
+* ファイル名を展開する関数:     File Name Expansion.    4.
+* file-name-absolute-p:         Relative File Names.    15.
+* 相対ファイル名:               Relative File Names.    4.
+* 絶対ファイル名:               Relative File Names.    4.
+* abbreviate-file-name:         Directory Names.        66.
+* 省略形、ディレクトリ名:       Directory Names.        39.
+* ディレクトリ名の省略形:       Directory Names.        39.
+* directory-file-name:          Directory Names.        32.
+* file-name-as-directory:       Directory Names.        23.
+* ディレクトリのファイル名:     Directory Names.        4.
+* ディレクトリ名:               Directory Names.        4.
+* file-name-sans-extension:     File Name Components.   61.
+* file-name-sans-versions:      File Name Components.   47.
+* file-name-nondirectory:       File Name Components.   36.
+* file-name-directory:          File Name Components.   24.
+* 版番号（ファイル名）:         File Name Components.   4.
+* 非ディレクトリ部分（ファイル名）: File Name Components.  4.
+* ディレクトリ部分（ファイル名）: File Name Components.  4.
+* ファイル名:                   File Names.             4.
+* ファイルモードとMS-DOS:       Changing Files.         121.
+* MS-DOSとファイルモード:       Changing Files.         121.
+* default-file-modes:           Changing Files.         120.
+* set-default-file-modes:       Changing Files.         108.
+* set-file-modes:               Changing Files.         104.
+* define-logical-name:          Changing Files.         101.
+* file-already-exists:          Changing Files.         94.
+* ln:                           Changing Files.         94.
+* make-symbolic-link:           Changing Files.         94.
+* rm:                           Changing Files.         84.
+* delete-file:                  Changing Files.         84.
+* copy-file:                    Changing Files.         72.
+* rename-file:                  Changing Files.         62.
+* ファイルのハードリンク:       Changing Files.         21.
+* 複数の名前のファイル:         Changing Files.         21.
+* add-name-to-file:             Changing Files.         21.
+* ファイルのモードの設定:       Changing Files.         4.
+* ファイルのリンク:             Changing Files.         4.
+* ファイルの削除:               Changing Files.         4.
+* ファイルのコピー:             Changing Files.         4.
+* ファイルの改名:               Changing Files.         4.
+* file-attributes:              File Attributes.        51.
+* file-nlinks:                  File Attributes.        36.
+* ファイルの属性:               File Attributes.        11.
+* パーミッション:               File Attributes.        11.
+* file-modes:                   File Attributes.        11.
+* file-truename:                Truenames.              13.
+* ファイルの実名:               Truenames.              4.
+* 実名（ファイル）:             Truenames.              4.
+* file-regular-p:               Kinds of Files.         45.
+* file-directory-p:             Kinds of Files.         29.
+* ファイルのシンボリックリンク: Kinds of Files.         10.
+* シンボリックリンク、ファイル: Kinds of Files.         10.
+* file-symlink-p:               Kinds of Files.         10.
+* ファイル更新時刻:             Testing Accessibility.  73.
+* ファイルの古さ:               Testing Accessibility.  73.
+* file-newer-than-file-p:       Testing Accessibility.  73.
+* file-ownership-preserved-p:   Testing Accessibility.  69.
+* access-file:                  Testing Accessibility.  64.
+* file-accessible-directory-p:  Testing Accessibility.  52.
+* file-writable-p:              Testing Accessibility.  36.
+* file-executable-p:            Testing Accessibility.  30.
+* file-readable-p:              Testing Accessibility.  19.
+* file-exists-p:                Testing Accessibility.  9.
+* 参照可能性、ファイル:         Testing Accessibility.  4.
+* ファイルの参照可能性:         Testing Accessibility.  4.
+* file-locked:                  File Locks.             55.
+* ask-user-about-lock:          File Locks.             40.
+* unlock-buffer:                File Locks.             34.
+* lock-buffer:                  File Locks.             28.
+* file-locked-p:                File Locks.             20.
+* ロック、ファイル:             File Locks.             4.
+* ファイルロック:               File Locks.             4.
+* with-temp-file:               Writing to Files.       57.
+* write-region:                 Writing to Files.       20.
+* append-to-file:               Writing to Files.       11.
+* insert-file-contents-literally: Reading from Files.   44.
+* insert-file-contents:         Reading from Files.     11.
+* write-file:                   Saving Buffers.         43.
+* save-some-buffers:            Saving Buffers.         30.
+* save-buffer:                  Saving Buffers.         13.
+* ファイルオープンエラー:       Subroutines of Visiting.  35.
+* 新規ファイルメッセージ:       Subroutines of Visiting.  35.
+* after-find-file:              Subroutines of Visiting.  31.
+* create-file-buffer:           Subroutines of Visiting.  11.
+* view-file:                    Visiting Functions.     82.
+* find-file-read-only:          Visiting Functions.     75.
+* find-file-other-window:       Visiting Functions.     68.
+* find-file-noselect:           Visiting Functions.     32.
+* find-file:                    Visiting Functions.     18.
+* ファイルを訪問する:           Visiting Files.         4.
+* ファイルを探す:               Visiting Files.         4.
+* make-help-screen:             Help Functions.         123.
+* Helper-help:                  Help Functions.         109.
+* Helper-describe-bindings:     Help Functions.         103.
+* describe-prefix-bindings:     Help Functions.         93.
+* print-help-return-message:    Help Functions.         42.
+* help-command:                 Help Functions.         34.
+* apropos:                      Help Functions.         12.
+* read-kbd-macro:               Describing Characters.  45.
+* text-char-description:        Describing Characters.  32.
+* メタ文字の表示:               Describing Characters.  18.
+* コントロール文字の表示:       Describing Characters.  18.
+* 文字の表示:                   Describing Characters.  18.
+* イベントの表示:               Describing Characters.  18.
+* single-key-description:       Describing Characters.  18.
+* Emacsのイベント標準表記:      Describing Characters.  12.
+* key-description:              Describing Characters.  12.
+* substitute-command-keys:      Keys in Documentation.  34.
+* 説明文内のキーの置換:         Keys in Documentation.  4.
+* キー、説明文字列:             Keys in Documentation.  4.
+* 説明文字列内のキー:           Keys in Documentation.  4.
+* 説明文、キー:                 Keys in Documentation.  4.
+* Snarf-documentation:          Accessing Documentation.  101.
+* documentation:                Accessing Documentation.  19.
+* documentation-property:       Accessing Documentation.  7.
+* `etc/DOC-VERSION':            Documentation Basics.   33.
+* `emacs/etc/DOC-VERSION':      Documentation Basics.   33.
+* `DOC'（説明文）ファイル:      Documentation Basics.   33.
+* variable-documentation:       Documentation Basics.   31.
+* 文字列、説明文字列を書く:     Documentation Basics.   4.
+* 説明文字列を書く:             Documentation Basics.   4.
+* 説明文の慣習:                 Documentation Basics.   4.
+* 説明文字列:                   Documentation.          4.
+* make-local-hook:              Hooks.                  116.
+* remove-hook:                  Hooks.                  109.
+* add-hook:                     Hooks.                  84.
+* run-hook-with-args-until-success: Hooks.              78.
+* run-hook-with-args-until-failure: Hooks.              72.
+* run-hook-with-args:           Hooks.                  68.
+* run-hooks:                    Hooks.                  52.
+* アブノーマルフック:           Hooks.                  28.
+* ノーマルフック:               Hooks.                  11.
+* フック:                       Hooks.                  4.
+* font-lock-warning-face:       Faces for Font Lock.    51.
+* font-lock-constant-face:      Faces for Font Lock.    47.
+* font-lock-type-face:          Faces for Font Lock.    42.
+* font-lock-variable-name-face: Faces for Font Lock.    37.
+* font-lock-function-name-face: Faces for Font Lock.    32.
+* font-lock-builtin-face:       Faces for Font Lock.    28.
+* font-lock-keyword-face:       Faces for Font Lock.    23.
+* font-lock-string-face:        Faces for Font Lock.    19.
+* font-lock-comment-face:       Faces for Font Lock.    15.
+* フォントロック（font-lock）モード: Font Lock Mode.    4.
+* iメニュー:                    Imenu.                  5.
+* `mode-line-format'、シェルモード: Mode Line Data.     70.
+* シェルモードの`mode-line-format': Mode Line Data.     70.
+* パーセント記号、モード行:     Mode Line Data.         27.
+* モード行のパーセント記号:     Mode Line Data.         27.
+* モード行構成:                 Mode Line Data.         4.
+* force-mode-line-update:       Mode Line Format.       28.
+* モード行の書式:               Mode Line Format.       4.
+* easy-mmode-define-minor-mode: Easy-Mmode.             10.
+* `self-insert-command'、マイナモード: Keymaps and Minor Modes.  9.
+* モード変数:                   Minor Mode Conventions.  13.
+* マイナモードを書くための慣習: Minor Mode Conventions.  4.
+* マイナモードの慣習:           Minor Mode Conventions.  4.
+* マイナモード:                 Minor Modes.            4.
+* define-derived-mode:          Derived Modes.          10.
+* describe-mode:                Mode Help.              12.
+* 説明文、メジャーモード:       Mode Help.              4.
+* メジャーモードの説明文:       Mode Help.              4.
+* ヘルプ、メジャーモード:       Mode Help.              4.
+* メジャーモードについてのヘルプ: Mode Help.            4.
+* モードヘルプ:                 Mode Help.              4.
+* hack-local-variables:         Auto Major Mode.        149.
+* `*scratch*':                  Auto Major Mode.        91.
+* set-buffer-major-mode:        Auto Major Mode.        82.
+* モード、訪問したファイル:     Auto Major Mode.        60.
+* 訪問したファイルのモード:     Auto Major Mode.        60.
+* set-auto-mode:                Auto Major Mode.        60.
+* ファイルモード指定のエラー:   Auto Major Mode.        35.
+* normal-mode:                  Auto Major Mode.        20.
+* fundamental-mode:             Auto Major Mode.        11.
+* 例、構文テーブル:             Example Major Modes.    58.
+* 構文テーブルの例:             Example Major Modes.    58.
+* `lisp-mode.el':               Example Major Modes.    53.
+* ロード、モード:               Major Mode Conventions.  158.
+* モードのロード:               Major Mode Conventions.  158.
+* カスタマイズ、`.emacs':       Major Mode Conventions.  154.
+* `.emacs'のカスタマイズ:       Major Mode Conventions.  154.
+* `special':                    Major Mode Conventions.  139.
+* 属性`mode-class':             Major Mode Conventions.  139.
+* `mode-class'属性:             Major Mode Conventions.  139.
+* メジャーモードフック:         Major Mode Conventions.  117.
+* モードフック:                 Major Mode Conventions.  117.
+* バッファローカルな変数、モード: Major Mode Conventions.  106.
+* モードのバッファローカルな変数: Major Mode Conventions.  106.
+* 略語表、モード:               Major Mode Conventions.  85.
+* モードの略語表:               Major Mode Conventions.  85.
+* 構文テーブル、モード:         Major Mode Conventions.  74.
+* モードの構文テーブル:         Major Mode Conventions.  74.
+* キーマップ、モード:           Major Mode Conventions.  45.
+* モードのキーマップ:           Major Mode Conventions.  45.
+* 関数群、モード:               Major Mode Conventions.  40.
+* モードの関数群:               Major Mode Conventions.  40.
+* 基本（fundamental）モード:    Major Modes.            4.
+* メジャーモード:               Major Modes.            4.
+* モード:                       Modes.                  4.
+* define-key-after:             Modifying Menus.        12.
+* メニューバー:                 Menu Bar.               4.
+* メニューの定義例:             Menu Example.           4.
+* menu-item:                    Extended Menu Items.    4.
+* プロンプト文字列、メニュー:   Defining Menus.         4.
+* メニュープロンプト文字列:     Defining Menus.         4.
+* メニューの定義:               Defining Menus.         4.
+* メニューキーマップ:           Menu Keymaps.           4.
+* describe-bindings:            Scanning Keymaps.       89.
+* where-is-internal:            Scanning Keymaps.       61.
+* accessible-keymaps:           Scanning Keymaps.       10.
+* local-unset-key:              Key Binding Commands.   65.
+* local-set-key:                Key Binding Commands.   57.
+* キーバインディングの解除:     Key Binding Commands.   38.
+* global-unset-key:             Key Binding Commands.   38.
+* global-set-key:               Key Binding Commands.   30.
+* `quoted-insert'の抑制:        Changing Key Bindings.  138.
+* ヤンクの抑制:                 Changing Key Bindings.  138.
+* `self-insert-command'の無効化: Changing Key Bindings.  129.
+* suppress-keymap:              Changing Key Bindings.  129.
+* バインディングの置き換え:     Changing Key Bindings.  92.
+* substitute-key-definition:    Changing Key Bindings.  92.
+* キー列エラー:                 Changing Key Bindings.  43.
+* 不正なプレフィックスキーエラー: Changing Key Bindings.  43.
+* define-key:                   Changing Key Bindings.  37.
+* コントロール文字キー定数:     Changing Key Bindings.  15.
+* メタ文字キー定数:             Changing Key Bindings.  15.
+* 再バインディング:             Changing Key Bindings.  4.
+* キーバインディングの変更:     Changing Key Bindings.  4.
+* ESC:                          Functions for Key Lookup.  90.
+* minor-mode-key-binding:       Functions for Key Lookup.  74.
+* global-key-binding:           Functions for Key Lookup.  67.
+* local-key-binding:            Functions for Key Lookup.  60.
+* key-binding:                  Functions for Key Lookup.  48.
+* undefined:                    Functions for Key Lookup.  44.
+* lookup-key:                   Functions for Key Lookup.  9.
+* プレフィックスキーの禁止:     Key Lookup.             99.
+* キーマップ内の`undefined':    Key Lookup.             93.
+* `undefined'、キーマップ:      Key Lookup.             93.
+* キーマップ内のシンボル:       Key Lookup.             81.
+* シンボル、キーマップ:         Key Lookup.             81.
+* キーマップ内の`lambda':       Key Lookup.             65.
+* `lambda'、キーマップ:         Key Lookup.             65.
+* キーマップ内のリスト:         Key Lookup.             58.
+* リスト、キーマップ:           Key Lookup.             58.
+* キーマップ内のキーマップ:     Key Lookup.             53.
+* キーマップ、キーマップ:       Key Lookup.             53.
+* キーマップ内の文字列:         Key Lookup.             47.
+* 文字列、キーマップ:           Key Lookup.             47.
+* キーマップ内のコマンド:       Key Lookup.             42.
+* コマンド、キーマップ:         Key Lookup.             42.
+* キーマップ内の`nil':          Key Lookup.             35.
+* `nil'、キーマップ:            Key Lookup.             35.
+* キーマップの項目:             Key Lookup.             4.
+* キー探索:                     Key Lookup.             4.
+* use-local-map:                Active Keymaps.         104.
+* use-global-map:               Active Keymaps.         98.
+* current-minor-mode-maps:      Active Keymaps.         94.
+* current-local-map:            Active Keymaps.         79.
+* current-global-map:           Active Keymaps.         71.
+* メジャーモードのキーマップ:   Active Keymaps.         41.
+* ローカルキーマップ:           Active Keymaps.         4.
+* グローバルキーマップ:         Active Keymaps.         4.
+* 活性なキーマップ:             Active Keymaps.         4.
+* コマンド、プレフィックス:     Prefix Keys.            89.
+* プレフィックスコマンド:       Prefix Keys.            89.
+* define-prefix-command:        Prefix Keys.            89.
+* facemenu-keymap:              Prefix Keys.            56.
+* `M-g':                        Prefix Keys.            56.
+* vc-prefix-map:                Prefix Keys.            52.
+* `C-x v':                      Prefix Keys.            52.
+* 2C-mode-map:                  Prefix Keys.            48.
+* `C-x 6':                      Prefix Keys.            48.
+* ctl-x-5-map:                  Prefix Keys.            44.
+* `C-x 5':                      Prefix Keys.            44.
+* ctl-x-4-map:                  Prefix Keys.            40.
+* `C-x 4':                      Prefix Keys.            40.
+* mule-keymap:                  Prefix Keys.            36.
+* `C-x RET':                    Prefix Keys.            36.
+* Control-X-prefix:             Prefix Keys.            31.
+* ctl-x-map:                    Prefix Keys.            31.
+* `C-x':                        Prefix Keys.            31.
+* mode-specific-map:            Prefix Keys.            24.
+* `C-c':                        Prefix Keys.            24.
+* `C-h':                        Prefix Keys.            20.
+* ESC-prefix:                   Prefix Keys.            15.
+* esc-map:                      Prefix Keys.            15.
+* プレフィックスキー:           Prefix Keys.            4.
+* set-keymap-parent:            Inheritance and Keymaps.  31.
+* keymap-parent:                Inheritance and Keymaps.  27.
+* 継承、キーマップのバインディング: Inheritance and Keymaps.  4.
+* キーマップのバインディングの継承: Inheritance and Keymaps.  4.
+* 継承、キーマップ:             Inheritance and Keymaps.  4.
+* キーマップの継承:             Inheritance and Keymaps.  4.
+* copy-keymap:                  Creating Keymaps.       30.
+* make-sparse-keymap:           Creating Keymaps.       22.
+* make-keymap:                  Creating Keymaps.       9.
+* キーマップの作成:             Creating Keymaps.       4.
+* keymapp:                      Format of Keymaps.      75.
+* メタ文字の探索:               Format of Keymaps.      47.
+* 全面プロンプト文字列:         Format of Keymaps.      46.
+* キーマップのプロンプト文字列: Format of Keymaps.      46.
+* デフォルトのキーバインディング: Format of Keymaps.    20.
+* 疎なキーマップ:               Format of Keymaps.      4.
+* 完全なキーマップ:             Format of Keymaps.      4.
+* キーマップの形式:             Format of Keymaps.      4.
+* 未定義キー:                   Keymap Terminology.     4.
+* 完全なキー:                   Keymap Terminology.     4.
+* キーのバインド:               Keymap Terminology.     4.
+* キーバインディング:           Keymap Terminology.     4.
+* 打鍵:                         Keymap Terminology.     4.
+* キー:                         Keymap Terminology.     4.
+* キーマップ:                   Keymaps.                4.
+* execute-kbd-macro:            Keyboard Macros.        12.
+* キーボードマクロ:             Keyboard Macros.        4.
+* 履歴、コマンド:               Command History.        4.
+* 複雑なコマンド:               Command History.        4.
+* コマンド履歴:                 Command History.        4.
+* disable-command:              Disabling Commands.     36.
+* enable-command:               Disabling Commands.     31.
+* disabled:                     Disabling Commands.     10.
+* 禁止コマンド:                 Disabling Commands.     4.
+* recursion-depth:              Recursive Editing.      92.
+* top-level:                    Recursive Editing.      88.
+* abort-recursive-edit:         Recursive Editing.      82.
+* exit-recursive-edit:          Recursive Editing.      78.
+* 評価の一時休止:               Recursive Editing.      59.
+* recursive-edit:               Recursive Editing.      59.
+* 強制終了:                     Recursive Editing.      29.
+* 再帰編集の終了:               Recursive Editing.      29.
+* exit:                         Recursive Editing.      29.
+* 例、`throw':                  Recursive Editing.      29.
+* `throw'の例:                  Recursive Editing.      29.
+* ミニバッファ入力:             Recursive Editing.      23.
+* コマンドループ、再帰:         Recursive Editing.      4.
+* 再帰編集レベル:               Recursive Editing.      4.
+* 再帰コマンドループ:           Recursive Editing.      4.
+* negative-argument:            Prefix Command Arguments.  104.
+* digit-argument:               Prefix Command Arguments.  98.
+* universal-argument:           Prefix Command Arguments.  93.
+* prefix-numeric-value:         Prefix Command Arguments.  71.
+* 数値前置引数:                 Prefix Command Arguments.  4.
+* 生の前置引数:                 Prefix Command Arguments.  4.
+* 前置引数:                     Prefix Command Arguments.  4.
+* keyboard-quit:                Quitting.               78.
+* `read-quoted-char'の中断:     Quitting.               48.
+* 中断:                         Quitting.               4.
+* `C-g':                        Quitting.               4.
+* sleep-for:                    Waiting.                40.
+* 再表示の強制:                 Waiting.                25.
+* sit-for:                      Waiting.                12.
+* 待機:                         Waiting.                4.
+* 休止:                         Waiting.                4.
+* 特殊イベント:                 Special Events.         5.
+* キーボードマクロの終了:       Event Input Misc.       69.
+* 入力の破棄:                   Event Input Misc.       69.
+* discard-input:                Event Input Misc.       69.
+* コマンドキー入力を待つ:       Event Input Misc.       46.
+* input-pending-p:              Event Input Misc.       46.
+* listify-key-sequence:         Event Input Misc.       34.
+* 前置引数の読み戻し:           Event Input Misc.       19.
+* 入力を覗き見る:               Event Input Misc.       11.
+* つぎの入力:                   Event Input Misc.       11.
+* 非印字文字、読み取り:         Quoted Character Input.  11.
+* コントロール文字、読み取り:   Quoted Character Input.  11.
+* 8進数字文字入力:              Quoted Character Input.  11.
+* read-quoted-char:             Quoted Character Input.  11.
+* クォートした文字の入力:       Quoted Character Input.  4.
+* read-char:                    Reading One Event.      40.
+* read-event:                   Reading One Event.      9.
+* `lookup-key'における小文字への変換: Key Sequence Input.  43.
+* 大文字のキー列:               Key Sequence Input.     43.
+* read-key-sequence-vector:     Key Sequence Input.     41.
+* キー列:                       Key Sequence Input.     11.
+* read-key-sequence:            Key Sequence Input.     11.
+* キー列の入力:                 Key Sequence Input.     4.
+* scroll-bar-scale:             Accessing Events.       57.
+* scroll-bar-event-ratio:       Accessing Events.       52.
+* posn-timestamp:               Accessing Events.       47.
+* posn-col-row:                 Accessing Events.       42.
+* posn-x-y:                     Accessing Events.       39.
+* posn-point:                   Accessing Events.       36.
+* posn-window:                  Accessing Events.       33.
+* event-end:                    Accessing Events.       22.
+* event-start:                  Accessing Events.       15.
+* event-convert-list:           Classifying Events.     84.
+* mouse-movement-p:             Classifying Events.     81.
+* event-basic-type:             Classifying Events.     60.
+* event-modifiers:              Classifying Events.     27.
+* イベント型:                   Classifying Events.     4.
+* `drag-n-drop'イベント:        Misc Events.            44.
+* イベント`drag-n-drop':        Misc Events.            44.
+* `mouse-wheel'イベント:        Misc Events.            29.
+* イベント`mouse-wheel':        Misc Events.            29.
+* `make-frame-visible'イベント: Misc Events.            22.
+* イベント`make-frame-visible': Misc Events.            22.
+* `iconify-frame'イベント:      Misc Events.            14.
+* イベント`iconify-frame':      Misc Events.            14.
+* `delete-frame'イベント:       Misc Events.            7.
+* イベント`delete-frame':       Misc Events.            7.
+* フォーカスイベント:           Focus Events.           4.
+* マウスモーションイベント:     Motion Events.          4.
+* モーションイベント:           Motion Events.          4.
+* event-click-count:            Repeat Events.          63.
+* トリプルクリックイベント:     Repeat Events.          4.
+* ダブルクリックイベント:       Repeat Events.          4.
+* 繰り返しイベント:             Repeat Events.          4.
+* ボタン押し下げイベント:       Button-Down Events.     4.
+* マウスドラッグイベント:       Drag Events.            4.
+* ドラッグイベント:             Drag Events.            4.
+* マウスクリックイベント:       Click Events.           4.
+* クリックイベント:             Click Events.           4.
+* ファンクションキー:           Function Keys.          5.
+* 基本コード（入力文字）:       Keyboard Events.        10.
+* 修飾ビット（入力文字）:       Keyboard Events.        10.
+* eventp:                       Input Events.           12.
+* 入力イベント:                 Input Events.           4.
+* イベント:                     Input Events.           4.
+* this-command-keys-vector:     Command Loop Info.      64.
+* this-command-keys:            Command Loop Info.      54.
+* キルコマンドの繰り返し:       Command Loop Info.      33.
+* 現在のコマンド:               Command Loop Info.      25.
+* interactive-p:                Interactive Call.       85.
+* `M-x':                        Interactive Call.       71.
+* 前置引数付きの実行:           Interactive Call.       67.
+* コマンド名の読み取り:         Interactive Call.       62.
+* execute-extended-command:     Interactive Call.       62.
+* キーボードマクロの実行:       Interactive Call.       46.
+* command-execute:              Interactive Call.       46.
+* コマンド履歴の記録:           Interactive Call.       38.
+* call-interactively:           Interactive Call.       32.
+* commandp:                     Interactive Call.       13.
+* 対話的呼び出し:               Interactive Call.       4.
+* 例、`interactive':            Interactive Examples.   4.
+* `interactive'の使用例:        Interactive Examples.   4.
+* 評価済みの式引数:             Interactive Codes.      188.
+* リージョン引数:               Interactive Codes.      158.
+* 数値前置引数の使い方:         Interactive Codes.      150.
+* 生の前置引数の使い方:         Interactive Codes.      145.
+* マーク引数:                   Interactive Codes.      130.
+* 位置引数:                     Interactive Codes.      76.
+* 読み取り、対話引数:           Interactive Codes.      36.
+* デフォルト引数文字列:         Interactive Codes.      21.
+* 補完、対話指定:               Interactive Codes.      10.
+* 文字、対話指定のコード:       Interactive Codes.      4.
+* コード、対話指定、記述子:     Interactive Codes.      4.
+* 記述子、対話指定のコード:     Interactive Codes.      4.
+* 対話コード記述子:             Interactive Codes.      4.
+* `@'、対話指定:                Using Interactive.      79.
+* 読み出し専用バッファ、対話指定: Using Interactive.    76.
+* `*'、対話指定:                Using Interactive.      76.
+* 引数プロンプト:               Using Interactive.      54.
+* 引数評価フォーム:             Using Interactive.      32.
+* 引数記述子:                   Using Interactive.      10.
+* interactive:                  Using Interactive.      10.
+* 対話的関数:                   Defining Commands.      4.
+* 関数、対話的にする:           Defining Commands.      4.
+* 定義、コマンド:               Defining Commands.      4.
+* コマンドの定義:               Defining Commands.      4.
+* コマンドループ:               Command Loop.           4.
+* エディタコマンドループ:       Command Loop.           4.
+* minibuffer-depth:             Minibuffer Misc.        82.
+* minibuffer-window-active-p:   Minibuffer Misc.        70.
+* window-minibuffer-p:          Minibuffer Misc.        63.
+* minibuffer-window:            Minibuffer Misc.        56.
+* active-minibuffer-window:     Minibuffer Misc.        52.
+* minibuffer-prompt-width:      Minibuffer Misc.        38.
+* minibuffer-prompt:            Minibuffer Misc.        34.
+* next-matching-history-element: Minibuffer Misc.       30.
+* previous-matching-history-element: Minibuffer Misc.   26.
+* next-history-element:         Minibuffer Misc.        22.
+* previous-history-element:     Minibuffer Misc.        18.
+* self-insert-and-exit:         Minibuffer Misc.        13.
+* exit-minibuffer:              Minibuffer Misc.        9.
+* read-passwd:                  Reading a Password.     10.
+* 読み取り、パスワード:         Reading a Password.     4.
+* map-y-or-n-p:                 Multiple Queries.       11.
+* yes-or-no-p:                  Yes-or-No Queries.      80.
+* y-or-n-p-with-timeout:        Yes-or-No Queries.      75.
+* y-or-n-p:                     Yes-or-No Queries.      22.
+* yes/noの問い合わせ:           Yes-or-No Queries.      4.
+* ユーザーへの問い合わせ:       Yes-or-No Queries.      4.
+* プログラム補完:               Programmed Completion.  4.
+* read-file-name:               Reading File Names.     11.
+* 例、`user-variable-p':        High-Level Completion.  104.
+* read-variable:                High-Level Completion.  81.
+* 例、`commandp':               High-Level Completion.  75.
+* `commandp'の例:               High-Level Completion.  75.
+* read-command:                 High-Level Completion.  48.
+* read-buffer:                  High-Level Completion.  14.
+* display-completion-list:      Completion Commands.    87.
+* minibuffer-completion-help:   Completion Commands.    80.
+* minibuffer-complete-and-exit: Completion Commands.    68.
+* minibuffer-complete:          Completion Commands.    65.
+* minibuffer-complete-word:     Completion Commands.    60.
+* completing-read:              Minibuffer Completion.  10.
+* all-completions:              Basic Completion.       79.
+* 補完におけるオブジェクト配列: Basic Completion.       25.
+* try-completion:               Basic Completion.       11.
+* 補完:                         Completion.             4.
+* 履歴リスト:                   Minibuffer History.     4.
+* ミニバッファの履歴:           Minibuffer History.     4.
+* edit-and-eval-command:        Object from Minibuffer.  47.
+* eval-minibuffer:              Object from Minibuffer.  35.
+* read-minibuffer:              Object from Minibuffer.  9.
+* ミニバッファ、`?':            Text from Minibuffer.   162.
+* `?'、ミニバッファ:            Text from Minibuffer.   162.
+* ミニバッファ、TAB:            Text from Minibuffer.   158.
+* TAB、ミニバッファ:            Text from Minibuffer.   158.
+* ミニバッファ、SPC:            Text from Minibuffer.   154.
+* SPC、ミニバッファ:            Text from Minibuffer.   154.
+* read-no-blanks-input:         Text from Minibuffer.   133.
+* read-string:                  Text from Minibuffer.   76.
+* read-from-minibuffer:         Text from Minibuffer.   16.
+* ミニバッファ:                 Minibuffers.            4.
+* 複雑な引数:                   Minibuffers.            4.
+* 引数の読み取り:               Minibuffers.            4.
+* 表示制限:                     Output Variables.       52.
+* エスケープ文字:               Output Variables.       11.
+* `\n'、表示:                   Output Variables.       11.
+* with-output-to-string:        Output Functions.       107.
+* オブジェクトから文字列へ:     Output Functions.       87.
+* prin1-to-string:              Output Functions.       87.
+* write-char:                   Output Functions.       83.
+* 改行、表示:                   Output Functions.       79.
+* terpri:                       Output Functions.       79.
+* princ:                        Output Functions.       65.
+* prin1:                        Output Functions.       54.
+* Lispプリンタ:                 Output Functions.       37.
+* print:                        Output Functions.       37.
+* エスケープ文字、表示:         Output Functions.       8.
+* クォート文字、表示:           Output Functions.       8.
+* `\'、表示:                    Output Functions.       8.
+* `"'、表示:                    Output Functions.       8.
+* 例、print:                    Output Streams.         44.
+* printの例:                    Output Streams.         44.
+* `nil'出力ストリーム:          Output Streams.         33.
+* `t'出力ストリーム:            Output Streams.         29.
+* 関数出力ストリーム:           Output Streams.         23.
+* マーカ出力ストリーム:         Output Streams.         16.
+* バッファ出力ストリーム:       Output Streams.         11.
+* 出力ストリーム:               Output Streams.         4.
+* ストリーム（表示）:           Output Streams.         4.
+* 文字列からオブジェクトへ:     Input Functions.        19.
+* read-from-string:             Input Functions.        19.
+* read:                         Input Functions.        15.
+* end-of-file（ファイルの終り）: Input Functions.       10.
+* get-file-char:                Input Streams.          127.
+* `nil'入力ストリーム:          Input Streams.          46.
+* `t'入力ストリーム:            Input Streams.          40.
+* 関数入力ストリーム:           Input Streams.          27.
+* 文字列入力ストリーム:         Input Streams.          23.
+* マーカ入力ストリーム:         Input Streams.          17.
+* バッファ入力ストリーム:       Input Streams.          12.
+* 入力ストリーム:               Input Streams.          4.
+* ストリーム（読み取り）:       Input Streams.          4.
+* 読み取り:                     Streams Intro.          4.
+* 表示:                         Streams Intro.          4.
+* Lispリーダ:                   Streams Intro.          4.
+* 構文エラー（edebug）:         Backtracking.           5.
+* バックトラック:               Backtracking.           5.
+* ラムダリスト（edebug）:       Specification List.     159.
+* ドット対リスト（edebug）:     Specification List.     143.
+* [...]（edebug）:              Specification List.     124.
+* 間接仕様:                     Specification List.     108.
+* バックトラックの阻止:         Specification List.     101.
+* &define （edebug）:           Specification List.     89.
+* &not （edebug）:              Specification List.     84.
+* &or （edebug）:               Specification List.     76.
+* &rest （edebug）:             Specification List.     66.
+* &optional （edebug）:         Specification List.     56.
+* edebug-unwrap:                Specification List.     36.
+* edebug用仕様リスト:           Specification List.     5.
+* def-edebug-spec:              Instrumenting Macro Calls.  16.
+* ウィンドウ構成（edebug）:     Edebug Display Update.  24.
+* カレントバッファのポイントとマーク（edebug）: Edebug Display Update.  20.
+* edebug-display-freq-count:    Coverage Testing.       24.
+* 効率解析:                     Coverage Testing.       5.
+* 頻度数計測:                   Coverage Testing.       5.
+* カバレッジテスト:             Coverage Testing.       5.
+* edebug-trace:                 Trace Buffer.           31.
+* edebug-tracing:               Trace Buffer.           26.
+* edebug-print-trace-after:     Trace Buffer.           21.
+* edebug-print-trace-before:    Trace Buffer.           21.
+* トレースバッファ:             Trace Buffer.           4.
+* cust-print:                   Printing in Edebug.     5.
+* 循環構造の出力:               Printing in Edebug.     5.
+* 出力（edebug）:               Printing in Edebug.     5.
+* 評価リストグループ:           Eval List.              41.
+* レキシカル（テキスト上の）束縛（edebug）: Edebug Eval.  21.
+* ソース上のブレークポイント:   Source Breakpoints.     5.
+* edebug:                       Source Breakpoints.     5.
+* edebug-set-global-break-condition: Global Break Condition.  11.
+* グローバルブレーク条件:       Global Break Condition.  5.
+* イベントによる停止:           Global Break Condition.  5.
+* ブレークポイント:             Breakpoints.            5.
+* キーボードマクロ（edebug）:   Edebug Execution Modes.  64.
+* edebugの実行モード:           Edebug Execution Modes.  5.
+* eval-expression （edebug）:   Instrumenting.          46.
+* cl-specs.el:                  Instrumenting.          35.
+* cl.el （edebug）:             Instrumenting.          35.
+* Common Lisp（edebug）:        Instrumenting.          35.
+* 無名ラムダ式（edebug）:       Instrumenting.          35.
+* 対話的コマンド（edebug）:     Instrumenting.          35.
+* スペシャルフォーム（edebug）: Instrumenting.          35.
+* edebug-eval-top-level-form:   Instrumenting.          24.
+* eval-current-buffer （edebug）: Instrumenting.        17.
+* eval-region （edebug）:       Instrumenting.          17.
+* eval-defun （edebug）:        Instrumenting.          9.
+* C-M-x:                        Instrumenting.          9.
+* 停止位置:                     Using Edebug.           32.
+* edebug:                       Edebug.                 5.
+* edebugモード:                 Edebug.                 4.
+* backtrace-frame:              Internals of Debugger.  83.
+* backtrace-debug:              Internals of Debugger.  66.
+* `funcall'とデバッグ:          Internals of Debugger.  59.
+* `apply'とデバッグ:            Internals of Debugger.  59.
+* `eval'とデバッグ:             Internals of Debugger.  59.
+* 呼び出しスタック:             Internals of Debugger.  18.
+* 実行時スタック:               Internals of Debugger.  18.
+* backtrace:                    Internals of Debugger.  18.
+* `error'、デバッグ:            Invoking the Debugger.  59.
+* デバッグの`error':            Invoking the Debugger.  59.
+* `lambda'、デバッグ:           Invoking the Debugger.  29.
+* デバッグの`lambda':           Invoking the Debugger.  29.
+* debug:                        Invoking the Debugger.  9.
+* デバッガコマンド一覧:         Debugger Commands.      4.
+* カレントスタックフレーム:     Using Debugger.         21.
+* cancel-debug-on-entry:        Function Debugging.     57.
+* debug-on-entry:               Function Debugging.     13.
+* デバッグ、特定の関数:         Function Debugging.     4.
+* 特定の関数のデバッグ:         Function Debugging.     4.
+* デバッグ、関数呼び出し:       Function Debugging.     4.
+* 関数呼び出しのデバッグ:       Function Debugging.     4.
+* 停止、無限ループ:             Infinite Loops.         4.
+* 無限ループの停止:             Infinite Loops.         4.
+* 中断、無限ループ:             Infinite Loops.         4.
+* 無限ループの中断:             Infinite Loops.         4.
+* ループ、無限:                 Infinite Loops.         4.
+* 無限ループ:                   Infinite Loops.         4.
+* デバッグ、エラー:             Error Debugging.        4.
+* エラーのデバッグ:             Error Debugging.        4.
+* ブレーク:                     Debugger.               4.
+* Lispデバッガ:                 Debugger.               4.
+* デバッガ:                     Debugger.               4.
+* ad-define-subr-args:          Subr Arguments.         14.
+* ad-set-args:                  Argument Access in Advice.  36.
+* ad-set-arg:                   Argument Access in Advice.  33.
+* ad-get-args:                  Argument Access in Advice.  30.
+* ad-get-arg:                   Argument Access in Advice.  27.
+* アドバイスの予約活性:         Preactivation.          4.
+* 予約活性、アドバイス:         Preactivation.          4.
+* ad-enable-regexp:             Enabling Advice.        36.
+* ad-disable-regexp:            Enabling Advice.        32.
+* ad-enable-advice:             Enabling Advice.        24.
+* ad-disable-advice:            Enabling Advice.        20.
+* アドバイスの無効化:           Enabling Advice.        4.
+* 有効化と無効化、アドバイス:   Enabling Advice.        4.
+* アドバイスの有効化:           Enabling Advice.        4.
+* ad-stop-advice:               Activation of Advice.   67.
+* ad-start-advice:              Activation of Advice.   62.
+* アドバイスの再活性化:         Activation of Advice.   55.
+* ad-update-regexp:             Activation of Advice.   53.
+* ad-deactivate-regexp:         Activation of Advice.   48.
+* ad-activate-regexp:           Activation of Advice.   43.
+* ad-deactivate-all:            Activation of Advice.   40.
+* ad-activate-all:              Activation of Advice.   37.
+* 不活性化、アドバイス:         Activation of Advice.   35.
+* アドバイスの不活性化:         Activation of Advice.   35.
+* ad-deactivate:                Activation of Advice.   34.
+* ad-activate:                  Activation of Advice.   27.
+* 活性化、アドバイス:           Activation of Advice.   4.
+* アドバイスの活性化:           Activation of Advice.   4.
+* ad-add-advice:                Computed Advice.        11.
+* 未定義のアドバイス（forward advice）: Defining Advice.  67.
+* アドバイス、包囲:             Defining Advice.        20.
+* 包囲アドバイス（around-advice）: Defining Advice.     20.
+* アドバイス、事後:             Defining Advice.        20.
+* 事後アドバイス（after-advice）: Defining Advice.      20.
+* アドバイス、事前:             Defining Advice.        20.
+* 事前アドバイス（before-advice）: Defining Advice.     20.
+* クラス、アドバイス:           Defining Advice.        20.
+* アドバイスクラス:             Defining Advice.        20.
+* defadvice:                    Defining Advice.        9.
+* アドバイス、定義:             Defining Advice.        4.
+* 定義、アドバイス:             Defining Advice.        4.
+* アドバイス断片:               Advising Functions.     9.
+* アドバイス、関数:             Advising Functions.     4.
+* disassemble:                  Disassembly.            19.
+* 逆アセンブル、バイトコード:   Disassembly.            4.
+* バイトコードの逆アセンブル:   Disassembly.            4.
+* make-byte-code:               Byte-Code Objects.      52.
+* バイトコード関数:             Byte-Code Objects.      4.
+* コンパイル済み関数:           Byte-Code Objects.      4.
+* eval-when-compile:            Eval During Compile.    16.
+* eval-and-compile:             Eval During Compile.    9.
+* fetch-bytecode:               Dynamic Loading.        47.
+* 遅延ロード:                   Dynamic Loading.        5.
+* 関数の動的ロード:             Dynamic Loading.        5.
+* `#$':                         Docs and Compilation.   45.
+* `#@COUNT':                    Docs and Compilation.   45.
+* 説明文字列の動的ロード:       Docs and Compilation.   4.
+* インタープリタ、バイトコード: Compilation Functions.  111.
+* バイトコードインタープリタ:   Compilation Functions.  111.
+* byte-code:                    Compilation Functions.  111.
+* batch-byte-compile:           Compilation Functions.  101.
+* コンパイル、ライブラリ:       Compilation Functions.  89.
+* ライブラリのコンパイル:       Compilation Functions.  89.
+* byte-recompile-directory:     Compilation Functions.  89.
+* byte-compile-file:            Compilation Functions.  65.
+* compile-defun:                Compilation Functions.  60.
+* byte-compile:                 Compilation Functions.  30.
+* コンパイル、マクロ:           Compilation Functions.  15.
+* マクロのコンパイル:           Compilation Functions.  15.
+* コンパイル関数:               Compilation Functions.  4.
+* コンパイル:                   Byte Compilation.       4.
+* バイトコード:                 Byte Compilation.       4.
+* eval-after-load:              Hooks for Loading.      10.
+* フック、ロード:               Hooks for Loading.      4.
+* ロードフック:                 Hooks for Loading.      4.
+* FEATURE-unload-hook:          Unloading.              23.
+* unload-feature:               Unloading.              10.
+* アンロード:                   Unloading.              4.
+* featurep:                     Named Features.         98.
+* require:                      Named Features.         85.
+* provide:                      Named Features.         64.
+* バイトコンパイル時の`require': Named Features.        44.
+* `require'によるロードエラー:  Named Features.         20.
+* 機能を提供する:               Named Features.         4.
+* 機能を要求する:               Named Features.         4.
+* 機能:                         Named Features.         4.
+* ロードの繰り返し:             Repeated Loading.       4.
+* update-directory-autoloads:   Autoload.               82.
+* update-file-autoloads:        Autoload.               82.
+* エラー、自動ロード:           Autoload.               69.
+* 自動ロードエラー:             Autoload.               69.
+* 自動ロードする関数セル:       Autoload.               53.
+* autoload:                     Autoload.               22.
+* 自動ロード:                   Autoload.               4.
+* locate-library:               Library Search.         89.
+* 環境変数`EMACSLOADPATH':      Library Search.         10.
+* `EMACSLOADPATH'環境変数:      Library Search.         10.
+* load-library:                 How Programs Do Loading.  76.
+* load-file:                    How Programs Do Loading.  70.
+* file-error:                   How Programs Do Loading.  60.
+* エラー、ロード:               How Programs Do Loading.  56.
+* ロードエラー:                 How Programs Do Loading.  56.
+* load:                         How Programs Do Loading.  14.
+* フォーム、トップレベル:       Loading.                14.
+* トップレベルのフォーム:       Loading.                14.
+* Lispライブラリ:               Loading.                4.
+* ライブラリ:                   Loading.                4.
+* ロード:                       Loading.                4.
+* defcustom:                    Variable Definitions.   9.
+* defgroup:                     Group Definitions.      22.
+* 評価、マクロ引数:             Argument Evaluation.    53.
+* マクロ引数の評価:             Argument Evaluation.    53.
+* for:                          Argument Evaluation.    10.
+* 繋ぎ合わせ（バッククォートとの組み合わせ）: Backquote.  38.
+* ,@ （バッククォートとの組み合わせ）: Backquote.       38.
+* , （バッククォート）:         Backquote.              19.
+* `:                            Backquote.              4.
+* ` （リストの置換）:           Backquote.              4.
+* バッククォート（リストの置換）: Backquote.            4.
+* defmacro:                     Defining Macros.        16.
+* マクロのバイトコンパイル:     Compiling Macros.       4.
+* マクロ展開:                   Expansion.              31.
+* macroexpand:                  Expansion.              31.
+* マクロ呼び出し:               Expansion.              4.
+* 展開、マクロ:                 Expansion.              4.
+* マクロの展開:                 Expansion.              4.
+* inc:                          Simple Macro.           9.
+* マクロ:                       Macros.                 4.
+* defsubst:                     Inline Functions.       5.
+* インライン関数:               Inline Functions.       4.
+* fset:                         Function Cells.         60.
+* fmakunbound:                  Function Cells.         46.
+* fboundp:                      Function Cells.         41.
+* 空の関数セル:                 Function Cells.         26.
+* void-function:                Function Cells.         13.
+* symbol-function:              Function Cells.         13.
+* 関数をクォートする:           Anonymous Functions.    80.
+* function:                     Anonymous Functions.    80.
+* 無名関数:                     Anonymous Functions.    4.
+* mapconcat:                    Mapping Functions.      52.
+* mapcar:                       Mapping Functions.      18.
+* マップ関数:                   Mapping Functions.      4.
+* ignore:                       Calling Functions.      87.
+* identity:                     Calling Functions.      84.
+* ファンクショナル:             Calling Functions.      73.
+* apply:                        Calling Functions.      50.
+* funcall:                      Calling Functions.      22.
+* 関数呼び出し:                 Calling Functions.      4.
+* 関数の起動:                   Calling Functions.      4.
+* defalias:                     Defining Functions.     58.
+* defun:                        Defining Functions.     10.
+* 関数を定義する:               Defining Functions.     4.
+* 関数名:                       Function Names.         4.
+* 名前付き関数:                 Function Names.         4.
+* 関数定義:                     Function Names.         4.
+* 説明文字列、関数:             Function Documentation.  4.
+* 関数の説明文字列:             Function Documentation.  4.
+* CLに関した注意−−省略可能引数のデフォルト: Argument List.  42.
+* &rest:                        Argument List.          15.
+* &optional:                    Argument List.          15.
+* rest引数:                     Argument List.          15.
+* optional引数:                 Argument List.          15.
+* 引数を束縛する:               Argument List.          4.
+* 引数束縛:                     Argument List.          4.
+* wrong-number-of-arguments:    Argument List.          4.
+* 関数本体:                     Lambda Components.      32.
+* ラムダリスト:                 Lambda Components.      13.
+* ラムダ式:                     Lambda Expressions.     4.
+* byte-code-function-p:         What Is a Function.     83.
+* subrp:                        What Is a Function.     74.
+* functionp:                    What Is a Function.     70.
+* 打鍵コマンド:                 What Is a Function.     66.
+* コマンド:                     What Is a Function.     52.
+* マクロ:                       What Is a Function.     44.
+* 組み込み関数:                 What Is a Function.     20.
+* subr:                         What Is a Function.     20.
+* 基本関数:                     What Is a Function.     20.
+* 関数:                         What Is a Function.     14.
+* make-variable-frame-local:    Frame-Local Variables.  17.
+* set-default:                  Default Value.          73.
+* setq-default:                 Default Value.          34.
+* default-boundp:               Default Value.          26.
+* default-value:                Default Value.          20.
+* デフォルト値:                 Default Value.          4.
+* 恒久的なローカル変数:         Creating Buffer-Local.  140.
+* kill-all-local-variables:     Creating Buffer-Local.  114.
+* kill-local-variable:          Creating Buffer-Local.  96.
+* buffer-local-variables:       Creating Buffer-Local.  70.
+* local-variable-p:             Creating Buffer-Local.  66.
+* make-variable-buffer-local:   Creating Buffer-Local.  44.
+* make-local-variable:          Creating Buffer-Local.  7.
+* 自動的にバッファローカルにする: Intro to Buffer-Local.  37.
+* バッファローカルな変数:       Buffer-Local Variables.  4.
+* 変数、バッファローカル:       Buffer-Local Variables.  4.
+* 浅い束縛（シャローバインディング、shallow binding）: Impl of Scope.  22.
+* 深い束縛（ディープバインディング、deep binding）: Impl of Scope.  4.
+* クロージャは使えない:         Extent.                 30.
+* CLに関した注意−−スペシャル変数: Variable Scoping.   22.
+* 動的スコープ:                 Variable Scoping.       9.
+* 存続期間:                     Variable Scoping.       9.
+* スコープ:                     Variable Scoping.       9.
+* add-to-list:                  Setting Variables.      86.
+* CLに関した注意−−`set'はローカル: Setting Variables.  77.
+* set:                          Setting Variables.      39.
+* setq:                         Setting Variables.      10.
+* symbol-value:                 Accessing Variables.    12.
+* variable-interactive:         Defining Variables.     122.
+* ユーザーオプション:           Defining Variables.     114.
+* user-variable-p:              Defining Variables.     114.
+* defconst:                     Defining Variables.     90.
+* defvar:                       Defining Variables.     23.
+* 変数定義:                     Defining Variables.     4.
+* boundp:                       Void Variables.         64.
+* makunbound:                   Void Variables.         18.
+* 空の変数:                     Void Variables.         4.
+* void-variable:                Void Variables.         4.
+* 無限再帰:                     Local Variables.        98.
+* 評価エラー:                   Local Variables.        98.
+* 変数制限エラー:               Local Variables.        98.
+* let*:                         Local Variables.        70.
+* let:                          Local Variables.        48.
+* 現在の束縛:                   Local Variables.        36.
+* 変数を隠す:                   Local Variables.        16.
+* グローバル束縛:               Local Variables.        4.
+* ローカル束縛:                 Local Variables.        4.
+* 変数、ローカル:               Local Variables.        4.
+* ローカル変数:                 Local Variables.        4.
+* ローカル変数束縛:             Local Variables.        4.
+* setting-constant:             Constant Variables.     4.
+* t:                            Constant Variables.     4.
+* nil:                          Constant Variables.     4.
+* 変数、グローバル:             Global Variables.       4.
+* グローバル変数:               Global Variables.       4.
+* 変数:                         Variables.              4.
+* ftp-login:                    Cleanups.               49.
+* エラーの後始末:               Cleanups.               11.
+* 保護されたフォーム:           Cleanups.               11.
+* 後始末フォーム:               Cleanups.               11.
+* unwind-protect:               Cleanups.               11.
+* エラーpeculiar:               Error Symbols.          28.
+* peculiarエラー:               Error Symbols.          28.
+* error-conditions:             Error Symbols.          4.
+* ユーザー定義エラー:           Error Symbols.          4.
+* 条件名:                       Error Symbols.          4.
+* エラー名:                     Error Symbols.          4.
+* エラーシンボル:               Error Symbols.          4.
+* `arith-error'の例:            Handling Errors.        112.
+* error-message-string:         Handling Errors.        109.
+* エラー記述:                   Handling Errors.        97.
+* condition-case:               Handling Errors.        67.
+* エラーを処理する:             Handling Errors.        4.
+* エラーハンドラ:               Handling Errors.        4.
+* `debug-on-error'の利用:       Processing of Errors.   18.
+* CLに関した注意−−継続可能なエラーはない: Signaling Errors.  62.
+* signal:                       Signaling Errors.       36.
+* error:                        Signaling Errors.       15.
+* エラー通知:                   Signaling Errors.       4.
+* エラー:                       Errors.                 4.
+* no-catch:                     Catch and Throw.        76.
+* throw:                        Catch and Throw.        69.
+* 実行時スタック上のタグ:       Catch and Throw.        55.
+* catch:                        Catch and Throw.        55.
+* CLに関した注意−−Emacsでは`throw'のみ: Catch and Throw.  49.
+* 非ローカル脱出:               Nonlocal Exits.         4.
+* while:                        Iteration.              11.
+* 再帰:                         Iteration.              4.
+* 繰り返し:                     Iteration.              4.
+* or:                           Combining Conditions.   52.
+* and:                          Combining Conditions.   16.
+* not:                          Combining Conditions.   11.
+* cond:                         Conditionals.           50.
+* unless:                       Conditionals.           40.
+* when:                         Conditionals.           30.
+* if:                           Conditionals.           11.
+* 評価、条件付き:               Conditionals.           4.
+* 条件付き評価:                 Conditionals.           4.
+* prog2:                        Sequencing.             60.
+* prog1:                        Sequencing.             43.
+* progn:                        Sequencing.             29.
+* 暗黙の`progn':                Sequencing.             18.
+* 制御構造:                     Control Structures.     4.
+* 制御構造向けのスペシャルフォーム: Control Structures.  4.
+* エラー、Lispの入れ子:         Eval.                   69.
+* Lispの入れ子のエラー:         Eval.                   69.
+* eval-current-buffer:          Eval.                   61.
+* 評価、バッファ内容:           Eval.                   59.
+* バッファ内容の評価:           Eval.                   59.
+* eval-region:                  Eval.                   44.
+* eval:                         Eval.                   21.
+* クォート、`'':                Quoting.                13.
+* `''によるクォート:            Quoting.                13.
+* quote:                        Quoting.                12.
+* クォート:                     Quoting.                4.
+* CLに関した注意−−スペシャルフォームの比較: Special Forms.  94.
+* 評価、スペシャルフォーム:     Special Forms.          4.
+* スペシャルフォームの評価:     Special Forms.          4.
+* 評価、マクロ呼び出し:         Macro Forms.            4.
+* マクロ呼び出しの評価:         Macro Forms.            4.
+* 関数呼び出し:                 Function Forms.         4.
+* 評価、関数フォーム:           Function Forms.         4.
+* 関数フォームの評価:           Function Forms.         4.
+* indirect-function:            Function Indirection.   58.
+* 不正な関数:                   Function Indirection.   18.
+* invalid-function:             Function Indirection.   18.
+* 空関数:                       Function Indirection.   4.
+* 間接:                         Function Indirection.   4.
+* 関数間接、シンボル:           Function Indirection.   4.
+* シンボルの関数間接:           Function Indirection.   4.
+* 評価、リストフォーム:         Classifying Lists.      4.
+* リストフォームの評価:         Classifying Lists.      4.
+* 評価、シンボル:               Symbol Forms.           4.
+* シンボルの評価:               Symbol Forms.           4.
+* 自己評価型フォーム:           Self-Evaluating Forms.  4.
+* 評価、リテラル:               Self-Evaluating Forms.  4.
+* リテラルの評価:               Self-Evaluating Forms.  4.
+* 評価、ベクトル:               Self-Evaluating Forms.  4.
+* ベクトルの評価:               Self-Evaluating Forms.  4.
+* 副作用:                       Intro Eval.             49.
+* 環境:                         Intro Eval.             43.
+* 再帰的評価:                   Intro Eval.             31.
+* 式:                           Intro Eval.             13.
+* フォーム:                     Intro Eval.             13.
+* 式の値:                       Evaluation.             4.
+* インタープリタ:               Evaluation.             4.
+* 評価:                         Evaluation.             4.
+* plist-put:                    Other Plists.           16.
+* plist-get:                    Other Plists.           9.
+* put:                          Symbol Plists.          33.
+* get:                          Symbol Plists.          23.
+* setplist:                     Symbol Plists.          10.
+* symbol-plist:                 Symbol Plists.          7.
+* 連想リストと属性リスト:       Plists and Alists.      5.
+* 属性リストと連想リスト:       Plists and Alists.      5.
+* plist（属性リスト）:          Property Lists.         4.
+* 属性リスト（plist）:          Property Lists.         4.
+* unintern:                     Creating Symbols.       145.
+* mapatoms:                     Creating Symbols.       126.
+* intern-soft:                  Creating Symbols.       103.
+* CLに関した注意−−既存シンボルのインターン: Creating Symbols.  97.
+* intern:                       Creating Symbols.       83.
+* make-symbol:                  Creating Symbols.       71.
+* symbol-name:                  Creating Symbols.       62.
+* CLに関した注意−−オブジェクト配列内のシンボル: Creating Symbols.  53.
+* インターンしてないシンボル:   Creating Symbols.       30.
+* 同値性、シンボル:             Creating Symbols.       30.
+* シンボルの同値性:             Creating Symbols.       30.
+* インターン:                   Creating Symbols.       19.
+* バケット（オブジェクト配列）: Creating Symbols.       10.
+* obarray（オブジェクト配列）:  Creating Symbols.       10.
+* オブジェクト配列（obarray）:  Creating Symbols.       10.
+* ハッシュ化:                   Creating Symbols.       10.
+* シンボル名のハッシュ化:       Creating Symbols.       10.
+* シンボルを読む:               Creating Symbols.       4.
+* シンボルを定義する:           Definitions.            4.
+* 属性リストセル:               Symbol Components.      32.
+* 関数セル:                     Symbol Components.      23.
+* 値セル:                       Symbol Components.      16.
+* 表示名:                       Symbol Components.      10.
+* シンボルの構成要素:           Symbol Components.      4.
+* symbolp:                      Symbols.                15.
+* シンボル:                     Symbols.                4.
+* bool-vector-p:                Bool-Vectors.           19.
+* make-bool-vector:             Bool-Vectors.           16.
+* ブールベクトル:               Bool-Vectors.           4.
+* map-char-table:               Char-Tables.            111.
+* set-char-table-range:         Char-Tables.            88.
+* char-table-range:             Char-Tables.            68.
+* set-char-table-extra-slot:    Char-Tables.            62.
+* char-table-extra-slot:        Char-Tables.            58.
+* set-char-table-parent:        Char-Tables.            55.
+* char-table-parent:            Char-Tables.            51.
+* set-char-table-default:       Char-Tables.            45.
+* char-table-subtype:           Char-Tables.            42.
+* char-table-p:                 Char-Tables.            38.
+* make-char-table:              Char-Tables.            30.
+* 文字テーブルのデフォルト値:   Char-Tables.            25.
+* 文字テーブルの親:             Char-Tables.            20.
+* 文字テーブルのサブタイプ:     Char-Tables.            12.
+* 文字テーブルの追加スロット:   Char-Tables.            4.
+* 文字テーブル:                 Char-Tables.            4.
+* コピー、ベクトル:             Vector Functions.       32.
+* ベクトルのコピー:             Vector Functions.       32.
+* vconcat:                      Vector Functions.       32.
+* make-vector:                  Vector Functions.       25.
+* vector:                       Vector Functions.       17.
+* vectorp:                      Vector Functions.       9.
+* ベクトル:                     Vectors.                4.
+* fillarray:                    Array Functions.        56.
+* aset:                         Array Functions.        32.
+* 配列要素:                     Array Functions.        20.
+* aref:                         Array Functions.        20.
+* arrayp:                       Array Functions.        9.
+* 配列:                         Arrays.                 4.
+* コピー、シーケンス:           Sequence Functions.     54.
+* シーケンスのコピー:           Sequence Functions.     54.
+* copy-sequence:                Sequence Functions.     54.
+* 要素、シーケンス:             Sequence Functions.     33.
+* シーケンスの要素:             Sequence Functions.     33.
+* elt:                          Sequence Functions.     33.
+* 長さ、シーケンス:             Sequence Functions.     15.
+* シーケンスの長さ:             Sequence Functions.     15.
+* 長さ、ベクトル:               Sequence Functions.     15.
+* ベクトルの長さ:               Sequence Functions.     15.
+* 長さ、リスト:                 Sequence Functions.     15.
+* リストの長さ:                 Sequence Functions.     15.
+* 長さ、文字列:                 Sequence Functions.     15.
+* 文字列の長さ:                 Sequence Functions.     15.
+* length:                       Sequence Functions.     15.
+* sequencep:                    Sequence Functions.     11.
+* シーケンス:                   Sequences Arrays Vectors.  4.
+* 連想リストのコピー:           Association Lists.      159.
+* copy-alist:                   Association Lists.      159.
+* assoc-default:                Association Lists.      144.
+* rassq:                        Association Lists.      115.
+* assq:                         Association Lists.      91.
+* rassoc:                       Association Lists.      83.
+* assoc:                        Association Lists.      52.
+* alist（連想リスト）:          Association Lists.      4.
+* 連想リスト（alist）:          Association Lists.      4.
+* delete:                       Sets And Lists.         86.
+* member:                       Sets And Lists.         71.
+* 削除、要素:                   Sets And Lists.         28.
+* 要素の削除:                   Sets And Lists.         28.
+* delq:                         Sets And Lists.         28.
+* リストのメンバ:               Sets And Lists.         17.
+* memq:                         Sets And Lists.         17.
+* CLに関した注意−−`union'と`intersection'の欠落: Sets And Lists.  11.
+* 集合:                         Sets And Lists.         4.
+* 集合としてのリスト:           Sets And Lists.         4.
+* ソート、リスト:               Rearrangement.          96.
+* リストのソート:               Rearrangement.          96.
+* 順序を保ったソート:           Rearrangement.          96.
+* sort:                         Rearrangement.          96.
+* 逆順、リスト:                 Rearrangement.          62.
+* リストを逆順にする:           Rearrangement.          62.
+* nreverse:                     Rearrangement.          62.
+* 接続、リスト:                 Rearrangement.          15.
+* リストを接続する:             Rearrangement.          15.
+* 連結、リスト:                 Rearrangement.          15.
+* リストを連結する:             Rearrangement.          15.
+* nconc:                        Rearrangement.          15.
+* リストの変更:                 Rearrangement.          4.
+* リストの順序の変更:           Rearrangement.          4.
+* setcdr:                       Setcdr.                 9.
+* setcar:                       Setcar.                 10.
+* rplacd:                       Modifying Lists.        9.
+* rplaca:                       Modifying Lists.        9.
+* CLに関した注意−−`rplaca'と`setcar': Modifying Lists.  9.
+* 破壊的なリスト操作:           Modifying Lists.        4.
+* reverse:                      Building Lists.         143.
+* リストのコピー:               Building Lists.         53.
+* append:                       Building Lists.         53.
+* make-list:                    Building Lists.         43.
+* list:                         Building Lists.         32.
+* コンスする:                   Building Lists.         23.
+* cons:                         Building Lists.         11.
+* リストの構築:                 Building Lists.         4.
+* コンスセル:                   Building Lists.         4.
+* cddr:                         List Elements.          109.
+* cdar:                         List Elements.          106.
+* cadr:                         List Elements.          103.
+* caar:                         List Elements.          100.
+* safe-length:                  List Elements.          91.
+* nthcdr:                       List Elements.          77.
+* nth:                          List Elements.          59.
+* cdr-safe:                     List Elements.          46.
+* car-safe:                     List Elements.          33.
+* cdr:                          List Elements.          20.
+* car:                          List Elements.          7.
+* リストの要素:                 List Elements.          4.
+* null:                         List-related Predicates.  39.
+* nlistp:                       List-related Predicates.  33.
+* listp:                        List-related Predicates.  24.
+* アトム:                       List-related Predicates.  16.
+* atom:                         List-related Predicates.  16.
+* consp:                        List-related Predicates.  12.
+* コンスセルの箱表示:           Lists as Boxes.         4.
+* 箱表示によるリスト:           Lists as Boxes.         4.
+* 箱表示、リスト:               Lists as Boxes.         4.
+* リスト構造:                   Cons Cells.             17.
+* `nil'とリスト:                Cons Cells.             4.
+* リストとコンスセル:           Cons Cells.             4.
+* 要素（リスト）:               Lists.                  4.
+* リスト:                       Lists.                  4.
+* describe-buffer-case-table:   Case Tables.            86.
+* set-case-syntax:              Case Tables.            83.
+* set-case-syntax-delims:       Case Tables.            80.
+* set-case-syntax-pair:         Case Tables.            77.
+* set-case-table:               Case Tables.            69.
+* current-case-table:           Case Tables.            66.
+* standard-case-table:          Case Tables.            63.
+* set-standard-case-table:      Case Tables.            59.
+* case-table-p:                 Case Tables.            56.
+* upcase-initials:              Case Conversion.        71.
+* キャピタライズ（先頭文字だけを大文字にする）: Case Conversion.  49.
+* capitalize:                   Case Conversion.        49.
+* upcase:                       Case Conversion.        33.
+* downcase:                     Case Conversion.        18.
+* Lispの大文字小文字変換:       Case Conversion.        4.
+* 大文字小文字:                 Case Conversion.        4.
+* 小文字:                       Case Conversion.        4.
+* 大文字:                       Case Conversion.        4.
+* パディング:                   Formatting Strings.     94.
+* フィールド幅:                 Formatting Strings.     94.
+* 数前置子:                     Formatting Strings.     94.
+* 整数の16進表記:               Formatting Strings.     65.
+* 整数の8進表記:                Formatting Strings.     57.
+* 書式付け指定:                 Formatting Strings.     19.
+* `%'、書式付け:                Formatting Strings.     19.
+* format:                       Formatting Strings.     16.
+* 書式付け、文字列:             Formatting Strings.     4.
+* 文字列の書式付け:             Formatting Strings.     4.
+* string-to-int:                String Conversion.      75.
+* 文字列から数へ:               String Conversion.      55.
+* string-to-number:             String Conversion.      55.
+* int-to-string:                String Conversion.      50.
+* 整数の10進表記:               String Conversion.      40.
+* 整数から文字列へ:             String Conversion.      40.
+* number-to-string:             String Conversion.      40.
+* 文字列から文字へ:             String Conversion.      23.
+* string-to-char:               String Conversion.      23.
+* 文字から文字列へ:             String Conversion.      18.
+* char-to-string:               String Conversion.      18.
+* 変換、文字と文字列:           String Conversion.      4.
+* 文字と文字列の変換:           String Conversion.      4.
+* assoc-ignore-representation:  Text Comparison.        100.
+* assoc-ignore-case:            Text Comparison.        95.
+* compare-strings:              Text Comparison.        79.
+* string-lessp:                 Text Comparison.        76.
+* string<:                      Text Comparison.        40.
+* 比較、辞書式順:               Text Comparison.        38.
+* 辞書式順の比較:               Text Comparison.        38.
+* string-equal:                 Text Comparison.        37.
+* string=:                      Text Comparison.        18.
+* char-equal:                   Text Comparison.        7.
+* 同値性、文字列:               Text Comparison.        4.
+* 文字列の同値性:               Text Comparison.        4.
+* store-substring:              Modifying Strings.      15.
+* split-string:                 Creating Strings.       118.
+* 連結、文字列:                 Creating Strings.       82.
+* 文字列の連結:                 Creating Strings.       82.
+* コピー、文字列:               Creating Strings.       82.
+* 文字列のコピー:               Creating Strings.       82.
+* concat:                       Creating Strings.       82.
+* substring:                    Creating Strings.       29.
+* string:                       Creating Strings.       23.
+* make-string:                  Creating Strings.       10.
+* char-or-string-p:             Predicates for Strings.  13.
+* stringp:                      Predicates for Strings.  10.
+* バイト:                       Strings and Characters.  4.
+* 文字:                         Strings and Characters.  4.
+* 文字配列:                     Strings and Characters.  4.
+* 文字列:                       Strings and Characters.  4.
+* random:                       Random Numbers.         23.
+* 乱数:                         Random Numbers.         4.
+* sqrt:                         Math Functions.         43.
+* expt:                         Math Functions.         39.
+* log10:                        Math Functions.         35.
+* log:                          Math Functions.         30.
+* exp:                          Math Functions.         26.
+* atan:                         Math Functions.         22.
+* acos:                         Math Functions.         18.
+* asin:                         Math Functions.         14.
+* tan:                          Math Functions.         11.
+* cos:                          Math Functions.         10.
+* sin:                          Math Functions.         9.
+* 数学関数:                     Math Functions.         4.
+* 三角関数:                     Math Functions.         4.
+* ビットごとの否定:             Bitwise Operations.     190.
+* 論理否定:                     Bitwise Operations.     190.
+* lognot:                       Bitwise Operations.     190.
+* 排他的論理和:                 Bitwise Operations.     173.
+* ビットごとの排他的論理和:     Bitwise Operations.     173.
+* logxor:                       Bitwise Operations.     173.
+* ビットごとの論理和:           Bitwise Operations.     156.
+* 論理和:                       Bitwise Operations.     156.
+* logior:                       Bitwise Operations.     156.
+* ビットごとの論理積:           Bitwise Operations.     123.
+* 論理積:                       Bitwise Operations.     123.
+* logand:                       Bitwise Operations.     123.
+* 算術シフト:                   Bitwise Operations.     78.
+* ash:                          Bitwise Operations.     78.
+* 論理シフト:                   Bitwise Operations.     14.
+* lsh:                          Bitwise Operations.     14.
+* fround:                       Rounding Operations.    25.
+* ftruncate:                    Rounding Operations.    21.
+* fceiling:                     Rounding Operations.    17.
+* ffloor:                       Rounding Operations.    13.
+* 丸める:                       Rounding Operations.    4.
+* 変換せずに丸める:             Rounding Operations.    4.
+* 剰余:                         Arithmetic Operations.  134.
+* mod:                          Arithmetic Operations.  134.
+* 余り:                         Arithmetic Operations.  109.
+* %:                            Arithmetic Operations.  109.
+* `arith-error'、除算:          Arithmetic Operations.  86.
+* 除算の`arith-error':          Arithmetic Operations.  86.
+* /:                            Arithmetic Operations.  75.
+* *:                            Arithmetic Operations.  64.
+* -:                            Arithmetic Operations.  50.
+* +:                            Arithmetic Operations.  40.
+* 1-:                           Arithmetic Operations.  37.
+* 1+:                           Arithmetic Operations.  18.
+* round:                        Numeric Conversions.    29.
+* ceiling:                      Numeric Conversions.    26.
+* floor:                        Numeric Conversions.    19.
+* truncate:                     Numeric Conversions.    16.
+* float:                        Numeric Conversions.    9.
+* 丸め変換:                     Numeric Conversions.    4.
+* abs:                          Comparison of Numbers.  82.
+* min:                          Comparison of Numbers.  76.
+* max:                          Comparison of Numbers.  66.
+* >=:                           Comparison of Numbers.  62.
+* >:                            Comparison of Numbers.  58.
+* <=:                           Comparison of Numbers.  54.
+* <:                            Comparison of Numbers.  50.
+* /=:                           Comparison of Numbers.  46.
+* =:                            Comparison of Numbers.  42.
+* CLに関した注意−−整数と`eq': Comparison of Numbers.  34.
+* 同値性、数:                   Comparison of Numbers.  4.
+* 数の同値性:                   Comparison of Numbers.  4.
+* zerop:                        Predicates on Numbers.  34.
+* natnump:                      Predicates on Numbers.  31.
+* 自然数:                       Predicates on Numbers.  27.
+* wholenump:                    Predicates on Numbers.  27.
+* numberp:                      Predicates on Numbers.  23.
+* integerp:                     Predicates on Numbers.  19.
+* floatp:                       Predicates on Numbers.  13.
+* logb:                         Float Basics.           38.
+* 非数値、NaN:                  Float Basics.           15.
+* NaN（非数値）:                Float Basics.           15.
+* 無限大:                       Float Basics.           15.
+* 負の無限大:                   Float Basics.           15.
+* 正の無限大:                   Float Basics.           15.
+* IEEE浮動小数点数:             Float Basics.           15.
+* 2の補数:                      Integer Basics.         37.
+* オーバフロー:                 Integer Basics.         10.
+* 桁溢れ:                       Integer Basics.         10.
+* 数:                           Numbers.                4.
+* 整数:                         Numbers.                4.
+* equal:                        Equality Predicates.    54.
+* eq:                           Equality Predicates.    11.
+* 同値:                         Equality Predicates.    4.
+* type-of:                      Type Predicates.        161.
+* 型の検査:                     Type Predicates.        17.
+* 型述語:                       Type Predicates.        17.
+* wrong-type-argument:          Type Predicates.        4.
+* 型検査:                       Type Predicates.        4.
+* 述語:                         Type Predicates.        4.
+* 画面配置:                     Frame Configuration Type.  4.
+* 画面配置:                     Window Configuration Type.  4.
+* 型、編集向け:                 Editing Types.          4.
+* 編集向けの型:                 Editing Types.          4.
+* スペシャルフォーム:           Primitive Function Type.  4.
+* 文字列の改行:                 Syntax for Strings.     12.
+* 改行、文字列:                 Syntax for Strings.     12.
+* 文字列のバックスラッシュ:     Syntax for Strings.     5.
+* バックスラッシュ、文字列:     Syntax for Strings.     5.
+* 文字列の`\':                  Syntax for Strings.     5.
+* `\'、文字列:                  Syntax for Strings.     5.
+* 文字列の二重引用符:           Syntax for Strings.     5.
+* 二重引用符、文字列:           Syntax for Strings.     5.
+* 文字列のダブルクォート:       Syntax for Strings.     5.
+* ダブルクォート、文字列:       Syntax for Strings.     5.
+* 文字列の`"':                  Syntax for Strings.     5.
+* `"'、文字列:                  Syntax for Strings.     5.
+* リスト内の`.':                Dotted Pair Notation.   4.
+* `.'、リスト:                  Dotted Pair Notation.   4.
+* ドット対記法:                 Dotted Pair Notation.   4.
+* 空リスト:                     Cons Cell Type.         73.
+* リスト内の`nil':              Cons Cell Type.         73.
+* `nil'、リスト:                Cons Cell Type.         73.
+* リスト内の`(...)':            Cons Cell Type.         73.
+* `(...)'、リスト:              Cons Cell Type.         73.
+* リストの図表示:               Cons Cell Type.         41.
+* 図表示、リスト:               Cons Cell Type.         41.
+* リストの箱表示:               Cons Cell Type.         41.
+* 箱表示、リスト:               Cons Cell Type.         41.
+* 括弧:                         Cons Cell Type.         32.
+* アトム:                       Cons Cell Type.         29.
+* ポインタ:                     Cons Cell Type.         4.
+* レジスタの減数フィールド:     Cons Cell Type.         4.
+* レジスタの番地フィールド:     Cons Cell Type.         4.
+* CLに関した注意−−大文字小文字の区別: Symbol Type.    30.
+* バックスラッシュ、シンボル内: Symbol Type.            17.
+* `\'、シンボル内:              Symbol Type.            17.
+* 文字定数、8進数字:            Character Type.         114.
+* 8進数字文字定数:              Character Type.         114.
+* 文字定数、バックスラッシュ:   Character Type.         114.
+* バックスラッシュ、文字定数:   Character Type.         114.
+* 文字定数、`\':                Character Type.         114.
+* `\'、文字定数:                Character Type.         114.
+* 文字定数、疑問符:             Character Type.         114.
+* 疑問符、文字定数:             Character Type.         114.
+* 文字定数、`?':                Character Type.         114.
+* `?'、文字定数:                Character Type.         114.
+* アルト文字:                   Character Type.         107.
+* スーパー文字:                 Character Type.         107.
+* ハイパー文字:                 Character Type.         107.
+* メタ文字:                     Character Type.         85.
+* コントロール文字:             Character Type.         55.
+* エスケープシーケンス:         Character Type.         51.
+* `\e':                         Character Type.         37.
+* エスケープ:                   Character Type.         37.
+* `\r':                         Character Type.         37.
+* 復帰:                         Character Type.         37.
+* `\n':                         Character Type.         37.
+* 改行:                         Character Type.         37.
+* `\f':                         Character Type.         37.
+* ページ送り:                   Character Type.         37.
+* `\v':                         Character Type.         37.
+* 垂直タブ:                     Character Type.         37.
+* `\t':                         Character Type.         37.
+* タブ:                         Character Type.         37.
+* `\b':                         Character Type.         37.
+* バックスペース:               Character Type.         37.
+* `\a':                         Character Type.         37.
+* ベル文字:                     Character Type.         37.
+* 白文字:                       Character Type.         37.
+* 文字の構文:                   Character Type.         20.
+* 表示表現、文字:               Character Type.         20.
+* 文字の表示表現:               Character Type.         20.
+* 入力構文、文字:               Character Type.         20.
+* 文字の入力構文:               Character Type.         20.
+* ASCII文字コード:              Character Type.         4.
+* 型、プログラミング向け:       Programming Types.      4.
+* プログラミング向けの型:       Programming Types.      4.
+* `;'、コメント内:              Comments.               4.
+* コメント:                     Comments.               4.
+* invalid-read-syntax:          Printed Representation.  26.
+* ハッシュ記法:                 Printed Representation.  20.
+* 入力構文:                     Printed Representation.  4.
+* 表示表現:                     Printed Representation.  4.
+* 基本型:                       Lisp Data Types.        15.
+* データ型:                     Lisp Data Types.        4.
+* 型:                           Lisp Data Types.        4.
+* Lispオブジェクト:             Lisp Data Types.        4.
+* オブジェクト:                 Lisp Data Types.        4.
+* emacs-version:                Version Info.           9.
+* 記述例、オプション:           A Sample Variable Description.  4.
+* オプションの記述例:           A Sample Variable Description.  4.
+* 記述例、変数:                 A Sample Variable Description.  4.
+* 変数の記述例:                 A Sample Variable Description.  4.
+* count-loop:                   A Sample Function Description.  59.
+* foo:                          A Sample Function Description.  22.
+* 記述、スペシャルフォーム:     A Sample Function Description.  4.
+* スペシャルフォームの記述:     A Sample Function Description.  4.
+* 記述、マクロ:                 A Sample Function Description.  4.
+* マクロの記述:                 A Sample Function Description.  4.
+* 記述、コマンド:               A Sample Function Description.  4.
+* コマンドの記述:               A Sample Function Description.  4.
+* 記述、関数:                   A Sample Function Description.  4.
+* 関数の記述:                   A Sample Function Description.  4.
+* 記述形式:                     Format of Descriptions.  4.
+* 表記法、バッファ内のテキスト: Buffer Text Notation.   4.
+* バッファ内のテキストの表記法: Buffer Text Notation.   4.
+* 表記法、エラーメッセージ:     Error Messages.         4.
+* エラーメッセージの表記法:     Error Messages.         4.
+* 表記法、結果表示:             Printing Notation.      4.
+* 結果表示の表記法:             Printing Notation.      4.
+* 表記法、記述:                 Evaluation Notation.    4.
+* 記述の表記法:                 Evaluation Notation.    4.
+* 表記法、評価:                 Evaluation Notation.    4.
+* 評価の表記法:                 Evaluation Notation.    4.
+* true（真）:                   nil and t.              21.
+* 真（true）:                   nil and t.              21.
+* `t'と真:                      nil and t.              21.
+* false（偽）:                  nil and t.              4.
+* 偽（false）:                  nil and t.              4.
+* ブール値:                     nil and t.              4.
+* 真理値:                       nil and t.              4.
+* `nil'の使い方:                nil and t.              4.
+* フォント:                     Some Terms.             11.
+* cl:                           Lisp History.           25.
+* Common Lisp:                  Lisp History.           9.
+* Maclisp:                      Lisp History.           9.
+* Lispの歴史:                   Lisp History.           4.
+
+
+
+
+

@@ -1,0 +1,1346 @@
+Info file: flex-ja.info,    -*-Text-*-
+produced by `texinfo-format-buffer'
+from file `flex-ja.texi'
+using `texinfmt.el' version 2.38 of 3 July 1998.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+This file documents Version 2.3.7 - 2.5.4 of the Flex lexical scanner
+generator.
+
+This is Edition  1.03,  February 1993, 
+of the `Flex Version  2.3.7 - 2.5.4 Manual'.
+
+Copyright (C) 1992, 1993 Free Software Foundation, Inc.
+
+Permission is granted to make and distribute verbatim copies of this
+manual provided the copyright notice and this permission notice are
+preserved on all copies.
+
+
+Permission is granted to copy and distribute modified versions of this
+manual under the conditions for verbatim copying, provided that the
+entire resulting derived work is distributed under the terms of a
+permission notice identical to this one.
+
+Permission is granted to copy and distribute translations of this manual
+into another language, under the above conditions for modified versions,
+except that this permission notice may be stated in a translation
+approved by the Free Software Foundation.
+
+
+
+
+
+
+
+
+File: flex-ja.info, Node: Handling Numbers, Next: Multiple Scanners, Prev: Handling Strings, Up: Useful Code
+
+数字の処理
+==========
+
+ここでは、Cに見られる様々な数値形式に対してよく使われる定義をいくつか示
+し、さらにその使い方の実例を１つ示します。注目すべき主要な点は、数の値を
+獲得するために`scanf()'を使っている点と、オーバーフローが発生しないよう
+`long'型の値をスキャンするデフォルトのルールです。一般的には、`yytext'を
+数に変換する最良の方法は、`sscanf()'を使うことです。
+
+     /*
+      * numbers.lex : 数をスキャンするための定義およびテクニックの実例
+      */
+
+     %{
+     #include <stdio.h>
+
+     #define UNSIGNED_LONG_SYM   1
+     #define SIGNED_LONG_SYM     2
+     #define UNSIGNED_SYM        3
+     #define SIGNED_SYM          4
+     #define LONG_DOUBLE_SYM     5
+     #define FLOAT_SYM           6
+
+     union _yylval {
+       long double    ylong_double;
+       float          yfloat; 
+       unsigned long  yunsigned_long;
+       unsigned       yunsigned;
+       long           ysigned_long;
+       int            ysigned;
+     } yylval;
+
+     %}
+
+     digit          [0-9]
+     hex_digit      [0-9a-fA-F]
+     oct_digit      [0-7]
+
+     exponent       [eE][+-]?{digit}+
+     i              {digit}+
+     float_constant ({i}\.{i}?|{i}?\.{i}){exponent}?
+     hex_constant   0[xX]{hex_digit}+
+     oct_constant   0{oct_digit}*
+     int_constant   {digit}+
+     long_ext       [lL]
+     unsigned_ext   [uU]
+     float_ext      [fF]
+     ulong_ext      [lL][uU]|[uU][lL]
+
+     %%
+
+     {hex_constant}{ulong_ext} {  /* 0xの部分をスキップする */
+                                  sscanf(&yytext[2],"%lx",
+                                         &yylval.yunsigned_long); 
+                                  return(UNSIGNED_LONG_SYM);
+                               }
+     {hex_constant}{long_ext}  {  
+                                  sscanf(&yytext[2],"%lx",
+                                         &yylval.ysigned_long); 
+                                  return(SIGNED_LONG_SYM);
+                               }
+     {hex_constant}{unsigned_ext}  { 
+                                  sscanf(&yytext[2],"%x",
+                                         &yylval.yunsigned); 
+                                  return(UNSIGNED_SYM);
+                               }
+     {hex_constant}   { /* オーバーフローを回避するために%lxを使う */
+                                  sscanf(&yytext[2],"%lx",
+                                         &yylval.ysigned_long); 
+                                  return(SIGNED_LONG_SYM);
+                               }
+     {oct_constant}{ulong_ext} {
+                                  sscanf(yytext,"%lo",
+                                         &yylval.yunsigned_long); 
+                                  return(UNSIGNED_LONG_SYM);
+                               }
+     {oct_constant}{long_ext}  {
+                                  sscanf(yytext,"%lo",
+                                         &yylval.ysigned_long); 
+                                  return(SIGNED_LONG_SYM);
+                               }
+     {oct_constant}{unsigned_ext}  {
+                                  sscanf(yytext,"%o",
+                                         &yylval.yunsigned); 
+                                  return(UNSIGNED_SYM);
+                               }
+     {oct_constant} { /* オーバーフローを回避するために%loを使う */
+                                  sscanf(yytext,"%lo",
+                                         &yylval.ysigned_long); 
+                                  return(SIGNED_LONG_SYM);
+                               }
+     {int_constant}{ulong_ext} {
+                                  sscanf(yytext,"%ld",
+                                         &yylval.yunsigned_long); 
+                                  return(UNSIGNED_LONG_SYM);
+                               }
+     {int_constant}{long_ext}  {
+                                  sscanf(yytext,"%ld",
+                                         &yylval.ysigned_long); 
+                                  return(SIGNED_LONG_SYM);
+                               }
+     {int_constant}{unsigned_ext}  {
+                                  sscanf(yytext,"%d", 
+                                         &yylval.yunsigned); 
+                                  return(UNSIGNED_SYM);
+                               }
+     {int_constant} { /* オーバーフローを回避するために%ldを使う */
+                                  sscanf(yytext,"%ld",
+                                         &yylval.ysigned_long); 
+                                  return(SIGNED_LONG_SYM);
+                               }
+     {float_constant}{long_ext}  {
+                                  sscanf(yytext,"%lf",
+                                  &yylval.ylong_double); 
+                                  return(LONG_DOUBLE_SYM);
+                               }
+     {float_constant}{float_ext}  {
+                                  sscanf(yytext,"%f",
+                                         &yylval.yfloat); 
+                                  return(FLOAT_SYM);
+                               }
+     {float_constant} { /* オーバーフローを回避するために%lfを使う */
+                                  sscanf(yytext,"%lf",
+                                         &yylval.ylong_double); 
+                                  return(LONG_DOUBLE_SYM);
+                               }
+     %%
+
+     int main(void)
+     {
+       int code;
+
+       while((code = yylex())){
+         printf("yytext          : %s\n",yytext);
+         switch(code){
+         case UNSIGNED_LONG_SYM:
+            printf("Type of number  : UNSIGNED LONG\n");
+            printf("Value of number : %lu\n",
+                   yylval.yunsigned_long);
+            break;
+         case SIGNED_LONG_SYM:  
+            printf("Type of number  : SIGNED LONG\n");
+            printf("Value of number : %ld\n",
+                   yylval.ysigned_long);
+            break;
+         case UNSIGNED_SYM:     
+            printf("Type of number  : UNSIGNED\n");
+            printf("Value of number : %u\n",
+                   yylval.yunsigned);
+            break;
+         case SIGNED_SYM:       
+            printf("Type of number  : SIGNED\n");
+            printf("Value of number : %d\n",
+                   yylval.ysigned);
+            break;
+         case LONG_DOUBLE_SYM:  
+            printf("Type of number  : LONG DOUBLE\n");
+            printf("Value of number : %lf\n",
+                   yylval.ylong_double);
+            break;
+         case FLOAT_SYM:        
+            printf("Type of number  : FLOAT\n");
+            printf("Value of number : %f\n",
+                   yylval.yfloat);
+            break;
+         default:
+            printf("Type of number  : UNDEFINED\n");
+            printf("Value of number : UNDEFINED\n");
+            break;
+         }
+       }
+       return(0);
+     }
+
+16進定数については、変換する前に先頭の`0x'をスキップする必要がある点に注
+意してください。これは`sscanf()'の仕様です。
+
+
+
+File: flex-ja.info, Node: Multiple Scanners, Next: Miscellaneous, Prev: Handling Numbers, Up: Useful Code
+
+複数のスキャナ
+==============
+
+時には、１つのプログラムの中で複数のスキャナを持つ必要がある場合がありま
+すが、こうすると、２回以上現れる関数や変数について、リンカが文句を言って
+きます。これを回避するためには、スキャナとそれに関連するすべてのものの名
+前を変更する必要があります。すべてのスキャナ関数、マクロ、およびデータの
+名前は`yy'もしくは`YY'で始まりますので、これはきわめて簡単です。しなけれ
+ばならないことは、名前の接頭辞を変更することだけです。これは`sed'を使っ
+て簡単に行うことができますが、ここではおもしろ半分で、これを行うflexスキャ
+ナを示しましょう。 (1) (*Note Multiple Scanners-Footnotes::)
+
+     /*
+      * replace.lex : flexにより生成されたスキャナや
+      *               bisonにより生成されたパーサの
+      *               一部の名前を変更する簡単なフィルタ
+      */
+
+     %{
+     #include <stdio.h>
+
+     char lower_replace[1024];
+     char upper_replace[1024];
+
+     %}
+
+     %%
+
+     "yy"   fprintf(yyout,"%s",lower_replace);
+     "YY"   fprintf(yyout,"%s",upper_replace);
+
+     %%
+
+     int main(argc,argv)
+     int argc;
+     char **argv;
+     {
+        if(argc < 3){
+          printf("Usage %s lower UPPER\n",argv[0]);
+          exit(1);
+        }
+        strcpy(lower_replace,argv[1]);
+        strcpy(upper_replace,argv[2]);
+        yylex();
+        return(0);
+     }
+
+すべてのスキャナ関数の名前を変更するには、コマンドライン上で以下のように
+実行するだけです。
+
+     replace myscan_ MYSCAN_ < lex.yy.c > myscan.c
+
+これにより、好きなだけ多くのスキャナを含めることができるようになります。
+ほとんど同じことを、排他的スタート状態と複数のバッファを使って実現するこ
+とも可能ですが、その方法は多少複雑になります。
+
+*注：*いくつかのFlex内部ルーチンは、将来Flexライブラリ（`-lfl'）の中に移
+されるでしょう。そうなると、このテクニックは機能しなくなります。しかし、
+この変更が行われる時には、変更する必要のある関数名を変更する方法を、Flex 
+自身がサポートするようになるでしょう。 (2) (*Note Multiple
+Scanners-Footnotes::)
+
+
+
+File: flex-ja.info  Node: Multiple Scanners-Footnotes, Up: Multiple Scanners
+
+(1) 訳注：Flex 2.5では、Flex起動時に`-PPREFIX'オプションを指
+定するか、スキャナ定義ファイルの中に`%option prefix="PREFIX"'
+を指定することによって、接頭辞`yy'を別の文字列に変更することができ
+ます。
+
+(2) 訳注：Flex 2.5では、`-PPREFIX'オプションや`%option
+prefix="PREFIX"'を指定することにより、関数名を変更することができま
+す。
+
+
+File: flex-ja.info, Node: Miscellaneous, Prev: Multiple Scanners, Up: Useful Code
+
+その他
+======
+
+   * 行数のカウント
+
+     行数をカウントしたいのであれば、ファイルの先頭のオプションのCコード・
+     セクションに変数を定義して、改行をチェックします。スタート状態の中
+     でも改行をチェックするのを忘れないようにしてください。さもないと、
+     行数のカウントはうまくいきません。例えば、以下のようにします。
+
+          %{
+          int linenumber = 0;
+          %}
+          %x COMMENT STRING
+          %%
+          "/*"              BEGIN(COMMENT);
+          <COMMENT>\n       line_number += 1;
+          <COMMENT>[^\n]*
+          <COMMENT>"*/"     BEGIN(INITIAL);
+          \"                BEGIN(STRING)
+          <STRING>\\\n      line_number += 1;
+          <STRING>[^\n\\\"]*
+          <STRING>\"        BEGIN(INITIAL);
+          \n                line_number += 1;
+
+
+   * スキャナとソケット
+
+     `yyin'と`yyout'をリダイレクトすることによって、スキャナを（したがっ
+     てBisonによるパーサをも）ソケットにアタッチすることができます。これ
+     は、`fdopen()'を呼び出すことによって行います。例えば、以下のように
+     なります。
+
+          yyin  = fdopen(connection, "r");
+          yyout = fdopen(connection, "w");
+
+     ここで`connection'は、確立されたソケット・コネクションのファイル・
+     ディスクリプタです。
+
+
+
+File: flex-ja.info, Node: Summary, Next: Index, Prev: Useful Code, Up: Top
+
+要約
+****
+
+     ここでは、Flexの使用に関連するすべての情報を要約します。この情報は、
+     クイック・リファレンスとして使うことができます。
+
+========================================================================
+* Menu:
+
+* Switches Summary:: Flexコマンドライン・オプションの要約
+* Switches Summary (Flex 2.5)::  同上（Flex 2.5の補足情報）
+* Summary or Flex Variables and Functions::  Flex変数、Flex関数の要約
+* Summary or Flex Variables and Functions (Flex 2.5)::  
+                                             同上（Flex 2.5の補足情報）
+* Summary of Flex Characters::  演算子、特殊文字、エスケープ・シーケンス
+                                以外の文字をその文字自身として受け付ける
+* Summary of Flex Rules::       Flexルールの２つの構成要素
+========================================================================
+
+
+
+File: flex-ja.info, Node: Switches Summary, Next: Summary or Flex Variables and Functions, Prev: Summary, Up: Summary
+
+Flexコマンドライン・オプションの要約
+====================================
+
+Flexには、以下のコマンドライン・オプションがあります。
+
+     `-b'
+          このオプションは、バックトラッキングを必要とする状態をもたらす
+          ルールに関する情報を含む、`lex.backtrack'というファイルを生成
+          します。なぜこの情報が重要なのか、また、この情報をどのように使
+          うかという点に関する詳細については、*Note Optimizing for
+          Speed::と*Note Removing Backtracking::を参照してください。
+
+     `-c'
+          このオプションは、POSIXとの互換性のためだけに提供されており、
+          実際には何もしません。以前は、テーブル圧縮を制御するために使わ
+          れていましたが、その機能は`-C'オプションに移されました。このフ
+          ラグを見つけると、Flexはユーザがテーブル圧縮を希望しているもの
+          と想定し、警告メッセージを出力します。将来、この警告メッセージ
+          は出力されないようになるかもしれません。 (1) (*Note Switches
+          Summary-Footnotes::)
+
+     `-d'
+          デバッグに使われます。実行中に自身の状態情報を`yyout'に書き込
+          むスキャナを生成します。あるルールがマッチするたびに、バックト
+          ラッキングに関する情報、検出されたバッファの終端、`NUL'に関す
+          る情報に加えて、以下のような情報が書き込まれます。
+
+               --accepting rule at line 行番号 ("マッチしたテキスト")
+
+          この中の行番号は（`-L'オプションが使われていない場合には）、生
+          成されたファイル`lex.yy.c'ではなく、スキャナを生成するのに使わ
+          れた記述ファイルの行番号を指します。
+
+     `-f'
+          *フル*・スキャナ（*full* scanner）を生成します。圧縮は一切行わ
+          れません。これは、`-Cf'と同等です（詳細については、*Note Table
+          Compression and Scanner Speed::）。
+
+     `-i'
+          大文字・小文字の区別を無視するスキャナを作成するよう、Flexに通
+          知します。ルールのマッチ処理において大文字・小文字の区別は無視
+          されますが、個々の文字は大文字または小文字に*変換*されないので、
+          `yytext'には大文字・小文字が混在した文字の並びが入ることになり
+          ます。
+
+     `-n'
+          このオプションは、Flexに対してはまったく意味を持たず、単に
+          POSIXとの互換性のためだけに提供されています。
+
+     `-p'
+          性能に関する情報を`stderr'に書き込むよう、Flexに通知します。報
+          告される情報は、性能を低下させるようなスキャナ記述情報の機能に
+          関するコメントによって構成されます。
+
+     `-s'
+          マッチするものがなかった場合のFlexスキャナのデフォルトのアクショ
+          ンは、マッチしなかった入力情報を`stdout'に書き込むことです。
+          `-s'オプションはこのアクションを抑制し、その代わりに、入力がマッ
+          チしないとすぐにスキャナを異常終了させます。
+
+     `-t'
+          このオプションが指定されると、Flexは生成されたスキャナをファイ
+          ル`lex.yy.c'にではなく、`stdout'に書き込みます。
+
+     `-v'
+          *冗長*モードで動作するよう、Flexに通知します。Flexは、生成され
+          たスキャナに関する統計情報の要約を生成して、`stdout'に出力しま
+          す。要約情報の第１行にはFlexのバージョン番号、次の行には日付と
+          時刻、さらに次の行には実際に使われているオプションが示されます。
+          要約情報のこれ以外の部分は、Flexやその他の同様のプログラムの動
+          作の詳細を理解している人以外にはほとんど意味を持ちません。
+
+     `-F'
+          *ファスト*・スキャナ（*fast* scanner）を生成するよう、Flexに通
+          知します。これは、`-CF'と同等です。詳細については、*Note スキャ
+          ナの最適化: Optimization。
+
+     `-I'
+          このオプションは、シェル上や、型を持つ入力情報を受け付ける必要
+          のあるプログラム内で使うことのできる*対話型*スキャナを生成する
+          よう、Flexに通知します。詳細については、*Note Interactive
+          Scanners::。
+
+          *注：*`-I'オプションは、`-Cf'、`-f'、`-CF'、`-F'の各オプション
+          と一緒に使うことはできません。
+
+     `-L'
+          デフォルトではFlexは、エラーがスキャナ定義のどこで発生したのか
+          を追跡できるように、生成されたスキャナのコード中に`#line'指示
+          子を生成します。`-L'オプションは、この`#line'指示子を生成する
+          機能を抑制します。
+
+     `-T'
+          Flexを"トレース"・モードで実行させます。Flexは、入力情報、スキャ
+          ン処理テーブル、同等クラス（equivalence class）、およびメタ同
+          等クラス（meta-equivalence class）に関するメッセージを生成して、
+          （`stderr'に）書き込みます。この情報は、Flexの内部的な動作を理
+          解していない人には、ほとんど意味を持たないでしょう。
+
+     `-8'
+          このオプションは、8ビットの入力情報を受け付けることのできるス
+          キャナを生成するよう、Flexに通知します。7ビットの入力情報しか
+          受け付けないスキャナに8ビットの入力情報を与えた場合の結果は、
+          予測不能です。
+
+     `-C[efmF]'
+          スキャン処理テーブルをどのように圧縮するかを、Flexに通知します。
+          詳細については、*Note スキャナの最適化: Optimizationを参照して
+          ください。
+
+     `-SSKELETON_FILE'
+          生成されるスキャナのベースとして、SKELETON_FILEで指定されるファ
+          イルを使うよう、Flexに通知します。これを使うことはほとんどあり
+          ませんが、MS-DOS上ではこれによって標準のスキャナ・スケルトンへ
+          のパスを設定することができます。
+
+
+
+
+File: flex-ja.info  Node: Switches Summary-Footnotes, Up: Switches Summary
+
+(1) 訳注：Flex 2.5では、この警告メッセージは出力されません。
+
+
+
+File: flex-ja.info, Node: Switches Summary (Flex 2.5), Next: Summary or Flex Variables and Functions, Prev: Switches Summary, Up: Summary
+
+Flexコマンドライン・オプションの要約（Flex 2.5の補足情報）
+==========================================================
+
+Flex 2.5では、前節（*Note Switches Summary::）で説明されていない、以下の
+オプションもサポートされています。
+
+     `-h'
+          Flexに対してコマンドライン・オプションの要約情報を出力するよう
+          指示します。
+
+     `-l'
+          AT&Tにより実装されたlexとの互換性を最大限に提供します。このオ
+          プションは、性能面でかなりの悪影響を及ぼします。また、このオプ
+          ションを、`-f'、`-F'、`-Cf'、`-CF'、`-+'オプションと同時に指定
+          することはできません。
+
+     `-w'
+          このオプションが指定されると、Flexは、警告メッセージを出力しま
+          せん。
+
+     `-B'
+          Flexに対してバッチ・スキャナを生成するよう指示します。これは、
+          対話型スキャナを生成するよう指示する`-I'オプションの否定です。
+
+     `-V'
+          Flexに対してバージョン番号を出力するよう指示します。
+
+     `-7'
+          Flexに対して7ビット・スキャナを生成するよう指示します。これは、
+          `-8'オプションの否定です。
+
+     `-+'
+          Flexに対してC++スキャナ・クラスを生成するよう指示します。
+
+     `-?'
+          Flexに対してコマンドライン・オプションの要約情報を出力するよう
+          指示します。（`-h'オプションと同じです）。
+
+     `-Ca'
+          このオプションは、スキャン処理用のテーブルを`long int'の配列と
+          して定義するようFlexに通知します（デフォルトでは`short int'型
+          の配列となります）。
+
+     `-Cr'
+          このオプションを指定して生成されたスキャナは、入力に`read()'シ
+          ステム・コールを使います。デフォルトでは、対話型スキャナの場合
+          は`getc()'が、バッチ（非対話型）・スキャナの場合は`fread()'が
+          使われます。
+
+     `-oFILE'
+          このオプションが指定されると、Flexは生成されたスキャナをFILEに
+          より指定されるファイルに出力します。デフォルトでは、スキャナは
+          ファイル`lex.yy.c'に出力されます。
+
+     `-PPREFIX'
+          Flexにより生成されるスキャナのソース・ファイルの中では、大域変
+          数や大域関数の名前の先頭に接頭辞`yy'が付けられます。このオプショ
+          ンが指定されると、`yy'の代わりに、PREFIXにより指定される文字列
+          が接頭辞として使用されます。また、`-o'オプションが指定されない
+          場合のスキャナ・ファイル名`lex.yy.c'も、`lex.PREFIX.c'となりま
+          す。
+
+     `--help'
+          Flexに対してコマンドライン・オプションの要約情報を出力するよう
+          指示します。（`-h'オプションと同じです）。
+
+     `--version'
+          Flexに対してバージョン番号を出力するよう指示します。（`-V'オプ
+          ションと同じです）。
+
+
+
+File: flex-ja.info, Node: Summary or Flex Variables and Functions, Next: Summary of Flex Characters, Prev: Switches Summary, Up: Summary
+
+Flex変数およびFlex関数の要約
+============================
+
+Flexに対する主要なCインターフェイスは、以下のルーチンおよび変数を通じて
+実現されます。個々のルーチン、変数に関する完全な説明については、*Note
+Interfacing to Flex::。
+
+     `yylex()'
+          主要なインターフェイスです。これが実際のスキャン処理を行う関数
+          です。
+
+     `yyin'
+          `yylex()'が文字を読み込む元となるファイルです。このデフォルト
+          は`stdin'です。
+
+     `yyout'
+          スキャナの出力ファイルです。デフォルトは`stdout'です。
+
+     `yytext'
+          最後にマッチした文字列を保持する大域変数です。つまり、最後に認
+          識されたトークンを保持しています。
+
+     `yyleng'
+          最後に認識されたトークンの長さを保持する大域変数です。
+
+     `yywrap()'
+          この関数は、`yyin'の終端に達した時に呼び出されます。これが
+          `TRUE'（ゼロ以外）を返すとスキャナは実行を終了しますが、
+          `FALSE'（ゼロ）を返すと、`yyin'が次の入力ファイルを指すよう設
+          定されたものと想定し、スキャン処理は継続されます。
+
+     `yymore()'
+          次に認識されるトークンで`yytext'の内容を上書きするのではなく、
+          そのトークンを`yytext'の末尾に付加するようFlexに通知する関数で
+          す。
+
+     `yyless(N)'
+          `yymore()'とほぼ反対のことを行います。この関数は、最初のN文字
+          を除くすべての文字を戻します。戻された文字の並びは、次のトーク
+          ンをマッチするのに使われます。`yyleng'と`yytext'の内容には、こ
+          の変更が反映されます。
+
+     `input()'
+          入力から次の１文字を返します。これは、標準のFlex記述言語や特に
+          Lex記述言語を使ったのではうまく処理できないようなスキャナにお
+          いて、よく使われます。
+
+     `unput(C)'
+          この関数は、文字Cを入力ストリームに戻します。この後、この文字
+          は次にスキャンされる文字になります。
+
+     `yyterminate()'
+          この関数は、アクションの中で使われると、スキャナ（`yylex()'）
+          の実行を終了させます。終了したスキャナは0を返します。この後
+          `yyrestart()'が呼び出されない間は、`yylex()'を呼び出してもすぐ
+          に復帰してしまいます。
+
+     `yyrestart(FILE)'
+          この関数は、スキャナの実行を再開するようFlexに通知します。これ
+          は、スキャンすべきファイル（通常は`yyin'）を表す引数を１つ取り
+          ます。EOFを処理するのに使うことができますし、また、Flexに割り
+          込みをかけ、その後で再開始することを可能にするために使うことも
+          できます。（Flexが*再入可能ではない*ので、このようなことが必要
+          になります。）
+
+     `ECHO'
+          `yytext'の内容を`yyout'にコピーするマクロです。
+
+     `REJECT'
+          カレントなトークンを認識しないで、次に最もよくマッチするものを
+          選択するよう、スキャナに通知します。スキャナは、マッチするもの
+          のうち最も長いものを探します。マッチするものが２つあってその長
+          さが同じ場合には、スキャナ記述の中で最初に定義されているものを
+          選択します。
+
+     `BEGIN(STATE)'
+          スキャナをある特定のスタート状態に置くために使われます。
+          `BEGIN'の後ろの名前は、スタート状態の名前です。これは、スキャ
+          ナ記述の先頭の定義セクションにおいて宣言されているものでなけれ
+          ばなりません。
+
+     `YY_USER_INIT'
+          スキャナが初期化される*前*に実行されるべきアクションを定義しま
+          す。詳細については、*Note Flex and C::を参照してください。
+
+     `YY_USER_ACTION'
+          マッチが発生した後で、ルール・セクションに定義されたアクション
+          が実行される*前*に、実行されるべきアクションを定義します。例え
+          ば、`yytext'の内容を小文字から大文字へ変換する等を行うのに使う
+          ことができます。デフォルトのルールでは何も実行されません。詳細
+          については、*Note Flex and C::を参照してください。
+
+     `YY_BREAK'
+          実際にはインターフェイス機能ではなく、むしろ生成されるコードを
+          変更するために使うことができるものです。
+
+          スキャナの中では、すべてのアクションは１つの大きな`switch'文の
+          構成要素であり、個々のアクションの区切りは、デフォルトで
+          `break;'文に変換される`YY_BREAK'で与えられます。もし、ほとんど
+          のルールのアクション部が`return;'文を含んでいると、コンパイラ
+          は`statement not reached'というエラーをたくさん表示することに
+          なるでしょう（表示するはずです）。`YY_BREAK'を再定義することに
+          よって、この警告メッセージを表示させないようにすることが可能で
+          す。
+
+          *注：*`YY_BREAK'を再定義する場合は、アクションが必ず`return;'
+          か`break;'で終わるようにしてください。
+
+     `YY_DECL'
+          スキャン処理を実行する関数の名前を定義するマクロです。デフォル
+          トは`yylex'ですが、再定義することができます。再定義した名前は、
+          関数のプロトタイプとして正当なものでなければなりません。
+
+     `YY_INPUT'
+          入力ルーチンの名前を定義するマクロです。必要があれば、この名前
+          は再定義することができます。例えば、文字列や、標準的ではない何
+          らかの入力デバイスを入力として、スキャン処理を行う場合に役に立
+          ちます。
+
+     `YY_NEW_FILE'
+          `yyin'が新しいファイルを指すよう設定されたこと、および、処理が
+          継続されるべきであることをFlexに通知するマクロです。 (1)
+          (*Note Summary or Flex Variables and Functions-Footnotes::)
+
+     `YY_CURRENT_BUFFER'
+          カレントな入力バッファを返すマクロです。
+
+     `yy_create_buffer()'
+          新しい入力バッファを作成するのに使われます。この関数と、この後
+          の２つの関数を使うことにより、複数のバッファを作成し、バッファ
+          間で切り替えることが可能になります。*Note バッファを操作する関
+          数: Buffer Manipulation。
+
+     `yy_delete_buffer()'
+          以前に作成された入力バッファを削除するのに使われます。
+
+     `yy_switch_to_buffer()'
+          複数の入力バッファの間で切り替えを行うのに使われます。
+
+     `YY_BUFFER_STATE'
+          バッファを処理するのに使われる*型*です。バッファのカレントなコ
+          ンテキストを保持します。複数のバッファ間で切り替えを行う時には、
+          この型の変数が必要になります。
+
+     `YYSTYPE'
+          Bisonファイル中の`%union'の型です。これは、FlexとBisonの間のイ
+          ンターフェイスで使われます。
+
+     `yylval'
+          Bisonパーサのカレントなパース状態に関連するデータを保持する、
+          Bisonパーサ中の変数です。この変数を使うことで、データをFlexと
+          Bisonの間で渡すことができます。
+
+
+
+
+File: flex-ja.info  Node: Summary or Flex Variables and Functions-Footnotes, Up: Summary or Flex Variables and Functions
+
+(1) 訳注：Flex 2.5では、`yyin'を変更した後に
+`YY_NEW_FILE'を実行する必要はなくなりました。
+
+
+
+File: flex-ja.info, Node: Summary or Flex Variables and Functions (Flex 2.5), Next: Summary of Flex Characters, Prev: Summary or Flex Variables and Functions, Up: Summary
+
+Flex変数およびFlex関数の要約（Flex 2.5の補足情報）
+==================================================
+
+Flex 2.5では、前節（*Note Summary or Flex Variables and Functions::）で
+説明されていない、以下の関数やマクロもサポートされています。
+
+     `yy_set_interactive()'
+          カレント・バッファを、対話的なものと見なすか、非対話的なものと
+          見なすかを制御します。引数にゼロ以外の値を渡すと、カレント・バッ
+          ファは対話的なものと見なされ、ゼロを渡すと、非対話的なものと見
+          なされます。
+
+     `yy_set_bol()'
+          バッファ内のカレントな位置が行の先頭にあるか否かを表すコンテキ
+          スト情報を設定します。引数にゼロ以外の値を渡すと、バッファ内の
+          カレントな位置は行の先頭である、というコンテキスト情報がセット
+          されます。したがって、次にトークンのマッチ処理が行われる時には、
+          行頭を表す`^'を含むルールの適用が試みられます。逆に、引数にゼ
+          ロを渡すと、バッファ内のカレントな位置は行の先頭ではないことに
+          なり、次にトークンのマッチ処理が行われる時には、行頭を表す`^'
+          を含むルールの適用が試みられなくなります。
+
+     `YY_AT_BOL()'
+          次にトークンのマッチ処理が行われる時に、行頭を表す`^'を含むルー
+          ルの適用が試みられるようなコンテキスト情報がセットされている場
+          合には、ゼロ以外の値を返します。それ以外の場合は、ゼロを返しま
+          す。
+
+     `yy_new_buffer()'
+          `yy_create_buffer'の別名です。
+
+     `yy_flush_buffer()'
+          引数で指定されたバッファの内容を破棄し、バッファの先頭２バイト
+          に`YY_END_OF_BUFFER_CHAR'（`\0'）をセットします。
+
+     `YY_FLUSH_BUFFER'
+          引数にカレント・バッファを指定して`yy_flush_buffer()'を呼び出
+          すよう定義されたマクロです。
+
+     `yy_scan_string()'
+          NULL文字で終端する文字列をスキャンするための入力バッファを作成
+          します。実際には、引数で渡された文字列のコピーがスキャンされま
+          す。
+
+     `yy_scan_bytes()'
+          引数で指定されたメモリ領域をスキャンするためのバッファを作成し
+          ます。実際には、メモリ領域上のデータのコピーがスキャンされます。
+
+     `yy_scan_buffer()'
+          引数で指定されたメモリ領域をスキャンするためのバッファを作成し
+          ます。メモリ領域上のデータはコピーされません。
+
+     `yy_push_state()'
+          カレントなスタート状態をスタート状態スタックにプッシュし、引数
+          で指定された状態に遷移します。
+
+     `yy_pop_state()'
+          スタート状態スタックからスタート状態をポップし、そのポップされ
+          たスタート状態に遷移します。
+
+     `yy_top_state()'
+          スタート状態スタックの先頭にあるスタート状態を返します（スター
+          ト状態スタックの内容は変更されません）。
+
+     `yyFlexLexer::yylex()'
+          C++スキャナにおいて実際にスキャン処理を行う関数です。
+
+     `yyFlexLexer::LexerInput()'
+          `yyFlexLexer'のサブクラスにおいて再定義することによって、C++ス
+          キャナの入力処理を変更することができます。
+
+     `yyFlexLexer::LexerOutput()'
+          `yyFlexLexer'のサブクラスにおいて再定義することによって、C++ス
+          キャナの出力処理を変更することができます。
+
+     `yyFlexLexer::LexerError()'
+          `yyFlexLexer'のサブクラスにおいて再定義することによって、C++ス
+          キャナのエラー・メッセージ出力処理を変更することができます。
+
+
+
+File: flex-ja.info, Node: Summary of Flex Characters, Next: Summary of Flex Rules, Prev: Summary or Flex Variables and Functions, Up: Summary
+
+Flex文字の要約
+==============
+
+Flexにおける基本的な構成要素の１つに、文字があります。基本的にFlexは、演
+算子、特殊文字、エスケープ・シーケンスを除いて、文字をそのまま受け付けま
+す。エスケープ・シーケンスは、ANSI Cに見られるものと同一です。Flexの演算
+子と特殊文字は以下のとおりです。
+
+
+`文字'
+     Flexの解釈
+
+`\'
+     バックスラッシュは、ANSI Cのエスケープ・シーケンスで使われるのと同
+     様の、エスケープ文字です。
+
+`[ ]'
+     角括弧[ ]は、文字の集合を"文字クラス"にグループ化するのに使われます。
+     詳細については、*Note Flexにおける文字のグループ化: Character
+     Classes。
+
+`^'
+     文字クラスの中では、`^'は否定を意味します。詳細については、*Note
+     Flexにおける文字のグループ化: Character Classes。一方、文字クラスの
+     外部では、行の先頭を意味し、（エスケープされていない場合は）ルール
+     の先頭にのみ置くことができます。
+
+`-'
+     ハイフンは、文字クラスの中で文字の範囲を設定するのに使われます。文
+     字クラスの外部では、ハイフン自身を表します。詳細については、*Note
+     Flexにおける文字のグループ化: Character Classes。
+
+`{ }'
+     大括弧{ }は、定義の参照、複数行にわたるアクションの先頭と末尾の指定、
+     またはパターンの繰り返し回数の範囲の定義を行います。
+
+`( )'
+     丸括弧( )は、優先順位の変更に使われます。また、定義は展開される時に、
+     暗黙のうちに丸括弧で囲まれることに注意してください。
+
+`""'
+     二重引用符は、文字列の範囲を示します。引用符で囲まれた範囲の中にあ
+     る文字だけがマッチされます。
+
+`/'
+     スラッシュは、後続コンテキスト（trailing context）を設定します。こ
+     れは、あるパターンを認識するのを、その後ろに別のパターンが続く場合
+     に限定したい、という場合です。これは、スラッシュ`/'が一種の「"ルッ
+     ク・アヘッド"（その先を見る）」演算子として機能することを意味します。
+
+`< >'
+     かぎ括弧< >は、スタート状態の参照、またはスタート状態のグループの参
+     照を行い、さらに`EOF'シンボル（`<<EOF>>'）で使われます。これに関す
+     る完全な説明については、*Note Start States::と*Note End-Of-File
+     Rules::を参照してください。
+
+`? + *'
+     `?'、`+'、`*'の各文字は、ある*正規表現*が何回出現することができるか
+     を指定するのに使われます。`?'は、ゼロ回もしくは１回（つまり、オプショ
+     ンであるということ）を、`+'は１回以上を、`*'はゼロ回以上をそれぞれ
+     意味します。
+
+`|'
+     OR演算子を表します。また、カレントなルールに対するマッチが発生した
+     場合、次に記述されているルールのアクションを実行するようFlexに通知
+     する、特別なアクションを表します。
+
+`$'
+     ドル記号は行末を意味します。
+
+ここに挙げた文字を、その文字自身として表したい場合には、その文字を引用符
+で囲む（例えば`"*"'）か、または、エスケープ・シーケンスとして表す必要が
+あります。詳細については、*Note Characters::。
+
+
+
+File: flex-ja.info, Node: Summary of Flex Rules, Prev: Summary of Flex Characters, Up: Summary
+
+Flexルールの要約
+================
+
+Flexにおけるルールには２つの部分があります。パターン・マッチング用の表現
+式とアクション部です。この２つは、以下のように配置されます。
+
+     PATTERN ACTIONS
+
+Flexがマッチするパターンは、
+正規表現を使って作られます。
+そしてその正規表現は、
+文字、文字列、定義、スタート状態、および演算子から作られます。
+下の表は、
+種々の正当な正規表現を示します。
+表中において、
+`c'は（エスケープ・シーケンスを含む）任意の単一文字を、
+`r'は任意の正規表現を、
+`s'は文字列を、
+それぞれ表します。
+表はグループ別に編成されていて、
+優先度の最も高いものが一番上にあります。
+
+ 
+
+
+                           Flexにおける正規表現
+     =============+=============================================+================
+     正規表現     |           マッチの対象                      |   例        
+     =============+=============================================+================
+        c         | 特殊文字を除く任意の文字                    |  A、\n、a
+        .         | 改行を除く任意の文字                        |    efg.*
+        [s]       | クラスs中にある任意の文字                   |    [efg]
+        [^s]      | クラスs中にない任意の文字                   |    [^moqs]
+        r*        | ０個以上のr                                 |  (a|b)*、[abc]*
+        r+        | １個以上のr                                 |    (a|b)+
+        r?        | ０個または１個のr                           |  (a|[b-q])?
+        r{x,y}    | x個以上y個以下のr                           |   foo{1,5}
+                  | （abc{1,3}は、abと１個以上３個以下のc）     |
+        "s"       | 字義どおりの文字列s                         |    "***"
+        \c        | （\cがANSI Cにおいて特別な意味を持たない    |    \"  \*
+                  |   場合）c                                   |
+        (r)       | r − 丸括弧( )はグループ化のためのもの      |    (Aa|b)      
+                  |                                             |
+        r1r2      | r1の後ろにr2が続くもの                      | Aa、(A|a)[0-9]
+                  |                                             |
+        r1|r2     | r1またはr2                                  |     A|B
+                  |                                             |
+        r1/r2     | r2が後ろに続くという条件を満足するr1        |    abc/123
+        ^         | 行頭                                        |    ^foo
+        $         | 行末                                        |    foo$
+                  |                                             |
+        <start>r  | スタート状態（start状態の時、rがアクティブ）|  <command>"*/"
+        <<EOF>>   | ファイルの終端（End-Of-Fileルールを参照）   |    <<EOF>>
+
+
+
+
+これは、`sed'、`grep'、Emacsや正規表現を使う他の一般的なプログラムにおい
+て使われる正規表現と完全に同一ではないことに注意してください。
+
+ルールのアクション部は、任意の正当なCコードです。単一行に複数の文を書く
+ことも可能ですし、括弧の対`{...}'で囲むことで、複数の文のブロックを複数
+行にわたって書くことも可能です。
+
+
+
+File: flex-ja.info, Node: Index, Prev: Summary, Up: Top
+
+インデックス
+************
+
+
+* Menu:
+
+* Flexにおける正規表現:         Summary of Flex Rules.  4.
+* Flex正規表現:                 Summary of Flex Rules.  4.
+* Flexルール、要約:             Summary of Flex Rules.  4.
+* Flexにおける文字、要約:       Summary of Flex Characters.  4.
+* Flex文字、要約:               Summary of Flex Characters.  4.
+* `yyFlexLexer::LexerError()'、要約: Summary or Flex Variables and Functions (Flex 2.5).  92.
+* `yyFlexLexer::LexerOutput()'、要約: Summary or Flex Variables and Functions (Flex 2.5).  87.
+* `yyFlexLexer::LexerInput()'、要約: Summary or Flex Variables and Functions (Flex 2.5).  82.
+* `yyFlexLexer::yylex()'、要約: Summary or Flex Variables and Functions (Flex 2.5).  78.
+* `yy_top_state()'、要約:       Summary or Flex Variables and Functions (Flex 2.5).  73.
+* `yy_pop_state()'、要約:       Summary or Flex Variables and Functions (Flex 2.5).  68.
+* `yy_push_state()'、要約:      Summary or Flex Variables and Functions (Flex 2.5).  63.
+* `yy_scan_buffer()'、要約:     Summary or Flex Variables and Functions (Flex 2.5).  58.
+* `yy_scan_bytes()'、要約:      Summary or Flex Variables and Functions (Flex 2.5).  53.
+* `yy_scan_string()'、要約:     Summary or Flex Variables and Functions (Flex 2.5).  47.
+* `YY_FLUSH_BUFFER'、要約:      Summary or Flex Variables and Functions (Flex 2.5).  42.
+* `yy_flush_buffer()'、要約:    Summary or Flex Variables and Functions (Flex 2.5).  37.
+* `yy_new_buffer()'、要約:      Summary or Flex Variables and Functions (Flex 2.5).  33.
+* `YY_AT_BOL()'、要約:          Summary or Flex Variables and Functions (Flex 2.5).  26.
+* `yy_set_bol()'、要約:         Summary or Flex Variables and Functions (Flex 2.5).  15.
+* `yy_set_interactive()'、要約: Summary or Flex Variables and Functions (Flex 2.5).  8.
+* FlexとCのインターフェイス（Flex2.5補足）: Summary or Flex Variables and Functions (Flex 2.5).  4.
+* `yylval'、要約:               Summary or Flex Variables and Functions.  177.
+* `YYSTYPE'、Bisonファイルにおける`%union'型: Summary or Flex Variables and Functions.  172.
+* `YY_BUFFER_STATE':            Summary or Flex Variables and Functions.  166.
+* `yy_switch_to_buffer()'、要約: Summary or Flex Variables and Functions.  162.
+* `YY_NEW_FILE'、要約:          Summary or Flex Variables and Functions.  141.
+* `YY_INPUT'、要約:             Summary or Flex Variables and Functions.  134.
+* `YY_DECL'、要約:              Summary or Flex Variables and Functions.  128.
+* `YY_BREAK'、要約:             Summary or Flex Variables and Functions.  111.
+* `YY_USER_ACTION'、要約:       Summary or Flex Variables and Functions.  103.
+* `YY_USER_INIT'、要約:         Summary or Flex Variables and Functions.  98.
+* `BEGIN'、要約:                Summary or Flex Variables and Functions.  91.
+* `ECHO':                       Summary or Flex Variables and Functions.  79.
+* 再入可能性とスキャナ:         Summary or Flex Variables and Functions.  70.
+* `yyrestart()'、要約:          Summary or Flex Variables and Functions.  70.
+* `yyterminate()'、要約:        Summary or Flex Variables and Functions.  63.
+* `unput()'、要約:              Summary or Flex Variables and Functions.  58.
+* `input()'、要約:              Summary or Flex Variables and Functions.  52.
+* `yyless()'、要約:             Summary or Flex Variables and Functions.  45.
+* `yymore()'、要約:             Summary or Flex Variables and Functions.  39.
+* `yywrap()'、要約:             Summary or Flex Variables and Functions.  32.
+* `yyleng'、要約:               Summary or Flex Variables and Functions.  28.
+* `yytext'、要約:               Summary or Flex Variables and Functions.  23.
+* `yyout'、要約:                Summary or Flex Variables and Functions.  19.
+* `yyin'、要約:                 Summary or Flex Variables and Functions.  14.
+* `yylex()'、要約:              Summary or Flex Variables and Functions.  9.
+* 関数と変数、要約:             Summary or Flex Variables and Functions.  4.
+* FlexとCのインターフェイス:    Summary or Flex Variables and Functions.  4.
+* `--version':                  Switches Summary (Flex 2.5).  81.
+* `--help':                     Switches Summary (Flex 2.5).  76.
+* `-P':                         Switches Summary (Flex 2.5).  67.
+* `-o':                         Switches Summary (Flex 2.5).  61.
+* `-Cr':                        Switches Summary (Flex 2.5).  54.
+* `-Ca':                        Switches Summary (Flex 2.5).  48.
+* `-?':                         Switches Summary (Flex 2.5).  43.
+* `-+':                         Switches Summary (Flex 2.5).  39.
+* `-7':                         Switches Summary (Flex 2.5).  34.
+* `-V':                         Switches Summary (Flex 2.5).  30.
+* `-B':                         Switches Summary (Flex 2.5).  25.
+* `-w':                         Switches Summary (Flex 2.5).  20.
+* `-l':                         Switches Summary (Flex 2.5).  13.
+* `-h':                         Switches Summary (Flex 2.5).  8.
+* Flexコマンドライン・オプション（Flex 2.5補足）: Switches Summary (Flex 2.5).  4.
+* `-S':                         Switches Summary.       128.
+* `-C[efmF]':                   Switches Summary.       122.
+* `-8':                         Switches Summary.       115.
+* `-T':                         Switches Summary.       107.
+* `-L':                         Switches Summary.       100.
+* `#line'指示子、制御:          Switches Summary.       100.
+* `-I':                         Switches Summary.       90.
+* `-F' :                        Switches Summary.       84.
+* `-v':                         Switches Summary.       75.
+* スキャナの生成結果のリダイレクト、`-t': Switches Summary.  70.
+* `-t':                         Switches Summary.       70.
+* `-s':                         Switches Summary.       63.
+* `-p':                         Switches Summary.       57.
+* `-n':                         Switches Summary.       52.
+* `-i':                         Switches Summary.       44.
+* `-f':                         Switches Summary.       38.
+* `-d':                         Switches Summary.       25.
+* `-c':                         Switches Summary.       15.
+* `-b':                         Switches Summary.       7.
+* コマンドライン・オプション:   Switches Summary.       4.
+* Flexコマンドライン・オプション: Switches Summary.     4.
+* `yyout'とソケット:            Miscellaneous.          37.
+* `yyin'とソケット:             Miscellaneous.          37.
+* 再帰:                         Handling Strings.       224.
+* 8進定数:                      Handling Strings.       115.
+* 16進定数:                     Handling Strings.       115.
+* `%x' 複数行文字列を使用したサンプル: Handling Strings.  115.
+* エスケープ・シーケンス、スキャン処理: Handling Strings.  10.
+* エスケープ・シーケンスの取り扱い: Handling Strings.   10.
+* `%x' より長いテキストにマッチするサンプル: Handling Comments.  47.
+* `%x' EOFを使用したサンプル:   Handling Comments.      31.
+* `input()'、サンプル:          Handling Comments.      9.
+* Cコメントのスキャン処理:      Handling Comments.      9.
+* Cコメント、スキャン処理:      Handling Comments.      9.
+* Lex:                          Lex.                    4.
+* `yyrestart()'とLex:           Flex and POSIX.         109.
+* `yyterminate()'とLex:         Flex and POSIX.         109.
+* `<<EOF>>'とLex:               Flex and POSIX.         109.
+* `#line'指示子とLex:           Flex and POSIX.         109.
+* `yytext'非互換性:             Flex and POSIX.         76.
+* `yytext'、`unput()':          Flex and POSIX.         63.
+* `yyleng'、`unput()':          Flex and POSIX.         63.
+* `yywrap()'とPOSIX:            Flex and POSIX.         57.
+* `yylineno' :                  Flex and POSIX.         49.
+* Ratforスキャナ:               Flex and POSIX.         43.
+* `output()':                   Flex and POSIX.         36.
+* `ECHO'と`output()':           Flex and POSIX.         36.
+* `input()'、LexとFlexの相違点: Flex and POSIX.         28.
+* POSIX:                        Flex and POSIX.         4.
+* FlexとLex、相違点:            Flex and Lex.           4.
+* FlexとLexの相違点:            Flex and Lex.           4.
+* Pascalコメント、スキャン処理: Example-Pascal Lexical Scanner.  20.
+* Pascalコメントのスキャン処理: Example-Pascal Lexical Scanner.  20.
+* 名前、不当:                   Example-Pascal Lexical Scanner.  20.
+* 不当な名前:                   Example-Pascal Lexical Scanner.  20.
+* 行数、カウント:               Example-Pascal Lexical Scanner.  20.
+* 行数のカウント:               Example-Pascal Lexical Scanner.  20.
+* `yyin'、リセットの例:         Example-Counting Words.  11.
+* スキャナの最適化:             Optimization.           4.
+* 最適化:                       Optimization.           4.
+* スピードとテーブル・サイズ:   Optimization.           4.
+* `<<EOF>>'、詳細:              End-Of-File Rules.      4.
+* End-Of-File、取り扱い:        End-Of-File Rules.      4.
+* 複数バッファを使う実例:       Example of Multiple Buffers.  4.
+* 入力バッファ、複数の使用:     Example of Multiple Buffers.  4.
+* `yy_scan_buffer()'、詳細:     Buffer Manipulation (Flex 2.5).  43.
+* `yy_scan_bytes()'、詳細:      Buffer Manipulation (Flex 2.5).  30.
+* `yy_scan_string()'、詳細:     Buffer Manipulation (Flex 2.5).  24.
+* `YY_FLUSH_BUFFER'、詳細:      Buffer Manipulation (Flex 2.5).  16.
+* `yy_flush_buffer()'、詳細:    Buffer Manipulation (Flex 2.5).  11.
+* `yy_new_buffer()'、詳細:      Buffer Manipulation (Flex 2.5).  7.
+* `YY_CURRENT_BUFFER':          Buffer Manipulation.    34.
+* `yy_delete_buffer()' :        Buffer Manipulation.    29.
+* `yy_switch_to_buffer()'、詳細: Buffer Manipulation.   21.
+* `YY_BUF_SIZE':                Buffer Manipulation.    15.
+* `yy_create_buffer()':         Buffer Manipulation.    8.
+* バッファ、複数:               Multiple Input Buffers.  4.
+* バッファの操作:               Multiple Input Buffers.  4.
+* 入力の変更:                   Multiple Input Buffers.  4.
+* 入力バッファ:                 Multiple Input Buffers.  4.
+* 翻訳テーブル:                 Translation Tables.     4.
+* `-Cem'、詳細:                 Table Compression and Scanner Speed.  84.
+* `-Cm'、詳細:                  Table Compression and Scanner Speed.  76.
+* メタ同等クラス:               Table Compression and Scanner Speed.  76.
+* `-CF'、詳細:                  Table Compression and Scanner Speed.  67.
+* `-Cf'、詳細:                  Table Compression and Scanner Speed.  67.
+* `-Ce'、詳細:                  Table Compression and Scanner Speed.  58.
+* 同等クラス:                   Table Compression and Scanner Speed.  58.
+* `ECHO'、サンプル:             Table Compression and Scanner Speed.  40.
+* `-F'、詳細:                   Table Compression and Scanner Speed.  30.
+* `-f'、詳細:                   Table Compression and Scanner Speed.  14.
+* スキャン処理のスピード:       Table Compression and Scanner Speed.  4.
+* テーブルの圧縮:               Table Compression and Scanner Speed.  4.
+* スキャナ、対話型:             Interactive Scanners.   4.
+* 対話型スキャナ:               Interactive Scanners.   4.
+* `-I'、詳細:                   Interactive Scanners.   4.
+* 型付けされた入力:             Interactive Scanners.   4.
+* 型付けされた入力のスキャン処理: Interactive Scanners.  4.
+* `-i'、詳細:                   The -i Switch.          5.
+* 大文字・小文字の無視:         Case Insensitive Scanners.  4.
+* 特殊なFlex機能:               Other Flex Features.    4.
+* `LexerError()'、`yyFlexLexer': Flex and C++ (Flex 2.5).  114.
+* `yyFlexLexer::LexerError()'、詳細: Flex and C++ (Flex 2.5).  114.
+* `LexerOutput()'、`yyFlexLexer': Flex and C++ (Flex 2.5).  109.
+* `yyFlexLexer::LexerOutput()'、詳細: Flex and C++ (Flex 2.5).  109.
+* `LexerInput()'、`yyFlexLexer': Flex and C++ (Flex 2.5).  101.
+* `yyFlexLexer::LexerInput()'、詳細: Flex and C++ (Flex 2.5).  101.
+* `yyFlexLexer::yylex()'、詳細: Flex and C++ (Flex 2.5).  75.
+* `yyFlexLexer':                Flex and C++ (Flex 2.5).  75.
+* `switch_streams()'、`FlexLexer': Flex and C++ (Flex 2.5).  59.
+* `yylex()'、`FlexLexer':       Flex and C++ (Flex 2.5).  59.
+* `yyrestart()'、`FlexLexer':   Flex and C++ (Flex 2.5).  59.
+* `yy_delete_buffer()'、`FlexLexer': Flex and C++ (Flex 2.5).  59.
+* `yy_create_buffer()'、`FlexLexer': Flex and C++ (Flex 2.5).  59.
+* `yy_switch_to_buffer()'、`FlexLexer': Flex and C++ (Flex 2.5).  59.
+* `set_debug()'、`FlexLexer':   Flex and C++ (Flex 2.5).  59.
+* `debug()'、`FlexLexer':       Flex and C++ (Flex 2.5).  55.
+* `lineno()'、`FlexLexer':      Flex and C++ (Flex 2.5).  51.
+* `yylex()'、`FlexLexer':       Flex and C++ (Flex 2.5).  46.
+* `YYLeng()'、`FlexLexer':      Flex and C++ (Flex 2.5).  42.
+* `YYText()'、`FlexLexer':      Flex and C++ (Flex 2.5).  38.
+* `yy_flex_debug'、`FlexLexer': Flex and C++ (Flex 2.5).  35.
+* `yylineno'、`FlexLexer':      Flex and C++ (Flex 2.5).  30.
+* `yyleng'、`FlexLexer':        Flex and C++ (Flex 2.5).  26.
+* `yytext'、`FlexLexer':        Flex and C++ (Flex 2.5).  22.
+* `FlexLexer':                  Flex and C++ (Flex 2.5).  18.
+* `lex.yy.cc':                  Flex and C++ (Flex 2.5).  7.
+* C++とFlexのインターフェイス:  Flex and C++ (Flex 2.5).  4.
+* `YYSTYPE':                    Notes on the Implementation.  7.
+* `front.lex':                  The Implementation.     128.
+* `front.y':                    The Implementation.     11.
+* Bison文法の例:                The Database Language.  4.
+* パース言語:                   The Database Language.  4.
+* `yylval'、説明:               YYSTYPE and yylval.     4.
+* `YYSTYPE'、Bisonとの関連:     YYSTYPE and yylval.     4.
+* Flexからのデータの返却:       Interfacing Flex and Bison.  4.
+* `Yacc':                       Flex and Bison.         4.
+* Bison:                        Flex and Bison.         4.
+* FlexとBisonのインターフェイス: Flex and Bison.        4.
+* デフォルトの振る舞い、スキャナ: An Example of Flex and C.  78.
+* `YY_AT_BOL()'、詳細:          Flex and C (Flex 2.5).  36.
+* `yy_set_bol()'、詳細:         Flex and C (Flex 2.5).  18.
+* `yy_set_interactive()'、詳細: Flex and C (Flex 2.5).  8.
+* CとFlexのインターフェイス（Flex2.5補足）: Flex and C (Flex 2.5).  4.
+* `YYBREAK'とともに使用される`break' : Flex and C.      667.
+* `YY_BREAK'、詳細:             Flex and C.             667.
+* ユーザ定義の初期化:           Flex and C.             579.
+* `YY_USER_INIT'、詳細:         Flex and C.             579.
+* ユーザ定義のアクション:       Flex and C.             531.
+* `YY_USER_ACTION'、詳細:       Flex and C.             531.
+* `BEGIN'、詳細:                Flex and C.             517.
+* パターン・マッチの拒絶:       Flex and C.             447.
+* `REJECT'、詳細:               Flex and C.             447.
+* `yytext'、表示:               Flex and C.             443.
+* スキャンされたテキストの表示、`ECHO': Flex and C.     443.
+* `YY_NEW_FILE'、詳細:          Flex and C.             391.
+* スキャナの再入可能性、`yyrestart()': Flex and C.      381.
+* `yyrestart()'、詳細:          Flex and C.             381.
+* `yylex()'と`yyterminate()'  : Flex and C.             374.
+* `yyterminate()'、詳細:        Flex and C.             374.
+* 入力ストリームへのテキストの追加: Flex and C.         308.
+* `unput()'、詳細:              Flex and C.             308.
+* 入力ストリームへのアクセス:   Flex and C.             257.
+* `input()'、詳細:              Flex and C.             257.
+* テキストの返却:               Flex and C.             237.
+* `yyless()'、詳細:             Flex and C.             237.
+* 再帰:                         Flex and C.             236.
+* テキストの末尾への追加:       Flex and C.             174.
+* `yymore()'、詳細:             Flex and C.             174.
+* `yywrap()'と`EOF':            Flex and C.             161.
+* `yywrap()'、詳細:             Flex and C.             161.
+* `yyleng':                     Flex and C.             156.
+* `yytext'の長さへのアクセス:   Flex and C.             156.
+* テキスト長:                   Flex and C.             156.
+* `yytext'、詳細:               Flex and C.             127.
+* スキャンされたテキストへのアクセス: Flex and C.       127.
+* スキャンされたテキスト:       Flex and C.             127.
+* `yyout':                      Flex and C.             121.
+* 標準出力:                     Flex and C.             121.
+* `YY_INPUT'、再定義:           Flex and C.             101.
+* `YY_INPUT'の再定義:           Flex and C.             101.
+* `yyin':                       Flex and C.             91.
+* `YY_DECL'、詳細:              Flex and C.             75.
+* `yylex()'、再定義:            Flex and C.             75.
+* `yylex()'の再定義:            Flex and C.             75.
+* `yylex()'、詳細:              Flex and C.             17.
+* CとFlexのインターフェイス:    Flex and C.             4.
+* Flex関数とFlex変数:           Flex and C.             4.
+* lexに対するCのインターフェイス: Flex and C.           4.
+* `yywrap'、`%option':          %option (Flex 2.5).     220.
+* `yymore'、`%option':          %option (Flex 2.5).     213.
+* `yylineno'、`%option':        %option (Flex 2.5).     208.
+* `yyclass'、`%option':         %option (Flex 2.5).     199.
+* `yy_top_state'、`%option':    %option (Flex 2.5).     192.
+* `yy_scan_string'、`%option':  %option (Flex 2.5).     187.
+* `yy_scan_bytes'、`%option':   %option (Flex 2.5).     182.
+* `yy_scan_buffer'、`%option':  %option (Flex 2.5).     177.
+* `yy_push_state'、`%option':   %option (Flex 2.5).     170.
+* `yy_pop_state'、`%option':    %option (Flex 2.5).     163.
+* `unput'、`%option':           %option (Flex 2.5).     157.
+* `stdinit'、`%option':         %option (Flex 2.5).     150.
+* `stack'、`%option':           %option (Flex 2.5).     145.
+* `reject'、`%option':          %option (Flex 2.5).     138.
+* `%pointer':                   %option (Flex 2.5).     133.
+* `pointer'、`%option':         %option (Flex 2.5).     133.
+* `never-interactive'、`%option': %option (Flex 2.5).   126.
+* `main'、`%option':            %option (Flex 2.5).     113.
+* `always-interactive'、`%option': %option (Flex 2.5).  106.
+* `%array':                     %option (Flex 2.5).     102.
+* `array'、`%option':           %option (Flex 2.5).     102.
+* `warn'、`%option':            %option (Flex 2.5).     119.
+* `verbose'、`%option':         %option (Flex 2.5).     115.
+* `stdout'、`%option':          %option (Flex 2.5).     111.
+* `read'、`%option':            %option (Flex 2.5).     107.
+* `prefix'、`%option':          %option (Flex 2.5).     103.
+* `perf-report'、`%option':     %option (Flex 2.5).     99.
+* `output'、`%option':          %option (Flex 2.5).     95.
+* `meta-ecs'、`%option':        %option (Flex 2.5).     91.
+* `lex-compat'、`%option':      %option (Flex 2.5).     87.
+* `interactive'、`%option':     %option (Flex 2.5).     83.
+* `full'、`%option':            %option (Flex 2.5).     79.
+* `fast'、`%option':            %option (Flex 2.5).     75.
+* `ecs'、`%option':             %option (Flex 2.5).     71.
+* `default'、`%option':         %option (Flex 2.5).     67.
+* `debug'、`%option':           %option (Flex 2.5).     63.
+* `caseless'、`%option':        %option (Flex 2.5).     59.
+* `case-insensitive'、`%option': %option (Flex 2.5).    55.
+* `case-sensitive'、`%option':  %option (Flex 2.5).     51.
+* `caseful'、`%option':         %option (Flex 2.5).     47.
+* `c++'、`%option':             %option (Flex 2.5).     43.
+* `batch'、`%option':           %option (Flex 2.5).     39.
+* `backup'、`%option':          %option (Flex 2.5).     35.
+* `align'、`%option':           %option (Flex 2.5).     31.
+* `8bit'、`%option':            %option (Flex 2.5).     27.
+* `7bit'、`%option':            %option (Flex 2.5).     23.
+* `%option':                    %option (Flex 2.5).     4.
+* 日付、スキャン処理:           Start State Example.    10.
+* 日付のスキャン処理:           Start State Example.    10.
+* 例、スタート状態:             Start State Example.    4.
+* スタート状態、使用:           Start State Example.    4.
+* `yy_top_state()'、詳細:       Start State Notes (Flex 2.5).  102.
+* `yy_pop_state()'、詳細:       Start State Notes (Flex 2.5).  97.
+* `yy_push_state()'、詳細:      Start State Notes (Flex 2.5).  92.
+* スタート状態スタック:         Start State Notes (Flex 2.5).  86.
+* スタート状態スコープ:         Start State Notes (Flex 2.5).  54.
+* `YY_START':                   Start State Notes (Flex 2.5).  30.
+* `<*>':                        Start State Notes (Flex 2.5).  8.
+* スタート状態、排他的:         Start State Notes.      31.
+* 排他的スタート状態:           Start State Notes.      31.
+* スタート状態、活性化:         Activating States.      5.
+* `BEGIN'、スタート状態の活性化: Activating States.     5.
+* `%s'、詳細:                   Start States Explained.  10.
+* `%x'、詳細:                   Start States Explained.  10.
+* スタート状態の使用:           Start States Explained.  4.
+* スタート状態:                 Start States.           4.
+* スタート状態の宣言:           Start States.           4.
+* 状態の振る舞いの設定:         Start States.           4.
+* スキャナの振る舞いの動的な変更: Start States.         4.
+* 条件スキャン処理:             Start States.           4.
+* コンテキスト依存スキャン処理: Start States.           4.
+* 文字クラス式:                 Character Class Expressions (Flex 2.5).  4.
+* Flex文字クラス:               Character Classes.      4.
+* 文字クラス:                   Character Classes.      4.
+* 文字のグループ化:             Character Classes.      4.
+* Flex文字列:                   Strings.                4.
+* Flexにおける文字列:           Strings.                4.
+* エスケープ・シーケンス:       Characters.             215.
+* Flex文字:                     Characters.             4.
+* Flexにおける文字:             Characters.             4.
+* Flexデータ型:                 Pattern Matching.       4.
+* Flexにおけるデータ型:         Pattern Matching.       4.
+* Flexルール:                   Pattern Matching.       4.
+* パターンのマッチング:         Pattern Matching.       4.
+* パターン、マッチング:         Pattern Matching.       4.
+* スキャナのデフォルト・アクション: Rules.              50.
+* ルール:                       Rules.                  4.
+* Flex、パターン・マッチング・ルール: Rules.            4.
+* ルール定義:                   Rules.                  4.
+* コード・ブロック:             %%.                     4.
+* ルールを使用した定義:         Definitions.            21.
+* 定義:                         Definitions.            4.
+* Cとのインターフェイス:        Optional C Code.        4.
+* Cコード、追加:                Optional C Code.        4.
+* 定義へのCコードの追加:        Optional C Code.        4.
+* 定義、コメント:               Comments.               4.
+* 定義ファイル中のコメント:     Comments.               4.
+* 記述、スキャナ:               Flex Descriptions.      4.
+* 記述、Flex:                   Flex Descriptions.      4.
+* Flex記述:                     Flex Descriptions.      4.
+* コマンドライン・オプション（Flex 2.5補足）: Command Line Switches (Flex 2.5).  4.
+* コマンドライン・オプション:   Command Line Switches.  4.
+* `lex.yy.c':                   Invoking Flex.          26.
+* `.l'、lexファイル:            Invoking Flex.          20.
+* Flex、起動:                   Invoking Flex.          4.
+* Flex、使用法:                 Invoking Flex.          4.
+* Flexの使用:                   Invoking Flex.          4.
+* Flexの起動:                   Invoking Flex.          4.
+* 字句スキャナ:                 Introduction.           4.
+* Flex、入門:                   Introduction.           4.
+* Flex入門:                     Introduction.           4.
+
+
+
+

@@ -1,0 +1,1112 @@
+Info file: hurd-ja.info,    -*-Text-*-
+produced by `texinfo-format-buffer'
+from file `hurd-ja.texi'
+using `texinfmt.el' version 2.38 of 3 July 1998.
+
+
+
+
+INFO-DIR-SECTION Kernel
+START-INFO-DIR-ENTRY
+* Hurd: (hurd).                 Using and programming the Hurd kernel servers.
+END-INFO-DIR-ENTRY
+
+
+Copyright (C) 1994-1998 Free Software Foundation, Inc.
+
+Permission is granted to make and distribute verbatim copies of this
+manual provided the copyright notice and this permission notice are
+preserved on all copies.
+
+
+Permission is granted to copy and distribute modified versions of this
+manual under the conditions for verbatim copying, provided also that the
+entire resulting derived work is distributed under the terms of a
+permission notice identical to this one.
+
+Permission is granted to copy and distribute translations of this manual
+into another language, under the above conditions for modified versions.
+
+
+
+
+
+File: hurd-ja.info, Node: Diskfs Globals, Next: Diskfs Node Management, Prev: Diskfs Arguments, Up: Diskfs Library
+
+Diskfsグローバル関数、グローバル変数
+------------------------------------
+
+以下の関数や変数は、このライブラリの全般的な振舞いを制御する。あなたの書
+くコールバック関数はこれらを参照する必要があるかもしれないが、これらを変
+更したり再定義したりする必要はないはずである。
+
+ -- Variable: mach_port_t diskfs_default_pager
+ -- Variable: mach_port_t diskfs_exec_ctl
+ -- Variable: mach_port_t diskfs_exec
+ -- Variable: auth_t diskfs_auth_server_port
+     これらはそれぞれ、デフォルト・ページャ、execserverのcontrol port
+     （FIXME-J:コントロール・ポート、制御ポート？）、execserverそれ自身、
+     authserverへのsend rights（FIXME-J:センド・ライト？）である。
+
+ -- Variable: mach_port_t diskfs_fsys_identity
+     ファイルシステムの`io_identity' identity port（FIXME-J:アイデンティ
+     ティ・ポート？）。
+
+ -- Variable: char ** diskfs_argv
+     デフォルトの引数パーサによりセットされた、diskfsの起動コマンドライ
+     ン。あなたが引数パーサを使わないのであれば、これを自分でセットする
+     こと。これはprocserverに与えるために、ブートストラップ・ファイルシ
+     ステムによってのみ使用される。
+
+ -- Variable: char * diskfs_boot_flags
+     ブートストラップ・ファイルシステムの場合、カーネルから渡されたコマ
+     ンドライン・オプション。ブートストラップ・ファイルシステムでない場
+     合は、この２つのケースを区別するのに使えるようゼロが入る。
+
+ -- Variable: struct rwlock diskfs_fsys_lock
+     ファイルシステム・レベルの操作を行っている間はこのロックを保有する
+     こと。特に害のない操作を行うユーザは単にreader lock（FIXME-J）を保
+     有するだけで良いが、他のスレッドに悪影響を及ぼす可能性のある操作で
+     はwriter lock（FIXME-J）を保有するべきである。
+
+ -- Variable: volatile struct mapped_time_value * diskfs_mtime
+     diskfsルーチンによって使用されている現在のシステム時刻。これは、Cの
+     ライブラリ関数`maptime_read'によって`struct timeval'に変換される
+     (FIXME xref)。
+
+ -- Variable: int diskfs_synchronous
+     すべての操作が同期的に行われなければならない場合のみ真となる。これ
+     がセットされている場合、アロケーション（FIXME-J:割当て？）情報が永
+     遠に同期されるようにするのはフォーマット固有のコードの責任である。
+     これ以外のことはフォーマット非依存のコードにより実行される。
+
+ -- Function: error_t diskfs_set_sync_interval (int INTERVAL)
+     INTERVAL秒ごとにファイルシステムに対してsync（FIXME-J）を実行するた
+     め、スレッドを生成する。INTERVALがゼロの場合は、スレッドの生成を行
+     わない。スレッドの生成時にエラーが発生した場合は、エラー値が返され
+     る。エラーが発生しなかった場合はゼロが返される。２回目以降の呼出し
+     時にも新しいスレッドが生成され、古いスレッドは(最終的には)取り除か
+     れる。いずれにしろ古いスレッドはこれ以上sync（FIXME-J）を実行するこ
+     とはない。
+
+ -- Variable: spin_lock_t diskfs_node_refcnt_lock
+     ページャのリファレンス・カウント・ロック。
+
+ -- Variable: int diskfs_readonly
+     ファイルシステムが現在書込み可能であればゼロがセットされる。
+
+ -- Function: error_t diskfs_set_readonly (int READONLY)
+     アクティブなファイルシステムのモードを、読込みのみ可能なモード、も
+     しくは、書込み可能なモードに変更する。同時に現在のモードを反映する
+     ようグローバル変数DISKFS_READONLYをセットする。エラーが返された場合
+     は、何も変更されていない。このルーチンを呼出している間は、
+     DISKFS_FSYS_LOCKを保有していなければならない。
+
+ -- Function: int diskfs_check_readonly (void)
+     ファイルシステムに書込みを行う操作の前に、そのファイルシステムが読
+     込みのみ可能かどうかをチェックする。読込みのみ可能であればゼロ以外
+     の値を返し、そうでなければゼロを返す。
+
+ -- Function: error_t diskfs_remount (void)
+     すべてのin-core（FIXME-J）データ構造をディスクから再度読込む。この
+     関数の呼出しは、DISKFS_READONLYが真である場合しか成功することはあり
+     えない。このルーチンを呼出している間は、DISKFS_FSYS_LOCKを保有して
+     いなければならない。
+
+ -- Function: error_t diskfs_shutdown (int FLAGS)
+     ファイルシステムをシャットダウンする。FLAGSの意味は、
+     `fsys_shutdown'の場合と同様である。
+
+
+
+
+File: hurd-ja.info, Node: Diskfs Node Management, Next: Diskfs Callbacks, Prev: Diskfs Globals, Up: Diskfs Library
+
+Diskfsノード管理
+----------------
+
+すべてのファイルやディレクトリはdiskfs"ノード"である。以下の関数は、あな
+たの書いたdiskfsコールバックがノードやノードへのreference（FIXME-J:リファ
+レンス、参照？）を管理するのを支援してくれるものである。
+
+ -- Function: void diskfs_drop_node (struct node *NP)
+     ノードNPはもはやreference（FIXME-J:リファレンス、参照？）を持たない
+     ので、すべてをクリーンな（FIXME-J）状態にする。
+     DISKFS_NODE_REFCNT_LOCKは保有されていなければならず、この関数から復
+     帰する際に解放される。NPはロックされていなければならない。
+
+ -- Function: void diskfs_node_update (struct node *NP, int WAIT)
+     `NP->dn_stat'の情報を使用して、disk fields（FIXME-J:ディスク・フィー
+     ルド？）をセットする。必要であればctime、atime、mtimeを更新する。
+     WAITが真であれば、物理的なメディアの更新が完全に終了するまで復帰し
+     ない。
+
+ -- Function: void diskfs_nref (struct node *NP)
+     ノードNPに対してhard reference（FIXME-J）を追加する。ノードにhard
+     reference（FIXME-J）があらかじめ存在しない場合、そのノードをロック
+     することはできない(なぜなら、ロックを保有するためにはhard reference
+     （FIXME-J）を保有していなければならないのであるから)。
+
+ -- Function: void diskfs_nput (struct node *NP)
+     ノードNPのロックを解除し、hard reference（FIXME-J）を解放する。これ
+     が最後のhard reference（FIXME-J）であり、かつ、そのファイルに対する
+     リンクが存在しなければ、light reference（FIXME-J）を除去するよう要
+     求する。
+
+ -- Function: void diskfs_nrele (struct node *NP)
+     NPのhard reference（FIXME-J）を解放する。NPが何者かによってロックさ
+     れていれば、これが最後のhard reference（FIXME-J）であることはありえ
+     ない(なぜなら、ロックを保有するためにはhard reference（FIXME-J）を
+     保有していなければならないのであるから)。これが最後のhard reference
+     （FIXME-J）であり、かつ、リンクが存在しなければ、light reference
+     （FIXME-J）を除去するよう要求する。
+
+ -- Function: void diskfs_nref_light (struct node *NP)
+     ノードに対してlight reference（FIXME-J）を追加する。
+
+ -- Function: void diskfs_nput_light (struct node *NP)
+     ノードNPのロックを解除し、light reference（FIXME-J）を解放する。
+
+ -- Function: void diskfs_nrele_light (struct node *NP)
+     NPに対するlight reference（FIXME-J）を解放する。NPが何者かによって
+     ロックされていれば、これが最後のreference（FIXME-J:リファレンス、参
+     照？）であることはありえない(なぜなら、ロックを保有するためにはhard
+     reference（FIXME-J）を保有していなければならないのであるから)。
+
+ -- Function: error_t diskfs_node_rdwr (struct node *NP, char *DATA, off_t OFF, size_t AMT, int DIRECTION, struct protid *CRED, size_t *AMTREAD)
+     これは、ファイルの読み書きを行う場合や自動的なファイル・サイズの拡
+     張が必要である場合に、他のファイルシステム・ルーチンから呼出される
+     ものである。NPは読み書きされるノードであり、ロックされていなければ
+     ならない。DATAの指すデータがファイルに書込まれたり、あるいは、ファ
+     イルから読込まれたデータがDATAの指す領域に書込まれたりする。OFFは、
+     I/Oが実際に行われるべきファイル中の場所を示す(負の値は許されない)。
+     AMTはDATAのサイズであり、どれだけのデータをコピーするべきかを示す。
+     DIRは、読込みの場合はゼロであり、書込みの場合はゼロ以外の値である。
+     CREDは、アクセスを行っているユーザを示す(ファイルを拡張しようとする
+     試みの正当性を判断するためだけに使われる)。読込みの場合、実際に読込
+     まれたデータのサイズが`*AMTREAD'に入れられる。
+
+ -- Function: void diskfs_notice_dirchange (struct node *DP, enum dir_changed_type TYPE, char *NAME)
+     `dir_notice_changes'によってディレクトリDPに関するnotification
+     （FIXME-J）を要求したユーザに対して、notification（FIXME-J）を送信
+     する。変更の種類と変更により影響を受けた名前が、それぞれTYPEとNAME
+     である。これは、`diskfs_direnter'、`diskfs_dirremove'、
+     `diskfs_dirrewrite'、および、そのディレクトリを変更する任意の関数か
+     ら、その変更が完全に終了した後に呼出されるべきものである。
+
+ -- Function: struct node * diskfs_make_node (struct disknode *DN)
+     DNを物理的なdisknode（FIXME-J）とする新しいnode構造体を作成する。新
+     しく作成されたノード（node）は、hard reference（FIXME-J）を１個持ち、
+     light reference（FIXME-J）は持たない。
+
+以下のノード操作関数群は一般的には有用ではないが、diskfs関数を再定義する
+必要がある場合には便利であるかもしれない。
+
+ -- Function: error_t diskfs_create_node (struct node *DIR, char *NAME, mode_t MODE, struct node **NEWNODE, struct protid *CRED, struct dirstat *DS)
+     新しいノードを作成し、そのモードをMODEとする。MODEに`IFDIR'が含まれ
+     ていれば、新しいディレクトリ中の`.'と`..'も初期化する。作成されたノー
+     ドはNPPに入れて返す。CREDは、この関数の呼出しに責任を負うユーザを識
+     別する。NAMEがゼロ以外の値であれば、新しく作成されたノードをNAMEと
+     いう名前でDIRにリンクする。DSは、ノード作成のために事前に呼出された
+     `diskfs_lookup'の結果である(DIRは、`diskfs_lookup'の呼出し以降ロッ
+     クされたままである)。DIRは、少なくともディスク・アロケーション
+     （FIXME-J:割当て？）方針のヒントとして、常にこの関数に渡されなけれ
+     ばならない。
+
+ -- Function: void diskfs_set_node_times (struct node *NP)
+     `NP->dn_set_ctime'がセットされていれば、しかるべく
+     `NP->dn_stat.st_ctime'を変更する。atimeとmtimeについても同じような
+     操作を行う。
+
+ -- Function: struct node * diskfs_check_lookup_cache (struct node *DIR, char *NAME)
+     キャッシュの中からDIRの中のNAMEを探す。既知の範囲でそのようなエント
+     リが存在しなければゼロを返す。そのようなエントリが存在しないことが
+     確実であれば-1を返す。これ以外の場合は、新しく割当てられたreference
+     （FIXME-J:リファレンス、参照？）とともに、エントリに対応するNPを返
+     す。
+
+ -- Function: error_t diskfs_cached_lookup (int CACHE_ID, struct node **NPP)
+     `*NPP'の中のCACHE_IDに対応するノードを返す。
+
+ -- Function: void diskfs_enter_lookup_cache (struct node *DIR, struct node *NP, char *NAME)
+     ノードNPは、DIRの中でNAMEという名前で見つけられたものである。NPが
+     NULLであれば、この名前のエントリがディレクトリの中に存在しないこと
+     が確認されたということを意味する。
+
+ -- Function: void diskfs_purge_lookup_cache (struct node *DP, struct node *NP)
+     ディレクトリDPの中のノードとしてNPを参照する、キャッシュ内のすべて
+     のreference（FIXME-J:リファレンス、参照？）を除去する。
+
+
+
+
+File: hurd-ja.info, Node: Diskfs Callbacks, Next: Diskfs Options, Prev: Diskfs Node Management, Up: Diskfs Library
+
+Diskfsコールバック
+------------------
+
+ほかのいくつかのHurdライブラリと同様、`libdiskfs'もあなたがアプリケーショ
+ン固有のコールバック関数を実装することをあてにしている。あなたは以下の関
+数と変数を定義*しなければならない*。また、いくつかのdiskfsオプションのデ
+フォルト値は、良いファイルシステム・サポートを提供するためには変更するべ
+きであるので、*Note Diskfs Options::も参照するべきである。
+
+ -- Structure: struct dirstat
+     この型はあなたが定義しなければならない。この型が、`diskfs_lookup'の
+     呼出しから`diskfs_direnter'、`diskfs_dirremove'、
+     `diskfs_dirrewrite'のいずれか１つの呼出しまでの間、情報を保有するこ
+     とになる。これらの呼出しが以下に説明するように機能するために十分な
+     情報が、この型の中に保持されなければならない。
+
+ -- Variable: size_t diskfs_dirstat_size
+     これは`struct dirstat'のバイト単位のサイズでなければならない。
+
+ -- Variable: int diskfs_link_max
+     これは、１個のファイルに対して存在することのできるリンクの最大個数
+     であり、正の整数でなければならない。`dir_rename'の実装は、許される
+     リンク数がただの１個である場合に処理を成功させる方法を知らない。そ
+     のようなフォーマットの場合、あなたは自分で`dir_rename'を再実装する
+     必要がある。
+
+ -- Variable: int diskfs_maxsymlinks
+     これは、１回の`dir_pathtrans'の呼出しでたどることのできるシンボリッ
+     ク・リンクの最大数を示す正の整数である。この値を超過すると、
+     `dir_pathtrans'は`ELOOP'を返すことになる。
+
+ -- Variable: struct node * diskfs_root_node
+     ここにはファイルシステムのルート・ノードをセットする。
+
+ -- Variable: char * diskfs_server_name
+     ここにはファイルシステム・サーバの名前をセットする。
+
+ -- Variable: char * diskfs_server_version
+     ここにはサーバのバージョンを示す文字列をセットする。
+
+ -- Variable: char * diskfs_disk_name
+     これは、このファイルシステムが解釈している特定のディスクを何らかの
+     形で識別する文字列でなければならない。通常これは、メッセージを表示
+     したり、同一のファイルシステム・タイプの複数のインスタンスを区別す
+     るためにのみ使用される。このファイルシステムが外部メディアに一切ア
+     クセスしないのであれば、これをゼロとして定義する。
+
+ -- Function: error_t diskfs_set_statfs (fsys_statfsbuf_t *STATFSBUF)
+     ファイルシステムの現在の状態を反映するよう適切な値を`*STATFSBUF'に
+     セットする。
+
+ -- Function: error_t diskfs_lookup (struct node *DP, char *NAME, enum lookup_type TYPE, struct node **NP, struct dirstat *DS, struct protid *CRED)
+ -- Function: error_t diskfs_lookup_hard (struct node *DP, char *NAME, enum lookup_type TYPE, struct node **NP, struct dirstat *DS, struct protid *CRED)
+     あなたは`diskfs_lookup'を定義するべきではない。なぜなら、これは単に
+     `diskfs_lookup_hard'に対するラッパーに過ぎず、既に`libdiskfs'の中で
+     定義されているからである。
+
+     (ロックされている)ディレクトリDPの中で名前NAMEを捜し出す(ルックアッ
+     プする)。TYPEは、`LOOKUP'、`CREATE'、`RENAME'、`REMOVE'のいずれかで
+     ある。CREDは、呼出しを行ったユーザを識別する。
+
+     名前NAMEが見つかればゼロを返し、(NPの値がゼロ以外であれば) それに対
+     応するノードを指すように`*NP'をセットするこのノードはロックされなけ
+     ればならない。その名前が見つからない場合は`ENOENT'を返し、(NPの値が
+     ゼロ以外であれば) `*NP'にゼロをセットする。NPがゼロであれば、見つかっ
+     たノードは一時的にであれロックされてはならない。(見つかったノードに
+     対するパーミションのチェックがしばしば実行されなければならない)
+     `REMOVE'と`RENAME'のためのルックアップの場合、NPは常にセットされる。
+
+     DSの値がゼロ以外であれば、要求されたルックアップ種別TYPEによって振
+     舞いが変わることになる。
+
+     `LOOKUP'
+          `diskfs_drop_dirstat'によって無視されるよう`*DS'をセットする。
+
+     `CREATE'
+          成功した場合は、
+          `diskfs_drop_dirstat'によって無視されるよう`*DS'をセットする。
+          失敗した場合は、
+          将来の`diskfs_direnter'の呼出し用に`*DS'をセットする。
+
+     `RENAME'
+          成功した場合は、
+          将来の`diskfs_dirrewrite'の呼出し用に`*DS'をセットする。
+          失敗した場合は、
+          将来の`diskfs_direnter'の呼出し用に`*DS'をセットする。
+
+     `REMOVE'
+          成功した場合は、
+          将来の`diskfs_dirremove'の呼出し用に`*DS'をセットする。
+          失敗した場合は、
+          `diskfs_drop_dirstat'によって無視されるよう`*DS'をセットする。
+
+     この関数の呼出し側は、次の２つのことを保証する。まず第１に、DSがゼ
+     ロ以外であれば、ディレクトリDPのロックが解除される前に、上にリスト
+     された適切な呼出しが行われること、もしくは、`diskfs_drop_dirstat'が
+     DSを引数として呼出されることを保証する。第２に、今回ルックアップ関
+     数を呼出してから*DSを使用する(もしくは、破棄する) までの間に、この
+     ディレクトリに対してルックアップ関数は一切呼出されないことを保証す
+     る。
+
+     あなたが`diskfs_rename_dir'、`diskfs_clear_directory'、
+     `diskfs_init_dir'のライブラリ・バージョンを使うのであれば、`..'に対
+     するルックアップでは、フラグ`SPEC_DOTDOT'がORされているかもしれない。
+     要求されたルックアップ種別TYPEによっては、これが特別な意味を持つ。
+
+     `LOOKUP'
+          復帰する前に、DPのロックは解除されなければならず、また、その
+          reference（FIXME-J:リファレンス、参照？）は除去されなければな
+          らない。
+
+     `CREATE'
+          `SPEC_DOTDOT'が与えられないことは保証されているので、このケー
+          スは無視してよい。
+
+     `RENAME'
+     `REMOVE'
+          どちらの場合も、見つかったノード(`*NP')は既にロックされている。
+          したがって、それをさらにロックしたり、reference（FIXME-J:リファ
+          レンス、参照？）を追加したりしないこと。
+
+     名前NAMEがディレクトリの中に存在しない場合は`ENOENT'を返す。NAMEが、
+     このファイルシステムのルートの`..'を指している場合は、`EAGAIN'を返
+     す。`EIO'を返すことが適切な場合には、`EIO'を返す。
+
+ -- Function: error_t diskfs_direnter (struct node *DP, char *NAME, struct node *NP, struct dirstat *DS, struct protid *CRED)
+ -- Function: error_t diskfs_direnter_hard (struct node *DP, char *NAME, struct node *NP, struct dirstat *DS, struct protid *CRED)
+     あなたは`diskfs_direnter'を定義するべきではない。なぜなら、これは単
+     に`diskfs_direnter_hard'に対するラッパーに過ぎず、既に`libdiskfs'の
+     中で定義されているからである。
+
+     ディレクトリDPにNAMEという名前でNPを追加する。これは、`CREATE'、も
+     しくは、`RENAME'の`diskfs_lookup'呼出しが失敗した後にのみ呼出される
+     ことになる。DPは、この`diskfs_lookup'の呼出し以降ロックされたままで
+     あり、DSの内容は、`diskfs_lookup'の呼出しによってセットされたままの
+     状態である。また、NPはロックされている。CREDは、この関数の呼出しに
+     責任を負うユーザを識別する(ディレクトリ拡張の正当性を判断するためだ
+     けに使われる)。
+
+ -- Function: error_t diskfs_dirrewrite (struct node *DP, struct node *OLDNP, struct node *NP, char *NAME, struct dirstat *DS)
+ -- Function: error_t diskfs_dirrewrite_hard (struct node *DP, struct node *NP, struct dirstat *DS)
+     あなたは`diskfs_dirrewrite'を定義するべきではない。なぜなら、これは
+     単に`diskfs_dirrewrite_hard'に対するラッパーに過ぎず、既に
+     `libdiskfs'の中で定義されているからである。
+
+     これは、`RENAME'の`diskfs_lookup'呼出しが成功した後にのみ呼出される
+     ことになる。この呼出しにより、ディレクトリDPに見つかった名前は、そ
+     れが以前に参照していたノードに換わって、ノードNPを指すように変更さ
+     れているはずである。DPは、この`diskfs_lookup'の呼出し以降ロックされ
+     たままであり、DSの内容は、`diskfs_lookup'の呼出しによってセットされ
+     たままの状態である。また、NPはロックされている。
+
+     `diskfs_dirrewrite'については、さらに追加仕様がある。NAMEは、DPの中
+     で以前参照されていたノードOLDNPに対応していた名前である。更新される
+     のはこのreference（FIXME-J:リファレンス、参照？）である。
+     `DP->dirmod_reqs'がゼロ以外であれば、`diskfs_dirrewrite'は
+     `diskfs_notice_dirchange'も呼出す。
+
+ -- Function: error_t diskfs_dirremove (struct node *DP, struct node *NP, char *NAME, struct dirstat *DS)
+ -- Function: error_t diskfs_dirremove_hard (struct node *DP, struct dirstat *DS)
+     あなたは`diskfs_dirremove'を定義するべきではない。なぜなら、これは
+     単に`diskfs_dirremove_hard'に対するラッパーに過ぎず、既に
+     `libdiskfs'の中で定義されているからである。
+
+     これは、`REMOVE'の`diskfs_lookup'呼出しが成功した後にのみ呼出される
+     ことになる。この呼出しにより、ディレクトリDSに見つかった名前は削除
+     されているはずである。DPは、この`diskfs_lookup'の呼出し以降ロックさ
+     れたままであり、DSの内容は、`diskfs_lookup'の呼出しによってセットさ
+     れたままの状態である。
+
+     `diskfs_dirremove'については、さらに追加仕様がある。
+     `DP->dirmod_reqs'がゼロ以外であれば、このルーチンは
+     `diskfs_notice_dirchange'も呼出さなければならない。削除されるエント
+     リは、NAMEという名前を持ち、NPを参照している。
+
+ -- Function: error_t diskfs_drop_dirstat (struct node *DP, struct dirstat *DS)
+     DSは、ディレクトリDPに対する`diskfs_lookup'の前回の呼出しによってセッ
+     トされたものである。`diskfs_direnter'、`diskfs_dirrewrite'、
+     `diskfs_dirremove'が以前に呼出されていなければ、この関数が呼出され
+     ることは保証されている。この関数は、`struct dirstat'により保持され
+     ているどのような状態も解放するべきである。DPは、`diskfs_lookup'の呼
+     出し以降ロックされたままの状態である。
+
+ -- Function: void diskfs_null_dirstat (struct dirstat *DS)
+     `diskfs_drop_dirstat'が無視するようにDSを初期化する。
+
+ -- Function: error_t diskfs_get_directs (struct node *DP, int ENTRY, int N, char **DATA, u_int *DATACNT, vm_size_t BUFSIZ, int *AMT)
+     ロックされたディレクトリ・ノードDPのENTRYから始まるN個のディレクト
+     リ・エントリを返す。これらのエントリは、現在`*DATACNT'バイトの領域
+     を指す`*DATA'に入れられる。このサイズが十分でない場合には、`*DATA' 
+     に対して`vm_allocate'を呼出す。`*DATACNT'には、実際に使用された総サ
+     イズをセットする。AMTにはコピーされたエントリの数を入れる。ただし、
+     BUFSIZバイトを超えてコピーしないこと。BUFSIZがゼロであれば、
+     `*DATACNT'の上限はない。Nが-1であれば、AMTの上限はない。
+
+ -- Function: int diskfs_dirempty (struct node *DP, struct protid *CRED)
+     ロックされたディレクトリDPが空であれば、ゼロ以外の値を返す。ユーザ
+     が、`diskfs_clear_directory'と`diskfs_init_directory'を再定義してい
+     なければ、「空」とは「`.'というラベルのエントリと`..'というラベルの
+     エントリだけを持つ」という意味である。CREDは、この呼出しを行ったユー
+     ザを識別する...  そのディレクトリを探索することがこのユーザにはでき
+     ない場合、このルーチンの呼出しは失敗しなければならない。
+
+ -- Function: error_t diskfs_get_translator (struct node *NP, char **NAMEP, u_int *NAMELEN)
+     (`diskfs_node_translated'が真であるような) ロックされたノードNPにつ
+     いて、そのトランスレータの名前を捜し出す。新たにmallocにより獲得さ
+     れた領域にその名前を格納し、その名前全体の長さを`*NAMELEN'にセット
+     する。
+
+ -- Function: error_t diskfs_set_translator (struct node *NP, char *NAME, u_int NAMELEN, struct protid *CRED)
+     ロックされたノードNPについて、そのトランスレータの名前としてNAMEの
+     値を、また、その名前のバイト長としてNAMELENの値を、それぞれセットす
+     る。CREDは、この関数の呼出しに責任を負うユーザを識別する。
+
+ -- Function: error_t diskfs_truncate (struct node *NP, off_t SIZE)
+     ロックされたノードNPの長さをSIZEバイトに切り詰める。NPの長さが既に
+     SIZEバイト以下であれば、何もしない。これがsymlink（FIXME-J:シンボリッ
+     ク・リンク？）である(かつ、`diskfs_shortcut_symlink'がセットされて
+     いる) 場合は、`diskfs_create_symlink_hook'がリンクのターゲットをど
+     こか別の場所にセットしている場合でも、そのsymlink（FIXME-J:シンボリッ
+     ク・リンク？）は除去されなければならない。
+
+ -- Function: error_t diskfs_grow (struct node *NP, off_t SIZE, struct protid *CRED)
+     ロックされたノードNPに対して割当てられたディスクを、少なくともSIZE
+     バイト以上になるようサイズを拡張し、実際に割当てられたサイズを
+     `NP->allocsize'にセットする。割当てられているサイズが既にSIZEバイト
+     である場合には、何もしない。CREDは、この関数の呼出しに責任を負うユー
+     ザを識別する。
+
+ -- Function: error_t diskfs_node_reload (struct node *NODE)
+     この関数は、ディスクに対して一切書込みを行うことなく、ディスクから
+     ノードNODEに固有なデータをすべて再読込みしなければならない。これは
+     常に、DISKFS_READONLYが真にセットされた状態で呼出される。
+
+ -- Function: error_t diskfs_reload_global_state (void)
+     この関数は、キャッシュされているすべてのグローバルな状態を無効にし
+     なければならない。また、ディスクに対して一切書込みを行うことなく、
+     必要に応じてディスクからそれを再読込みしなければならない。これは常
+     に、DISKFS_READONLYを真にセットした状態で呼出される。常に、この関数
+     の呼出しに続いて、すべてのアクティブなノードに対して
+     `diskfs_node_reload'が呼出されるので、この関数ではノード固有のデー
+     タを再読込みする必要はない。
+
+ -- Function: error_t diskfs_node_iterate (error_t (*FUN) (struct node *NP))
+     アクティブなノードNPの１つ１つについて、FUNを呼出す。ノードは、FUN
+     の呼出しの間はロックされる。FUNが任意のノードについてゼロ以外の値を
+     返した場合は、即座に処理を停止し、その値を返す。
+
+ -- Function: error_t diskfs_alloc_node (struct node *DP, mode_t MODE, struct node **NP)
+     ロックされたディレクトリDPの中でモードMODEを持つノードとするために
+     新しいノードを割当てる。ただし、実際にそのモードをセットしたり、ディ
+     レクトリを変更したりすることはしない。これらは、呼出し側によって行
+     われるからである。このリクエストに責任を負うユーザは、CREDにより識
+     別することができる。新しく割当てられたノードを`*NP'にセットする。
+
+ -- Function: void diskfs_free_node (struct node *NP, mode_t MODE)
+     ノードNPを解放する。(`NP->dn_stat.st_mode'がゼロであったものについ
+     ては) ディスク上のコピーは既に`diskfs_node_update'によって同期が取
+     られている。NPのかつてのモードがMODEである。
+
+ -- Function: void diskfs_lost_hardrefs (struct node *NP)
+     ロックされたノードNPは、まだいくつかlight reference（FIXME-J）は持
+     つものの、ちょうど最後のhard reference（FIXME-J）を失ったところであ
+     る。
+
+ -- Function: void diskfs_new_hardrefs (struct node *NP)
+     ロックされたノードNPはこれまでhard reference（FIXME-J）を持たなかっ
+     たが、ちょうど１つ獲得したところである。したがって、実際にユーザが
+     いなくてもlight reference（FIXME-J）を持つことができるようになった。
+
+ -- Function: void diskfs_try_dropping_softrefs (struct node *NP)
+     ノードNPは、まだいくつかlight reference（FIXME-J）は持つものの、ちょ
+     うど最後のhard reference（FIXME-J）を失ったところである。light
+     reference（FIXME-J）に解放可能なものがあれば、それを解放するような
+     手段を講じる。DISKFS_NODE_REFCNT_LOCKとNPはどちらもロックされている。
+     この関数は、`diskfs_lost_hardrefs'の後に呼出される。
+
+ -- Function: void diskfs_node_norefs (struct node *NP)
+     ノードNPはもはやreference（FIXME-J:リファレンス、参照？）を持たない。
+     `*NP'が保持されるべきでなければ、それも含めてローカルな状態を解放す
+     る。DISKFS_NODE_REFCNT_LOCKは保有されている。
+
+ -- Function: error_t diskfs_set_hypermetadata (int WAIT, int CLEAN)
+     フォーマット固有のバッファにある、ページングされていないメタデータ
+     をディスクに書込む。この書込みは、WAITの値がゼロであれば、非同期に
+     行われる。CLEANの値がゼロ以外であれば、この書込みが行われた後にファ
+     イルシステムは完全にクリーンな状態になり、ページングされていないメ
+     タデータがその事実を示すことができなければならない。
+
+ -- Function: void diskfs_write_disknode (struct node *NP, int WAIT)
+     `NP->dn_stat'の中の情報とそれに関連するフォーマット固有の情報をディ
+     スクに書込む。WAITが真であれば、物理的なメディアが完全に更新された
+     後にはじめて復帰する。
+
+ -- Function: void diskfs_file_update (struct node *NP, int WAIT)
+     ファイルNPの内容とそれに関連するすべてのメタデータをディスクに書込
+     む。一般にこれは、メタデータのほとんどの部分に関して
+     `diskfs_node_update'を呼出すことになる。WAITが真であれば、物理的な
+     メディアが完全に更新された後にはじめて復帰する。
+
+ -- Function: mach_port_t diskfs_get_filemap (struct node *NP, vm_prot_t PROT)
+     NPのファイル内容に対応するメモリ・オブジェクトのポート(send right
+     （FIXME-J:センド・ライト？）)を返す。PROTは、許容される最大限のアク
+     セスを示す。エラーが発生した場合には、`MACH_PORT_NULL'を返し、
+     `errno'をセットする。
+
+ -- Function: struct pager * diskfs_get_filemap_pager_struct (struct node *NP)
+     ロックされたノードNPに対してdiskfs_get_filemapが返したページャを参
+     照する`struct pager *'を返す。この戻り値は、`pager_memcpy'の引数と
+     して使うのに適している。
+
+ -- Function: vm_prot_t diskfs_max_user_pager_prot (void)
+     すべてのアクティブなユーザ・ページャに設定された最大限の`prot'パラ
+     メータ(`diskfs_get_filemap'の第２引数) のビットごとのORを返す。
+
+ -- Function: int diskfs_pager_users (void)
+     ユーザによって使用されているかもしれないエクスポートされたページャ・
+     ポートが存在すればゼロ以外の値を返す。この関数がゼロを返すまでは、
+     それ以上のページャの生成はブロックされるべきである。
+
+ -- Function: void diskfs_sync_everything (int WAIT)
+     すべてのページャをsync（FIXME-J）して、hypermetadata（FIXME-J:ハイ
+     パメタデータ？）を除き、ディスク上に存在するべきデータをすべて書込
+     む。WAITが真であれば、物理的なメディアが完全に更新された後にはじめ
+     て復帰する。
+
+ -- Function: void diskfs_shutdown_pager (void)
+     すべてのページャをシャットダウンする。これは一度始めると元に戻すこ
+     とはできず、ファイルシステムが終了する時に実行される。
+
+
+
+
+File: hurd-ja.info, Node: Diskfs Options, Next: Diskfs Internals, Prev: Diskfs Callbacks, Up: Diskfs Library
+
+Diskfsオプション
+----------------
+
+このサブセクションで説明する関数や変数には既に`libdiskfs'の中にデフォル
+トの実装があるため、それらを再定義するよう強制されることはない。ケース・
+バイ・ケースで、それらを再定義しても構わない。
+
+オプション(任意選択)の変数はいずれも、プログラムが起動したらすぐに(例え
+ば引数解析のようなdiskfs関数の呼出しを行うよりも前に) 値をセットしなけれ
+ばならない。
+
+ -- Variable: int diskfs_hard_readonly
+     ファイルシステムのメディアを決して書込み可能にすることができないの
+     であれば、この変数にゼロ以外の値をセットするべきである。
+
+ -- Variable: char * diskfs_extra_version
+     --versionオプションが使われた際に表示されるべき追加的なバージョン情報をここにセットする。
+
+ -- Variable: int diskfs_shortcut_symlink
+     これは、ファイルシステム・フォーマットがショートカットのためのシン
+     ボリック・リンクtranslation(FIXME-J:翻訳、トランスレーション？)をサ
+     ポートしている場合に限り、ゼロ以外の値を取るべきである。ライブラリ
+     は、ユーザがこのノードの内容を直接読み書きできないことを保証する。
+     ライブラリがこのような保証を行うのは、symlink hook(FIXME-J:シンボリッ
+     ク・リンクをフックする、シンボリック・リンクのフック？)関数
+     (`diskfs_create_symlink_hook'と`diskfs_read_symlink_hook') が
+     `EINVAL'を返す場合か、それらの関数が定義されていない場合だけである。
+     たとえhook function(FIXME-J:フック関数？)が使われている場合でも、ラ
+     イブラリは、`dn_stat.st_size'フィールドがsymlink(FIXME-J:シンボリッ
+     ク・リンク？)の長さであることを知っている。
+
+ -- Variable: int diskfs_shortcut_chrdev
+ -- Variable: int diskfs_shortcut_blkdev
+ -- Variable: int diskfs_shortcut_fifo
+ -- Variable: int diskfs_shortcut_ifsock
+     これらの変数は、ファイルシステム・フォーマットが、ショートカットの
+     ためのキャラクタ・デバイス・ノード、ブロック・デバイス・ノード、
+     FIFO、UNIXドメイン・ソケットのtranslation(FIXME-J:翻訳、ランスレー
+     ション？)をそれぞれサポートしている場合にのみ、ゼロ以外の値を取るべ
+     きである。
+
+ -- Variable: int diskfs_default_sync_interval
+     最初のdiskfsスレッドが（`diskfs_spawn_first_thread'の中で）起動され
+     た時に、この値を引数として`diskfs_set_sync_interval'が呼出される。
+     この変数のデフォルトの値は30であり、このデフォルトでは、ディスク・
+     バッファは少なくとも30秒ごとにフラッシュされることになる。
+
+ -- Function: error_t diskfs_validate_mode_change (struct node *NP, mode_t MODE)
+ -- Function: error_t diskfs_validate_owner_change (struct node *NP, uid_t UID)
+ -- Function: error_t diskfs_validate_group_change (struct node *NP, gid_t GID)
+ -- Function: error_t diskfs_validate_author_change (struct node *NP, uid_t AUTHOR)
+ -- Function: error_t diskfs_validate_flags_change (struct node *NP, int FLAGS)
+ -- Function: error_t diskfs_validate_rdev_change (struct node *NP, dev_t RDEV)
+     ノードNPが要求されたとおりに変更可能であればゼロを返す。これはすな
+     わち、NPのモードをMODEに、オーナをUIDに、グループをGIDに、author
+     （FIXME-J：作成者？）をAUTHORに、フラグをFLAGSに、ロー・デバイス番
+     号をRDEVに、それぞれ変更可能である場合を指す。変更可能でない場合は
+     エラー・コードを返す。
+
+     モードやフラグをクリアすることは常に可能でなければならない。diskfs
+     は、これらをクリアする前に許可を求めることはしない。
+
+ -- Function: void diskfs_readonly_changed (int READONLY)
+     これは、ディスクが読込みのみ可能なモードから読み書き可能なモードに
+     変更された時、あるいは、その逆の変更が行われた時に呼出される。
+     READONLYは新しい状態を表す（これはDISKFS_READONLYにも反映される）。
+     ファイルシステムが書込み可能なものとなる場合、この関数は初期起動時
+     にも呼出される。
+
+ -- Variable: error_t (* diskfs_create_symlink_hook ) (struct node *NP, char *TARGET)
+     この関数ポインタがゼロ以外の値である場合（かつ、
+     `diskfs_shortcut_symlink'がセットされている場合）、symlink(FIXME-J:
+     シンボリック・リンク？)をセットするためにその関数が呼出される。その
+     関数が`EINVAL'を返した場合、あるいは、そもそも関数がセットされてい
+     ない場合、通常の方式（すなわち、ファイル・データへの書込み）が使わ
+     れる。これ以外のエラーが返された場合は、そのエラーはユーザに返され
+     る。
+
+ -- Variable: error_t (* diskfs_read_symlink_hook ) (struct node *NP, char *TARGET)
+     この関数ポインタがゼロ以外の値である場合（かつ、
+     `diskfs_shortcut_symlink'がセットされている場合）、symlink(FIXME-J:
+     シンボリック・リンク？)の内容を読込むためにその関数が呼出される。そ
+     の関数が`EINVAL'を返した場合、あるいは、そもそも関数がセットされて
+     いない場合、通常の方式（すなわち、ファイル・データの読込み）が使わ
+     れる。これ以外のエラーが返された場合は、そのエラーはユーザに返され
+     る。
+
+ -- Function: error_t diskfs_rename_dir (struct node *FDP, struct node *FNP, char *FROMNAME, struct node *TDP, char *TONAME, struct protid *FROMCRED, struct protid *TOCRED)
+     （FDPを親ディレクトリ・ノードとして持ち、そのディレクトリの中で
+     FROMNAMEという名前を持つ）ディレクトリ・ノードFNPを、ディレクトリ
+     TDPの中でTONAMEという名前を持つように、名前変更する。これらのノード
+     はどれもロックされておらず、関数の復帰時にどれもロックされていては
+     ならない。このルーチンはserialize（FIXME-J:シリアライズ？）されるの
+     で、再入可能である必要はない。ディレクトリがこのルーチン以外によっ
+     て名前変更されることは決してない。FROMCREDはFDPとFNPに対して責任を
+     負うユーザである。また、TOCREDはTDPに対して責任を負うユーザである。
+     このルーチンは、`.'と`..'は普通の慣例どおり通常のリンクによって表さ
+     れるものと想定している。あなたが実装するフォーマットにおいてこの想
+     定が正しくない場合、あなたはこの関数を再定義しなければならない。
+
+ -- Function: error_t diskfs_clear_directory (struct node *DP, struct node *PDP, struct protid *CRED)
+     ディレクトリDPから`.'と`..'のエントリをクリア（FIXME-J:削除？）する。
+     DPの親ディレクトリがPDPであり、この親ディレクトリに対して責任を負う
+     ユーザはCREDにより識別される。どちらのディレクトリもロックされてい
+     なければならない。このルーチンは、`.'と`..'は普通の慣例どおり通常の
+     リンクによって表されるものと想定している。あなたが実装するフォーマッ
+     トにおいてこの想定が正しくない場合、あなたはこの関数を再定義しなけ
+     ればならない。
+
+ -- Function: error_t diskfs_init_dir (struct node *DP, struct node *PDP, struct protid *CRED)
+     ロックされたノードDPは新規ディレクトリである。これに構造体
+     （FIXME-J:構造？）を提供するために必要なリンクをすべて追加する。こ
+     のノードの親ノードが（ロックされている）PDPである。このルーチンは、
+     PDPに対して`diskfs_lookup'を呼出さないこともある。この新規ディレク
+     トリは、`diskfs_dirempty'の意味する範囲においてクリア（FIXME-J:？）
+     でなければならない。このルーチンは、`.'と`..'は普通の慣例どおり通常
+     のリンクによって表されるものと想定している。あなたが実装するフォー
+     マットにおいてこの想定が正しくない場合、あなたはこの関数を再定義し
+     なければならない。CREDは、この関数呼出しをおこなったユーザを識別す
+     る。
+
+
+
+
+File: hurd-ja.info, Node: Diskfs Internals, Prev: Diskfs Options, Up: Diskfs Library
+
+Diskfsの内部詳細
+----------------
+
+このライブラリは以下の関数群もエクスポートしている。ただし、このライブラ
+リが提供している他の関数群を再定義するのでなければ、これらは一般的には有
+用ではない。
+
+ -- Function: error_t diskfs_create_protid (struct peropen *PO, struct iouser *USER, struct protid **CRED)
+     ユーザUSERを指すCREDの中の既存のperopen POに対応するprotidを作成し
+     て返す。ノード`PO->np'はロックされていなければならない。
+
+ -- Function: error_t diskfs_start_protid (struct peropen *PO, struct protid **CRED)
+     peropen POに対応する、ユーザ識別情報を持たないprotidをCREDの中に構
+     築して返す。ノード`PO->np'はロックされていなければならない。
+
+ -- Function: void diskfs_finish_protid (struct protid *CRED, struct iouser *USER)
+     `diskfs_start_protid'により開始されたprotid CREDの構築を終了させる。
+     protidに組み込まれるユーザがUSERである。
+
+ -- Function: void diskfs_protid_rele (void *ARG)
+     protid CREDがもはやreference（FIXME-J:リファレンス、参照？）を持た
+     なくなった時に呼出される。protidへのreference（FIXME-J:リファレンス、
+     参照？）はポート管理ライブラリによって保守されるため、これはクリー
+     ンな（FIXME-J:？）ルーチンの一覧に含められる。ポート・ライブラリが
+     この構造体を解放する。
+
+ -- Function: struct peropen * diskfs_make_peropen (struct node *NP, int FLAGS, struct peropen *CONTEXT)
+     ノードNP上にオープン・フラグFLAGSを持つ新しいperopen構造体を作成し
+     て返す。`root_parent'、`shadow_root'、`shadow_root_parent'の各フィー
+     ルドの初期値は、CONTEXTがゼロ以外であればそこからコピーされる。
+     CONTEXTがゼロであれば、これらの値はいずれもゼロにセットされる。
+
+ -- Function: void diskfs_release_peropen (struct peropen *PO)
+     POに対するreference（FIXME-J:リファレンス、参照？）・カウントをデク
+     リメントする。
+
+ -- Function: error_t diskfs_execboot_fsys_startup (mach_port_t PORT, int FLAGS, mach_port_t CTL, mach_port_t *REAL, mach_msg_type_name_t *REALPOLY)
+     この関数は、execserverのブートストラップのために`S_fsys_startup'に
+     より呼出される。execserverは本物のノードがなくても機能することがで
+     きるので、このようなぺてんが可能である（FIXME-J:？）。引数は
+     `<hurd/fsys.defs>'の中の`fsys_startup'と同様である。
+
+ -- Function: int diskfs_demuxer (mach_msg_header_t *INP, mach_msg_header_t *OUTP)
+     diskfsポートに対して入ってくる`libports'メッセージをdemultiplex
+     （FIXME-J:？）する。
+
+diskfsライブラリは、fs、io、fsys、interrupt、notifyの各インターフェイス
+をdemultiplex（FIXME-J:？）するための関数群も提供している。すべてのサー
+バ・ルーチンは、`diskfs_S_'という接頭辞を持つ。これらのルーチンについて
+は、`file_t'型、もしくは、`io_t'型の`in'（入力）引数は、スタブからは
+`struct protid *'として見える。
+
+
+
+
+File: hurd-ja.info, Node: Twisted Filesystems, Next: Distributed Filesystems, Prev: Stored Filesystems, Up: Top
+
+Twisted（FIXME-J:？）ファイルシステム
+*************************************
+
+Hurdでは、ファイルシステムに対するリクエストをトランスレータが別のトラン
+スレータへ転送することが可能であり、これにより、背後にあるデータが同一で
+あっても、それが複数の異なる見え方をするというような実装を実現することが
+可能になる。この章で説明するトランスレータは、データに対する直接的なアク
+セスを提供するものではない。むしろ、既存の物理的なファイルシステム・レイ
+アウトを単純化するのに役立つ構成ツールである。
+
+これらのトランスレータは細心の注意を払って使うべきである。さもないと、ファ
+イルシステムは厳密なツリー構造であってほしいと考えている人々に、誤って害
+を与えることがあるかもしれない。 (1) (*Note Twisted
+Filesystems-Footnotes::)
+
+FIXME: finish
+
+
+symlink, firmlink
+=================
+
+hostmux, usermux
+================
+
+shadowfs
+========
+
+
+
+File: hurd-ja.info  Node: Twisted Filesystems-Footnotes, Up: Twisted Filesystems
+
+(1) ねじれ曲がったファイルシステムの迷路の中で迷子になってしまう、等々
+...
+
+
+
+File: hurd-ja.info, Node: Distributed Filesystems, Next: Networking, Prev: Twisted Filesystems, Up: Top
+
+分散ファイルシステム
+********************
+
+分散ファイルシステムは、何らかのネットワーク接続を使って別々のマシン間で
+ファイルを共有するために設計されている。そのデザインは、stored（FIXME-J）
+ファイルシステムのデザインとは大きく異なっている(*Note Stored
+Filesystems::)。ネットワークの遅延や障害といった問題に対処する必要があり、
+また、複数のファイル・サーバ間でやりとりされる複雑なauthentication
+（FIXME-J:認証？）プロトコルやreplication（FIXME-J）プロトコルを必要とす
+る可能性もある。
+
+* Menu:
+
+* File Transfer Protocol::      FTPベースの分散ファイルシステム。
+* Network File System::         SunのNFS: 出来は悪いが、よく使われているファイルシステム。
+
+
+
+
+File: hurd-ja.info, Node: File Transfer Protocol, Next: Network File System, Prev: Distributed Filesystems, Up: Distributed Filesystems
+
+File Transfer Protocol
+======================
+
+FIXME: finish
+
+* Menu:
+
+* FTP Connection Library::      Managing remote FTP server connections.
+
+
+ftpcp, ftpdir
+-------------
+
+ftpfs
+-----
+
+
+
+File: hurd-ja.info, Node: FTP Connection Library, Prev: File Transfer Protocol, Up: File Transfer Protocol
+
+FTP Connection Library
+----------------------
+
+FIXME: finish
+
+
+
+
+File: hurd-ja.info, Node: Network File System, Prev: File Transfer Protocol, Up: Distributed Filesystems
+
+Network File System
+===================
+
+FIXME: finish
+
+
+nfsd
+----
+
+nfs
+---
+
+
+
+
+File: hurd-ja.info, Node: Networking, Next: Terminal Handling, Prev: Distributed Filesystems, Up: Top
+
+Networking
+**********
+
+FIXME: this subsystem is in flux 
+* Menu:
+
+* Socket Interface::            Network communication I/O protocol.
+
+
+
+pfinet
+======
+
+pflocal
+=======
+
+libpipe
+=======
+
+
+
+File: hurd-ja.info, Node: Socket Interface, Prev: Networking, Up: Networking
+
+Socket Interface
+================
+
+FIXME: net frobbing stuff may be added to socket.defs
+
+
+
+
+File: hurd-ja.info, Node: Terminal Handling, Next: Running Programs, Prev: Networking, Up: Top
+
+Terminal Handling
+*****************
+
+FIXME: finish
+
+
+term
+====
+
+term.defs
+=========
+
+
+
+
+File: hurd-ja.info, Node: Running Programs, Next: Authentication, Prev: Terminal Handling, Up: Top
+
+Running Programs
+****************
+
+FIXME: finish
+
+
+ps, w
+=====
+
+libps
+=====
+
+exec
+====
+
+proc
+====
+
+crash
+=====
+
+
+
+
+File: hurd-ja.info, Node: Authentication, Next: Index, Prev: Running Programs, Up: Top
+
+Authentication
+**************
+
+FIXME: finish
+
+* Menu:
+
+* Auth Interface::              Auth ports implement the auth interface.
+
+
+addauth, rmauth, setauth
+========================
+
+su, sush, unsu
+==============
+
+login, loginpr
+==============
+
+auth
+====
+
+
+
+File: hurd-ja.info, Node: Auth Interface, Prev: Authentication, Up: Authentication
+
+Auth Interface
+==============
+
+FIXME: finish
+
+* Menu:
+
+* Auth Protocol::               Bidirectional authentication.
+
+
+
+File: hurd-ja.info, Node: Auth Protocol, Prev: Auth Interface, Up: Auth Interface
+
+Auth Protocol
+-------------
+
+FIXME: finish
+
+
+
+
+File: hurd-ja.info, Node: Index, Prev: Authentication, Up: Top
+
+Index
+*****
+
+
+* Menu:
+
+* auth.defs:                    Auth Interface.         4.
+* socket.defs:                  Socket Interface.       4.
+* NFS:                          Network File System.    4.
+* ftpconn.h:                    FTP Connection Library.  4.
+* libftpconn:                   FTP Connection Library.  4.
+* FTP:                          File Transfer Protocol.  4.
+* diskfs_S_*:                   Diskfs Internals.       48.
+* libstorefs:                   Diskfs Library.         12.
+* diskfs.h:                     Diskfs Library.         4.
+* libdiskfs:                    Diskfs Library.         4.
+* isofs:                        ISO-9660 CD-ROM FS.     4.
+* ufs:                          BSD Unix FS.            4.
+* ext2fs:                       Linux Extended 2 FS.    4.
+* fsck:                         Repairing Filesystems.  4.
+* filesystems, disk-based:      Stored Filesystems.     4.
+* disk-based filesystems:       Stored Filesystems.     4.
+* `remap' store:                Store Classes.          247.
+* `mvol' store:                 Store Classes.          224.
+* disks, interleaving:          Store Classes.          197.
+* interleaving disks:           Store Classes.          197.
+* disk striping:                Store Classes.          197.
+* striping, disk:               Store Classes.          197.
+* RAID-0:                       Store Classes.          197.
+* `ileave' store:               Store Classes.          196.
+* concatenation, disk:          Store Classes.          171.
+* disk concatenation:           Store Classes.          171.
+* disks, appending:             Store Classes.          171.
+* appending disks:              Store Classes.          171.
+* linear concatenation:         Store Classes.          171.
+* `concat' store:               Store Classes.          170.
+* `gunzip' store:               Store Classes.          150.
+* `copy' store:                 Store Classes.          124.
+* `zero' store:                 Store Classes.          112.
+* `task' store:                 Store Classes.          97.
+* `file' store:                 Store Classes.          81.
+* `device drivers':             Store Classes.          66.
+* `device' store:               Store Classes.          65.
+* `typed_open' store:           Store Classes.          38.
+* `query' store:                Store Classes.          22.
+* store.h:                      Store Library.          4.
+* libstore:                     Store Library.          4.
+* fsys.defs:                    Filesystem Interface.   4.
+* file_lock_stat:               File Locking.           9.
+* file_lock:                    File Locking.           9.
+* file_exec:                    Program Execution.      5.
+* file_set_size:                Changing Status.        32.
+* file_utimes:                  Changing Status.        28.
+* file_chflags:                 Changing Status.        22.
+* file_chmod:                   Changing Status.        20.
+* file_chauthor:                Changing Status.        17.
+* file_chown:                   Changing Status.        12.
+* fs.defs:                      File Interface.         4.
+* fshelp.h:                     Fshelp Library.         4.
+* libfshelp:                    Fshelp Library.         4.
+* trivfs.h:                     Trivfs Library.         4.
+* libtrivfs:                    Trivfs Library.         4.
+* settrans:                     Invoking settrans.      4.
+* io_map:                       Mapped Data.            5.
+* io_server_version:            Information Queries.    47.
+* io_stat:                      Information Queries.    5.
+* io_get_icky_async_id:         Asynchronous I/O.       39.
+* io_get_owner:                 Asynchronous I/O.       39.
+* io_mod_owner:                 Asynchronous I/O.       39.
+* io_select:                    Asynchronous I/O.       29.
+* io_async:                     Asynchronous I/O.       5.
+* io_clear_some_openmodes:      Open Modes.             5.
+* io_set_some_openmodes:        Open Modes.             5.
+* io_get_openmodes:             Open Modes.             5.
+* io_set_all_openmodes:         Open Modes.             5.
+* io_readable:                  Simple Operations.      43.
+* io_seek:                      Simple Operations.      38.
+* io_read:                      Simple Operations.      17.
+* io_write:                     Simple Operations.      5.
+* io_reauthenticate:            I/O Object Ports.       48.
+* io_restrict_auth:             I/O Object Ports.       43.
+* io_duplicate:                 I/O Object Ports.       40.
+* io.defs:                      I/O Interface.          4.
+* external pager (XP):          Pager Library.          5.
+* XP (external pager):          Pager Library.          5.
+* pager.h:                      Pager Library.          4.
+* libpager:                     Pager Library.          4.
+* iohelp_put_shared_data:       Conch Management.       5.
+* iohelp_fetch_shared_data:     Conch Management.       5.
+* iohelp_verify_user_conch:     Conch Management.       5.
+* iohelp_handle_io_release_conch: Conch Management.     5.
+* iohelp_get_conch:             Conch Management.       5.
+* iohelp_handle_io_get_conch:   Conch Management.       5.
+* iohelp_initialize_conch:      Conch Management.       5.
+* conch:                        Conch Management.       5.
+* iohelp.h:                     Iohelp Library.         4.
+* libiohelp:                    Iohelp Library.         4.
+* libhurdbugaddr:               Bug Address Library.    4.
+* libshouldbeinlibc:            Misc Library.           4.
+* ihash.h:                      Integer Hash Library.   4.
+* libihash:                     Integer Hash Library.   4.
+* ports.h:                      Ports Library.          4.
+* libports:                     Ports Library.          4.
+* Microkernel Object Model:     Microkernel Object Library.  12.
+* MOM:                          Microkernel Object Library.  12.
+* mom.h:                        Microkernel Object Library.  4.
+* libmom:                       Microkernel Object Library.  4.
+* cthreads.h:                   Threads Library.        4.
+* libthreads:                   Threads Library.        4.
+* reboot:                       Shutdown.               4.
+* halt:                         Shutdown.               4.
+* servers.boot:                 Boot Scripts.           4.
+* /boot/servers.boot:           Boot Scripts.           4.
+* serverboot:                   Server Bootstrap.       4.
+* GRand Unified Bootloader:     Bootloader.             12.
+* GRUB:                         Bootloader.             12.
+
+
+

@@ -1,0 +1,1837 @@
+Info file: flex-ja.info,    -*-Text-*-
+produced by `texinfo-format-buffer'
+from file `flex-ja.texi'
+using `texinfmt.el' version 2.38 of 3 July 1998.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+This file documents Version 2.3.7 - 2.5.4 of the Flex lexical scanner
+generator.
+
+This is Edition  1.03,  February 1993, 
+of the `Flex Version  2.3.7 - 2.5.4 Manual'.
+
+Copyright (C) 1992, 1993 Free Software Foundation, Inc.
+
+Permission is granted to make and distribute verbatim copies of this
+manual provided the copyright notice and this permission notice are
+preserved on all copies.
+
+
+Permission is granted to copy and distribute modified versions of this
+manual under the conditions for verbatim copying, provided that the
+entire resulting derived work is distributed under the terms of a
+permission notice identical to this one.
+
+Permission is granted to copy and distribute translations of this manual
+into another language, under the above conditions for modified versions,
+except that this permission notice may be stated in a translation
+approved by the Free Software Foundation.
+
+
+
+
+
+
+
+
+File: flex-ja.info  Node: %option (Flex 2.5)-Footnotes, Up: %option (Flex 2.5)
+
+(1) Flex 2.5.4に付属のドキュメント`flex.texi'には、関数
+`input()'についても同様のことが記載されていますが、実際に
+`%option *no*input'を指定してみると、生成されるスキャナ
+の中に、関数`input()'が組み込まれます。
+
+
+File: flex-ja.info, Node: Interfacing to Flex, Next: Other Flex Features, Prev: Flex Descriptions, Up: Top
+
+Flexとのインターフェイス
+************************
+
+     この章ではCおよびBisonと一緒にFlexを使う方法を説明します。 (1)
+     (*Note Interfacing to Flex-Footnotes::)C、Bisonのそれぞれが非常に多
+     くの細目を含むため、本章は２つの部分に分割されています。その両方に、
+     全般的なインターフェイス概念に関する節と実例を示す節があります。
+
+========================================================================
+* Menu:
+
+* Flex and C:: CとFlexのインターフェイス
+* Flex and C (Flex 2.5)::       同上（Flex 2.5の補足情報）
+* An Example of Flex and C::    フィルタにおける文字列代替
+* Flex and Bison::              FlexとBisonの協同
+* Another Example of Flex and Bison::  FlexとBisonのもう１つの実例
+* Flex and C++ (Flex 2.5)::     C++とFlexのインターフェイス
+                                （Flex 2.5の補足情報）
+========================================================================
+
+
+ File: flex-ja.info Node: Interfacing to Flex-Footnotes, Up:
+Interfacing to Flex
+
+(1) 訳注：この章の最後で、C++の使い方についても説明します。
+
+
+File: flex-ja.info, Node: Flex and C, Next: An Example of Flex and C, Prev: Interfacing to Flex, Up: Interfacing to Flex
+
+FlexとC
+=======
+
+Flexに対するCの主要なインターフェイスは、以下に挙げるルーチンと変数によ
+るものです。以下の節を読む際には、いくつかの細かな部分でFlexとLexとの間
+に相違点があるということを意識しておいてください。Lexが提供していない関
+数がいくつかありますし、宣言の内容が違うものもあります。こうした相違点は、
+通常大きな問題にはなりません。というのは、相違のある関数は一般的にはあま
+り使われていないからです。相違点に関する詳細については、*Note Flex and
+Lex::および*Note Flex and POSIX::を参照してください。
+
+     `関数'
+          説明と実例
+
+     `yylex()'
+          `yylex()'は実際のスキャン処理を行う関数です。ファイル（デフォ
+          ルトは`stdin'）を読み込み、パターン・マッチングを行い、パター
+          ンに関連付けされたアクションを実行します。デフォルトでは、入力
+          の終端に達するまでマッチングを行い、終端に達したところでゼロを
+          返します。（`return'を使って、呼び出し側のプログラムにほかの値
+          を返すことは可能です。これは、*Note Flex and Bison::で説明して
+          います。）したがって、インターフェイスを提供する簡単な方法の１
+          つは、オプションのCコード領域の１つに以下のようなコードを追加
+          することです。
+
+               #include <stdio.h>
+
+               int main(argc,argv)
+               int argc;
+               char *argv;
+               {
+                  yylex();
+               }
+
+          しかしこのような場合には、Flexライブラリ（`-lfl'）もしくはLex
+          ライブラリ（`-ll'）のいずれかをリンクして、そこからこれと同じ
+          ような`main()'関数を取り込むことができます。この場合は、スキャ
+          ナは単にファイルをスキャンして、ルールに関連付けされたアクショ
+          ンを実行するだけであるという点に注意してください。
+
+          `yylex()'の使い方としてもう１つよく見られるのが、マッチされた
+          ものが何であるかを示す値を返させることです。これは、アクション
+          に`return'文を追加することで行われます。`return'文を見つけると、
+          `yylex()'は指定された値を返します。これが、Bisonによるパーサが
+          Flexによるスキャナから情報を獲得する方法です。
+
+          ルールの中に、マッチされたテキストが何を表しているかを示すコー
+          ドを返す`return'文があれば、以下のようなインターフェイスを使う
+          ことができます。
+
+               #include <stdio.h>
+
+               int main(argc,argv)
+               int argc;
+               char *argv;
+               {
+                  int return_code;
+                  while((return_code = yylex()) != 0){
+                      switch(return_code){
+                      case KEYWORD1:
+                         /* 何かを行う */
+                         break;
+                      case KEYWORD2:
+                         /* 何か別のことを行う */
+                         break;
+                           ...
+                      case KEYWORDN:
+                      }
+                  }
+               }
+
+          `yylex'のデフォルトの定義は`int yylex(void)'ですが、これは
+          `YY_DECL'マクロを使うことによって変更することができます。例を
+          示すと、以下のコードは`yylex()'の名前を`gettok()'に、型をchar
+          に対するポインタ型に変更し、パラメータ`buffer'を受け取るように
+          指定します。
+
+               #undef   YY_DECL
+               #define  YY_DECL char *gettok(char *buffer)
+
+          *注：*ANSI対応でないCを使っている場合は以下のように定義しなけ
+          ればなりません。#define YY_DECL char *gettok(buffer) \ char
+          *buffer; 言葉を変えると、再宣言はターゲットとなるCコンパイラに
+          とって正当な関数宣言でなければなりません。さらに、この再宣言は、
+          ファイルの*先頭*にあるオプションのCコード領域になければならな
+          いという点に注意してください。
+
+     `yyin'
+          `yyin'は、`yylex()'が文字を読み込む元となるファイルです。デフォ
+          ルトは`stdin'ですが、`fopen()'を使って変更することができます。
+          `yyin'を読み込むデフォルトの方法は、複数文字から成るブロックを
+          一度に読むというものです。これは、`YY_INPUT'マクロによって変更
+          できます。`YY_INPUT'マクロは、ファイルではなく文字列をスキャン
+          するためのスキャナを生成するのに便利です。`YY_INPUT'を定義する
+          方法は以下のとおりです。
+
+               YY_INPUT(buffer,result,max_size)
+
+          ここで、`buffer'は入力バッファ、`result'は読み込まれた文字数が
+          セットされる変数、`max_size'は`buffer'のサイズです。以下に、一
+          度に１文字ずつ読み込むという入力方法に変更する再定義の例を示し
+          ます。この方法を使うと*かなり*遅くなるので、お勧めはできません。
+
+               #undef   YY_INPUT
+               #define  YY_INPUT(buffer,result,max_size) \
+                        {\
+                           buffer[0] = getchar();\
+                           if(buffer[0] == EOF)\
+                              result = YY_NULL;\
+                           else\
+                              result = 1;\
+                        }
+
+          *注：*この再宣言は、ファイルの*先頭*にあるオプションのCコード
+          領域になければなりません。
+
+     `yyout'
+          `yyout'はスキャナが`ECHO'の出力を書き込むファイルです。デフォ
+          ルトは`stdout'ですが、これも`fopen()'を呼び出すことで変更でき
+          ます。
+
+     `yytext'
+          `yytext'は最後にマッチされた文字列、つまり最後に認識されたトー
+          クンを含む大域変数です。`yytext'の正しい外部定義は、Lexの場合
+          のcharの配列とは*異なり*、charに対するポインタ型である点に注意
+          してください。 (1) (*Note Flex and C-Footnotes::) つまり、
+          `yytext'は
+
+
+               extern char yytext[];
+
+          ではなく、常に
+
+               extern char *yytext;
+
+          のように宣言されなければならないということです。
+          @noindent
+
+          このようになっている理由は性能です。`yytext'が配列であると、ス
+          キャナ中でそれを操作するコードは、コピー処理をたくさん行う必要
+          があります。これに対して`yytext'がポインタである場合には、この
+          ようなことは必要ありません。
+
+          通常は、`yytext'は変更すべきではありません。`yytext'の内容が変
+          更される必要がある場合には、代わりのバッファが使われるべきです。
+          （`examples'サブディレクトリの`yymore2.lex'ファイルでは、
+          `yytext'を直接操作する技法が実演されています。ただし、このよう
+          なやり方は*お勧めできません*。）
+
+     `yyleng'
+          `yyleng'は、最後に認識されたトークンの長さを保持する大域変数で
+          す。
+
+     `yywrap()'
+          `yywrap'は、`yyin'の終端に達した時に呼び出される関数です。この
+          関数が`TRUE'（ゼロ以外）を返すとスキャナは終了し、`FALSE'（ゼ
+          ロ）を返すと、`yyin'が次の入力ファイルを指すように設定されたも
+          のと仮定して、スキャン処理が続行されます。
+
+          現在のところ`yywrap()'は、常に１を返すよう定義されているマクロ
+          です。このため、再定義するには、まず最初に`#undef'で定義解除し
+          なければなりません。Lexでは、`yywrap()'は関数です。Flexも将来
+          のある時点で、これを関数として定義することになるでしょう。 (2)
+          (*Note Flex and C-Footnotes::)
+
+     `yymore()'
+          `yymore()' は、次に認識されるトークンで`yytext'の内容を更新す
+          るのではなく、その時点の`yytext'の内容の後ろにそのトークンを追
+          加するようFlexに通知する関数です。したがって、以下の例に対して
+          `foobar'という文字の並びを入力として与えると、`stdout'に
+          `foofoobar'という文字の並びが書き込まれます。
+
+               %%
+               foo    ECHO; yymore(); 
+               bar    ECHO;
+
+          これは、まず`foo'ルールによって`foo'という文字の並びが認識され
+          て`ECHO'され、次に`bar'という文字の並びが認識されて`yytext'の
+          内容の後ろに追加された後に、`foobar'という文字の並びが`ECHO'さ
+          れるからです。
+
+          もう少し現実的な例を取り上げましょう。以下のコードは複数行の文
+          字列を処理するのに`yymore()'を使っています。
+
+               /*
+                *  yymore.lex: yymore()を有効に使う例
+                */
+
+               %{
+               #include <memory.h>
+               void yyerror(char *message)
+               {
+                 printf("Error: %s\n",message);
+               }
+
+               %}
+
+               %x STRING
+
+               %%
+               \"   BEGIN(STRING);
+
+               <STRING>[^\\\n"]* yymore();
+               <STRING><<EOF>> {
+                             yyerror("EOF in string.");       
+                             BEGIN(INITIAL);
+                           }
+               <STRING>\n  {
+                             yyerror("Unterminated string."); 
+                             BEGIN(INITIAL);
+                           }
+               <STRING>\\\n yymore(); /* 複数行にわたる
+                                       * 文字列を処理する
+                                       */
+               <STRING>\"  {
+                             yytext[yyleng-1] = '\0';
+                             printf("string = \"%s\"",yytext); 
+                             BEGIN(INITIAL);
+                           }
+               %%
+
+          この例では、エスケープ・シーケンスの変換がまったく行われていな
+          いので、文字列に対してさらに処理が必要である点に注意してくださ
+          い。この例は、*Note 文字列リテラルの処理: Handling Stringsにお
+          いて、エスエープ・シーケンスを処理する、より役に立つ形式に拡張
+          されます。
+
+     `yyless(N)'
+          `yyless()'は、`yymore()'とほぼ反対のことを行うものです。この関
+          数は、最初のN文字以外のすべてを戻します。戻された文字の並びは、
+          次のトークンをマッチするのに使われ、`yyleng'と`yytext'には、こ
+          の変化を反映した値が設定されます。引数Nにゼロを指定して
+          `yyless()'を呼び出すと、全入力データが戻され、スキャナは
+          （`BEGIN'、またはそれに類似のものでデフォルトの動作が変更され
+          ない限り）無限ループに入ります。例えば、次のコードに`foobar'と
+          いう文字の並びを入力として与えると、`foobarbar'という文字の並
+          びが出力されます。
+
+               %%
+               foobar      ECHO; yyless(3);
+               [a-z]+      ECHO;
+
+          これは、`foobar'が認識され`ECHO'された後に、`bar'が戻されるか
+          らです。となると、次にマッチするのは（`[a-z]+'というルールでマッ
+          チされる）`bar'だけで、これが次に`ECHO'されることになります。
+
+     `input()'
+          `input()'は、`yyin'から次の文字を取って返す関数です。これは、
+          標準的なFlexルール・システムを使ったのではうまく扱えないケース
+          を処理するのによく使われます。例えば、ほとんどの言語におけるコ
+          メントは、これを使って処理することができます。これを使う理由は、
+
+               %%
+               "/*".*"*/"
+
+          が、ピリオドが改行*以外*の任意の文字にマッチしてしまうために複
+          数行にわたるコメントをうまく処理できず、また、
+
+               %%
+               "/*"[.\n]*"*/"
+
+          は、文字クラスが*任意*の文字にマッチしてしまうために、バッファ
+          をオーバーフローさせるか、さもなくばファイルの内容をすべて読み
+          込んでしまうからです。（実際には、排他的スタート状態を使うこと
+          で、こうしたことを非常にエレガントな方法で処理することができま
+          す。実例については、*Note 役に立つコードの抜粋: Useful Codeを
+          参照してください。しかし、POSIXによりサポートされているにもか
+          かわらず、ここで必要になるいくつかの機能をLexが提供していない
+          ために、この方法には移植性がありません。）Cのコメントは以下の
+          ようにして移植性のある方法で処理することができます。
+
+               %%
+               "/*" {
+                       int a,b;
+        
+                       a = input();
+                       while(a != EOF){
+                         b = input();
+                         if(a == '*' && b == '/'){
+                           break;
+                          }else{
+                           a = b;
+                          }
+                        }
+                       if(a == EOF){
+                         error_message("EOF in comment");
+                       }
+                     }
+
+          *注：*スキャナがC++コンパイラを使ってコンパイルされる場合は、
+          この関数`input'は`yyinput'という名前になります。これは、
+          `input'という名前が同一名のC++ストリームと衝突するからです。ま
+          た、Flexでは`input()'は`yytext'の内容を破壊しますが、Lexでは
+          `yytext'は変更されずそのまま残ります。これは将来のリリースで修
+          正される予定です。
+
+     `unput(c)'
+          `unput()'は、文字`c'が次にスキャンされる文字になるように、文字
+          `c'を入力ストリームに置く関数です。例えば、
+
+               %%
+               foo  unput('b'); 
+
+          は`foo'を`b'で置き換えます。これは、`foo'にマッチして`b'を戻し、
+          この`b'が次にスキャンされる文字になるからです。デフォルトのルー
+          ルにより、`b'は`stdout'に書き込まれます。
+
+          １つの文字が次にスキャンされる文字になるということには１つ微妙
+          な点があって、それは、文字列を入力ストリームに置きたい場合には、
+          逆順に行わなければならないということです。以下に例を示します。
+
+               foobar  {
+                          char  *baz = "baz";
+                          int   i    = strlen(baz)-1;
+
+                          while(i >= 0){
+                             unput(baz[i]);
+                             i--;
+                          }
+                       }
+
+          これは、`foobar'がマッチされた時に、入力ストリームに`baz'を置
+          きます。以下は、*してはならない*ことを示す例です。
+
+               /*
+                * unput.l : unput()を使って行ってはならない
+                *           処理の例
+                */
+
+               %{
+               #include <stdio.h>
+
+               void putback_yytext(void);
+               %}
+
+               %%
+               foobar   putback_yytext();
+               raboof   putback_yytext();
+               %%
+
+               void putback_yytext(void)
+               {
+                   int   i;
+                   int   l = strlen(yytext);
+                   char  buffer[YY_BUF_SIZE];
+
+                   strcpy(buffer,yytext);
+                   printf("Got: %s\n",yytext);
+                   for(i=0; i<l; i++){
+                      unput(buffer[i]);
+                   }
+               }
+
+          この例に`foobar'を入力として与えると、まず`foobar'にマッチし、
+          次に`raboof'にマッチする無限ループに陥ります。
+
+          *注：*`input()'と同様に`unput()'も`yytext'の内容を破壊します。 
+          (3) (*Note Flex and C-Footnotes::)つまり、`yytext'から文字情報
+          を返したい場合には、上の例に示されるように、まず`yytext'の内容
+          をコピーしなければならないことを意味しています。
+
+     `yyterminate()'
+          アクションの中で呼び出されると、`yyterminate()'はスキャナの実
+          行を終了させ、その後に`yylex()'が0を返します。この後は、
+          `yyrestart()'（下記参照）が呼び出されない限り、`yylex()'を呼び
+          出してもすぐに復帰してしまいます。
+
+     `yyrestart(FILE)'
+          `yyrestart()'は、スキャナの実行を再開するようFlexに通知する関
+          数です。これは引数を１つだけ、すなわち、スキャンの対象となるファ
+          イル（通常は`yyin'）を取ります。これは、EOFを処理するために使
+          うこともできますし、また、Flexに割り込みをかけ、その後に再開始
+          させることができるようにするために使うこともできます。（Flexス
+          キャナは*再入可能ではない*ので、このようなことが必要になりま
+          す。）
+
+     `YY_NEW_FILE'
+          `yyin'が新しいファイルを指すよう変更され、処理が継続されるべき
+          であるということをFlexに通知するマクロです。 (4) (*Note Flex
+          and C-Footnotes::) 以下に例を示します。
+
+               /*
+                * cat.lex: YY_NEW_FILEの実演
+                */
+
+               %{
+               #include <stdio.h>
+
+               #define ERRORMESS "Unable to open %s\n"
+
+               char **names = NULL;
+               int  current = 1;
+               %}
+
+               %%
+               <<EOF>> {
+                        current += 1;
+                        if(names[current] != NULL){
+                           yyin = fopen(names[current],"r");
+                           if(yyin == NULL){
+                             fprintf(stderr,ERRORMESS,
+                                      names[current]);
+                             yyterminate();
+                           }
+                           YY_NEW_FILE;
+                        } else {
+                          yyterminate();
+                        }
+                       }
+               %%
+
+               int main(int argc, char **argv)
+               {
+                 if(argc < 2){
+                    fprintf(stderr,"Usage: cat files....\n");
+                    exit(1);
+                 }
+                 names = argv;
+
+                 yyin = fopen(names[current],"r");
+                 if(yyin == NULL){
+                   fprintf(stderr,ERRORMESS,names[current]);
+                   yyterminate();
+                 }
+                 yylex();
+               }
+
+     `ECHO'
+          `yytext'の内容を`yyout'に書き込むマクロです。
+
+     `REJECT'
+          `REJECT'は、その時点においてマッチしているものを受け入れず、次
+          に最もよくマッチするものを受け入れるようスキャナに通知するマク
+          ロです。スキャナはマッチするものの中で最長のものを探し、マッチ
+          するものが２つあってその長さが同じ場合は、記述ファイルにおいて
+          最初に定義されている方を選択します。つまり、認識されるテキスト
+          の長さは、同一の長さになることもあり、または短くなることもある
+          ということを意味しています。`REJECT'を使った後は、`yytext'と
+          `yyleng'は新しい値を取ります。`REJECT'に関して知っておくべき重
+          要な点が２つあります。１つめは、`REJECT'は分岐命令であり、決し
+          て戻ってこないので、`REJECT'の後ろに記述されたアクションは実行
+          されないということです。２つめは、`REJECT'とファスト・テーブル
+          （fast table／`-F'）は一緒に使うことはできないということです。
+          以下に簡単な例を示します。
+
+
+               /*
+                * reject.lex: REJECTとunput()を悪用する実例
+                */
+
+               %%
+               UNIX   { 
+                           unput('U'); unput('N'); 
+                           unput('G'); unput('\0');
+                           REJECT;
+                      } 
+               GNU    printf("GNU is Not Unix!\n"); 
+               %%
+
+          この例は、新式のテキスト代替の技法を示しています。`UNIX'にマッ
+          チするものが見つかると、`unput()'によって`GNU'という文字の並び
+          が戻され、その時点におけるスキャン・バッファの内容が上書きされ
+          ます。次に`REJECT'により分岐が行われ、別のものにマッチするよう
+          スキャナに対して通知が行われます。`GNU'がバッファに書き込まれ
+          たので、これが次にマッチされ、そのアクションが実行されます。以
+          下に、その結果こうなるであろうと思われる例を示します。
+
+               UNIX RETURN
+               GNU is Not Unix!
+
+          実際のところは、Flexにおいて`REJECT'の用途はほんの少ししかあり
+          ません。上記以外では、重複するパターンや状態の変更に*使うこと
+          ができます*。例を示すと、以下のようになります。
+
+               nday         [1-9]|[1-2][0-9]|3[0-1]
+               nmonth       [1-9]|1[0-2]
+               nyear        [0-9]{1,4}
+
+               %x DAY MONTH YEAR
+
+               %%
+
+               {nday}           BEGIN(DAY);   REJECT;
+               <DAY>{nday}
+                    ...  
+               {nmonth}         BEGIN(MONTH); REJECT;
+               <MONTH>{nday}
+                    ...
+               {nyear}          BEGIN(YEAR);  REJECT;
+               <YEAR>{nday}
+                    ...
+
+          この例では、日付の形式は重複しており、最初に認識された構成要素
+          によって、どのように日付をパースするかを決定します。しかし、こ
+          の例は少々不自然な感じがします。というのは、少し考えれば、
+          `REJECT'を使わずに、より効率的なスキャナにすることができるから
+          です。これは、*Note スタート状態の使用例: Start State Example
+          に示しています。
+
+     `BEGIN'
+          `BEGIN'は、スキャナをある特定のスタート状態にするためのマクロ
+          です。`BEGIN'に続く名前はスタート状態の名前です。例えば、
+
+               %x FLOAT
+               %%
+               floats   BEGIN(FLOAT)
+               <FLOAT>SOME_RULE SOME_ACTION
+                      ...
+
+          は、`floats'という単語がマッチした時に、スタート状態を`FLOAT'
+          に設定します（詳細については、*Note Start States Explained::）。
+
+     `YY_USER_ACTION'
+          `YY_USER_ACTION'は、ルール・セクション中のどのアクションよりも
+          *前*に実行されるアクションを定義するマクロです。これは、以下の
+          例で示すように、`yytext'の内容の小文字から大文字への変換等を行
+          うのに役に立ちます。
+
+               /*
+                * user_act.lex: YY_USER_ACTIONを使う
+                *               ユーザ・アクションの例
+                */
+
+               %{
+
+               #include <ctype.h>
+
+               void user_action(void);
+
+               #define YY_USER_ACTION user_action();
+
+               %}
+
+               %%
+
+               .*         ECHO;
+               \n         ECHO;
+
+               %%
+
+               /*
+                * このユーザ・アクションはすべての文字を
+                * 単に大文字に変換する
+                */
+
+               void user_action(void)
+               {
+                 int loop;
+  
+                 for(loop=0; loop<yyleng; loop++){
+                   if(islower(yytext[loop])){
+                      yytext[loop] = toupper(yytext[loop]);
+                   }
+                 }
+               }
+
+          これは、すべての入力文字を単に大文字に変換して`ECHO'します。
+          `YY_USER_ACTION'のデフォルトの設定では、何も実行されません。
+
+     `YY_USER_INIT'
+          `YY_USER_INIT'は、スキャン処理が開始される*前*に実行されるアク
+          ションを定義するマクロです。基本的には、`main()'関数の中で、
+          `yylex()'を呼び出す文の前に同様のコードを記述するのと同じこと
+          です。以下に簡単な例を示します。
+
+               /*
+                * userinit.lex: YY_USER_INITを使う例
+                */
+
+               %{
+               #define YY_USER_INIT open_input_file()
+
+               extern FILE *yyin;
+
+               void open_input_file(void)
+               {
+                 char *file_name,buffer[1024];
+
+                 yyin      = NULL; 
+
+                 while(yyin == NULL){
+                   printf("Input file: ");
+                   file_name = fgets(buffer,1024,stdin);
+                   if(file_name){
+                     file_name[strlen(file_name)-1] = '\0';
+                     yyin = fopen(file_name,"r");
+                     if(yyin == NULL){
+                       printf("Unable to open \"%s\"\n",
+                              file_name);
+                     }
+                   } else {
+                     printf("stdin\n");
+                     yyin = stdin;
+                     break;
+                   }
+                 }
+               }
+
+               %}
+               %%
+
+          これは、ファイルがオープンされるかEOFが検出されるまで、入力ファ
+          イル名を入力するようユーザに催促します。EOFが検出された場合は、
+          入力元はデフォルトで`stdin'になります。これは以下と同じことで
+          す。
+
+               /*
+                * この例は、前の例と同じことをYY_USER_INITを
+                * 使わずに行う
+                */
+ 
+               %{
+               void open_input_file(void)
+               {
+                 char *file_name,buffer[1024];
+
+                 yyin      = NULL; 
+
+                 while(yyin == NULL){
+                   printf("Input file: ");
+                   file_name = fgets(buffer,1024,stdin);
+                   if(file_name){
+                     file_name[strlen(file_name)-1] = '\0';
+                     yyin = fopen(file_name,"r");
+                     if(yyin == NULL){
+                       printf("Unable to open \"%s\"\n",
+                              file_name);
+                     }
+                   } else {
+                     printf("stdin\n");
+                     yyin = stdin;
+                     break;
+                   }
+                 }
+               }
+
+               %}
+               %%
+               %%
+
+               int main(int argc, char *argv[])
+               {
+                  open_input_file();
+                  yylex();
+               }
+
+     `YY_BREAK'
+          `YY_BREAK'はマクロです。インターフェイス的な機能というよりも、
+          むしろ生成されるコードを変更するために使うことができるものです。
+
+          スキャナ中において、すべてのアクションは１つの大きな`switch'文
+          の要素であり、デフォルトでCの`break;'文に置き換えられる
+          `YY_BREAK'によって区切られます。ルールのアクション部が多くの
+          `return'文を含んでいる場合、コンパイラが`statement not
+          reached'というエラー・メッセージをたくさん出力するかもしれませ
+          ん。`YY_BREAK'を再定義することによって、この警告メッセージの出
+          力を止めることが可能です。再定義は、セミ・コロンを含む正当なC
+          の文でなければ*なりません*。
+
+
+ 
+          *注：*`YY_BREAK'を再定義して空にするのであれば、アクションの最
+          後は必ず`return;'か`break;'になるようにしてください。
+
+
+
+File: flex-ja.info  Node: Flex and C-Footnotes, Up: Flex and C
+
+(1) 訳注：Flex 2.5では、`%pointer'と`%array'により、
+`yytext'の型を選択できるようになりました。`%pointer'
+を指定した場合は`char *yytext'、`%array'を指定した場
+合は`char yytext[YYLMAX]'となります。デフォルトは
+`%pointer'です。`%array'を指定した場合の配列のサイズ
+は、`YYLMAX'を再定義することによって変更可能です。
+
+(2) 訳注：Flex 2.5では、`%option noyywrap'が指定されない
+限り、`yywrap()'は関数です。再定義をするのに、
+`#undef'で定義解除する必要はありません。
+
+(3) 訳注：Flex 2.5では、`%array'が指定された場合は、
+`unput()'は`yytext'の内容を破壊しません。
+
+(4) 訳注：Flex 2.5では、`yyin'を変更した後に
+`YY_NEW_FILE'を実行する必要はなくなりました。
+
+
+
+File: flex-ja.info, Node: Flex and C (Flex 2.5), Next: An Example of Flex and C, Prev: Flex and C, Up: Interfacing to Flex
+
+FlexとC（Flex 2.5の補足情報）
+=============================
+
+Flex 2.5では、前節（*Note Flex and C::）で説明されていない、以下のマクロ
+もサポートされています。
+
+     `yy_set_interactive(IS_INTERACTIVE)'
+          カレント・バッファを、対話的なものと見なすか、非対話的なものと
+          見なすかを制御します。引数IS_INTERACTIVEにゼロ以外の値を渡すと、
+          カレント・バッファは対話的なものと見なされ、ゼロを渡すと、非対
+          話的なものと見なされます。`yy_set_interactive()'による指定は、
+          `%option always-interactive'や`%option never-interactive'によ
+          る指定に優先します。このマクロは、バッファからのスキャン処理が
+          始まるよりも前に呼び出されなければなりません。
+
+     `yy_set_bol(at_bol)'
+          バッファは、様々なコンテキスト情報を保持しています。例えば、行
+          頭を表す`^'を含むルールが適用されるのは、バッファ内のカレント
+          な位置が実際に行の先頭である場合だけですが、カレントな位置が行
+          の先頭にあるか否かという情報は、バッファのコンテキスト情報とし
+          て保持されています。
+
+          マクロ`yy_set_bol()'は、バッファ内のカレントな位置が行の先頭に
+          あるか否かを表すコンテキスト情報を設定します。引数にゼロ以外の
+          値を渡すと、バッファ内のカレントな位置は行の先頭である、という
+          コンテキスト情報がセットされます。したがって、次にトークンのマッ
+          チ処理が行われる時には、行頭を表す`^'を含むルールの適用が試み
+          られます。逆に、引数にゼロを渡すと、バッファ内のカレントな位置
+          は行の先頭ではないことになり、次にトークンのマッチ処理が行われ
+          る時には、行頭を表す`^'を含むルールの適用が試みられなくなりま
+          す。
+
+     `YY_AT_BOL()'
+          次にトークンのマッチ処理が行われる時に、行頭を表す`^'を含むルー
+          ルの適用が試みられるようなコンテキスト情報がセットされている場
+          合には、ゼロ以外の値を返します。それ以外の場合は、ゼロを返しま
+          す。
+
+
+
+File: flex-ja.info, Node: An Example of Flex and C, Next: Flex and Bison, Prev: Flex and C, Up: Interfacing to Flex
+
+FlexとCの簡単な実例
+===================
+
+ある単語が現れた時に、それを別の単語に置き換える必要の生じることがよくあ
+ります。例えば、ある名前が現れるたびに、それをある１つの環境変数の値で置
+き換えてくれるユーティリティを作りたいとしましょう。そして、以下のような
+ことができるように、そのユーティリティがフィルタとして動作するようにさせ
+たいとします。
+
+     nick% myname   < infile | more
+     nick% myname   < infile > outfile
+
+以下に、こうしたことを実現する方法を示すFlexファイルの簡単な例を挙げます。
+
+     /*
+      * myname.lex : トークンの置き換えを行うFlexプログラム
+      *              のサンプル
+      */
+
+     %%
+
+     %NAME     { printf("%s",getenv("LOGNAME")); }
+     %HOST     { printf("%s",getenv("HOST"));    }
+     %HOSTTYPE { printf("%s",getenv("HOSTTYPE"));}
+     %HOME     { printf("%s",getenv("HOME"));    }
+
+     %%
+
+このソース・ファイルは`examples'サブディレクトリにあり、その名前は
+`myname.lex'です。これをビルドするには、`examples'サブディレクトリに移動
+して`make myname'を実行するか、以下を実行します。
+
+     flex myname.lex
+     cc lex.yy.c -o myname -lfl
+
+ここで`-lfl'は、リンカに対してFlexライブラリをリンクするよう通知します。
+現在のところ、Flexライブラリにはデフォルトの`main()'関数だけが含まれてい
+ます。将来のバージョンのFlexでは、他の関数も含まれるようになるでしょう。
+Flexライブラリがインストールされていない場合は、この部分は`-ll'でなけれ
+ばなりません。
+
+いずれの場合でも、最終的には`myname'という名前の実行ファイルが生成される
+はずです。これは、以下のような変換処理を実行するフィルタです。
+
+     `%NAME'
+          ユーザのログイン名に置き換えられます。
+
+     `%HOST'
+          ユーザのホスト・コンピュータ名に置き換えられます。
+
+     `%HOSTTYPE'
+          ユーザのホスト・コンピュータのマシン・タイプに置き換えられます。
+
+     `%HOME'
+          ユーザのホーム・ディレクトリを表すパスに置き換えられます。
+
+したがって、以下のような内容を持つファイル`myname.txt'を作成して、
+
+     Hello, my name is %NAME.  Actually 
+     "%NAME" isn't my real name, it is the
+     alias I use when I'm on %HOST, which
+     is the %HOSTTYPE I use.  My HOME 
+     directory is %HOME.  
+
+以下を実行すると、
+
+     myname < myname.txt
+
+以下のテキストに似たものが`stdout'へ書き込まれます。
+
+     Hello, my name is foobar.  Actually 
+     "foobar" isn't my real name, it is the
+     alias I use when I'm on baz, which
+     is the cray I use.  My HOME 
+     directory is /home/foo/foobar.  
+
+このプログラムがうまく動作するのは、`yyin'と`yyout'がデフォルトでは
+`stdin'、`stdout'にそれぞれ割り当てられ、かつ、デフォルトのアクションが
+`yyin'の内容を`yyout'にコピーするからです。また、個々のルールに対応する
+唯一のアクションが単一行で記述されているため、`{ }'は必要ではないことに
+注意してください。このような場合には、アクションを`{ }'で囲むか否かは、
+個人的な好みの問題になります。
+
+これが、引用符で囲まれた部分にあるものも含めて、指定された名前が現れると
+ころ*すべて*にマッチしたことに気がつきましたか？Flexにおいては、引用符で
+囲まれた部分にあるものにマッチさせたくない場合には、それに対応するルール
+を作成することにより、そうしないよう明示的にFlexに通知しなければなりませ
+ん。以下に例を示します。
+
+     /*
+      * myname2.lex : トークンの置き換えを行うFlexプログラムの例
+      */
+
+     %{
+     #include <stdio.h>
+     %}
+
+     %x STRING
+     %%
+     \"                ECHO; BEGIN(STRING); 
+     <STRING>[^\"\n]*  ECHO;
+     <STRING>\"        ECHO; BEGIN(INITIAL);
+
+     %NAME     { printf("%s",getenv("LOGNAME")); }
+     %HOST     { printf("%s",getenv("HOST"));    }
+     %HOSTTYPE { printf("%s",getenv("HOSTTYPE"));}
+     %HOME     { printf("%s",getenv("HOME"));    }
+
+この例では、排他的スタート状態を使って、文字列中のテキストが変更されるこ
+とのないようにしています。この例も`examples'サブディレクトリにあるもので、
+その名前は`myname2.lex'です。
+
+
+
+File: flex-ja.info, Node: Flex and Bison, Next: Another Example of Flex and Bison, Prev: An Example of Flex and C, Up: Interfacing to Flex
+
+FlexとBison
+===========
+
+Bisonは、Flexと同様、ある記述情報を受け取って、それをもとにCのコードを生
+成するプログラムです。両者の違いは、BisonがCやPascalのような言語の文法に
+関する記述情報を入力として受け取り、その記述情報から"パーサ"を生成する点
+にあります。FlexとBisonを結合することにより、言語の字句解析と構文解析の
+両方を処理することができるようになります。（これは、コンパイラ・デザイン
+において最も容易に自動化できる部分です。）
+
+生成されるパーサが機能するためには、Bisonは`yylex()'という関数を必要とし
+ます。この関数はユーザによって提供され、呼び出された時に、パースされてい
+る言語のある要素を表す整数値をBisonに返します。Flexにおいてスキャン処理
+を行うルーチンは`yylex()'であり、デフォルトでは整数値を返します。これに
+より、FlexとBisonを一緒に使うのは非常に簡単になります。
+
+*警告：* 以下の節では、読者がBisonの基本的なパーサの宣言を理解しているも
+のと仮定します。Bisonを使った経験のない人には、パーサの定義は混乱をもた
+らす可能性がありますので、先に進む前に是非`Bison'のマニュアルを読んでく
+ださい。Bisonに興味の無い人は、この節全体を飛ばしても構いません。
+
+========================================================================
+* Menu:
+
+* Interfacing Flex and Bison:: 一般的な方法* YYSTYPE and yylval:: 単なる
+整数以上の情報の渡し方
+========================================================================
+
+
+
+File: flex-ja.info, Node: Interfacing Flex and Bison, Next: YYSTYPE and yylval, Prev: Flex and Bison, Up: Flex and Bison
+
+FlexとBisonのインターフェイス
+-----------------------------
+
+FlexとBisonの間で情報を渡す基本的な方法は、関数`yylex()'を使うことです。
+これは、Flexにより生成されるスキャナにおいて、スキャン処理を実行する関数
+の名前です。Flexの入力ファイルのアクション部分において`return'文を使うこ
+とによって、単なる0や1以外の値を返すことができます。この方法で、
+`yylex()'は最後に認識されたトークンを表す整数値を返すことができます。
+
+Bisonを`-d'オプション付きで使うと、Bisonは`.tab.h'という拡張子を持つファ
+イルを生成します。このファイルには、記述情報中にある正当なトークンの１つ
+１つに対する一意な定義情報が含まれます。この出力情報は、特にスキャナによっ
+て使用されることを想定して設計されています。このファイルをFlexにより生成
+されたスキャナに含めることで、２つのプログラムの間に非常に明確なインター
+フェイスを作ることができます。例として、以下にBisonのファイルを示します。
+このファイルの名前を`expr.y'としましょう。
+
+     /*
+      * expr.y : Bisonマニュアル中の例に基づく
+      *          Bisonによる簡単な表現式パーサ
+      */
+
+     %{
+     #include <stdio.h>
+     #include <math.h>
+
+     %}
+
+     %union {
+        float val;
+     }
+
+     %token NUMBER
+     %token PLUS MINUS MULT DIV EXPON
+     %token EOL
+     %token LB RB
+
+     %left  MINUS PLUS
+     %left  MULT DIV
+     %right EXPON
+
+     %type  <val> exp NUMBER
+
+     %%
+     input   :
+             | input line
+             ;
+
+     line    : EOL
+             | exp EOL { printf("%g\n",$1);}
+
+     exp     : NUMBER                 { $$ = $1;        }
+             | exp PLUS  exp          { $$ = $1 + $3;   }
+             | exp MINUS exp          { $$ = $1 - $3;   }
+             | exp MULT  exp          { $$ = $1 * $3;   }
+             | exp DIV   exp          { $$ = $1 / $3;   }
+             | MINUS  exp %prec MINUS { $$ = -$2;       }
+             | exp EXPON exp          { $$ = pow($1,$3);}
+             | LB exp RB              { $$ = $2;        }
+             ;
+
+     %%
+
+     void yyerror(char *s)
+     {
+       printf("%s\n",s);
+     }
+
+     int main()
+     {
+       yyparse();
+     }
+
+これは非常に簡単な計算機の文法定義です。
+
+`-y -d'オプション付きで呼び出されると、Bisonは`y.tab.h'というファイルを
+生成します。このファイルには以下のような定義か、それにきわめてよく似た定
+義が含まれます。
+
+     typedef union  {
+        float val;
+     } YYSTYPE;
+     extern YYSTYPE yylval;
+     #define NUMBER  258
+     #define PLUS    259
+     #define MINUS   260
+     #define MULT    261
+     #define DIV     262
+     #define EXPON   263
+     #define EOL     264
+     #define LB      265
+     #define RB      266
+
+Flexがトークンの値を正しくBisonに返すことができるように、（`#include'を
+使って）これをスキャナに含めることができます。そのコードは以下のようなも
+のになります。
+
+     /*
+      * expr.lex : 簡単な表現式パーサのためのスキャナ
+      */
+
+     %{
+     #include "y.tab.h"
+     %}
+
+     %%
+
+     [0-9]+     { yylval.val = atof(yytext);
+                  return(NUMBER);
+                }
+     [0-9]+\.[0-9]+ { 
+                  sscanf(yytext,"%f",&yylval.val);
+                  return(NUMBER);
+                }
+     "+"        return(PLUS);
+     "-"        return(MINUS);
+     "*"        return(MULT);
+     "/"        return(DIV);
+     "^"        return(EXPON);
+     "("        return(LB);
+     ")"        return(RB);
+     \n         return(EOL);
+     .          { yyerror("Illegal character"); 
+                  return(EOL);
+                }
+     %%
+
+上記のファイルは、以下のようにしてコンパイルすることができます。
+
+     bison -d -y expr.y
+     flex -I  expr.lex
+     cc -o expr y.tab.c lex.yy.c alloca.c 
+
+また、この例のソースが手元にあれば、`examples'サブディレクトリにおいて
+`make expr'を実行するだけでコンパイルできます。どちらの方法でも、`expr'
+という名前の簡単な計算機が生成されます。これは以下のような表現式をパース
+して、その結果を出力します。
+
+     1 + 2 * (199*2)
+
+@noindent
+
+
+これを見てお分かりのように、この種のインターフェイスは非常に柔軟であり、
+かつ、保守も非常に容易です。（トークンを定義する名前が変わらない限り）
+BisonとFlexの間のインターフェイスを変更することなく、Flex、Bisonいずれの
+入力情報においても、機能の追加や削除、定義やコードの変更を行うことが可能
+です。
+
+この例では、FlexとBisonの間で情報を渡すための別の方法を導入していること
+に注意してください。この例では、数字の値をBisonに返すのに`yylval'を使っ
+ています。これについては次の節でより詳細に説明します。ここではとりあえず、
+`return'文の使い方を学んでおいてください。
+
+*注：*これは単純な例です。表現式のパース処理についてより詳しく知りたい人
+は、`Bison'のマニュアルを参照してください。
+
+
+
+File: flex-ja.info, Node: YYSTYPE and yylval, Prev: Interfacing Flex and Bison, Up: Flex and Bison
+
+YYSTYPEとyylval
+---------------
+
+FlexからBisonに対して、単なる整数値以上の情報を渡す必要の生じることがよ
+くあります。例えば、コンパイラにおいては、どのような*種類*のトークンが認
+識されたかだけではなく、そのトークンの値についても知る必要のある場合がと
+きどきあります。文字列、文字、および数値定数などが良い例です。ここで問題
+なのは、どのようにしてFlexにこうした情報を返させるかです。
+
+その答は、Bisonが持っている`%union'文です。これは、`YYSTYPE'という型を定
+義するものです。`YYSTYPE'は、パーサ定義中において使われるすべての正当な
+データ型の共用体（`union'）です。Bisonがカレントなパース状態に関連づけた
+データを保存するために使う、`YYSTYPE'型の変数`yylval'というものがあり、
+Flexから`yylval'に値を設定することができるので、トークンの型だけでなく、
+それ以上の情報をBisonに返すことができます。
+
+Bisonにおいて`%union'を宣言して`-d'オプションを使うと、Bisonは`.tab.h'と
+いう拡張子を持つファイルを作成して、そこにトークンの定義情報だけでなく、
+`YYSTYPE'と`yylval'の宣言も含めます。したがって、`yylval'にアクセスする
+ためにしなければならないことは、Flexの定義情報の中にこの`.tab.h'ファイル
+をインクルードすることだけです。これは、追加のCコード・セクションにおけ
+る定義の先頭でインクルードしなければなりません（*Note Interfacing Flex
+and Bison::）。
+
+*注：*初期のバージョンのBisonは、自動的に`YYSTYPE'と`yylval'の宣言を生成
+しません。この場合には、より新しいバージョンのBisonを入手するか、もしく
+は、Flexの定義ファイルの先頭において`YYSTYPE'と`yylval'を宣言する必要が
+あります。
+
+
+
+File: flex-ja.info, Node: Another Example of Flex and Bison, Prev: Flex and Bison, Up: Interfacing to Flex
+
+FlexとBisonのもう１つの実例
+===========================
+
+コードを読むのは、プログラミングの方法を学ぶ良い方法です。そこで、Flex、
+Bisonのインターフェイス例をもう１つ示すことにします。下の例では、拡張し
+てデータベースを操作するために使うことができるような、小規模な言語のため
+の簡単なパーサを作ります。
+
+========================================================================
+* Menu:
+
+* The Database Language:: データベース言語の定義* The Implementation:: 
+言語を解析するファイル* Notes on the Implementation:: この実装を選択した
+理由に関する（簡単な）注
+========================================================================
+
+
+
+File: flex-ja.info, Node: The Database Language, Next: The Implementation, Prev: Another Example of Flex and Bison, Up: Another Example of Flex and Bison
+
+インターフェイス言語
+--------------------
+
+データベースとのインターフェイス言語は、英語の非常に小さなサブセットにな
+ります。文法はおおよそ以下のようになります。
+
+     command_list     ::= sentence {sentence ...}
+     sentence         ::= verb_phrase noun_phrase position_phrase 
+                          adverb period
+     verb_phrase      ::= VERB | adverb VERB
+     noun_phrase      ::= declared_noun | qualified_noun | noun
+     declared_noun    ::= declarator NOUN
+     declarator       ::= THIS | THAT | THE | THOSE
+     qualified_noun   ::= qualifier NOUN
+     qualifier        ::= SOME | MANY | ALL { declarator } NOUN
+     position_phrase  ::= position declarator NOUN  | empty      
+     position         ::= IN | ON | AT
+     adverb           ::= ADVERB | empty
+
+結果として作成されるプログラムは、以下のような文章を受け付けます。
+
+     FIND MEN
+     QUICKLY FIND MEN
+     FIND ALL MEN ON THE NETWORK
+     QUICKLY FIND ALL MEN ON THE NETWORK
+     FIND ALL MEN ON THE NETWORK QUICKLY
+
+この例では、BisonとFlexの間のインターフェイスが明確に示されるよう、文章
+の簡単な解析結果が表示されます。このプログラムを試しに実行してみると、そ
+の表示結果は大体以下のようになります。
+
+     % front
+     FIND MEN
+     I understand that sentence.  
+     VP = FIND
+     NP = MEN
+     PP = 
+     AD =
+     QUICKLY FIND ALL THE MEN ON THE NETWORK
+     I understand that sentence.  
+     VP = QUICKLY FIND
+     NP = ALL THE MEN
+     PP = ON THE NETWORK
+     AD = 
+     ^C
+     %
+
+これは特別便利なものではありません。というのは、これは文章の構成要素を表
+示する以外に何も*行わない*からです。しかし、そこには拡張のためのフックも
+ありますし、一般的な技法も示されています。より一般的な形式の文章を受け付
+けるよう、この例を拡張してみてください。ほとんどの場合、文章は動詞句
+（`VERB'）と名詞句（`NOUN'）に分割することができますが、所有格名詞、名詞
+の後ろに名詞が続く場合など、文章を構成する他の要素も許容されるようにする
+必要があります。（`FIND ALL JONE'S CAT NAMES'のような文章をどうやってパー
+スするかを想像してみてください。）Bisonの文法やその使い方に関する詳しい
+説明については、`Bison'のマニュアルを参照してください。
+
+
+
+File: flex-ja.info, Node: The Implementation, Next: Notes on the Implementation, Prev: The Database Language, Up: Another Example of Flex and Bison
+
+実装：コマンド文パーサ
+----------------------
+
+上の節で、小規模な言語について説明しました。次にそれを実装してみることに
+しましょう。以下のファイルがこれを実現します。
+
+*注：**これはあくまでも１つの例として見てください。特に文法の部分は、英
+語のパース処理としてはあまり良い例ではありません。*
+
+以下はBisonのファイルです。`%union'の部分、および、`yylval'にアクセスす
+るために`$$'と`$'nを使う方法に注目してください。
+
+     /* Cコードはファイルの先頭で提供する */
+
+     %{
+
+     #include <stdio.h>                          
+     #include <string.h>
+
+     extern int  yylexlinenum;  /* lex.yy.cに存在する */
+     extern char *yytext;       /* カレント・トークン */
+
+     %}
+
+     /* キーワードと予約語がここから始まる */
+
+     %union{                    /* これはデータの共用体 */
+         char   name[128];      /* 名前                 */
+     }
+
+     /*------------- 予約語 ------------------*/
+
+     %token PERIOD
+     %token NEWLINE
+     %token POSITIONAL
+
+     %token VERB
+     %token ADVERB
+
+     %token PROPER_NOUN
+     %token NOUN
+
+     %token DECLARATIVE
+     %token CONDITIONAL
+
+     %type  <name> declarative
+     %type  <name> verb_phrase
+     %type  <name> noun_phrase
+     %type  <name> position_phrase
+     %type  <name> adverb
+
+     %type  <name> POSITIONAL VERB ADVERB PROPER_NOUN 
+     %type  <name> NOUN DECLARATIVE CONDITIONAL
+
+     %%
+
+     sentence_list : sentence
+                   | sentence_list NEWLINE sentence
+                   ;
+
+     sentence : verb_phrase noun_phrase position_phrase 
+                adverb period 
+                {
+                  printf("I understand that sentence.\n");
+                  printf("VP = %s \n",$1);
+                  printf("NP = %s \n",$2);
+                  printf("PP = %s \n",$3);
+                  printf("AD = %s \n",$4);
+                }
+              | { yyerror("That's a strange sentence!");  }
+              ;
+
+     position_phrase : POSITIONAL  declarative PROPER_NOUN 
+                       {
+                         sprintf($$,"%s %s %s",$1,$2,$3);
+                       }   
+                     | /* 空 */ { strcpy($$,""); }
+                     ;
+
+     verb_phrase : VERB { strcpy($$,$1); strcat($$," "); }
+                 | adverb VERB  
+                   {
+                     sprintf($$,"%s %s",$1,$2);
+                   }
+                 ;
+
+     adverb : ADVERB      { strcpy($$,$1); }
+            | /* 空 */    { strcpy($$,""); }
+            ;
+
+     noun_phrase : DECLARATIVE NOUN 
+                   {
+                     sprintf($$,"%s %s",$1,$2);
+                   }
+                 | CONDITIONAL declarative NOUN 
+                   {
+                     sprintf($$,"%s %s %s",$1,$2,$3);
+                   }   
+                 | NOUN { strcpy($$,$1); strcat($$," "); }
+                 ;
+
+     declarative : DECLARATIVE { strcpy($$,$1); }
+                 | /* 空 */    { strcpy($$,""); }
+                 ;
+
+     period : /* 空 */
+            | PERIOD
+            ;
+
+     %%
+
+     /* main()およびyyerror()関数を提供する */
+
+     void main(int argc, char **argv)
+     {
+       yyparse();       /* ファイルをパースする */
+     }
+
+     int yyerror(char *message)
+     {
+       extern FILE *yyout;
+
+       fprintf(yyout,"\nError at line %5d.  (%s) \n",
+                          yylexlinenum,message);
+     }
+
+以下はFlexのファイルです。文字列が渡される方法に注意してください。これは
+最適化された方法ではありませんが、最も理解しやすい方法です。
+
+     %{
+     #include <stdio.h>
+     #include <string.h>
+     #include "y.tab.h"      /* これはBisonにより生成される */
+
+     #define TRUE  1
+     #define FALSE 0
+
+     #define copy_and_return(token_type) \
+              { \
+                  strcpy(yylval.name,yytext);\
+                  return(token_type); \
+              }
+
+     int yylexlinenum = 0;  /* 行数カウント用 */
+     %}
+
+     %%
+        /* 字句解析ルールがここから始まる */
+
+     MEN|WOMEN|STOCKS|TREES      copy_and_return(NOUN)
+     MISTAKES|GNUS|EMPLOYEES     copy_and_return(NOUN)
+     LOSERS|USERS|CARS|WINDOWS   copy_and_return(NOUN)
+
+     DATABASE|NETWORK|FSF|GNU    copy_and_return(PROPER_NOUN)
+     COMPANY|HOUSE|OFFICE|LPF    copy_and_return(PROPER_NOUN)
+
+     THE|THIS|THAT|THOSE         copy_and_return(DECLARATIVE)
+
+     ALL|FIRST|LAST              copy_and_return(CONDITIONAL)
+
+     FIND|SEARCH|SORT|ERASE|KILL copy_and_return(VERB)
+     ADD|REMOVE|DELETE|PRINT     copy_and_return(VERB)
+
+     QUICKLY|SLOWLY|CAREFULLY    copy_and_return(ADVERB)
+
+     IN|AT|ON|AROUND|INSIDE|ON   copy_and_return(POSITIONAL)
+
+     "."                         return(PERIOD);                             
+     "\n"                        yylexlinenum++; return(NEWLINE);            
+     .  
+     %%
+
+これらのファイルは、以下を実行することでコンパイルできます。
+
+     % bison -d front.y
+     % flex -I front.lex
+     % cc -o front alloca.c front.tab.c lex.yy.c
+
+または、この例のソースが手元にあれば、`examples'サブディレクトリにおいて
+`make front'を実行することでもコンパイルできます。
+
+*注：**Bisonパーサは`alloca.c'というファイルを必要とします。このファイル
+はexamplesサブディレクトリにあります。Bisonの代わりに`yacc'を使うのであ
+れば、このファイルは必要ありません。*
+
+
+
+File: flex-ja.info, Node: Notes on the Implementation, Prev: The Implementation, Up: Another Example of Flex and Bison
+
+実装に関する注
+--------------
+
+以下に実装に関する注を示します。
+
+   * `YYSTYPE' と `yylval' `yylval'がFlexからアクセスされる方法に注目し
+     てください。Bison文法においてパース・ツリーの上位にデータを渡す方法
+     については、`Bison'のマニュアルに説明されていますが、Flexに対しては
+     何の影響も持ちません。整数値、浮動小数点数値、および他の任意の型の
+     データも同様の方法で返すことができます。
+
+   * トークン値の返却 この例では、トークンの*型*と値の両方がBisonからア
+     クセスできるように、トークンの値と文字列の値の両方がBisonに返されて
+     いることに注意してください。
+
+   * BisonとFlex BisonとFlexがいかにうまく調和しているかに注目してくださ
+     い。データを交換するためのコード以外に、インターフェイスのためのコー
+     ドは一切ありません。Bisonは`yylex()'を呼び出し、スキャナがトークン
+     定義を提供しています。
+
+
+
+
+File: flex-ja.info, Node: Flex and C++ (Flex 2.5), Prev: Another Example of Flex and Bison, Up: Interfacing to Flex
+
+FlexとC++（Flex 2.5の補足情報）
+===============================
+
+Flex 2.5では、Flexに対するC++インターフェイスが提供されています。
+
+FlexのC++インターフェイスを使うためには、Flex実行時に`-+'オプションを指
+定するか、スキャナ定義ファイルの中で`%option c++'を指定する必要がありま
+す。これにより、C++のスキャナ・クラスを実装する`lex.yy.cc'というファイル
+が生成されます。
+
+`lex.yy.cc'は、Flexが提供する`FlexLexer.h'をインクルードします。この
+`FlexLexer.h'の中に、C++スキャナ・クラスの実装に利用される２つのC++クラ
+ス（`FlexLexer'と`yyFlexLexer'）が定義されています。
+
+
+`FlexLexer'は、C++スキャナ・クラスが実装すべきインターフェイスを構成する
+抽象仮想関数を定義するクラスです。
+
+`FlexLexer'の持つメンバを以下に示します。
+
+     `char* yytext'
+          最後に認識された文字列（トークン）を保持します。
+
+     `int yyleng'
+          最後に認識された文字列（トークン）の長さを保持します。
+
+     `int yylineno'
+          `%option yylineno'が指定されている場合は、入力された行数を保持
+          します。それ以外の場合は、固定値1を持ちます。
+
+     `int yy_flex_debug'
+          この値がゼロ以外の場合、C++スキャナはデバッグ出力を行います。
+
+次に、`FlexLexer'の持つメンバ関数のうち、抽象仮想関数ではないものを以下
+に示します。
+
+     `const char* YYText()'
+          メンバ`yytext'の値を返します。
+
+     `int YYLeng()'
+          メンバ`yyleng'の値を返します。
+
+     `int yylex(istream* NEW_IN, ostream* NEW_OUT = 0)'
+          NEW_INとNEW_OUTを引数に指定して、メンバ関数`switch_streams()'
+          を呼び出した後、メンバ関数`int yylex(void)'を呼び出します。
+
+     `int lineno() const'
+          メンバ`yylineno'の値を返します。
+
+     `int debug() const'
+          メンバ`yy_flex_debug'の値を返します。
+
+     `void set_debug(int FLAG)'
+          FLAGをメンバ`yy_flex_debug'に代入します。
+
+次に、`FlexLexer'の持つ抽象仮想メンバ関数を列挙します。
+
+     void yy_switch_to_buffer(struct yy_buffer_state* new_buffer)
+     struct yy_buffer_state* yy_create_buffer(istream* s, int size)
+     void yy_delete_buffer(struct yy_buffer_state* b)
+     void yyrestart(istream* s)
+     int yylex()
+     void switch_streams(istream* new_in = 0, ostream* new_out = 0)
+
+最初の５つのメンバ関数は、FlexのCインターフェイスにおける同名の関数と同
+等の機能を実現します。Cインターフェイスでは、`FILE*'となっていた引数の型
+が、`istream*'となっている点に注意してください。最後の`switch_streams()'
+は、入出力ストリームの切り替えを行います。これらの抽象仮想メンバ関数の定
+義は、サブクラス`yyFlexLexer'において与えられ、そのコードは`lex.yy.cc'の
+中に生成されます。
+
+
+`yyFlexLexer'は、`FlexLexer'のサブクラスです。デフォルトの状態では、
+`yyFlexLexer'のインスタンスを生成して、`yylex()'メンバ関数を呼び出すこと
+によって、スキャナの処理が実行されます。以下に例を示します。
+
+     int main( int /* argc */, char** /* argv */ )
+         {
+         FlexLexer* lexer = new yyFlexLexer;
+         while(lexer->yylex() != 0)
+             ;
+         return 0;
+         }
+
+これは、Cインターフェイスにおける、以下のコードに対応します。
+
+     int main( int /* argc */, char** /* argv */ )
+         {
+         yylex();
+         return 0;
+         }
+
+スキャナ定義ファイルの中に`%option yyclass="CLASSNAME"'を指定すると、
+`lex.yy.cc'に`CLASSNAME::yylex()'が生成されます。クラスCLASSNAMEを
+`yyFlexLexer'のサブクラスとして定義することによって、CLASSNAMEのインスタ
+ンスを使ってスキャン処理を実行することができます。クラスCLASSNAMEを定義
+する際、以下に示す、`yyFlexLexer'の持つ`protected'メンバ関数を再定義する
+ことによって、スキャナの振る舞いを変更することができます。
+
+     `int LexerInput(char* BUF, int MAX_SIZE)'
+          これを再定義することによって、スキャナの入力処理を変更すること
+          ができます。最大MAX_SIZEバイトの文字を入力してBUFの指す領域に
+          セットし、実際に入力したバイト数を戻り値とします。入力を対話的
+          に扱う場合と扱わない場合で、処理内容を変更する必要がある場合は、
+          `#ifdef YY_INTERACTIVE'を使います。
+
+     `void LexerOutput(const char* BUF, int SIZE)'
+          これを再定義することによって、スキャナの出力処理を変更すること
+          ができます。BUFの指す領域にあるSIZEバイトの文字を出力します。
+
+     `void LexerError(const char* MSG)'
+          これを再定義することによって、エラー・メッセージの出力処理を変
+          更することができます。エラー・メッセージは、引数MSGで渡されま
+          す。
+
+
+スキャン処理に関わるすべてのコンテキスト情報は、`yyFlexLexer'のインスタ
+ンスの内部に閉じています。このことは、C++スキャナ・クラスを使うことによっ
+て、再入可能なスキャナを生成することが可能であることを意味しています。
+
+複数のC++スキャナ・クラスを生成して、１つの実行プログラムにリンクするこ
+とも可能です。これを行うには、Flex起動時に`-PPREFIX'オプションを指定する
+か、スキャナ定義ファイルの中に`%option prefix="PREFIX"'を指定することに
+よって、`yyFlexLexer'の名前を`PREFIXFlexLexer'に変更します。
+`PREFIXFlexLexer'クラスを使うソース・ファイルの中では、以下のようにして
+`FlexLexer.h'をインクルードすることによって、`PREFIXFlexLexer' （実際に
+は`yyFlexLexer'）の定義を参照する必要があります。
+
+     #undef yyFlexLexer
+     #define yyFlexLexer PREFIXFlexLexer
+     #include <FlexLexer.h>
+
+
+
+File: flex-ja.info, Node: Other Flex Features, Next: Optimization, Prev: Interfacing to Flex, Up: Top
+
+Flexの他の特徴
+**************
+
+     ここでは、Lexが提供していない機能や一般にはあまり使われない機能を説
+     明します。Flexはほぼ100パーセントLex互換ですが、Lexよりも後に実装さ
+     れたため、性能的により優れており、また、広範な用途に使えるスキャナ
+     をより簡単に作成することができるよう、特別な機能を提供しています。
+
+========================================================================
+* Menu:
+
+* Case Insensitive Scanners:: 大文字・小文字を区別するスキャナ*
+Interactive Scanners:: ユーザから入力を受け取るスキャナ* Table
+Compression and Scanner Speed:: テーブル圧縮とスキャナのスピード*
+Translation Tables:: 文字をグループ化する別の方法* Multiple Input
+Buffers:: 複数の入力ストリームを受け付ける方法* End-Of-File Rules:: EOF
+を処理するための特殊なルール
+========================================================================
+
+
+
+File: flex-ja.info, Node: Case Insensitive Scanners, Next: Interactive Scanners, Prev: Other Flex Features, Up: Other Flex Features
+
+大文字・小文字を区別しないスキャナ
+==================================
+
+多くの言語は、その識別子において大文字・小文字を区別しません（Pascal、
+BASIC、FORTRAN等）。Lexにも、大文字・小文字を区別しないスキャナを指定す
+るための方法がありますが、それらは概して美しくなく、理解するのも困難です。
+個々の文字を置き換えてくれる定義を、長いリストにして作成することも可能で
+すし、すべての識別子を受け付ける１つのルールを作成し、そのルールにおいて
+大文字・小文字を変換してから、トークンの種類を返すようにすることも可能で
+す。以下のコードは、この２つの方法を示すものです。定義を使うのであれば、
+以下のようになります。
+
+     A [aA]
+     B [bB]
+      ...  
+     Z [zZ]
+
+     %%
+     {B}{E}{G}{I}{N}      return(BEGIN_SYM);
+     {E}{N}{D}            return(END_SYM);
+
+これに似た操作をサブルーチンで実行するのであれば、以下のようにします。
+
+     ALPHA      [a-zA-Z]
+     NUM        [0-9]
+     ALPHANUM   {ALPHA}|{NUM}
+
+     %%
+     {ALPHA}{ALPHANUM}*     return(convert_and_lookup(yytext));
+
+もっともこれは、関数呼び出しの必要があるため、効率が悪くなります（Flexで
+は、パターンの複雑さは大した影響をもたらしません）。
+
+ほかにもこれと同じことを行う方法がありますが、いずれもエレガントではあり
+ません。
+
+========================================================================
+* Menu:
+
+* The -i Switch:: 入力において大文字・小文字を無視する方法
+========================================================================
+
+
+
+File: flex-ja.info, Node: The -i Switch, Prev: Case Insensitive Scanners, Up: Case Insensitive Scanners
+
+`-i'オプション
+--------------
+
+Flexは、この問題を簡単に解決するための方法を提供しています。コマンドライ
+ンで`-i'オプションを使うことによって、入力情報の大文字・小文字を区別しな
+いスキャナを生成するよう、Flexに対して通知することができます。つまり、
+Flexでは上記のようなテクニックを使う必要がないということを意味しています。
+例えば、
+
+     %%
+     begin        return(BEGIN_SYM);
+     end          return(END_SYM);
+
+は、`-i'オプションを使うことによって、`BEGIN'、`begin'、`BeGiN'、および
+これ以外のすべての大文字・小文字の組み合わせにマッチします。これは、Lex
+において同様のことを行うための方法よりも、はるかに簡単です。
+
+`-i'オプションには１つ注意すべき点があります。それは、スキャナが大文字・
+小文字を区別しないだけで、その*変換まではしてくれない*ということです。つ
+まり、Pascalにおいてシンボル名をハッシュしたいような場合、自分でシンボル
+名を大文字または小文字に変換しなければならないことを意味しています。そう
+しないと、`FOO'と`foo'は異なるものとして扱われます。これは、シンボルを保
+存するルーチンの中で対処することもできますし、`YY_USER_ACTION'を使うこと
+によって対処することもできます。これを実現する方法の例については、*Note
+Flex and C::における`YY_USER_ACTION'の説明を参照してください。
+
+
+
+File: flex-ja.info, Node: Interactive Scanners, Next: Table Compression and Scanner Speed, Prev: Case Insensitive Scanners, Up: Other Flex Features
+
+`-I'オプション：対話型スキャナ
+==============================
+
+Flexの問題として、どのルールを適用するかを決定する前に、入力情報中の次の
+１文字を先読みする必要があるということがあります。対話的ではない使い方を
+する場合には問題になりませんが、Flexを使ってユーザから直接入力文字を受け
+取るような場合には、問題になることがあります。
+
+このような場合を２つ挙げると、１つはシェルとやりとりする場合、もう１つは
+データベースのフロント・エンドとやりとりする場合です。通常のアクションは、
+改行が入力の終わりを表すというもので、改行自身は一種の「中身のない文」と
+して受け付けるのが望ましいのですが、通常のFlexスキャナではこれは可能では
+ありません。Flexが常に先読みをするという事実は、改行が認識されるためには
+ユーザが次の行を入力しなければならないということを意味しています（すなわ
+ち、単一の改行は、それだけでは認識されず、他の文字が入力される必要がある
+ということです）。これはシェル上ではまったく望ましくありません。
+
+Flexにはこれを回避する方法があります。コマンドラインで`-I'オプションを使
+うと、Flexは、必要な場合にしか先読みをしない特別な*対話型*スキャナを生成
+します。この種のスキャナは、ユーザからの入力を直接受け取るのに適していま
+すが、若干の性能低下を引き起こすかもしれません。
+
+*注：*`-I'オプションは、`-f'、`-F'、`-Cf'、または`-CF'フラグと一緒に使う
+ことはできません。つまり、先読みができないことから来る性能低下に加えて、
+パーサも性能向上のために最適化することができないということを意味していま
+す。
+
+`-I'オプションに関連するマイナス面は、通常はきわめて小さいので、入力情報
+がどこから来るのか確かではなく、性能向上のための最適化を施す可能性を諦め
+ても構わないのであれば、コマンドラインにおいて`-I'オプションを使う方が良
+いでしょう。
+
+
+
+File: flex-ja.info, Node: Table Compression and Scanner Speed, Next: Translation Tables, Prev: Interactive Scanners, Up: Other Flex Features
+
+テーブルの圧縮とスキャナのスピード
+==================================
+
+テーブルの圧縮とスピードの領域では、FlexはLexの能力をはるかに上回ってい
+ます。Flexは、使われるオプションに応じて、Lexよりもはるかに高速なテーブ
+ル、あるいは、はるかに小さいテーブルを生成することができます。この節では、
+利用可能なオプションと各オプションがスピードにもたらす影響について説明し
+ます。一般的には、テーブルが圧縮されるほど、そのスピードは遅くなります。
+Flexでは、こうしたオプションをコマンドラインで指定します。オプションは以
+下のとおりです。 (1) (*Note Table Compression and Scanner
+Speed-Footnotes::)
+
+     `-fまたは-Cf'
+          このオプションは、Flexが"フル"・テーブル（"full" table）を生成
+          すべきであることを指定します。このテーブルはまったく圧縮されず、
+          サイズが大きくなりますが、スピードは速くなります。このオプショ
+          ンが指定された場合は、アクションの部分に`REJECT'を使うことはで
+          きない点に注意してください。
+
+          注：`-f'フラグと`-F'フラグは、Flexが生成するテーブルにおいて相
+          違をもたらします。`-f'フラグは*フル*・テーブル（*full* table）
+          を生成し、`-F'フラグは*ファスト*・テーブル（*fast* table）を生
+          成します。ファスト・テーブルとは、スピードを最大限にするよう最
+          適化されたテーブル形式であり、一方、フル・テーブルには最適化は
+          一切施されません。もたらされる結果はよく似ていますが、テーブル
+          のサイズは大きく異なるものになる可能性があります。
+
+     `-Fまたは-CF'
+          このオプションは"ファスト"・テーブル（"fast" table）形式を用い
+          てテーブルを生成するようFlexに通知します。一般的には、このテー
+          ブルのスピードは先に説明したフル・テーブル（full table）とほと
+          んど同じですが、使われるパターンに応じて、そのサイズは小さくも
+          大きくもなる可能性があります。原則として、すべての識別子をキャッ
+          チするルールのほかにキーワードの一覧も持つファイルに対しては、
+          `-f'オプションを使うべきです。例えば、
+
+               ALPHA     [a-zA-Z]
+               NUM       [0-9]
+               ALPHANUM  {ALPHA}|{NUM}
+               %%
+               begin                  return(BEGIN_SYM);
+                 ...  RULES AND ACTIONS ...  
+               end                    return(END_SYM);
+               {ALPHA}{ALPHANUM}* return(IDENTIFIER);
+
+          は`-f'フラグを使って処理すべきであり、
+
+               {ALPHA}{ALPHANUM}* {ECHO; 
+                                   return(lookup(yytext));}
+
+          は`-F'フラグを使って処理すべきです。これらのオプションが指定さ
+          れている場合は、アクションの部分に`REJECT'を使うことができない
+          点に注意してください。
+
+     `-Ce'
+          このオプションを使うと、性能にはわずかしか影響を及ぼさずに、テー
+          ブルのサイズをかなり小さくすることができます。`-Ce'が使われる
+          と、Flexは"同等クラス"（"equivalence classes"）を作成します。
+          同等クラスとは、同一の方法で使われる文字のグループです。例えば、
+          使われる数字が集合`[0-9]'の範囲に限定されるのであれば、0から9
+          までの数は同等クラスの中に置かれることになります。
+
+     `-Cfe,-CFe'
+          同等クラスを持つファスト・テーブルです。このオプションによって
+          生成されたスキャナもまた高速であり、かつ、`-Cf'あるいは`-CF'を
+          指定して生成されたスキャナと比較して、サイズもはるかに小さくな
+          る可能性があります。サイズ、またはスピードの一方が他方に比べて
+          はるかに重要であるということがないのであれば、これは良い組み合
+          わせです。
+
+     `-Cm'
+          Flexに対して"メタ同等クラス"（"meta-equivalence classes"）を使
+          うよう通知します。これは、一緒に使われることが多い文字の集合、
+          または（同等クラスが使われている場合には）同等クラスです。同等
+          クラスを使う場合よりも性能はさらに悪くなりますが、これは多くの
+          場合、テーブル・サイズを小さくするのに非常に効果的な方法です。
+
+     `-Cem'
+          デフォルトのテーブル圧縮です。このオプションで生成されるスキャ
+          ナは、Flexが生成するスキャナの中で事実上最も小さく、かつ、最も
+          性能の劣るものになります。
+
+     `-C'
+          `-C'オプション単体では、同等クラスやメタ同等クラスを使わずにテー
+          ブルを圧縮するよう、Flexに対して通知します。
+
+*注：*`-CXX'オプションは、コマンドライン上には１つだけ指定すべきです。と
+いうのは、このうち最後に見つかったオプションだけが実際の効果を持つからで
+す。したがって、
+
+     flex -Cf -Cem foo.l
+
+は、Flexに`-Cem'オプションを使わせることになります。
+
+Flexのデフォルトの動作は、コマンドライン上で`-Cem'オプションを使った場合
+に相当します。この動作では圧縮を最大限に行うことになり、一般的には最も遅
+いスキャナが生成されることになります。こうした小さなテーブルはより速く生
+成され、コンパイルもより速く実行されるので、デフォルトは、開発段階では非
+常に便利です。スキャナのデバッグが終了した後は、より高速な（そして通常は
+よりサイズの大きい）スキャナを作成することができます。
+
+
+
+File: flex-ja.info  Node: Table Compression and Scanner Speed-Footnotes, Up: Table Compression and Scanner Speed
+
+(1) 訳注：Flex 2.5では、ここに列挙されているもの以外に、`-Ca'オプショ
+ンをサポートしています。これについては、*Note Command Line Switches (Flex 2.5)::を参照してください。
+
+

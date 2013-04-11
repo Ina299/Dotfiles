@@ -1,0 +1,1016 @@
+Info file: emacs-ja.info,    -*-Text-*-
+produced by `texinfo-format-buffer'
+from file `emacs-ja.texi'
+using `texinfmt.el' version 2.38 of 3 July 1998.
+
+
+Emacs 20.6版対応に改訂した`GNU Emacs Manual' 13版です。
+
+INFO-DIR-SECTION Editors
+START-INFO-DIR-ENTRY
+* Emacs: (emacs-ja).	The extensible self-documenting text editor.
+END-INFO-DIR-ENTRY
+
+
+Published by the Free Software Foundation 59 Temple Place, Suite 330
+Boston, MA 02111-1307 USA
+
+Copyright (C) 1985, 1986, 1987, 1993, 1994, 1995, 1996, 1997, 1998, 1999
+Free Software Foundation, Inc.
+
+Permission is granted to make and distribute verbatim copies of this
+manual provided the copyright notice and this permission notice are
+preserved on all copies.
+
+Permission is granted to copy and distribute modified versions of this
+manual under the conditions for verbatim copying, provided also that the
+sections entitled "The GNU Manifesto", "Distribution" and "GNU General
+Public License" are included exactly as in the original, and provided
+that the entire resulting derived work is distributed under the terms of
+a permission notice identical to this one.
+
+Permission is granted to copy and distribute translations of this manual
+into another language, under the above conditions for modified versions,
+except that the sections entitled "The GNU Manifesto", "Distribution"
+and "GNU General Public License" may be included in a translation
+approved by the Free Software Foundation instead of in the original
+English.
+
+
+
+
+
+File: emacs-ja.info, Node: Command Index, Next: Variable Index, Prev: Key Index, Up: Top
+
+コマンド/関数索引
+*****************
+
+* Menu:
+
+* grep （MS-DOS）:              MS-DOS Processes.       5.
+* compile （MS-DOS）:           MS-DOS Processes.       5.
+* codepage-setup:               MS-DOS and MULE.        96.
+* ps-spool-buffer （MS-DOS）:   MS-DOS Printing.        52.
+* ps-print-buffer （MS-DOS）:   MS-DOS Printing.        52.
+* print-region （MS-DOS）:      MS-DOS Printing.        34.
+* print-buffer （MS-DOS）:      MS-DOS Printing.        34.
+* remove-untranslated-filesystem: Text and Binary.      71.
+* add-untranslated-filesystem:  Text and Binary.        51.
+* find-file-binary:             Text and Binary.        38.
+* find-file-text:               Text and Binary.        38.
+* mode25:                       MS-DOS Display.         22.
+* mode4350:                     MS-DOS Display.         22.
+* debug_print:                  Checklist.              198.
+* open-termscript:              Checklist.              95.
+* open-dribble-file:            Checklist.              85.
+* report-emacs-bug:             Checklist.              31.
+* emacs-version:                Understanding Bug Reporting.  5.
+* doctor:                       Total Frustration.      12.
+* enable-flow-control-on:       Unasked-for Search.     17.
+* enable-flow-control:          Unasked-for Search.     14.
+* top-level:                    Quitting.               75.
+* keyboard-escape-quit:         Quitting.               65.
+* abort-recursive-edit:         Quitting.               57.
+* describe-syntax:              Syntax.                 15.
+* keyboard-translate:           Keyboard Translations.  13.
+* enable-command:               Disabling.              29.
+* disable-command:              Disabling.              29.
+* substitute-key-definition:    Init Rebinding.         5.
+* define-key:                   Init Rebinding.         5.
+* local-unset-key:              Rebinding.              11.
+* global-unset-key:             Rebinding.              11.
+* local-set-key:                Rebinding.              11.
+* global-set-key:               Rebinding.              11.
+* kbd-macro-query:              Kbd Macro Query.        5.
+* insert-kbd-macro:             Save Kbd Macro.         14.
+* name-last-kbd-macro:          Save Kbd Macro.         5.
+* apply-macro-to-region-lines:  Basic Kbd Macro.        60.
+* edit-kbd-macro:               Basic Kbd Macro.        53.
+* call-last-kbd-macro:          Basic Kbd Macro.        5.
+* end-kbd-macro:                Basic Kbd Macro.        5.
+* start-kbd-macro:              Basic Kbd Macro.        5.
+* enable-local-eval:            File Variables.         99.
+* enable-local-variables:       File Variables.         92.
+* default-value:                Locals.                 67.
+* setq-default:                 Locals.                 55.
+* kill-local-variable:          Locals.                 49.
+* make-variable-buffer-local:   Locals.                 24.
+* make-local-variable:          Locals.                 19.
+* customize-customized:         Specific Customization.  54.
+* customize-saved:              Specific Customization.  54.
+* customize-changed-options:    Specific Customization.  48.
+* customize-apropos:            Specific Customization.  42.
+* customize-group:              Specific Customization.  36.
+* customize-face:               Specific Customization.  34.
+* customize-option:             Specific Customization.  28.
+* modify-face:                  Face Customization.     40.
+* widget-backward:              Changing an Option.     86.
+* widget-forward:               Changing an Option.     86.
+* widget-complete:              Changing an Option.     48.
+* customize-browse:             Customization Groups.   53.
+* customize:                    Easy Customization.     5.
+* set-variable:                 Examining.              27.
+* binary-overwrite-mode:        Minor Modes.            63.
+* overwrite-mode:               Minor Modes.            63.
+* dunnet:                       Amusements.             17.
+* mpuz:                         Amusements.             12.
+* blackbox:                     Amusements.             12.
+* mpuz:                         Amusements.             4.
+* gomoku:                       Amusements.             4.
+* yow:                          Amusements.             4.
+* hanoi:                        Amusements.             4.
+* dissociated-press:            Dissociated Press.      5.
+* vip-mode:                     Emulation.              44.
+* vi-mode:                      Emulation.              30.
+* viper-mode:                   Emulation.              21.
+* edt-emulation-off:            Emulation.              11.
+* edt-emulation-on:             Emulation.              11.
+* exit-recursive-edit:          Recursive Edit.         10.
+* desktop-save:                 Saving Emacs Sessions.  18.
+* 2C-dissociate:                Two-Column.             55.
+* 2C-merge:                     Two-Column.             51.
+* 2C-newline:                   Two-Column.             47.
+* 2C-associate-buffer:          Two-Column.             36.
+* 2C-split:                     Two-Column.             23.
+* 2C-two-columns:               Two-Column.             13.
+* widen:                        Narrowing.              39.
+* narrow-to-defun:              Narrowing.              34.
+* narrow-to-page:               Narrowing.              34.
+* narrow-to-region:             Narrowing.              30.
+* sort-columns:                 Sorting.                88.
+* sort-numeric-fields:          Sorting.                21.
+* sort-fields:                  Sorting.                21.
+* sort-pages:                   Sorting.                21.
+* sort-paragraphs:              Sorting.                21.
+* sort-lines:                   Sorting.                21.
+* ps-spool-buffer-with-faces:   Postscript.             38.
+* ps-spool-region-with-faces:   Postscript.             38.
+* ps-spool-buffer:              Postscript.             38.
+* ps-spool-region:              Postscript.             38.
+* ps-print-buffer-with-faces:   Postscript.             27.
+* ps-print-region-with-faces:   Postscript.             27.
+* ps-print-buffer:              Postscript.             27.
+* ps-print-region:              Postscript.             27.
+* lpr-region:                   Hardcopy.               20.
+* lpr-buffer:                   Hardcopy.               20.
+* print-region:                 Hardcopy.               20.
+* print-buffer:                 Hardcopy.               20.
+* server-edit:                  Emacs Server.           21.
+* rlogin-directory-tracking-mode: Remote Host.          32.
+* rlogin:                       Remote Host.            20.
+* telnet:                       Remote Host.            13.
+* comint-dynamic-complete-variable: Shell Options.      37.
+* comint-magic-space:           History References.     22.
+* comint-copy-old-input:        Shell History Copying.  13.
+* comint-next-prompt:           Shell History Copying.  9.
+* comint-previous-prompt:       Shell History Copying.  5.
+* comint-get-next-from-history: Shell Ring.             21.
+* comint-next-matching-input:   Shell Ring.             13.
+* comint-previous-matching-input: Shell Ring.           13.
+* comint-next-input:            Shell Ring.             9.
+* comint-previous-input:        Shell Ring.             5.
+* comint-run:                   Shell Mode.             150.
+* comint-truncate-buffer:       Shell Mode.             152.
+* comint-strip-ctrl-m:          Shell Mode.             142.
+* comint-continue-subjob:       Shell Mode.             137.
+* send-invisible:               Shell Mode.             126.
+* comint-dynamic-list-input-ring: Shell Mode.           116.
+* shell-backward-command:       Shell Mode.             111.
+* shell-forward-command:        Shell Mode.             105.
+* comint-show-maximum-output:   Shell Mode.             100.
+* comint-show-output:           Shell Mode.             95.
+* comint-kill-output:           Shell Mode.             87.
+* comint-quit-subjob:           Shell Mode.             81.
+* comint-stop-subjob:           Shell Mode.             75.
+* comint-interrupt-subjob:      Shell Mode.             69.
+* comint-kill-input:            Shell Mode.             60.
+* comint-bol:                   Shell Mode.             44.
+* comint-delchar-or-maybe-eof:  Shell Mode.             38.
+* comint-dynamic-list-filename...: Shell Mode.          33.
+* comint-dynamic-complete:      Shell Mode.             22.
+* comint-send-input:            Shell Mode.             13.
+* dirtrack-mode:                Interactive Shell.      61.
+* dirs:                         Interactive Shell.      56.
+* shell:                        Interactive Shell.      5.
+* shell-command-on-region:      Single Shell.           18.
+* shell-command:                Single Shell.           5.
+* gnus-summary-search-article-forward: Summary of Gnus.  97.
+* gnus-summary-isearch-article: Summary of Gnus.        92.
+* gnus-summary-prev-subject:    Summary of Gnus.        85.
+* gnus-summary-next-subject:    Summary of Gnus.        85.
+* gnus-group-prev-group:        Summary of Gnus.        85.
+* gnus-group-next-group:        Summary of Gnus.        85.
+* gnus-summary-prev-unread-article: Summary of Gnus.    80.
+* gnus-group-prev-unread-group: Summary of Gnus.        80.
+* gnus-summary-next-unread-article: Summary of Gnus.    75.
+* gnus-group-next-unread-group: Summary of Gnus.        75.
+* gnus-summary-prev-page:       Summary of Gnus.        73.
+* gnus-group-read-group:        Summary of Gnus.        52.
+* gnus-group-kill-group:        Summary of Gnus.        42.
+* gnus-group-unsubscribe-current-group: Summary of Gnus.  35.
+* gnus-group-list-groups:       Summary of Gnus.        31.
+* gnus-group-list-all-groups:   Summary of Gnus.        25.
+* gnus-group-exit:              Summary of Gnus.        17.
+* gnus:                         Gnus.                   12.
+* appt-delete:                  Appointments.           45.
+* appt-add:                     Appointments.           45.
+* appt-make-list:               Appointments.           9.
+* diary-float:                  Special Diary Entries.  73.
+* diary-cyclic:                 Special Diary Entries.  53.
+* insert-cyclic-diary-entry:    Special Diary Entries.  49.
+* insert-block-diary-entry:     Special Diary Entries.  44.
+* diary-block:                  Special Diary Entries.  39.
+* diary-anniversary:            Special Diary Entries.  29.
+* insert-anniversary-diary-entry: Special Diary Entries.  24.
+* insert-yearly-diary-entry:    Adding to Diary.        22.
+* insert-monthly-diary-entry:   Adding to Diary.        22.
+* insert-weekly-diary-entry:    Adding to Diary.        22.
+* insert-diary-entry:           Adding to Diary.        17.
+* american-calendar:            Date Formats.           39.
+* european-calendar:            Date Formats.           39.
+* diary-mail-entries:           Diary Commands.         64.
+* diary:                        Diary Commands.         55.
+* show-all-diary-entries:       Diary Commands.         43.
+* mark-diary-entries:           Diary Commands.         36.
+* view-diary-entries:           Diary Commands.         27.
+* calendar-next-calendar-round-date: Mayan Calendar.    53.
+* calendar-next-haab-date:      Mayan Calendar.         46.
+* calendar-previous-haab-date:  Mayan Calendar.         46.
+* calendar-next-tzolkin-date:   Mayan Calendar.         39.
+* calendar-previous-tzolkin-date: Mayan Calendar.       39.
+* calendar-goto-mayan-long-count-date: Mayan Calendar.  32.
+* list-yahrzeit-dates:          From Other Calendar.    39.
+* calendar-goto-ethiopic-date:  From Other Calendar.    9.
+* calendar-goto-coptic-date:    From Other Calendar.    9.
+* calendar-goto-persian-date:   From Other Calendar.    9.
+* calendar-goto-chinese-date:   From Other Calendar.    9.
+* calendar-goto-french-date:    From Other Calendar.    9.
+* calendar-goto-islamic-date:   From Other Calendar.    9.
+* calendar-goto-hebrew-date:    From Other Calendar.    9.
+* calendar-goto-astro-day-number: From Other Calendar.  9.
+* calendar-goto-julian-date:    From Other Calendar.    9.
+* calendar-goto-iso-date:       From Other Calendar.    9.
+* calendar-print-mayan-date:    To Other Calendar.      47.
+* calendar-print-persian-date:  To Other Calendar.      43.
+* calendar-print-ethiopic-date: To Other Calendar.      39.
+* calendar-print-coptic-date:   To Other Calendar.      36.
+* calendar-print-chinese-date:  To Other Calendar.      33.
+* calendar-print-french-date:   To Other Calendar.      29.
+* calendar-print-islamic-date:  To Other Calendar.      25.
+* calendar-print-hebrew-date:   To Other Calendar.      21.
+* calendar-print-astro-day-number: To Other Calendar.   17.
+* calendar-print-julian-date:   To Other Calendar.      13.
+* calendar-print-iso-date:      To Other Calendar.      10.
+* phases-of-moon:               Lunar Phases.           18.
+* calendar-phases-of-moon:      Lunar Phases.           15.
+* sunrise-sunset:               Sunrise/Sunset.         17.
+* calendar-sunrise-sunset:      Sunrise/Sunset.         17.
+* list-holidays:                Holidays.               49.
+* holidays:                     Holidays.               41.
+* list-calendar-holidays:       Holidays.               37.
+* calendar-unmark:              Holidays.               30.
+* mark-calendar-holidays:       Holidays.               30.
+* calendar-cursor-holidays:     Holidays.               24.
+* exit-calendar:                General Calendar.       28.
+* redraw-calendar:              General Calendar.       20.
+* calendar-print-day-of-year:   General Calendar.       15.
+* calendar-count-days-region:   Counting Days.          8.
+* scroll-calendar-right-three-months: Scroll Calendar.  30.
+* scroll-calendar-left-three-months: Scroll Calendar.   30.
+* scroll-calendar-right:        Scroll Calendar.        24.
+* scroll-calendar-left:         Scroll Calendar.        24.
+* calendar-goto-today:          Specified Dates.        22.
+* calendar-other-month:         Specified Dates.        19.
+* calendar-goto-date:           Specified Dates.        15.
+* calendar-end-of-year:         Move to Beginning or End.  24.
+* calendar-beginning-of-year:   Move to Beginning or End.  21.
+* calendar-end-of-month:        Move to Beginning or End.  18.
+* calendar-beginning-of-month:  Move to Beginning or End.  15.
+* calendar-end-of-week:         Move to Beginning or End.  12.
+* calendar-beginning-of-week:   Move to Beginning or End.  9.
+* calendar-forward-year:        Calendar Unit Motion.   33.
+* calendar-forward-year:        Calendar Unit Motion.   33.
+* calendar-backward-month:      Calendar Unit Motion.   33.
+* calendar-forward-month:       Calendar Unit Motion.   33.
+* calendar-backward-week:       Calendar Unit Motion.   25.
+* calendar-forward-week:        Calendar Unit Motion.   25.
+* calendar-backward-day:        Calendar Unit Motion.   25.
+* calendar-forward-day:         Calendar Unit Motion.   25.
+* calendar:                     Calendar/Diary.         4.
+* find-dired:                   Dired and Find.         24.
+* find-grep-dired:              Dired and Find.         16.
+* find-name-dired:              Dired and Find.         8.
+* dired-sort-toggle-or-edit:    Dired Updating.         54.
+* dired-do-kill-lines:          Dired Updating.         41.
+* dired-do-redisplay:           Dired Updating.         32.
+* revert-buffer （dired）:      Dired Updating.         27.
+* dired-hide-all:               Hiding Subdirectories.  16.
+* dired-hide-subdir:            Hiding Subdirectories.  10.
+* dired-next-dirline:           Subdirectory Motion.    38.
+* dired-prev-dirline:           Subdirectory Motion.    32.
+* dired-tree-down:              Subdirectory Motion.    27.
+* dired-tree-up:                Subdirectory Motion.    23.
+* dired-prev-subdir:            Subdirectory Motion.    18.
+* dired-next-subdir:            Subdirectory Motion.    13.
+* dired-maybe-insert-subdir:    Subdirectories in Dired.  17.
+* dired-backup-diff:            Comparison in Dired.    14.
+* dired-diff:                   Comparison in Dired.    9.
+* dired-do-symlink-regexp:      Transforming File Names.  27.
+* dired-do-hardlink-regexp:     Transforming File Names.  25.
+* dired-do-copy-regexp:         Transforming File Names.  23.
+* dired-do-rename-regexp:       Transforming File Names.  21.
+* dired-downcase:               Transforming File Names.  15.
+* dired-upcase:                 Transforming File Names.  7.
+* dired-do-shell-command:       Shell Commands in Dired.  5.
+* dired-create-directory:       Operating on Files.     105.
+* dired-do-query-replace:       Operating on Files.     110.
+* dired-do-search:              Operating on Files.     101.
+* dired-do-byte-compile:        Operating on Files.     95.
+* dired-do-load:                Operating on Files.     90.
+* dired-do-compress:            Operating on Files.     85.
+* dired-do-print:               Operating on Files.     78.
+* dired-do-chown:               Operating on Files.     69.
+* dired-do-chgrp:               Operating on Files.     65.
+* dired-do-chmod:               Operating on Files.     59.
+* dired-do-symlink:             Operating on Files.     53.
+* dired-do-hardlink:            Operating on Files.     47.
+* dired-do-rename:              Operating on Files.     38.
+* dired-do-delete:              Operating on Files.     33.
+* dired-do-copy:                Operating on Files.     23.
+* dired-undo:                   Marks vs Flags.         124.
+* dired-mark-files-containing-regexp: Marks vs Flags.   118.
+* dired-mark-files-regexp:      Marks vs Flags.         107.
+* dired-change-marks:           Marks vs Flags.         86.
+* dired-do-toggle:              Marks vs Flags.         80.
+* dired-prev-marked-file:       Marks vs Flags.         76.
+* dired-next-marked-file:       Marks vs Flags.         71.
+* dired-unmark-all-files:       Marks vs Flags.         62.
+* dired-unmark-all-files-no-query: Marks vs Flags.      57.
+* dired-unmark-backward:        Marks vs Flags.         52.
+* dired-unmark:                 Marks vs Flags.         46.
+* dired-mark-subdir-files:      Marks vs Flags.         39.
+* dired-mark-directories:       Marks vs Flags.         33.
+* dired-mark-symlinks:          Marks vs Flags.         28.
+* dired-mark-executables:       Marks vs Flags.         23.
+* dired-mark:                   Marks vs Flags.         17.
+* dired-view-file:              Dired Visiting.         39.
+* dired-mouse-find-file-other-window: Dired Visiting.   33.
+* dired-display-file:           Dired Visiting.         28.
+* dired-find-file-other-window: Dired Visiting.         21.
+* dired-find-file:              Dired Visiting.         12.
+* dired-flag-files-regexp:      Flagging Many Files.    51.
+* dired-clean-directory:        Flagging Many Files.    40.
+* dired-flag-backup-files:      Flagging Many Files.    34.
+* dired-flag-auto-save-files:   Flagging Many Files.    34.
+* dired-flag-garbage-files:     Flagging Many Files.    29.
+* dired-expunge:                Dired Deletion.         30.
+* dired-flag-file-deletion:     Dired Deletion.         17.
+* dired-other-frame:            Dired Enter.            16.
+* dired-other-window:           Dired Enter.            16.
+* dired:                        Dired Enter.            5.
+* rot13-other-window:           Rmail Rot13.            11.
+* unrmail:                      Out of Rmail.           5.
+* undigestify-rmail-message:    Rmail Digest.           13.
+* rmail-edit-current-message:   Rmail Editing.          14.
+* rmail-toggle-header:          Rmail Display.          19.
+* rmail-summary-quit:           Rmail Summary Edit.     52.
+* rmail-summary-wipe:           Rmail Summary Edit.     52.
+* rmail-summary-by-topic:       Rmail Make Summary.     36.
+* rmail-summary-by-recipients:  Rmail Make Summary.     32.
+* rmail-summary-by-labels:      Rmail Make Summary.     28.
+* rmail-summary:                Rmail Make Summary.     24.
+* rmail-continue:               Rmail Reply.            93.
+* rmail-mail:                   Rmail Reply.            87.
+* rmail-resend:                 Rmail Reply.            80.
+* unforward-rmail-message:      Rmail Reply.            69.
+* rmail-forward:                Rmail Reply.            62.
+* rmail-retry-failure:          Rmail Reply.            52.
+* rmail-reply:                  Rmail Reply.            26.
+* rmail-previous-labeled-message: Rmail Labels.         33.
+* rmail-next-labeled-message:   Rmail Labels.           33.
+* rmail-kill-label:             Rmail Labels.           26.
+* rmail-add-label:              Rmail Labels.           26.
+* rmail-output-body-to-file:    Rmail Output.           39.
+* rmail-output:                 Rmail Output.           20.
+* rmail-output-to-rmail-file:   Rmail Output.           20.
+* rmail-get-new-mail:           Rmail Files.            54.
+* set-rmail-inbox-list:         Rmail Files.            44.
+* rmail-input:                  Rmail Files.            25.
+* rmail-undelete-previous-message: Rmail Deletion.      42.
+* rmail-expunge:                Rmail Deletion.         42.
+* rmail-delete-backward:        Rmail Deletion.         29.
+* rmail-delete-forward:         Rmail Deletion.         29.
+* rmail-first-message:          Rmail Motion.           63.
+* rmail-last-message:           Rmail Motion.           63.
+* rmail-show-message:           Rmail Motion.           63.
+* rmail-search:                 Rmail Motion.           51.
+* rmail-previous-message:       Rmail Motion.           39.
+* rmail-next-message:           Rmail Motion.           39.
+* rmail-previous-undeleted-message: Rmail Motion.       39.
+* rmail-next-undeleted-message: Rmail Motion.           39.
+* rmail-beginning-of-message:   Rmail Scrolling.        20.
+* rmail-bury:                   Rmail Basics.           32.
+* rmail-quit:                   Rmail Basics.           32.
+* rmail-save:                   Rmail Basics.           26.
+* rmail-mode:                   Rmail.                  4.
+* rmail:                        Rmail.                  4.
+* spook:                        Distracting NSA.        5.
+* mail-attach-file:             Mail Mode Misc.         36.
+* ispell-message:               Mail Mode Misc.         31.
+* mail-signature:               Mail Mode Misc.         19.
+* mail-text:                    Mail Mode Misc.         16.
+* mail-fill-yanked-message:     Citing Mail.            37.
+* mail-yank-region:             Citing Mail.            32.
+* mail-yank-original:           Citing Mail.            17.
+* mail-complete:                Header Editing.         32.
+* mail-fcc:                     Header Editing.         26.
+* mail-bcc:                     Header Editing.         26.
+* mail-cc:                      Header Editing.         26.
+* mail-subject:                 Header Editing.         26.
+* mail-to:                      Header Editing.         26.
+* mail-send-and-exit:           Mail Sending.           14.
+* mail-send:                    Mail Sending.           14.
+* mail-interactive-insert-alias: Mail Aliases.          66.
+* define-mail-abbrev:           Mail Aliases.           61.
+* expand-mail-aliases:          Mail Aliases.           49.
+* define-mail-alias:            Mail Aliases.           34.
+* compose-mail-other-frame:     Sending Mail.           22.
+* compose-mail-other-window:    Sending Mail.           22.
+* compose-mail:                 Sending Mail.           22.
+* picture-yank-rectangle-from-register: Rectangles in Picture.  31.
+* picture-yank-rectangle:       Rectangles in Picture.  31.
+* picture-clear-rectangle-to-register: Rectangles in Picture.  22.
+* picture-clear-rectangle:      Rectangles in Picture.  22.
+* picture-set-tab-stops:        Tabs in Picture.        21.
+* picture-tab:                  Tabs in Picture.        16.
+* picture-tab-search:           Tabs in Picture.        5.
+* picture-motion-reverse:       Insert in Picture.      28.
+* picture-motion:               Insert in Picture.      28.
+* picture-movement-se:          Insert in Picture.      5.
+* picture-movement-sw:          Insert in Picture.      5.
+* picture-movement-ne:          Insert in Picture.      5.
+* picture-movement-nw:          Insert in Picture.      5.
+* picture-movement-right:       Insert in Picture.      5.
+* picture-movement-left:        Insert in Picture.      5.
+* picture-movement-down:        Insert in Picture.      5.
+* picture-movement-up:          Insert in Picture.      5.
+* picture-open-line:            Basic Picture.          33.
+* picture-clear-line:           Basic Picture.          25.
+* picture-clear-column:         Basic Picture.          25.
+* picture-backward-clear-column: Basic Picture.         25.
+* picture-newline:              Basic Picture.          19.
+* picture-move-up:              Basic Picture.          5.
+* picture-move-down:            Basic Picture.          5.
+* picture-backward-column:      Basic Picture.          5.
+* picture-forward-column:       Basic Picture.          5.
+* edit-picture:                 Picture.                4.
+* dabbrev-completion:           Dynamic Abbrevs.        11.
+* dabbrev-expand:               Dynamic Abbrevs.        11.
+* define-abbrevs:               Saving Abbrevs.         36.
+* insert-abbrevs:               Saving Abbrevs.         36.
+* quietly-read-abbrev-file:     Saving Abbrevs.         24.
+* read-abbrev-file:             Saving Abbrevs.         24.
+* write-abbrev-file:            Saving Abbrevs.         18.
+* edit-abbrevs:                 Editing Abbrevs.        29.
+* list-abbrevs:                 Editing Abbrevs.        10.
+* expand-region-abbrevs:        Expanding Abbrevs.      49.
+* unexpand-abbrev:              Expanding Abbrevs.      42.
+* abbrev-prefix-mark:           Expanding Abbrevs.      26.
+* expand-abbrev:                Expanding Abbrevs.      23.
+* kill-all-abbrevs:             Defining Abbrevs.       49.
+* inverse-add-mode-abbrev:      Defining Abbrevs.       35.
+* inverse-add-global-abbrev:    Defining Abbrevs.       35.
+* add-mode-abbrev:              Defining Abbrevs.       30.
+* add-global-abbrev:            Defining Abbrevs.       20.
+* abbrev-mode:                  Abbrev Concepts.        11.
+* lisp-eval-defun:              External Lisp.          30.
+* lisp-mode:                    External Lisp.          24.
+* run-lisp:                     External Lisp.          10.
+* ielm:                         Lisp Interaction.       24.
+* lisp-interaction-mode:        Lisp Interaction.       17.
+* eval-current-buffer:          Lisp Eval.              56.
+* eval-region:                  Lisp Eval.              56.
+* eval-last-sexp:               Lisp Eval.              47.
+* eval-defun:                   Lisp Eval.              37.
+* eval-expression:              Lisp Eval.              31.
+* emacs-lisp-mode:              Lisp Eval.              5.
+* load-library:                 Lisp Libraries.         15.
+* load:                         Lisp Libraries.         15.
+* load-file:                    Lisp Libraries.         9.
+* gud-def:                      GUD Customization.      16.
+* gud-finish:                   Commands of GUD.        84.
+* gud-gdb-complete-command:     Commands of GUD.        76.
+* gud-down:                     Commands of GUD.        73.
+* gud-up:                       Commands of GUD.        66.
+* gud-tbreak:                   Commands of GUD.        70.
+* gud-remove:                   Commands of GUD.        62.
+* gud-cont:                     Commands of GUD.        54.
+* gud-stepi:                    Commands of GUD.        48.
+* gud-next:                     Commands of GUD.        41.
+* gud-step:                     Commands of GUD.        34.
+* gud-refresh:                  Commands of GUD.        26.
+* pdb:                          Starting GUD.           46.
+* jdb:                          Starting GUD.           42.
+* perldb:                       Starting GUD.           37.
+* sdb:                          Starting GUD.           25.
+* xdb:                          Starting GUD.           20.
+* dbx:                          Starting GUD.           16.
+* gdb:                          Starting GUD.           10.
+* next-error:                   Compilation Mode.       17.
+* compile-goto-error:           Compilation Mode.       5.
+* grep-find:                    Grep Searching.         20.
+* grep:                         Grep Searching.         5.
+* kill-compilation:             Compilation.            55.
+* compile:                      Compilation.            23.
+* fortran-narrow-to-subprogram: Fortran Misc.           8.
+* fortran-window-create:        Fortran Columns.        30.
+* fortran-column-ruler:         Fortran Columns.        14.
+* fortran-auto-fill-mode:       Fortran Autofill.       11.
+* fortran-comment-region:       Fortran Comments.       71.
+* fortran-join-line:            ForIndent Commands.     35.
+* fortran-split-line:           ForIndent Commands.     30.
+* fortran-indent-subprogram:    ForIndent Commands.     27.
+* fortran-indent-new-line:      ForIndent Commands.     23.
+* fortran-indent-line:          ForIndent Commands.     18.
+* fortran-next-statement:       Fortran Motion.         10.
+* fortran-previous-statement:   Fortran Motion.         10.
+* mark-fortran-subprogram:      Fortran Motion.         10.
+* end-of-fortran-subprogram:    Fortran Motion.         10.
+* beginning-of-fortran-subprogram: Fortran Motion.      10.
+* fortran-mode:                 Fortran.                14.
+* c-show-syntactic-information: Other C Commands.       50.
+* cpp-highlight-buffer:         Other C Commands.       41.
+* c-backslash-region:           Other C Commands.       30.
+* c-macro-expand:               Other C Commands.       19.
+* c-fill-paragraph:             Other C Commands.       12.
+* c-mark-function:              Other C Commands.       7.
+* c-toggle-auto-hungry-state:   Hungry Delete.          16.
+* c-toggle-hungry-state:        Hungry Delete.          11.
+* c-scope-operator:             Electric C.             27.
+* c-toggle-auto-state:          Electric C.             18.
+* c-forward-into-nomenclature:  Motion in C.            63.
+* c-backward-into-nomenclature: Motion in C.            52.
+* c-end-of-statement:           Motion in C.            47.
+* c-beginning-of-statement:     Motion in C.            31.
+* c-forward-conditional:        Motion in C.            25.
+* c-backward-conditional:       Motion in C.            19.
+* c-up-conditional:             Motion in C.            10.
+* emerge-skip-prefers-mode:     Submodes of Emerge.     31.
+* emerge-auto-advance-mode:     Submodes of Emerge.     31.
+* emerge-buffers-with-ancestor: Overview of Emerge.     21.
+* emerge-buffers:               Overview of Emerge.     17.
+* emerge-files-with-ancestor:   Overview of Emerge.     13.
+* emerge-files:                 Overview of Emerge.     9.
+* tags-apropos:                 List Tags.              19.
+* list-tags:                    List Tags.              10.
+* tags-query-replace:           Tags Search.            29.
+* tags-loop-continue:           Tags Search.            24.
+* tags-search:                  Tags Search.            19.
+* find-tag-regexp:              Find Tag.               62.
+* pop-tag-mark:                 Find Tag.               54.
+* find-tag-other-frame:         Find Tag.               44.
+* find-tag-other-window:        Find Tag.               44.
+* find-tag:                     Find Tag.               27.
+* visit-tags-table:             Select Tags Table.      5.
+* change-log-mode:              Change Log.             47.
+* add-change-log-entry-other-window: Change Log.        5.
+* Man-fontify-manpage:          Documentation.          47.
+* manual-entry:                 Documentation.          30.
+* info-lookup-file:             Documentation.          23.
+* info-lookup-symbol:           Documentation.          23.
+* eldoc-mode:                   Documentation.          16.
+* which-function-mode:          Which Function.         8.
+* lisp-complete-symbol:         Symbol Completion.      25.
+* complete-symbol:              Symbol Completion.      15.
+* move-past-close-and-reindent: Balanced Editing.       11.
+* insert-parentheses:           Balanced Editing.       11.
+* set-comment-column:           Options for Comments.   5.
+* comment-region:               Multi-Line Comments.    13.
+* indent-new-comment-line:      Multi-Line Comments.    5.
+* kill-comment:                 Comment Commands.       54.
+* indent-for-comment:           Comment Commands.       5.
+* show-paren-mode:              Matching.               29.
+* c-add-style:                  C Indent Styles.        25.
+* c-set-style:                  C Indent Styles.        11.
+* c-set-offset:                 Changing Indent Style.  43.
+* c-indent-command:             C Indent.               20.
+* c-indent-exp:                 C Indent.               14.
+* c-indent-defun:               C Indent.               9.
+* indent-sexp:                  Multi-line Indent.      16.
+* newline-and-indent:           Basic Indent.           22.
+* lisp-indent-line:             Basic Indent.           10.
+* c-indent-line:                Basic Indent.           10.
+* c-mark-function:              Defuns.                 25.
+* mark-defun:                   Defuns.                 22.
+* end-of-defun:                 Defuns.                 22.
+* beginning-of-defun:           Defuns.                 22.
+* mark-sexp:                    List Commands.          68.
+* transpose-sexps:              List Commands.          61.
+* down-list:                    List Commands.          50.
+* backward-up-list:             List Commands.          50.
+* backward-list:                List Commands.          44.
+* forward-list:                 List Commands.          44.
+* backward-kill-sexp:           List Commands.          40.
+* kill-sexp:                    List Commands.          40.
+* backward-sexp:                List Commands.          26.
+* forward-sexp:                 List Commands.          26.
+* backward-delete-char-untabify: Program Modes.         25.
+* format-find-file:             Forcing Enriched Mode.  25.
+* set-justification-none:       Format Justification.   51.
+* set-justification-center:     Format Justification.   46.
+* set-justification-full:       Format Justification.   43.
+* set-justification-right:      Format Justification.   40.
+* set-justification-left:       Format Justification.   37.
+* increase-left-margin:         Format Indentation.     12.
+* facemenu-set-background:      Format Colors.          23.
+* facemenu-set-foreground:      Format Colors.          23.
+* facemenu-set-face:            Format Faces.           30.
+* facemenu-set-underline:       Format Faces.           26.
+* facemenu-set-bold-italic:     Format Faces.           22.
+* facemenu-set-italic:          Format Faces.           18.
+* facemenu-set-bold:            Format Faces.           14.
+* facemenu-set-default:         Format Faces.           10.
+* list-text-properties-at:      Editing Format Info.    26.
+* facemenu-remove-all:          Editing Format Info.    21.
+* facemenu-remove-props:        Editing Format Info.    16.
+* enriched-mode:                Requesting Formatted Text.  9.
+* electric-nroff-mode:          Nroff Mode.             22.
+* count-text-lines:             Nroff Mode.             13.
+* backward-text-line:           Nroff Mode.             13.
+* forward-text-line:            Nroff Mode.             13.
+* nroff-mode:                   Nroff Mode.             5.
+* tex-bibtex-file:              TeX Print.              118.
+* tex-file:                     TeX Print.              93.
+* tex-region:                   TeX Print.              74.
+* tex-recenter-output-buffer:   TeX Print.              63.
+* tex-kill-job:                 TeX Print.              63.
+* tex-show-print-queue:         TeX Print.              32.
+* tex-view:                     TeX Print.              32.
+* tex-print:                    TeX Print.              32.
+* tex-buffer:                   TeX Print.              32.
+* tex-close-latex-block:        LaTeX Editing.          25.
+* tex-latex-block:              LaTeX Editing.          15.
+* tex-terminate-paragraph:      TeX Editing.            49.
+* tex-validate-region:          TeX Editing.            49.
+* up-list:                      TeX Editing.            42.
+* tex-insert-braces:            TeX Editing.            42.
+* tex-insert-quote:             TeX Editing.            22.
+* slitex-mode:                  TeX Mode.               4.
+* latex-mode:                   TeX Mode.               4.
+* plain-tex-mode:               TeX Mode.               4.
+* tex-mode:                     TeX Mode.               4.
+* hide-other:                   Outline Visibility.     72.
+* hide-sublevels:               Outline Visibility.     68.
+* show-all:                     Outline Visibility.     62.
+* hide-body:                    Outline Visibility.     62.
+* show-children:                Outline Visibility.     58.
+* show-branches:                Outline Visibility.     53.
+* hide-leaves:                  Outline Visibility.     53.
+* show-subtree:                 Outline Visibility.     46.
+* hide-subtree:                 Outline Visibility.     46.
+* show-entry:                   Outline Visibility.     41.
+* hide-entry:                   Outline Visibility.     41.
+* outline-backward-same-level:  Outline Motion.         31.
+* outline-forward-same-level:   Outline Motion.         31.
+* outline-up-heading:           Outline Motion.         31.
+* outline-previous-visible-heading: Outline Motion.     24.
+* outline-next-visible-heading: Outline Motion.         24.
+* outline-minor-mode:           Outline Mode.           5.
+* outline-mode:                 Outline Mode.           5.
+* paragraph-indent-text-mode:   Text Mode.              23.
+* text-mode:                    Text Mode.              4.
+* upcase-region:                Case.                   37.
+* downcase-region:              Case.                   37.
+* capitalize-word:              Case.                   19.
+* upcase-word:                  Case.                   19.
+* downcase-word:                Case.                   19.
+* fill-nonuniform-paragraphs:   Fill Prefix.            63.
+* fill-individual-paragraphs:   Fill Prefix.            57.
+* set-fill-prefix:              Fill Prefix.            23.
+* set-fill-column:              Fill Commands.          41.
+* center-line:                  Fill Commands.          37.
+* fill-region-as-paragraph:     Fill Commands.          24.
+* fill-region:                  Fill Commands.          21.
+* fill-paragraph:               Fill Commands.          16.
+* auto-fill-mode:               Auto Fill.              14.
+* count-lines-page:             Pages.                  43.
+* mark-page:                    Pages.                  30.
+* backward-page:                Pages.                  24.
+* forward-page:                 Pages.                  24.
+* mark-paragraph:               Paragraphs.             29.
+* forward-paragraph:            Paragraphs.             4.
+* backward-paragraph:           Paragraphs.             4.
+* backward-kill-sentence:       Sentences.              29.
+* kill-sentence:                Sentences.              29.
+* forward-sentence:             Sentences.              18.
+* backward-sentence:            Sentences.              18.
+* mark-word:                    Words.                  61.
+* transpose-words:              Words.                  52.
+* backward-kill-word:           Words.                  44.
+* kill-word:                    Words.                  36.
+* backward-word:                Words.                  27.
+* forward-word:                 Words.                  27.
+* untabify:                     Just Spaces.            11.
+* tabify:                       Just Spaces.            11.
+* edit-tab-stops-note-changes:  Tab Stops.              10.
+* edit-tab-stops:               Tab Stops.              10.
+* tab-to-tab-stop:              Tab Stops.              5.
+* indent-relative:              Indentation Commands.   41.
+* indent-rigidly:               Indentation Commands.   31.
+* indent-region:                Indentation Commands.   31.
+* delete-indentation:           Indentation Commands.   20.
+* split-line:                   Indentation Commands.   14.
+* back-to-indentation:          Indentation Commands.   5.
+* normal-mode:                  Choosing Modes.         73.
+* standard-display-8bit:        Single-Byte European Support.  29.
+* create-fontset-from-fontset-spec: Defining Fontsets.  91.
+* set-buffer-process-coding-system: Specify Coding.     101.
+* set-next-selection-coding-system: Specify Coding.     94.
+* set-selection-coding-system:  Specify Coding.         94.
+* set-keyboard-coding-system:   Specify Coding.         81.
+* set-terminal-coding-system:   Specify Coding.         69.
+* universal-coding-system-argument: Specify Coding.     41.
+* set-buffer-file-coding-system: Specify Coding.        34.
+* prefer-coding-system:         Recognize Coding.       27.
+* list-coding-systems:          Coding Systems.         40.
+* describe-coding-system:       Coding Systems.         33.
+* list-input-methods:           Select Input Method.    46.
+* quail-set-keyboard-layout:    Select Input Method.    40.
+* toggle-input-method:          Select Input Method.    26.
+* set-input-method:             Select Input Method.    20.
+* describe-input-method:        Select Input Method.    17.
+* describe-language-environment: Language Environments.  32.
+* set-language-environment:     Language Environments.  17.
+* view-hello-file:              International Intro.    14.
+* select-frame-by-name:         Non-Window Terminals.   18.
+* set-frame-name:               Non-Window Terminals.   18.
+* other-frame:                  Misc X.                 24.
+* delete-frame:                 Misc X.                 19.
+* iconify-or-deiconify-frame:   Misc X.                 9.
+* highlight-changes-mode:       Highlight Changes.      5.
+* lazy-lock-mode:               Lazy Lock Mode.         12.
+* fast-lock-mode:               Fast Lock Mode.         12.
+* font-lock-add-keywords:       Font Lock.              80.
+* font-lock-fontify-block:      Font Lock.              27.
+* global-font-lock-mode:        Font Lock.              21.
+* turn-on-font-lock:            Font Lock.              12.
+* font-lock-mode:               Font Lock.              12.
+* list-faces-display:           Faces.                  29.
+* scroll-bar-mode:              Scroll Bars.            25.
+* set-frame-font:               Frame Parameters.       58.
+* auto-lower-mode:              Frame Parameters.       8.
+* auto-raise-mode:              Frame Parameters.       8.
+* set-border-color:             Frame Parameters.       8.
+* set-mouse-color:              Frame Parameters.       8.
+* set-cursor-color:             Frame Parameters.       8.
+* set-background-color:         Frame Parameters.       8.
+* set-foreground-color:         Frame Parameters.       8.
+* make-frame-on-display:        Multiple Displays.      10.
+* find-file-read-only-other-frame: Creating Frames.     42.
+* make-frame-command:           Creating Frames.        17.
+* mouse-yank-secondary:         Secondary Selection.    29.
+* mouse-secondary-save-then-kill: Secondary Selection.  23.
+* mouse-start-secondary:        Secondary Selection.    19.
+* mouse-set-secondary:          Secondary Selection.    9.
+* mouse-save-then-click:        Mouse Commands.         14.
+* mouse-yank-at-click:          Mouse Commands.         14.
+* mouse-set-point:              Mouse Commands.         14.
+* mouse-set-region:             Mouse Commands.         14.
+* balance-windows:              Change Window.          82.
+* shrink-window-if-larger-than-buffer: Change Window.   77.
+* enlarge-window-horizontally:  Change Window.          64.
+* enlarge-window:               Change Window.          64.
+* delete-other-windows:         Change Window.          51.
+* kill-buffer-and-window:       Change Window.          47.
+* delete-window:                Change Window.          38.
+* scroll-other-window:          Other Window.           28.
+* other-window:                 Other Window.           17.
+* split-window-horizontally:    Split Window.           21.
+* split-window-vertically:      Split Window.           15.
+* make-indirect-buffer:         Indirect Buffers.       9.
+* buffer-menu:                  Several Buffers.        13.
+* clean-buffer-list:            Kill Buffer.            35.
+* kill-some-buffers:            Kill Buffer.            16.
+* kill-buffer:                  Kill Buffer.            16.
+* view-buffer:                  Misc Buffer.            42.
+* vc-toggle-read-only:          Misc Buffer.            14.
+* list-buffers:                 List Buffers.           8.
+* switch-to-buffer:             Select Buffer.          14.
+* switch-to-buffer-other-frame: Select Buffer.          14.
+* switch-to-buffer-other-window: Select Buffer.         14.
+* auto-compression-mode:        Compressed Files.       5.
+* make-symbolic-link:           Misc File Ops.          49.
+* copy-file:                    Misc File Ops.          45.
+* add-name-to-file:             Misc File Ops.          41.
+* rename-file:                  Misc File Ops.          34.
+* delete-file:                  Misc File Ops.          30.
+* write-region:                 Misc File Ops.          26.
+* insert-file:                  Misc File Ops.          22.
+* view-file:                    Misc File Ops.          9.
+* compare-windows:              Comparing Files.        22.
+* diff-backup:                  Comparing Files.        18.
+* diff:                         Comparing Files.        5.
+* list-directory:               Directories.            22.
+* vc-insert-headers:            Version Headers.        19.
+* vc-rename-file:               Renaming and VC.        5.
+* vc-update-change-log:         Change Logs and VC.     11.
+* vc-retrieve-snapshot:         Making Snapshots.       15.
+* vc-create-snapshot:           Making Snapshots.       9.
+* vc-resolve-conflicts:         Merging.                51.
+* vc-merge:                     Merging.                14.
+* vc-dired-mark-locked:         VC Dired Commands.      21.
+* vc-dired-toggle-terse-mode:   VC Dired Commands.      21.
+* vc-directory:                 VC Dired Mode.          5.
+* vc-cancel-version:            VC Undo.                21.
+* vc-revert-buffer:             VC Undo.                12.
+* vc-print-log:                 VC Status.              8.
+* vc-register:                  Registering.            5.
+* vc-annotate:                  Old Versions.           50.
+* vc-diff:                      Old Versions.           27.
+* vc-version-other-window:      Old Versions.           21.
+* vc-toggle-read-only:          Basic VC Editing.       12.
+* vc-next-action:               Basic VC Editing.       12.
+* recover-session:              Recover.                20.
+* recover-file:                 Recover.                5.
+* do-auto-save:                 Auto Save Control.      31.
+* auto-save-mode:               Auto Save Control.      5.
+* revert-buffer:                Reverting.              4.
+* ask-user-about-lock:          Interlocking.           16.
+* write-file:                   Saving.                 82.
+* set-visited-file-name:        Saving.                 73.
+* not-modified:                 Saving.                 58.
+* save-some-buffers:            Saving.                 33.
+* save-buffer:                  Saving.                 20.
+* find-file-literally:          Visiting.               117.
+* find-file-other-frame:        Visiting.               112.
+* find-file-other-window:       Visiting.               104.
+* find-alternate-file:          Visiting.               94.
+* find-file-read-only:          Visiting.               90.
+* find-file:                    Visiting.               43.
+* substitute-in-file-name:      File Names.             63.
+* pwd:                          File Names.             28.
+* cd:                           File Names.             28.
+* ispell-kill-ispell:           Spelling.               125.
+* ispell-complete-word:         Spelling.               117.
+* ispell-region:                Spelling.               49.
+* ispell-buffer:                Spelling.               49.
+* ispell-word:                  Spelling.               45.
+* flyspell-mode:                Spelling.               29.
+* transpose-sexps:              Transpose.              26.
+* transpose-words:              Transpose.              26.
+* transpose-lines:              Transpose.              26.
+* transpose-chars:              Transpose.              14.
+* keep-lines:                   Other Repeating Search.  10.
+* flush-lines:                  Other Repeating Search.  10.
+* delete-matching-lines:        Other Repeating Search.  10.
+* delete-non-matching-lines:    Other Repeating Search.  10.
+* count-matches:                Other Repeating Search.  10.
+* occur:                        Other Repeating Search.  10.
+* list-matching-lines:          Other Repeating Search.  10.
+* query-replace-regexp:         Query Replace.          20.
+* query-replace:                Query Replace.          12.
+* replace-regexp:               Unconditional Replace.  4.
+* replace-string:               Unconditional Replace.  4.
+* re-search-backward:           Regexp Search.          36.
+* re-search-forward:            Regexp Search.          36.
+* isearch-backward-regexp:      Regexp Search.          10.
+* isearch-forward-regexp:       Regexp Search.          10.
+* word-search-backward:         Word Search.            28.
+* word-search-forward:          Word Search.            28.
+* search-backward:              Nonincremental Search.  26.
+* search-forward:               Nonincremental Search.  26.
+* isearch-backward:             Incremental Search.     99.
+* isearch-forward:              Incremental Search.     16.
+* display-time:                 Optional Mode Line.     21.
+* column-number-mode:           Optional Mode Line.     17.
+* line-number-mode:             Optional Mode Line.     5.
+* set-selective-display:        Selective Display.      4.
+* hscroll-mode:                 Horizontal Scrolling.   31.
+* scroll-right:                 Horizontal Scrolling.   19.
+* scroll-left:                  Horizontal Scrolling.   19.
+* reposition-window:            Scrolling.              81.
+* scroll-down:                  Scrolling.              42.
+* scroll-up:                    Scrolling.              42.
+* recenter:                     Scrolling.              37.
+* bookmark-insert:              Bookmarks.              79.
+* bookmark-insert-location:     Bookmarks.              75.
+* bookmark-delete:              Bookmarks.              71.
+* bookmark-write:               Bookmarks.              67.
+* bookmark-load:                Bookmarks.              60.
+* bookmark-jump:                Bookmarks.              27.
+* bookmark-set:                 Bookmarks.              27.
+* bookmark-save:                Bookmarks.              29.
+* list-bookmarks:               Bookmarks.              25.
+* bookmark-jump:                Bookmarks.              21.
+* bookmark-set:                 Bookmarks.              16.
+* increment-register:           RegNumbers.             14.
+* number-to-register:           RegNumbers.             11.
+* frame-configuration-to-register: RegConfig.           5.
+* window-configuration-to-register: RegConfig.          5.
+* copy-rectangle-to-register:   RegRect.                9.
+* insert-register:              RegText.                15.
+* copy-to-register:             RegText.                15.
+* jump-to-register:             RegPos.                 18.
+* point-to-register:            RegPos.                 14.
+* view-register:                Registers.              10.
+* string-rectangle:             Rectangles.             83.
+* delete-whitespace-rectangle:  Rectangles.             79.
+* clear-rectangle:              Rectangles.             74.
+* open-rectangle:               Rectangles.             74.
+* yank-rectangle:               Rectangles.             60.
+* delete-rectangle:             Rectangles.             46.
+* kill-rectangle:               Rectangles.             46.
+* append-to-file:               Accumulating Text.      4.
+* copy-to-buffer:               Accumulating Text.      4.
+* prepend-to-buffer:            Accumulating Text.      4.
+* append-to-buffer:             Accumulating Text.      4.
+* yank-pop:                     Earlier Kills.          5.
+* append-next-kill:             Appending Kills.        39.
+* kill-ring-save:               Kill Ring.              21.
+* yank:                         Kill Ring.              12.
+* zap-to-char:                  Other Kill Commands.    25.
+* kill-region:                  Other Kill Commands.    4.
+* kill-line:                    Killing by Lines.       8.
+* just-one-space:               Deletion.               29.
+* delete-horizontal-space:      Deletion.               29.
+* delete-char:                  Deletion.               4.
+* delete-backward-char:         Deletion.               4.
+* pop-global-mark:              Global Mark Ring.       16.
+* mark-whole-buffer:            Marking Objects.        27.
+* transient-mark-mode:          Transient Mark.         21.
+* exchange-point-and-mark:      Setting Mark.           40.
+* set-mark-command:             Setting Mark.           26.
+* describe-project:             Misc Help.              51.
+* describe-no-warranty:         Misc Help.              51.
+* describe-distribution:        Misc Help.              51.
+* describe-copying:             Misc Help.              51.
+* view-emacs-news:              Misc Help.              51.
+* view-emacs-FAQ:               Misc Help.              51.
+* describe-bindings:            Misc Help.              37.
+* describe-mode:                Misc Help.              32.
+* view-lossage:                 Misc Help.              27.
+* Info-goto-emacs-command-node: Misc Help.              15.
+* Info-goto-emacs-key-command-node: Misc Help.          15.
+* info:                         Misc Help.              5.
+* help-previous-ref:            Help Mode.              26.
+* help-next-ref:                Help Mode.              26.
+* finder-by-keyword:            Library Keywords.       5.
+* apropos-value:                Apropos.                45.
+* apropos-documentation:        Apropos.                42.
+* apropos:                      Apropos.                37.
+* apropos-variable:             Apropos.                32.
+* apropos-command:              Apropos.                5.
+* where-is:                     Name Help.              36.
+* describe-function:            Name Help.              5.
+* describe-key:                 Key Help.               14.
+* describe-key-briefly:         Key Help.               5.
+* help-for-help:                Help.                   12.
+* help-command:                 Help.                   4.
+* execute-extended-command:     M-x.                    54.
+* repeat-complex-command:       Repetition.             16.
+* list-command-history:         Repetition.             10.
+* next-matching-history-element: Minibuffer History.    45.
+* previous-matching-history-element: Minibuffer History.  45.
+* previous-history-element:     Minibuffer History.     26.
+* next-history-element:         Minibuffer History.     26.
+* previous-completion:          Completion Commands.    58.
+* next-completion:              Completion Commands.    53.
+* choose-completion:            Completion Commands.    47.
+* switch-to-completions:        Completion Commands.    37.
+* mouse-choose-completion:      Completion Commands.    30.
+* minibuffer-complete-word:     Completion Commands.    19.
+* minibuffer-complete:          Completion Example.     5.
+* resize-minibuffer-mode:       Minibuffer Edit.        21.
+* repeat:                       Repeating.              5.
+* universal-argument:           Arguments.              22.
+* negative-argument:            Arguments.              14.
+* digit-argument:               Arguments.              14.
+* what-cursor-position:         Position Info.          38.
+* count-lines-region:           Position Info.          34.
+* what-line:                    Position Info.          21.
+* what-page:                    Position Info.          21.
+* delete-blank-lines:           Blank Lines.            12.
+* open-line:                    Blank Lines.            12.
+* undo:                         Undo.                   19.
+* set-goal-column:              Moving Point.           65.
+* move-to-window-line:          Moving Point.           13.
+* goto-line:                    Moving Point.           13.
+* goto-char:                    Moving Point.           13.
+* end-of-buffer:                Moving Point.           13.
+* beginning-of-buffer:          Moving Point.           13.
+* previous-line:                Moving Point.           13.
+* next-line:                    Moving Point.           13.
+* backward-char:                Moving Point.           13.
+* forward-char:                 Moving Point.           13.
+* end-of-line:                  Moving Point.           13.
+* beginning-of-line:            Moving Point.           13.
+* self-insert:                  Inserting Text.         60.
+* newline:                      Inserting Text.         60.
+* quoted-insert:                Inserting Text.         31.
+* help-with-tutorial:           Basic.                  5.
+* save-buffers-kill-emacs:      Exiting.                47.
+* suspend-emacs:                Exiting.                23.
+* tmm-menubar:                  Menu Bar.               9.
+
+
+

@@ -1,0 +1,2688 @@
+Info file: find-ja.info,    -*-Text-*-
+produced by `texinfo-format-buffer'
+from file `find-ja.texi'
+using `texinfmt.el' version 2.38 of 3 July 1998.
+
+
+
+
+
+START-INFO-DIR-ENTRY
+* Finding Files(ja): (find-ja). Listing and operating on files
+                                that match certain criteria.
+END-INFO-DIR-ENTRY
+
+This file documents the GNU utilities for finding files that match
+certain criteria and performing various operations on them.
+
+Copyright (C) 1994 Free Software Foundation, Inc.
+
+Permission is granted to make and distribute verbatim copies of this
+manual provided the copyright notice and this permission notice are
+preserved on all copies.
+
+Permission is granted to copy and distribute modified versions of this
+manual under the conditions for verbatim copying, provided that the
+entire resulting derived work is distributed under the terms of a
+permission notice identical to this one.
+
+Permission is granted to copy and distribute translations of this manual
+into another language, under the above conditions for modified versions,
+except that this permission notice may be stated in a translation
+approved by the Foundation.
+
+
+
+
+File: find-ja.info, Node: Top, Next: Introduction, Prev: (dir), Up: (dir)
+
+このファイルは，特定の基準に一致するファイルを検索し，それらに様々なアク
+ションを実行するGNUユーティリティの説明です．これは，`find'のバージョン 
+4.1に対する，エディション 1.1です．
+
+
+* Menu:
+
+* Introduction::                Summary of the tasks this manual describes.
+* Finding Files::               Finding files that match certain criteria.
+* Actions::                     Doing things to files you have found.
+* Common Tasks::                Solutions to common real-world problems.
+* Databases::                   Maintaining file name databases.
+* File Permissions::            How to control access to files.
+* Reference::                   Summary of how to invoke the programs.
+* Primary Index::               The components of `find' expressions.
+
+
+
+File: find-ja.info, Node: Introduction, Next: Finding Files, Prev: Top, Up: Top
+
+はじめに
+********
+
+このマニュアルは，指定した基準にあったファイルを検索する方法と，見つけた
+ファイルに様々なアクションを実行する方法を示します．これらの作業を実行す
+るために使用する主なプログラムは，`find'，`locate'，そして`xargs'です．
+このマニュアルにある例は，これらのプログラムのGNUバージョン特有の能力を
+使用します．
+
+GNU `find'は，元々Eric Deckerによって書かれ，David MacKenzie，Jay Plett，
+そしてTim Woodによって拡張されました．GNU `xargs'は，元々Mike Rendellに
+よって書かれ，David MacKenzieによって拡張されました．GNU `locate'とそれ
+に関連するユーティリティは，元々James Woodsによって書かれ，David
+MacKenzieよって拡張されました．`find -print0'と`xargs -0'に関するアイデ
+アは，Dan Bernsteinによります．その他，多くの人がバグの修正，小さな改良，
+そして有益な提案を寄与してくれました．どうもありがとう！
+
+これらのプログラムに関するメールでの提案とバグの報告先は
+`bug-gnu-utils@prep.ai.mit.edu'になります．`find --version'を実行して得
+られるバージョンナンバーを含めてください．
+
+* Menu:
+
+* Scope::
+* Overview::
+* find Expressions::
+
+
+
+File: find-ja.info, Node: Scope, Next: Overview, Prev: Introduction, Up: Introduction
+
+スコープ
+========
+
+簡潔にするため，このマニュアル内の単語"ファイル"は，通常のファイル，ディ
+レクトリ，シンボリックリンク，またはディレクトリエントリを持つノードのよ
+うなその他のあらゆるものを意味します．ディレクトリエントリは"ファイル名"
+とも呼ばれます．ファイル名は，ファイルに前置されるパス内のディレクトリを，
+いくつか含む，全て含む，または全く含まないかもしれません．このマニュアル
+で"ファイル名"と呼ばれるものの全ての例があります．
+
+     parser.c
+     README
+     ./budget/may-94.sc
+     fred/.cshrc
+     /usr/local/include/termcap.h
+
+"ディレクトリツリー"はディレクトリとそれが含むファイル，その全てのサブディ
+レクトリとそれが含むファイル等です．それは，単一のディレクトリではないファ
+イルとすることも可能です．
+
+これらのプログラムは，一つまたはそれ以上のディレクトリツリー内部の，以下
+のようなファイルを見つけることを可能にします．
+
+   * 特定のテキストや特定のパターンに一致する名前を持つもの．
+   * 特定のファイルにリンクしているもの．
+   * 最近の特定の期間に使用されたもの．
+   * 特定の大きさの範囲にあるもの．
+   * 特定の形式(通常のファイル，ディレクトリ，シンボリックリンク等)のも
+     の．
+   * 特定のユーザやグループに所有されているもの．
+   * 特定のアクセス許可を持つもの．
+   * 特定のパターンに一致するテキストを含むもの．
+   * ディレクトリツリーの特定の深さにあるもの．
+   * 上記の組み合わせ．
+
+一旦探しているファイル(または，探している可能性があるファイル)を見つける
+と，単純なそれらの名前のリスト以上のものにすることが可能です．ファイルを
+個別にまたは様々な大きさのまとまりとして，属性のあらゆる組み合わせを取得
+したり，多くの方法で処理したりすることが可能です．見つけたファイル上で実
+行したい動作は，以下のことだけに制限されません．
+
+   * 閲覧または編集．
+   * アーカイブへ保存．
+   * 削除や名前の変更．
+   * アクセス許可の変更．
+   * グループ分け．
+
+このマニュアルは，これらのそれぞれの作業を実行する方法と，それ以上のもの
+を記述しています．
+
+
+
+
+File: find-ja.info, Node: Overview, Next: find Expressions, Prev: Scope, Up: Introduction
+
+概要
+====
+
+与えられた基準に一致するファイルのリストを作成し，その上でコマンドを実行
+するために使用される主なプログラムは，`find'，`locate'，そして`xargs'で
+す．追加のコマンドは`updatedb'で，それは`locate' が使用するデータベース
+を作成するために，システム管理者が使用します．
+
+`find'はディレクトリ階層内でファイルを検索し，見つかったファイルの情報を
+出力します．以下のように実行します．
+
+     find [FILE...] [EXPRESSION]
+
+ここに典型的な`find'の使用方法があります．この例は，`/usr/src' をルート
+としたディレクトリツリー内で，名前が`.c'で終り，100Kバイト以上の大きさを
+持つ，全てのファイルの名前を出力します．
+     find /usr/src -name '*.c' -size +100k -print
+
+`locate'は，特別なファイル名のデータベースで，パターンに一致するファイル
+名を探します．システム管理者は，データベースを作成するために`updatedb'を
+実行します．`locate'は以下のように実行します．
+
+     locate [OPTION...] PATTERN...
+
+この例は，デフォルトファイル名のデータベースで，名前が`Makefile'または
+`makefile'で終わる，全てのファイルの名前を出力します．データベースに保存
+されるファイル名は，システム管理者が`updatedb'を実行した方法に依存します．
+
+     locate '*[Mm]akefile'
+
+名前`xargs'は，EX-argsと発音され，それは"引数を統合する"という意味があり
+ます．`xargs'は，標準入力で読み込む引数をかき集めることで構築しコマンド
+行を実行します．これらの引数は，`find'で生成されるファイル名のリストとな
+ることが最も多くなっています．`xargs'は，以下のように実行します．
+
+     xargs [OPTION...] [COMMAND [INITIAL-ARGUMENTS]]
+
+以下のコマンドは，ファイル`file-list'内にリストアップされているファイル
+を検索し，単語`typedef'を含むものの全ての行を出力します．
+     xargs grep typedef < file-list
+
+
+
+
+File: find-ja.info, Node: find Expressions, Prev: Overview, Up: Introduction
+
+`find'の式
+==========
+
+ファイルを選択するために`find'が使用する式は，一つまたはそれ以上の"プラ
+イマリ"から成り立ち，それらはそれぞれ分離した`find'へのコマンドライン引
+数です．`find'はそのたびに式を評価し，ファイルを処理します．式は以下のプ
+ライマリの形式のいずれかを含むことが可能です．
+
+"オプション(options)"
+     特定のファイルの処理ではなく全体的な処理に影響を与えます．
+"テスト(tests)"
+     ファイルの属性に依存し，真または偽の値を返します．
+"アクション(actions)"
+     それらを評価するとき他の引数と連結し影響を与えます．
+
+2つのプライマリの間のオペレータは省略可能です．そのデフォルトは`-and'で
+す．プライマリをより複雑な式に連結する方法は，*Note Combining Primaries
+With Operators::.式が`-prune'以外のアクションを含まない場合，全ての式が
+真である全てのファイルで，`-print'が動作します(*Note Print File Name::)．
+
+式の中にオプションがあるとき，それぞれのファイルに対し評価されるのではな
+く，すぐに影響を与えます．そのため，明確にするため，式の最初にそれらを配
+置するのが最善です．
+
+プライマリの多くは引数をとり，それらは`find'への次のコマンドライン引数の
+直後に続きます．引数は，ファイル名，パターン，またはその他の文字列になる
+ものもあります．それ以外は数字です．数字の引数は以下のように指定可能です．
+
+`+N'
+     Nより大きい．
+`-N'
+     Nより小さい．
+`N'
+     Nに等しい．
+
+
+
+
+File: find-ja.info, Node: Finding Files, Next: Actions, Prev: Introduction, Up: Top
+
+ファイル検索
+************
+
+デフォルトで，`find'は標準出力に，与えられた基準に一致するファイルの名前
+を出力します．一致したファイルに関する詳細を取得する方法は，*Note
+Actions::.
+
+* Menu:
+
+* Name::
+* Links::
+* Time::
+* Size::
+* Type::
+* Owner::
+* Permissions::
+* Contents::
+* Directories::
+* Filesystems::
+* Combining Primaries With Operators::
+
+
+
+File: find-ja.info, Node: Name, Next: Links, Prev: Finding Files, Up: Finding Files
+
+名前
+====
+
+基準パターンに一致する名前をもつファイルを検索する方法下記のようになりま
+す．これらのテストでのPATTERN引数の記述については，*Note Shell Pattern
+Matching::.
+
+これらのテストには，`i'で始まる名前を持つ，大文字小文字を区別バージョン
+と区別しないバージョンがあります．大文字小文字を区別しない比較では，パター
+ン`fo*'と`F??'は，ファイル名`Foo'，`FOO'，`foo'，`fOo'等に一致します．
+
+* Menu:
+
+* Base Name Patterns::
+* Full Name Patterns::
+* Fast Full Name Search::
+* Shell Pattern Matching::      Wildcards used by these programs.
+
+
+
+File: find-ja.info, Node: Base Name Patterns, Next: Full Name Patterns, Prev: Name, Up: Name
+
+ベース名のパターン
+------------------
+
+ -- Test: -name PATTERN
+ -- Test: -iname PATTERN
+     ファイル名のベース(前置されるディレクトリが削除されたパス)がシェル
+     パターンPATTERNに一致する場合は真です． `-iname'の場合は，大文字小
+     文字の区別をしない一致です．ディレクトリツリー全体を無視するために，
+     `-prune'を使用して下さい(*Note Directories::)．例として，
+     `/usr/local/doc'のTexinfoソースファイルを見つけるため以下のようにし
+     ます．
+
+          find /usr/local/doc -name '*.texi'
+
+
+
+
+File: find-ja.info, Node: Full Name Patterns, Next: Fast Full Name Search, Prev: Base Name Patterns, Up: Name
+
+完全なファイル名のパターン
+--------------------------
+
+ -- Test: -path PATTERN
+ -- Test: -ipath PATTERN
+     見つかったファイルで，コマンドライン引数で始まるファイル名全体がシェ
+     ルパターンPATTERNに一致する場合は真です．`-ipath'の場合は，大文字小
+     文字を区別しません．ディレクトリツリー全体を無視するために，ツリー
+     の全てのファイルを調査するのではなく，`-prune'を使用してください．
+
+ -- Test: -regex EXPR
+ -- Test: -iregex EXPR
+     ファイル名全体が正規表現EXPRに一致する場合は真です．これはパス全体
+     への一致で，サーチではありません．例えば，`./fubar3'というファイル
+     名に一致させるため，正規表現`.*bar.'や`.*b.*3'は使用可能ですが，
+     `b.*r3'は不可能です．正規表現の構文の記述は，*Note Syntax of
+     Regular Expressions: (emacs)Regexps.  `-iregex'の場合は，大文字小文
+     字を区別しません．
+
+
+
+File: find-ja.info, Node: Fast Full Name Search, Next: Shell Pattern Matching, Prev: Full Name Patterns, Up: Name
+
+すばやい完全な名前の検索
+------------------------
+
+実際にディスク上のディレクトリをスキャンすることなく(きっと遅いでしょう)，
+ファイルを名前で検索するために，`locate'プログラムを使用することが可能で
+す．与えたそれぞれのシェルパターンに対し，`locate'は，一つまたはそれ以上
+のファイル名のデータベースを検索し，パターンを含むファイル名を表示します．
+シェルパターンの詳細は，*Note Shell Pattern Matching::.
+
+パターンが--メタ文字を含まない--平文の場合，`locate'は，文字列を含む全て
+のファイル名を表示します．パターンがメタ文字を含む場合，`locate'はパター
+ンに正確に一致しているファイル名のみ表示します．結果として，メタ文字を含
+むパターンは，通常`*'で開始すべきで，同じもので終わることが最も多くなっ
+ています．例外は，ファイル名の最初または最後への，明示的な一致を試みるパ
+ターンです．
+
+以下のコマンドは，
+     locate PATTERN
+
+こちらとほとんど等価です．
+     find DIRECTORIES -name PATTERN
+
+ここでのDIRECTORIESは，情報を含むファイル名データベースのディレクトリで
+す．違いは`locate'情報が古い可能性があり，そして，`locate'は`find'とわず
+かに異なるパターンでワイルドカードを扱うことです(*Note Shell Pattern
+Matching::) ．
+
+ファイル名データベースは，データベースが最後に更新されたときにシステムに
+存在したファイルのリストを含みます．システム管理者はデフォルトのデータベー
+スのファイル名，データベースを更新する頻度，そして，エントリーを含むディ
+レクトリを選択することが可能です．
+
+ここに，`locate'が検索するファイル名データベースを選択する方法があります．
+デフォルトはシステムに依存します．
+
+`--database=PATH'
+`-d PATH'
+     デフォルトのファイル名データベースを検索する代わりに，PATH内のファ
+     イル名データベースを検索し，それはコロンで分けられたデータベースの
+     ファイル名リストとなります．検索するデータベースファイルのリストを
+     設定するために，環境変数`LOCATE_PATH'を使用することも可能です．両方
+     使用されている場合，オプションは環境変数に優先します．
+
+
+
+
+File: find-ja.info, Node: Shell Pattern Matching, Prev: Fast Full Name Search, Up: Name
+
+シェルパターンマッチング
+------------------------
+
+`find'と`locate'は，ファイル名やファイル名の一部を，シェルパターンと比較
+することが可能です．"シェルパターン"は，以下の特殊文字を含む可能性がある
+文字列で，それは"ワイルドカード"や"メタ文字"をして知られています．
+
+メタ文字を含むパターンを，シェルがそれ自身を展開することから避けるため引
+用符で囲む必要があります．二重引用符とシングル引用符の両方が動作します．
+そのため，(それ自身は)バックスラッシュでエスケープします．
+
+`*'
+     ゼロ以上の文字に一致します．
+
+`?'
+     あらゆる一文字に一致します．
+
+`[STRING]'
+     文字列STRINGに存在する，正確に1文字に一致します．これは"文字集合"と
+     呼ばれます．短いものとして，STRINGは範囲を含めることが可能で，それ
+     は間にダッシュがある２つの文字です．例えば，集合`[a-z0-9_]'は小文字，
+     数字，またはアンダースコアです．`!'や`^'を開括弧の前に配置すること
+     で，否定集合も可能です．このため，`[^A-Z@]'は大文字とアットマーク以
+     外に一致します．
+
+`\'
+     以下の特殊文字の意味をなくします．これは文字集合でも動作します．
+
+`find'がシェルのパターンマッチ(`-name'，`-path'等)で行なうテストでは，パ
+ターンの中のワイルドカードはファイル名の最初の`.'に一致しません．これは
+`locate'ではそうなりません．このため，`find -name '*macs''は`.emacs'に一
+致しませんが，`locate '*macs''では一致します．
+
+スラッシュ文字は，`find'と`locate'が行なうシェルのパターンマッチで特殊な
+意味はなく，ワイルドカードがそれに一致しないシェルとは異なります．そのた
+め，パターン`foo*bar'はファイル名`foo3/bar'に一致し，パターン`./sr*sc'は
+ファイル名`./src/misc'に一致するはずです．
+
+
+
+
+File: find-ja.info, Node: Links, Next: Time, Prev: Name, Up: Finding Files
+
+リンク
+======
+
+ファイルをお互いにリンクすること可能にする２つの方法があります．"シンボ
+リックリンク(symbolic link)"は，他のファイルの名前の部分が内容になる，ファ
+イルの特殊な形式です．"ハードリンク(hard link)"は，一つのファイルに対す
+る，複数のディレクトリエントリですファイル名のすべては同じインデックスノー
+ド("inode")番号をディスク上に持ちます．
+
+* Menu:
+
+* Symbolic Links::
+* Hard Links::
+
+
+
+File: find-ja.info, Node: Symbolic Links, Next: Hard Links, Prev: Links, Up: Links
+
+シンボリックリンク
+------------------
+
+ -- Test: -lname PATTERN
+ -- Test: -ilname PATTERN
+     ファイルがシェルパターンPATTERNに一致する内容のシンボリックリンクの
+     場合は真です．`-ilname'の場合は，大文字小文字を区別しない一致です．
+     PATTERN引数の詳細は，*Note Shell Pattern Matching::.そして，現在の
+     ディレクトリとそのサブディレクトリ内の，`sysdep.c'へのあらゆるシン
+     ボリックリンクをリストアップするために，以下のようにして行なうこと
+     ができます．
+
+          find . -lname '*sysdep.c'
+
+ -- Option: -follow
+     シンボリックリンクと異なります．このオプションを与えた時の動作には，
+     以下の違いがあります．
+
+        * `find'は，ディレクトリツリーを検索する時，ディレクトリへのシン
+          ボリックリンクをたどります．
+        * `-lname'と`-ilname'は常に偽を返します．
+        * `-type'はシンボリックリンクが示すファイルの形式を報告します．
+        * 暗黙に`-noleaf'を指定します(*Note Directories::)．
+
+
+
+
+File: find-ja.info, Node: Hard Links, Prev: Symbolic Links, Up: Links
+
+ハードリンク
+------------
+
+ハードリンクを探すため，最初に見つけたいファイルにリンクしているファイル
+のinodeナンバーを取得します．`ls -i'や`find -ls'を実行することで，ファイ
+ルのinodeナンバーとそれへのリンクの数を知ることが可能です．ファイルに1つ
+以上のリンクがある場合，そのinodeナンバーを`-inum'に渡すことで，他のリン
+クを検索することが可能です．多くのシステムの`/usr'のように，他のファイル
+システムをマウントしているディレクトリを起点に検索を開始している場合は，
+`-xdev'オプションを加えて下さい．ファイルへのハードリンクは同じファイル
+システムに存在する必要があるので，これを行なうことで不要な検索を防ぎます．
+*Note Filesystems::.
+
+ -- Test: -inum N
+     ファイルがinodeナンバーNを持つかどうかの調査．
+
+`-links'を用いると，特定の数のリンクを持つファイルを検索することも可能で
+す．ディレクトリは通常，少なくとも2つのハードリンクがあります．それらの
+`.'エントリは2番目のものです．サブディレクトリがある場合，それは個別に親
+ディレクトリを示す`..'と呼ばれるハードリンクもあります．
+
+ -- Test: -links N
+     ファイルがN個のハードリンクを持つかどうかの調査．
+
+
+
+
+File: find-ja.info, Node: Time, Next: Size, Prev: Links, Up: Finding Files
+
+時間
+====
+
+それぞれのファイルには3つのタイムスタンプがあり，それらはファイルに対し
+て特定な処理を実行した，最後の時間を記録します．
+
+  1. アクセス(ファイルの内容を読み込む)
+  2. ステータスの変更(ファイルの編集や属性の変更)
+  3. 編集(ファイルの内容を変更)
+
+タイムスタンプが特定の範囲にあるファイルを検索したり，他のタイムスタンプ
+と比較したりすることが可能です．
+
+* Menu:
+
+* Age Ranges::
+* Comparing Timestamps::
+
+
+
+File: find-ja.info, Node: Age Ranges, Next: Comparing Timestamps, Prev: Time, Up: Time
+
+期間の範囲
+----------
+
+これらのテストは，範囲(`+N'と`-N')を用いる場合に，主に役立ちます．
+
+ -- Test: -atime N
+ -- Test: -ctime N
+ -- Test: -mtime N
+     ファイルの最後のアクセス(またはステータスの変更，または編集)が，
+     N*24時間前の場合は真です．
+
+ -- Test: -amin N
+ -- Test: -cmin N
+ -- Test: -mmin N
+     ファイルの最後のアクセス(またはステータスの変更，または編集)が，N 
+     分前の場合は真です．これらのテストは，`-atime'等よりもより細かな計
+     測を提供します．例えば，`/u/bill'内の最後に読み込まれたのが2〜6分 
+     (1) (*Note Age Ranges-Footnotes::) 前のファイルをリストアップするた
+     めに以下のようにします．
+
+          find /u/bill -amin +2 -amin -6
+
+ -- Option: -daystart
+     24時間前ではなく今日の最初から時間をはかります．そのため，ホームディ
+     レクトリ内で昨日編集された通常のファイルをリストアップするために，
+     以下のようにします．
+
+          find ~ -daystart -type f -mtime 1
+
+
+
+File: find-ja.info  Node: Age Ranges-Footnotes, Up: Age Ranges
+
+(1) 訳注：原文はhours(時間)だが間違いと思われる．
+
+
+
+File: find-ja.info, Node: Comparing Timestamps, Prev: Age Ranges, Up: Time
+
+タイムスタンプの比較
+--------------------
+
+タイムスタンプを現在の時間と比較する代わりに，それを他のファイルのタイム
+スタンプと比較することが可能です．そのファイルのタイムスタンプは，いくつ
+かのイベントによって，他のプログラムによって更新されるかもしれません．ま
+た，`touch'コマンドを使用して，特定の固定した日付に設定することもできる
+でしょう．例えば，今年の1月1日移行に編集された`/usr'内のファイルをリスト
+アップするために，以下のようにします．
+
+     touch -t 02010000 /tmp/stamp$$
+     find /usr -newer /tmp/stamp$$
+     rm -f /tmp/stamp$$
+
+ -- Test: -anewer FILE
+ -- Test: -cnewer FILE
+ -- Test: -newer FILE
+     ファイルが最後にアクセス(またはステータスの変更，または編集)された
+     のがFILEの編集以降の場合は真です．これらのテストは，`-follow'がコマ
+     ンドラインのそれら(のオプション)の前にある場合のみ，`-follow'影響を
+     受けます．
+
+          find . -newer /bin/sh
+
+ -- Test: -used N
+     ファイルが最後にアクセスされたのが，そのステータスが最後に変更され
+     てからN日後の場合は真です．使用されておらず，ディスクスペースを確保
+     するために圧縮または削除されたファイルを探すのに役立ちます．
+
+
+
+
+File: find-ja.info, Node: Size, Next: Type, Prev: Time, Up: Finding Files
+
+サイズ
+======
+
+ -- Test: -size N[BCKW]
+     切上げでN単位領域をファイルが使用している場合は真です．単位はデフォ
+     ルトで512バイトブロックですが，Nの接尾子として1文字加えることで変更
+     可能です．
+
+     `b'
+          512バイトブロック単位
+     `c'
+          バイト単位
+     `k'
+          キロバイト(1024バイト)単位
+     `w'
+          2バイトワード単位
+
+     サイズは間接的なブロックを数えませんが，実際には割り当てられていな
+     い疎らなファイル内のブロックは数えます．
+
+ -- Test: -empty
+     ファイルが空の場合で，通常のファイルまたはディレクトリのどちらかの
+     場合は真です．これで，削除に適した候補が作成されるでしょう．このテ
+     ストは，`-depth' (*Note Directories::)と`-exec rm -rf '{}' ';''
+     (*Note Single File::)とともに用いた場合，役に立ちます．
+
+
+
+
+File: find-ja.info, Node: Type, Next: Owner, Prev: Size, Up: Finding Files
+
+形式
+====
+
+ -- Test: -type C
+     ファイルがCの形式の場合は真です．
+
+     `b'
+          (バッファされる)ブロックスペシャルファイル
+     `c'
+          (バッファされない)ブロックスペシャルファイル
+     `d'
+          ディレクトリ
+     `p'
+          名前付きパイプ(FIFO)
+     `f'
+          通常のファイル
+     `l'
+          シンボリックリンク
+     `s'
+          ソケット
+
+ -- Test: -xtype C
+     ファイルがシンボリックリンクでない場合，`-type'と同じです．シンボリッ
+     クリンクに対しては以下のようになります．`-follow'が与えられていない
+     場合，ファイルがC形式のファイルにリンクしている場合は真です．
+     `-follow'が与えられている場合，Cが`l'の場合は真です．言い替えると，
+     シンボリックリンクに対し，`-xtype'は，`-type'が調査しないファイルの
+     形式を調査します．`-follow'の詳細は，*Note Symbolic Links::.
+
+
+
+
+File: find-ja.info, Node: Owner, Next: Permissions, Prev: Type, Up: Finding Files
+
+所有者
+======
+
+ -- Test: -user UNAME
+ -- Test: -group GNAME
+     ファイルが(グループGNAMEに所属する)ユーザUNAMEに所有されている場合
+     は真です．数字のIDも可能です．
+
+ -- Test: -uid N
+ -- Test: -gid N
+     ファイルの数字のユーザID(グループID)がNの場合は真です．これらのテス
+     トは，`-user'と`-group'とは異なり，範囲指定(`+N' と`-N') をサポート
+     します．
+
+ -- Test: -nouser
+ -- Test: -nogroup
+     ファイルの数字のユーザIDに対応するユーザがいない(数字のグループIDに
+     対応するグループがない)場合は真です．これらの場合は，通常，システム
+     から削除されているためにユーザに属さなくなったファイルを意味します．
+     そのようなファイルの所有権を，`chown'や`chgrp'プログラムを使用して，
+     既存のユーザとグループに変更したほうが良いでしょう．
+
+
+
+
+File: find-ja.info, Node: Permissions, Next: Contents, Prev: Owner, Up: Finding Files
+
+許可
+====
+
+ファイルの許可の構造とそれを指定する方法に関する情報は，*Note File
+Permissions::.
+
+ -- Test: -perm MODE
+     ファイルの許可が正確にMODE(数値的でも象徴的でも可能です)と同一の場
+     合は真です．象徴的なモードは，0を起点として使用します．MODEが`-'で
+     始まっている場合，MODEの許可が*すべて*ファイルに設定されている場合
+     は真です．MODEに設定されていない許可は無視されます．MODEが`+'で始まっ
+     ている場合，MODEの許可が*ひとつでも*ファイルに設定されている場合は
+     真です．MODEに設定されていない許可は無視されます．
+
+
+
+
+File: find-ja.info, Node: Contents, Next: Directories, Prev: Permissions, Up: Finding Files
+
+内容
+====
+
+ファイルの内容を基に検索するために，`grep'プログラムを使用することが可能
+です．例えば，現在のディレクトリで，文字列`thing'を含むCのソースファイル
+を見つけるためには，以下のようにすることで可能となります．
+
+     grep -l thing *.[ch]
+
+サブディレクトリのファイルの文字列を検索したい時も，以下のように`find'と
+`xargs'を用いて，`grep'を組み合わせることが可能です．
+
+     find . -name '*.[ch]' | xargs grep -l thing
+
+`grep'は`-l'オプションで，文字列を含む行ではなくそれを含むファイル名のみ
+出力します．文字列の引数(`thing')は，実際には正規表現で，そのためメタ文
+字を含みます．この方法で，`find'の出力がない場合は`xargs'に`grep'を実行
+させないように，`-r'オプションを使用したり，名前にスペースを含んでいて間
+違って解釈することを防ぐために，`find'のアクション`-print0'と`xargs'のオ
+プション`-0' を使用することで改善が可能です．
+
+     find . -name '*.[ch]' -print0 | xargs -r -0 grep -l thing
+
+パターンに一致する内容があるファイルを見つけるためのより完全な扱いは，
+`grep'のマニュアルページを参照して下さい．
+
+
+
+
+File: find-ja.info, Node: Directories, Next: Filesystems, Prev: Contents, Up: Finding Files
+
+ディレクトリ
+============
+
+ディレクトリでの`find'の検索を制御し，それらを検索する方法がここにありま
+す．これらの2つのオプションで，ディレクトリツリーを輪切りにする処理が可
+能となります．
+
+ -- Option: -maxdepth LEVELS
+     コマンドライン引数以下の，最大LEVELS(正の整数)のレベルのディレクト
+     リまで下ります．`-maxdepth 0'はコマンドライン引数のみ，テストとアク
+     ションを適用することを意味します．
+
+ -- Option: -mindepth LEVELS
+     LEVELS(正の整数)未満のレベルではテストもアクションも適用しません．
+     `-mindepth 1'はコマンドライン引数以外のすべてのファイルを処理するこ
+     とを意味します．
+
+ -- Option: -depth
+     ディレクトリ自身の前に，それぞれのディレクトリの内容を処理します．
+     `cpio'や`tar'でファイルのリストを生成する時，これを行なうのは良い考
+     えです．ディレクトリにその所有者に対する書き込み許可がない場合，ディ
+     レクトリの許可はその内容のあとで復元されるため，その内容はアーカイ
+     ブから復元することが可能です．
+
+ -- Action: -prune
+     `-depth'が与えられていない場合は真です，現在のディレクトリから下り
+     ません．`-depth'が与えられている場合は，偽です．効果はありません．
+     `-prune'は，その式の前ではなく，後にあるテストとアクションにのみ効
+     果があります．
+
+     例えば，ディレクトリ`src/emacs'と，そのすべてのファイルと，それ以下
+     のディレクトリを省略し，それ以外で見つかったファイルの名前を出力す
+     るために以下のようにします．
+
+          find . -path './src/emacs' -prune -o -print
+
+ -- Option: -noleaf
+     ディレクトリが，ハードリンクの数より2少ないサブディレクトリを含むこ
+     とを仮定することで，最適化を行ないません．このオプションは，CD-ROM
+     やMS-DOSファイルシステムやAFSボリュームマウントポイントといった，
+     Unixのディレクトリリンクの規約に従わないファイルシステムを検索する
+     時に必要です．通常のUnix のファイルシステムのそれぞれのディレクトリ
+     は，少なくとも2つのハードリンクがあります．その名前とその`.'エント
+     リです．更に，そのサブディレクトリ(が存在する場合)には，そのディレ
+     クトリにリンクしている`..'エントリが，それぞれにあります．`find'が
+     ディレクトリを調査している時，ディレクトリのリンク数よりサブディレ
+     クトリが2つ少ないことがはっきりした後で，それはディレクトリのエント
+     リの残りがディレクトリでない(ディレクトリ内の"leaf"ツリー)ことが分
+     かります．ファイルの名前のみ調査に必要な場合は，それらをはっきりさ
+     せる必要はありません．これで検索スピードが飛躍的に増加します．
+
+
+
+
+File: find-ja.info, Node: Filesystems, Next: Combining Primaries With Operators, Prev: Directories, Up: Finding Files
+
+ファイルシステム
+================
+
+"ファイルシステム"とはディスクの区分のことで，それはローカルホスト，また
+は，ネットワーク経由のリモートホストからマウントされたもののいずれかにな
+ります．ネットワークファイルシステムを検索すると遅くなるはずなので，通常
+は`find'がそうすることを避けます．
+
+特定のファイルシステムの検索を避ける2つの方法があります．一つの方法は，
+`find'に１つのファイルシステムのみを検索するよう伝えることです．
+
+ -- Option: -xdev
+ -- Option: -mount
+     他のファイルシステムのディレクトリに下りません．これらのオプション
+     は同じです．
+
+もう一つの方法は，それぞれのファイルがあるファイルシステムの形式を調査し，
+好ましくないファイルシステムの形式にあるディレクトリに下らないようにしま
+す．
+
+ -- Test: -fstype TYPE
+     ファイルが，形式TYPEのファイルシステム上にある場合は真です．有効な
+     ファイルシステム形式は，Unixの異なるバージョン間で異なります．いく
+     つかのバージョンのUnixなどが受け入れる，ファイルシステムの形式の不
+     完全なリストは，以下のとおりです．ufs 4.2 4.3 nfs tmp mfs S51K S52K 
+     ファイルシステムの形式を知るために，`%F'指示語とともに`-printf'を使
+     用することが可能です．*Note Print File Information::.リモートファイ
+     ルシステムの検索を避けるために，`-fstype'は通常，`-prune'とともに使
+     用されます．(*Note Directories::).
+
+
+
+
+File: find-ja.info, Node: Combining Primaries With Operators, Prev: Filesystems, Up: Finding Files
+
+オペレーターの主なものを組み合わせる
+====================================
+
+オペレータはテストとアクションから，複雑な表現を構築します．オペレータは
+優先順位が下がる順序で，以下のものがあります．
+
+`( EXPR )'
+     優先順位をあげます．EXPRが真の場合は真です．
+
+`! EXPR'
+`-not EXPR'
+     EXPRが偽の場合は真です．
+
+`EXPR1 EXPR2'
+`EXPR1 -a EXPR2'
+`EXPR1 -and EXPR2'
+     And(論理積)です．EXPR1が偽の場合，EXPR2は評価されません．
+
+`EXPR1 -o EXPR2'
+`EXPR1 -or EXPR2'
+     Or(論理和)です．EXPR1が真の場合，EXPR2は評価されません．
+
+`EXPR1 , EXPR2'
+     リストです．EXPR1とEXPR2は，常に評価されます．EXPR2が真の場合は真で
+     す．EXPR1の値は放棄されます．このオペレータで，一回の処理で，他の処
+     理が成功したかどうかに依存せず，複数の独立した処理を行なうことがで
+     きます．
+
+`find'は，右から左まで式を評価しながら，それぞれのファイル名を起点とした
+ディレクトリツリーを，優先順位の規則に従い，(`-and'に対しては左が偽，
+`-or'に対しては真となる)結果が分かるまで検索し，そして，`find'は次のファ
+イル名へ移動します．
+
+複雑な表現で役に立つ，２つのテストが他にあります．
+
+ -- Test: -true
+     常に真です．
+
+ -- Test: -false
+     常に偽です．
+
+
+
+
+File: find-ja.info, Node: Actions, Next: Common Tasks, Prev: Finding Files, Up: Top
+
+アクション
+**********
+
+`find'の式で与えた基準に一致するファイルの情報を出力する方法が，いくつか
+あります．標準出力または指名したファイルに，情報を出力することが可能です．
+ファイル名を引数として，コマンドを実行することも可能です．これらのコマン
+ドを，選択したファイルへのフィルターとして以外でも使用することが可能です．
+
+* Menu:
+
+* Print File Name::
+* Print File Information::
+* Run Commands::
+* Adding Tests::
+
+
+
+File: find-ja.info, Node: Print File Name, Next: Print File Information, Prev: Actions, Up: Actions
+
+ファイル名の出力
+================
+
+ -- Action: -print
+     真の時，完全なファイル名を標準出力に出力し，改行を続けます．
+
+ -- Action: -fprint FILE
+     真の時，完全なファイル名をファイルFILEに出力し，改行を続けます．
+     `find'の実行時にFILEが存在しない場合は作成されます．存在する場合は0
+     バイトに切り詰められます．ファイル名`/dev/stdout'と`/dev/stderr'は，
+     特別な扱いをされます．それらはそれぞれ，標準出力と標準エラー出力を
+     参照します．
+
+
+
+
+File: find-ja.info, Node: Print File Information, Next: Run Commands, Prev: Print File Name, Up: Actions
+
+ファイル情報の出力
+==================
+
+ -- Action: -ls
+     真の時，現在のファイルを`ls -dils'の書式で標準出力にリストアップし
+     ます．出力はこのようになります．
+
+          204744   17 -rw-r--r--   1 djm      staff       17337 Nov  2  1992 ./lwall-quotes
+
+     フィールドは以下のとおりです．
+
+       1. ファイルのinodeナンバーです．inodeナンバーを元にしたファイルの
+          検索方法は，*Note Hard Links::.
+
+       2. ファイルのブロック数です．ブロック計算は，512バイトブロック単
+          位を使用する環境変数`POSIXLY_CORRECT'が設定されていない場合，
+          1Kブロック単位です．サイズを元にしたファイルの検索方法は，
+          *Note Size::.
+
+       3. ファイルの形式と許可です．形式は，通常のファイルに対してはダッ
+          シュで表示されます．それ以外のファイル形式に対しては，`-type'
+          に対して使用される文字です(*Note Type::)．許可は，読み込み，書
+          き込み，そして実行で，それぞれファイルの所有者，そのグループ，
+          そしてその他のユーザに対するものです．ダッシュは許可が与えられ
+          ていないことを意味します．ファイルの許可の詳細は，*Note File
+          Permissions::.その許可を元にしたファイルの検索方法は，*Note
+          Permissions::.
+
+       4. ファイルに対するハードリンクの数です．
+
+       5. ファイルを所有しているユーザです．
+
+       6. ファイルのグループです．
+
+       7. ファイルのバイト単位のサイズです．
+
+       8. ファイルが竿語の編集された日付です．
+
+       9. ファイル名です．`-ls'は，ファイル名で使用されている出力不可能
+          な文字を，Cのようなバックスラッシュエスケープを使用して引用符
+          で囲みます．
+
+ -- Action: -fls FILE
+     真の時，`-ls'に似ていますが，`-fprint'のようにFILEに書き出します
+     (*Note Print File Name::)．
+
+ -- Action: -printf FORMAT
+     真の時，`\'エスケープと`%'指示語を解釈しながら，FORMATを標準出力に
+     出力します．フィールドの幅と精度は，C関数の`printf'の用に指定可能で
+     す．`-print'とは異なり，`-printf'は文字列の終りに改行を追加しません．
+
+ -- Action: -fprintf FILE FORMAT
+     真の時，`-printf'に似ていますが，`-fprint'のようにFILEに書き出しま
+     す(*Note Print File Name::)．
+
+* Menu:
+
+* Escapes::
+* Format Directives::
+* Time Formats::
+
+
+
+File: find-ja.info, Node: Escapes, Next: Format Directives, Prev: Print File Information, Up: Print File Information
+
+エスケープ
+----------
+
+`-printf'と`-fprintf'で認識されるエスケープは以下のとおりです．
+
+`\a'
+     アラームベル．
+`\b'
+     バックスペース．
+`\c'
+     この書式の直後出力の停止し，出力をフラッシュ．
+`\f'
+     フォームフィード．
+`\n'
+     改行．
+`\r'
+     キャリッジリターン．
+`\t'
+     水平タブ．
+`\v'
+     垂直タブ．
+`\\'
+     バックスラッシュそのもの(`\')．
+
+`\'文字に他の文字が続くものは，通常の文字として扱われるので，両方が出力
+され，(おそらくそれは入力ミスなので)標準エラー出力に警告メッセージが出力
+されます．
+
+
+
+
+File: find-ja.info, Node: Format Directives, Next: Time Formats, Prev: Escapes, Up: Print File Information
+
+書式指示語
+----------
+
+`-printf'と`-fprintf'は，処理しているファイルに関する情報を出力するため，
+以下の書式指示語をサポートします．Cの`printf'関数と異なり，それらはフィー
+ルド幅の指定をサポートしていません．
+
+`%%'はパーセント記号そのものです．他の文字が続く`%'文字は削除され(が，そ
+れ<%>以外の文字は出力され)，(おそらく入力ミスのため)標準出力に警告メッセー
+ジが出力されます．
+
+* Menu:
+
+* Name Directives::
+* Ownership Directives::
+* Size Directives::
+* Location Directives::
+* Time Directives::
+
+
+
+File: find-ja.info, Node: Name Directives, Next: Ownership Directives, Prev: Format Directives, Up: Format Directives
+
+名前指示語
+..........
+
+`%p'
+     ファイル名．
+`%f'
+     前置されるディレクトリを削除したファイル名(最後の要素のみ)．
+`%h'
+     ファイル名に前置されるディレクトリ(最後の要素とその前のスラッシュ以
+     外すべて)．
+`%P'
+     ファイル名で，それが見つけられたコマンドライン引数の名前は，最初か
+     ら削除されます．
+`%H'
+     それによりファイルが見つけられた，コマンドライン引数．
+
+
+
+
+File: find-ja.info, Node: Ownership Directives, Next: Size Directives, Prev: Name Directives, Up: Format Directives
+
+所有者指示語
+............
+
+`%g'
+     ファイルのグループ名，または名前がない場合はグループID．
+`%G'
+     ファイルの数値的なグループID．
+`%u'
+     ファイルのユーザ名，または名前がない場合はユーザID．
+`%U'
+     ファイルの数値的なユーザID．
+`%m'
+     ファイルの許可(8進数)
+
+
+
+
+File: find-ja.info, Node: Size Directives, Next: Location Directives, Prev: Ownership Directives, Up: Format Directives
+
+サイズ指示語
+............
+
+`%k'
+     1Kブロック単位でのファイルサイズ(切上げ)．
+`%b'
+     512バイトブロック単位でのファイルサイズ(切上げ)．
+`%s'
+     バイト単位でのファイルサイズ．
+
+
+
+
+File: find-ja.info, Node: Location Directives, Next: Time Directives, Prev: Size Directives, Up: Format Directives
+
+位置指示語
+..........
+
+`%d'
+     ディレクトリツリーでのファイルの深さ．コマンドラインのファイル名は，
+     深さが0です．
+`%F'
+     ファイルが存在するファイルシステム．この値は，`-fstype'で使用される
+     はずです(*Note Directories::)．
+`%l'
+     シンボリックリンクのオブジェクト(ファイルがシンボリックリンクでない
+     場合は空文字です．)
+`%i'
+     ファイルのinodeナンバー(10進数)．
+`%n'
+     ファイルのハードリンクのナンバー．
+
+
+
+
+File: find-ja.info, Node: Time Directives, Prev: Location Directives, Up: Format Directives
+
+時間指示語
+..........
+
+これらの指示語にはCの`ctime'関数を使用するものもあります．その出力は現在
+のロケールに依存しますが，典型的なものは以下のようになります．
+
+     Wed Nov  2 00:42:36 1994
+
+`%a'
+     Cの`ctime'関数で返される書式での，ファイルの最後にアクセスされた時
+     間．
+`%AK'
+     Kで指定される書式での，ファイルの最後にアクセスされた時間(*Note
+     Time Formats::)．
+`%c'
+     Cの`ctime'関数で返される書式での，ファイルの最後にステータスが変更
+     された時間．
+`%CK'
+     Kで指定される書式での，ファイルの最後にステータスが変更された時間
+     (*Note Time Formats::)．
+`%t'
+     Cの`ctime'関数で返される書式での，ファイルの最後に編集された時間．
+`%TK'
+     Kで指定される書式での，ファイルの最後に編集された時間(*Note Time
+     Formats::)．
+
+
+
+
+File: find-ja.info, Node: Time Formats, Prev: Format Directives, Up: Print File Information
+
+時間の書式
+----------
+
+以下は，指示語`%A'，`%C'，そして`%T'に対する書式で，それはファイルのタイ
+ムスタンプを出力します．これらの書式には，Cの`strftime'関数のシステム間
+での違いにより，すべてのシステムで利用可能でないものもあります．
+
+* Menu:
+
+* Time Components::
+* Date Components::
+* Combined Time Formats::
+
+
+
+File: find-ja.info, Node: Time Components, Next: Date Components, Prev: Time Formats, Up: Time Formats
+
+時間の内容
+..........
+
+以下の書式指示語は，時間の単一の内容を出力します．
+
+`H'
+     時間(00..23)
+`I'
+     時間(01..12)
+`k'
+     時間( 0..23)
+`l'
+     時間( 1..12)
+`p'
+     ロケールの午前や午後
+`Z'
+     タイムゾーン(例えば，EDT)，またはタイムゾーンが定義されていない場合
+     は何も出力しない．
+`M'
+     分(00..59)
+`S'
+     秒(00..61)
+`@'
+     1970年1月1日00:00 GMT以来の秒．
+
+
+
+
+File: find-ja.info, Node: Date Components, Next: Combined Time Formats, Prev: Time Components, Up: Time Formats
+
+日付の内容
+..........
+
+以下の書式指示語は，日付の単一の内容を出力します．
+
+`a'
+     ロケールの略記された曜日名(Sun..Sat)
+`A'
+     ロケールの完全な曜日名，可変長(Sunday..Saturday)
+`b'
+`h'
+     ロケールの略記された月名(Jan..Dec)
+`B'
+     ロケールの完全な月名，可変長(January..December)
+`m'
+     月(01..12)
+`d'
+     日(01..31)
+`w'
+     曜日(0..6)
+`j'
+     年間の日付(001..366)
+`U'
+     日曜日を週の最初の日とした時の，年間の週数(00..53)
+`W'
+     月曜日を週の最初の日とした時の，年間の週数(00..53)
+`Y'
+     年(1970...)
+`y'
+     年の最後の2桁(00..99)
+
+
+
+
+File: find-ja.info, Node: Combined Time Formats, Prev: Date Components, Up: Time Formats
+
+時間の書式の組み合わせ
+......................
+
+以下の書式指示語は，時間と日付の組み合わせを出力します．
+
+`r'
+     時間，12時間制(hh:mm:ss [AP]M)
+`T'
+     時間，24時間制(hh:mm:ss)
+`X'
+     ロケールの時間表現(H:M:S)
+`c'
+     ロケールの日付と時間(Sat Nov 04 12:02:33 EST 1989)
+`D'
+     日付(mm/dd/yy)
+`x'
+     ロケールの日付表現(mm/dd/yy)
+
+
+
+
+File: find-ja.info, Node: Run Commands, Next: Adding Tests, Prev: Print File Information, Up: Actions
+
+コマンドの実行
+==============
+
+`find'や`locate'で作成されたファイル名のリストを，他のコマンドへの引数と
+して使用可能です．この方法で，ファイルへの任意の動作を実行することが可能
+です．
+
+* Menu:
+
+* Single File::
+* Multiple Files::
+* Querying::
+
+
+
+File: find-ja.info, Node: Single File, Next: Multiple Files, Prev: Run Commands, Up: Run Commands
+
+単一のファイル
+--------------
+
+ここに一つのファイルへのコマンドを，一度に実行する方法があります．
+
+ -- Action: -exec COMMAND ;
+     COMMANDを実行します．0のステータスが返される場合は真です．`find'は，
+     `-exec'以降のすべての引数を，`;'から成り立つ引数に到達するまで，コ
+     マンドの部分として受けとります．それは，文字列`{}'を現在のファイル
+     名で置換し，コマンドにそれがある場所で処理されます．これらの構文は
+     どちらも，シェルによる展開を防ぐために(`\'を用いて)エスケープしたり，
+     引用符で囲む必要があります．コマンドは，`find' を実行しているディレ
+     クトリで実行されます．
+
+     例えば，現在のディレクトリのそれぞれのCのヘッダファイルを，ファイル
+     `/tmp/master'と比較するために以下のようにします．
+
+          find . -name '*.h' -exec diff -u '{}' /tmp/master ';'
+
+
+
+
+File: find-ja.info, Node: Multiple Files, Next: Querying, Prev: Single File, Up: Run Commands
+
+複数のファイル
+--------------
+
+単一のファイルを処理する必要がある時もあります．しかし，それができない時，
+ファイル毎にコマンドを実行するより，できるだけ多くのファイルをコマンドで
+実行した方が速くなります．これを行なうことで，それぞれのコマンドを開始す
+る時間を稼ぐことになります．
+
+一度に一つ以上のファイルをコマンドで実行するために，`xargs'コマンドを使
+用し，以下のように呼び出して下さい．
+
+     xargs [OPTION...] [COMMAND [INITIAL-ARGUMENTS]]
+
+`xargs'は標準入力から引数を読み込み，それは空白(それは，ダブルクオートや
+シングルクオートまたはバックスラッシュで保護可能)や改行で分離されていま
+す．それはCOMMAND (デフォルトで`/bin/echo')を，標準入力から読み込まれた
+引数が続くあらゆるINITIAL-ARGUMENTSを用いて，一回以上実行します．標準入
+力の空白行は無視されます．
+
+空白の分離名の代わりに，`find -print0'や`find -fprint0'を使用し，GNU
+`xargs'，GNU `tar'，GNU `cpio'，または`perl' へ，`-0'や`--null'オプショ
+ンを与えて，出力を処理した方が安全です．
+
+以下のように，引数リストを処理するためシェルコマンドの置換(バッククオー
+ト)を使用することが可能です．
+
+     grep -l sprintf `find $HOME -name '*.c' -print`
+
+しかし，その方法は，`.c'ファイル名の長さが，オペレーティングシステムのコ
+マンドラインの長さの制限を超過する場合，エラーが生じるでしょう．`xargs'
+は，制限を超過しないようにするために必要なだけコマンドを実行することで，
+その問題を避けます．
+
+     find $HOME -name '*.c' -print | grep -l sprintf
+
+しかし，標準入力が端末であることを必要とするコマンド(例えば，`less')の場
+合，シェルコマンドの置換の手法を使用する必要があります．
+
+* Menu:
+
+* Unsafe File Name Handling::
+* Safe File Name Handling::
+* Limiting Command Size::
+* Interspersing File Names::
+
+
+
+File: find-ja.info, Node: Unsafe File Name Handling, Next: Safe File Name Handling, Prev: Multiple Files, Up: Multiple Files
+
+安全でないファイル名の扱い
+..........................
+
+ファイル名には，引用符，バックスラッシュ，空白文字，そして改行でさえ含め
+ることが可能なので，処理のデフォルトモードで`xargs'を使用しながらそれを
+処理することは安全ではありません．しかし，ほとんどのファイル名は空白を含
+まないので，この問題は滅多に発生しません．安全なファイル名だと知っている
+ファイルを検索している場合のみ，それについて悩む必要はありません．
+
+応用する際は，名前に特殊文字を含んでいるため，`xargs'ファイルをうまく処
+理できない場合も多く，失われるデータもあります．この問題の重要性は，デー
+タの重要性に依存し，それを訂正するためにはできるだけ速く，失ったものに気
+づくかに依存します．しかし，ここに，空白で分離した名前の使用で引き起こさ
+れる究極の例があります．以下のコマンドが，毎日`cron'で実行される場合，あ
+らゆるユーザはあらゆるファイルを削除可能です．
+
+     find / -name '#*' -atime +7 -print | xargs rm
+
+例えば，以下のようなことが可能でしょう．
+
+     eg$ echo > '#
+     vmunix'
+
+`/'を現在のディレクトリとして，`xargs'を実行してしまった場合，そして，
+`cron'は`/vmunix'を削除するでしょう．
+
+他のファイルを削除するために，例えば`/u/joeuser/.plan'は，以下のようにす
+ることで可能でしょう．
+
+     eg$ mkdir '#
+     '
+     eg$ cd '#
+     '
+     eg$ mkdir u u/joeuser u/joeuser/.plan'
+     '
+     eg$ echo > u/joeuser/.plan'
+     /#foo'
+     eg$ cd ..
+     eg$ find . -name '#*' -print | xargs echo
+     ./# ./# /u/joeuser/.plan /#foo
+
+
+
+
+File: find-ja.info, Node: Safe File Name Handling, Next: Limiting Command Size, Prev: Unsafe File Name Handling, Up: Multiple Files
+
+安全なファイル名の扱い
+......................
+
+ここに，`find'が出力したファイル名を，他のプログラムでめちゃくちゃにされ
+たり誤解されたりしないで，他のプログラムで使用可能にする方法があります．
+この方法で生成されたファイル名に，`-0'や`--null'オプションを，GNU
+`xargs'，GNU `tar'，GNU `cpio'，または，`perl'に渡すことで，処理すること
+が可能です．
+
+ -- Action: -print0
+     真です．標準出力の完全なファイル名にヌル文字を続けて出力します．
+
+ -- Action: -fprint0 FILE
+     真です．`-print0'ににていますが，FILEを`-fprint'のように書き出しま
+     す(*Note Print File Name::)．
+
+
+
+
+File: find-ja.info, Node: Limiting Command Size, Next: Interspersing File Names, Prev: Safe File Name Handling, Up: Multiple Files
+
+コマンドサイズの制限
+....................
+
+`xargs'で，それぞれの実行時にコマンドに渡す引数の数を制御することができ
+ます．デフォルトで，`ARG_MAX' - 2k，または20kまでの小さい方を，コマンド
+毎の文字として使用します．それは，制限以内のできるだけ多くの行と引数を使
+用します．以下のオプションはこれらの値を変更します．
+
+`--no-run-if-empty'
+`-r'
+     標準入力が空白でない文字を含まない場合，コマンドを実行しません．デ
+     フォルトで，入力が無い場合でもコマンドは一度実行されます．
+
+`--max-lines[=MAX-LINES]'
+`-l[MAX-LINES]'
+     最大MAX-LINESの空白でない入力行を，コマンドライン毎に使用します．省
+     略された場合，MAX-LINESのデフォルトは１です．後置される空白は，行を
+     数える目的で，入力行を，次の入力行に論理的に連結します．`-x'を暗黙
+     に指定します．
+
+`--max-args=MAX-ARGS'
+`-n MAX-ARGS'
+     最大MAX-ARGS個の引数を，コマンドライン毎に使用します．大きさが
+     MAX-ARGSを超過した場合，それより小さいものが使用されますが，それは
+     `-x'オプションが与えられていない場合に限り，その場合は`xargs' は終
+     了します．
+
+`--max-chars=MAX-CHARS'
+`-s MAX-CHARS'
+     最大MAX-CHARS文字を，コマンドライン毎に使用し，それはコマンドと最初
+     の引数と引数文字列の最後の終端のヌルを含みます．
+
+`--max-procs=MAX-PROCS'
+`-P MAX-PROCS'
+     MAX-PROCSプロセスまで一度に実行します．デフォルトは1です．MAX-PROCS
+     が0の場合，`xargs'は可能な限り多くのプロセスを，一度に実行します．
+     `-P'とともに，`-n'，`-s'，または`-l'オプションを使用して下さい．そ
+     うしない場合，コマンドが実行される機会は，1 度しかありません．
+
+
+
+
+File: find-ja.info, Node: Interspersing File Names, Prev: Limiting Command Size, Up: Multiple Files
+
+ファイル名をばらまく
+....................
+
+`xargs'は，処理するファイル名を，コマンドに対して与えた引数の間に挿入可
+能です．コマンドの大きさを制限するオプションを与えていない場合(*Note
+Limiting Command Size::)，このモードの処理は，`find -exec'と等価です
+(*Note Single File::)．
+
+`--replace[=REPLACE-STR]'
+`-i[REPLACE-STR]'
+     最初の引数のREPLACE-STRがあるところを，標準入力から読み込まれる名前
+     に置換します．また，引用符で囲まれていない空白は，引数の最後になり
+     ません．REPLACE-STRが省略された場合，デフォルトは`{}'です(`find
+     -exec'に似ています)．`-x'と`-l 1'を暗黙に指定します．例えば，
+     `bills'ディレクトリのそれぞれのファイルをソートし，出力をファイル名
+     に`.sorted'を後置したものに書き出す時，以下のようにすることで可能で
+     す．
+
+          find bills -type f | xargs -iXX sort -o XX.sorted XX
+
+     `find -exec'を使用した等価のコマンドは以下のようになります．
+
+          find bills -type f -exec sort -o '{}.sorted' '{}' ';'
+
+
+
+
+File: find-ja.info, Node: Querying, Prev: Multiple Files, Up: Run Commands
+
+問い合わせ
+----------
+
+ユーザに単一のファイル上でコマンドを実行するかどうかを尋ねるため，
+`-exec'の代わりに，`find'のプライマリ`-ok'が使用可能です．
+
+ -- Action: -ok COMMAND ;
+     `-exec'に似ていますが(*Note Single File::)，ユーザに(標準入力上で) 
+     最初に尋ねます．応答が`y'や`Y'で始まらない場合，コマンドを実行せず，
+     偽を返します．
+
+単一のコマンドで複数のファイルを処理する時，ユーザに問い合わせるため，
+`xargs'に以下のオプションを与えます．このオプションを使用する時，コマン
+ドの呼出毎に処理するファイルの数を制御することが役に立つと分かるでしょう．
+
+`--interactive'
+`-p'
+     ユーザにそれぞれのコマンドラインを実行するかどうかプロンプトを表示
+     し，端末から1行読み込みます．応答が`y'や`Y'で始まる場合のみコマンド
+     ラインを実行します．暗黙に`-t'が指定されます．
+
+
+
+
+File: find-ja.info, Node: Adding Tests, Prev: Run Commands, Up: Actions
+
+テストの追加
+============
+
+`find'の組み込みテストが調査しない，ファイルの属性の調査をすることが可能
+です．こうするために，`find'が出力したファイルリストへのフィルターとなる
+プログラムを実行するため，`xargs'を使用してください．`xargs'によって実行
+されるプログラムが行なう仕事を減らすため，リストが少なくなるように，
+`find'の組み込みテストをできるだけ使用して下さい．`find'の組み込みテスト
+は，他のプログラムが実行するテストより速く実行されるでしょう．
+
+例えばここに，`/usr/local'ディレクトリツリー内のstripされていないバイナ
+リの，すべての名前を出力する方法があります．組み込みテストは，通常のファ
+イルでないものや，実行可能でないファイルで，`file'を実行することを避けま
+す．
+
+     find /usr/local -type f -perm +a=x | xargs file | 
+       grep 'not stripped' | cut -d: -f1
+
+`cut'プログラムは，`file'の出力からファイル名以降のものすべてを削除しま
+す．
+
+`find'の式の中間のどこかで特殊な調査を配置したい場合，調査を実行するプロ
+グラムを実行するために，`-exec' を使用することが可能です．`-exec'は，実
+行されたプログラムの終了ステータスを評価するので，特殊な属性を検査するプ
+ログラム(それは，シェルスクリプトも可能です)を書くことと，真(ゼロ)や偽
+(ゼロ以外)のステータスで終了させることが可能です．そのような特殊なテスト
+は，新しいプロセスを開始し，組み込みテストが偽と評価する場合は行なわない
+ので，それを組み込みテストの*後で*配置することは良い考えです．それぞれの
+ファイルを調査するために，一つ以上の新しいプロセスを開始することは，多く
+のファイルの調査を一つのプロセスで開始する`xargs'の使用より遅くなるので，
+この手法は，`xargs'の柔軟性が十分でない時にのみ使用して下さい．
+
+以下は，引数がstripされているバイナリファイルかどうかを調査する，
+`unstripped'という名前のシェルスクリプトです．
+
+     #!/bin/sh
+     file $1 | grep 'not stripped' > /dev/null
+
+このスクリプトは，シェルが実行した最後のプログラムのステータスで終了する
+という事実に依存し，この場合`grep'になります．`grep'は，あらゆる一致が見
+つかる場合は真で終了し，それ以外では偽で終了します．ここに(サーチパスに
+あると仮定している)スクリプトを利用している例があります．それは，ファイ
+ル`sbins'内のstripされている実行形式と，`ubins'内のstrip されていない実
+行形式をリストアップします．
+
+     find /usr/local -type f -perm +a=x \
+       \( -exec unstripped '{}' \; -fprint ubins -o -fprint sbins \)
+
+
+
+
+File: find-ja.info, Node: Common Tasks, Next: Databases, Prev: Actions, Up: Top
+
+一般的な作業
+************
+
+以下のセクションは，これらのプログラムの能力に利用する際の良い考えを与え，
+一般的な現実問題を解説する方法を提示している，拡張された例を含みます．
+
+* Menu:
+
+* Viewing And Editing::
+* Archiving::
+* Cleaning Up::
+* Strange File Names::
+* Fixing Permissions::
+* Classifying Files::
+
+
+
+File: find-ja.info, Node: Viewing And Editing, Next: Archiving, Prev: Common Tasks, Up: Common Tasks
+
+閲覧と編集
+==========
+
+特定の基準を満たすファイルのリストを見るために，引数にファイル名を用いて，
+単純にファイルビューアープログラムを実行してください．シェルは，バックク
+オートで囲まれたコマンドを，その出力に置換するので，コマンド全体はこのよ
+うになります．
+
+     less `find /usr/include -name '*.h' | xargs grep -l mode_t`
+
+ファイルビューアープログラムの代わりにエディタの名前を与えることで，これ
+らのファイルを編集することも可能です．
+
+
+
+
+File: find-ja.info, Node: Archiving, Next: Cleaning Up, Prev: Viewing And Editing, Up: Common Tasks
+
+アーカイブ
+==========
+
+`find'で生成したファイルリストを，ファイルアーカイブプログラムに渡すこと
+も可能です．GNU `tar'と`cpio'は，どちらも標準入力からファイル名のリスト
+を読み込むことが可能です--ヌル(安全な方法)，または，空白(簡単だが危険な
+デフォルトの方法)のどちらかで分離します．ヌルで名前を分離する方法を使用
+するため，`--null'オプションを与えてください．ファイルアーカイブをファイ
+ルに保存したり，テープに書き出したり，ネットワーク越しの他のマシンに展開
+したりすることも可能です。
+
+ファイルをアーカイブする一般的な`find'の使用方法は，ディレクトリツリー内
+のファイルリストを`cpio'に送る方法です．所有者がディレクトリに書き込み許
+可が無い場合は`-depth'を使用し，(その場合，)ディレクトリの許可はその内容
+の後でリストアされるため，その内容をアーカイブからリストアすることが可能
+です．こうするために`cpio'使用した例がここにあります．特定のファイルのみ
+アーカイブするために，より複雑な`find'の式を使用することも可能です．
+
+     find . -depth -print0 |
+       cpio --create --null --format=crc --file=/dev/nrst0
+
+以下のコマンドを使用して，そのアーカイブをリストアすることが可能です．
+
+     cpio --extract --null --make-dir --unconditional \
+       --preserve --file=/dev/nrst0
+
+同じことを`tar'を使用して行なうコマンドは以下のようになります．
+
+     find . -depth -print0 |
+       tar --create --null --files-from=- --file=/dev/nrst0
+
+     tar --extract --null --preserve-perm --same-owner \
+       --file=/dev/nrst0
+
+一つのマシンから他のマシンに，ディレクトリをコピーする例は以下のようにな
+ります．
+
+     find . -depth -print0 | cpio -0o -Hnewc |
+       rsh OTHER-MACHINE "cd `pwd` && cpio -i0dum"
+
+
+
+
+File: find-ja.info, Node: Cleaning Up, Next: Strange File Names, Prev: Archiving, Up: Common Tasks
+
+クリーンアップ
+==============
+
+このセクションでは，さまざまな状況で，不要なファイルを削除する例を提供し
+ます．マージの要求で更新された時に作成されるCVSバックアップファイルを削
+除するコマンドは以下のようになります．
+
+     find . -name '.#*' -print0 | xargs -0r rm -f
+
+`/tmp'内のゴミファイルをきれいにするためにこのコマンドを実行することが可
+能です．ログアウトする時にシェルがそれを実行するよう，(使用しているシェ
+ルに依存しますが，`.bash_logout'，`.logout'，または`.zlogout')ファイルに
+書き出すことも可能です．
+
+     find /tmp -user $LOGNAME -type f -print0 | xargs -0 -r rm -f
+
+古いEmacsのバックアップファイルと自動保存ファイルを削除するために，以下
+のようなコマンドが使用可能です．VMメーラーのようなEmacsパッケージは，
+`#reply to David J. MacKenzie<1>#'のようにスペースを含む一時ファイルを作
+成することが多いので，ヌルで終端されているファイル名を使用する方法は，こ
+の場合には特に重要です．
+
+     find ~ \( -name '*~' -o -name '#*#' \) -print0 |
+       xargs --no-run-if-empty --null rm -vf
+
+`/tmp'から古いファイルを削除するため，通常は`cron'から実行します．
+
+     find /tmp /var/tmp -not -type d -mtime +3 -print0 |
+       xargs --null --no-run-if-empty rm -f
+
+     find /tmp /var/tmp -depth -mindepth 1 -type d -empty -print0 |
+       xargs --null --no-run-if-empty rmdir
+
+上記の2番目の`find'コマンドは，空のディレクトリの最初の深度をきれいにす
+るため，`-depth'を使用し，それで親が空になり，削除も可能になることを期待
+しています．全体が空になった場合，`/tmp'自身を削除しないように，
+`-mindepth'を使用します．
+
+
+
+
+File: find-ja.info, Node: Strange File Names, Next: Fixing Permissions, Prev: Cleaning Up, Up: Common Tasks
+
+奇妙なファイル名
+================
+
+`find'は，名前に奇妙な文字を含むファイルを，削除したり名前を変更したりす
+る手助けにもなります．スペース，タブ，制御文字，またはハイビットセットを
+用いた文字のような，もの(文字)を含む名前のファイルに邪魔される時もありま
+す．そのようなファイルを削除する最も簡単な方法は，以下のようになります．
+
+     rm -i SOME*PATTERN*THAT*MATCHES*THE*PROBLEM*FILE
+
+`rm'は，与えられたパターンに一致するそれぞれのファイルを削除するかどうか
+尋ねます．古いシェルを使用している場合で，ファイル名にハイビットセットを
+用いた文字を含む場合には，この方法は動作しません．シェルはそれを削除しま
+す．より信頼できる方法は，以下のようになります．
+
+     find . -maxdepth 1 TESTS -ok rm '{}' \;
+
+ここでのTESTSは，ファイルをユニークに識別します．`-maxdepth 1'オプション
+は，`find'があらゆるサブディレクトリのファイルを検索することで，時間を無
+駄にすることを妨げます．サブディレクトリが無い場合は省略してもかまいませ
+ん．問題のファイルをユニークに識別する良い方法は，そのinodeナンバーを知
+ることです．以下のように使用します．
+
+     ls -i
+
+制御文字を名前に含んでいるファイルを持っていて，そのinodeナンバーが12345 
+だと分かったと仮定します．以下のコマンドは，それを削除するかどうか，プロ
+ンプトを表示します．
+
+     find . -maxdepth 1 -inum 12345 -ok rm -f '{}' \;
+
+ファイル名が奇妙な文字列を含んでいて，出力時にスクリーンが駄目になるため，
+尋ねられたくない場合は，`-ok'の代わりに`-exec'を使用して下さい．
+
+そうではなく，ファイルの名前を変更したい場合，`rm'の代わりに`mv'を使用す
+ることが可能です．
+
+     find . -maxdepth 1 -inum 12345 -ok mv '{}' NEW-FILE-NAME \;
+
+
+
+
+File: find-ja.info, Node: Fixing Permissions, Next: Classifying Files, Prev: Strange File Names, Up: Common Tasks
+
+許可の修正
+==========
+
+特定のディレクトリツリーのディレクトリに，誰でも書き込めることを確実にし
+たいと仮定します．ユーザまたはグループ(または両方)の許可が無く，それらの
+許可を修正する方法がここにあります．
+
+     find . -type d -not -perm -ug=w | xargs chmod ug+w
+
+ディレクトリが誰でも書き込め*ない*ことを確実にしたい場合，反対の処理も可
+能でしょう．
+
+
+
+
+File: find-ja.info, Node: Classifying Files, Prev: Fixing Permissions, Up: Common Tasks
+
+ファイルの分類
+==============
+
+ファイルの集合を異なる基準でいくつかのグループに分類したい場合，ファイル
+上で複数の独立したテストを実行するため，カンマオペレータを使用することが
+可能です．例えば以下のようにします．
+
+     find / -type d \( -perm -o=w -fprint allwrite , \
+       -perm -o=x -fprint allexec \)
+
+     echo "Directories that can be written to by everyone:"
+     cat allwrite
+     echo ""
+     echo "Directories with search permissions for everyone:"
+     cat allexec
+
+`find'は，ディレクトリツリー全体を1度走査する必要があるだけです(それはそ
+の作業で最も時間がかかる部分の一つです)．
+
+
+
+
+File: find-ja.info, Node: Databases, Next: File Permissions, Prev: Common Tasks, Up: Top
+
+ファイル名のデータベース
+************************
+
+`locate'で使用されるファイル名のデータベースには，データベースが最後に更
+新された時の，特定のディレクトリツリー内のファイルのリストが含まれていま
+す．データベースのデフォルトファイル名は，`locate'と`updatedb'がコンフィ
+グレーションされインストールされた時に決定されます．データベースが更新さ
+れる頻度と，項目に含めるディレクトリは，`updatedb'が実行される頻度と，そ
+の引数に依存します．
+
+* Menu:
+
+* Database Locations::
+* Database Formats::
+
+
+
+File: find-ja.info, Node: Database Locations, Next: Database Formats, Prev: Databases, Up: Databases
+
+データベースの位置
+==================
+
+複数のファイル名のデータベースの存在が可能です．ユーザは，`locate' が検
+索を行なうデータベースを，環境変数やコマンドラインオプションを使用して選
+択可能です．システム管理者は，デフォルトのデータベースのファイル名，デー
+タベースを更新する頻度，そして，項目に含めるディレクトリを選択することが
+可能です．ファイル名のデータベースは，`updatedb'プログラムで，通常夜に実
+行され更新されます．
+
+ネットワーク環境では，ファイルシステムの項目を含めながら，それぞれのルー
+トファイルシステムでデータベースを構築することに意味があります．
+`updatedb'は，ネットワークのスラッシングを避けるため，ファイルシステムが
+ローカルディスクにあるファイルサーバの，それぞれのファイルシステムで実行
+されます．`updatedb'に，それぞれのデータベースが含んでいる項目のディレク
+トリを選択させるオプションは以下のとおりです．
+
+`--localpaths='PATH...''
+     データベースに書き込むネットワーク以外のディレクトリです．デフォル
+     トは`/'です．
+
+`--netpaths='PATH...''
+     データベースに書き込むネットワークディレクトリ(NFS，AFS，RFS，等々)
+     です．デフォルトはありません．
+
+`--prunepaths='PATH...''
+     データベースに書き込まないディレクトリで，それ以外は書き込まれます．
+     デフォルトは，`/tmp /usr/tmp /var/tmp /afs'です．
+
+`--output=DBFILE'
+     構築されるデータベースファイルです．デフォルトはシステムに依存しま
+     すが，通常は，`/usr/local/var/locatedb'です．
+
+`--netuser=USER'
+     ネットワークディレクトリを検索するユーザで，`su'を使用します．デフォ
+     ルトは`daemon'です．
+
+
+
+
+File: find-ja.info, Node: Database Formats, Prev: Database Locations, Up: Databases
+
+データベースの書式
+==================
+
+ファイル名のデータベースには，データベースが最後に更新された時の，特定の
+ディレクトリツリーのファイルのリストを含まれます．ファイル名のデータベー
+スの書式変更は，異なるバイト順序を用いるマシンでも，データベースの共有が
+可能となるように，GNU `locate'バージョン4.0から開始されました．新しいGNU
+`locate'は，新旧両方のデータベースの書式を読み込むことが可能です．しかし，
+古いバージョンの`locate'と`find'では，新しい書式のデータベースを与えられ
+た場合，間違った結果となります．
+
+* Menu:
+
+* New Database Format::
+* Sample Database::
+* Old Database Format::
+
+
+
+File: find-ja.info, Node: New Database Format, Next: Sample Database, Prev: Database Formats, Up: Database Formats
+
+新しいデータベースの書式
+------------------------
+
+`updatedb'は，4の要素を5にする (1) (*Note New Database
+Format-Footnotes::)ことでデータベースの大きさが小さくなるように，ファイ
+ル名のリストを"前部圧縮"するために`frcode'を実行します．前部圧縮(増分符
+合化としても知られている)は以下のように動作します．
+
+データベースの項目は，(ユーザの利便性のため，大文字小文字を識別しないで) 
+ソートされているリストです．リストはソートされているので，それぞれの項目
+は，前の項目と同じ接頭辞(最初の文字列)を共有することがよくあります．それ
+ぞれのデータベース項目はオフセットバイトの差分の数で始まっていて，それは
+前の項目の更に前のものが使用している数以上を使用している，前の項目に前置
+される接頭辞の追加の文字数です (2) (*Note New Database
+Format-Footnotes::)．(数は負になることもあるはずです．)それ以降の数は，
+ヌルで終端されているASCII文字の残りです--共有している接尾辞以降の名前の
+部分です．
+
+オフセット差分数がバイト(+/-127)で保存できるものより大きい場合，バイトの
+値が0x80になり，それ以下の2バイトがその数値になっていて，それはハイバイ
+トを最初(ネットワークバイトの順序)にしたものを用います．
+
+すべてのデータベースは，`LOCATE02'と呼ばれるダミーの項目で始まっていて，
+それは，データベースファイルの書式が正しいことを確認するために，`locate'
+が調査するものです．検索時にはその項目は無視されます．
+
+最初の(ダミー)項目を，最初のデータベース以外からすべて切り取った場合でも，
+データベースをお互いに連結させることは不可能です．これは，2番目とそれ以
+降の最初の項目にあるオフセット差分数が間違ってしまうためです．
+
+
+
+File: find-ja.info  Node: New Database Format-Footnotes, Up: New Database Format
+
+(1) 訳注：原文はby a factor of 4 to 5
+
+(2) 訳注：この文日本語になっていません．原文は，Each database entry
+begins with an offset-differential count byte, which is the additional
+number of characters of prefix of the preceding entry to use beyond the
+number that the preceding entry is using of its predecessor.
+
+
+
+File: find-ja.info, Node: Sample Database, Next: Old Database Format, Prev: New Database Format, Up: Database Formats
+
+サンプルデータベース
+--------------------
+
+`frcode'へのサンプル入力です．
+
+     /usr/src
+     /usr/src/cmd/aardvark.c
+     /usr/src/cmd/armadillo.c
+     /usr/tmp/zoo
+
+共有しているために前置される，最も長い接頭辞の長さは以下のようになります．
+
+     0 /usr/src
+     8 /cmd/aardvark.c
+     14 rmadillo.c
+     5 tmp/zoo
+
+最後のヌルを改行に変更し，バイトを出力可能文字に変更した場合の，`frcode'
+からの出力は以下のようになります．
+
+     0 LOCATE02
+     0 /usr/src
+     8 /cmd/aardvark.c
+     6 rmadillo.c
+     -9 tmp/zoo
+
+(6 = 14 - 8, and -9 = 5 - 14)
+
+(6 = 14 - 8，そして -9 = 5 - 14)
+
+
+
+
+File: find-ja.info, Node: Old Database Format, Prev: Sample Database, Up: Database Formats
+
+古いデータベースの書式
+----------------------
+
+古いデータベースの書式は，Unixの`locate'と`find'プログラム，そして早期の
+GNUがリリースしたもので使用されています．`updatedb'は，`--old-format'オ
+プションが与えられた場合，この書式を生成します．
+
+`updatedb'は，古い書式のデータベースを生成するために，`bigram' と`code'
+と呼ばれるプログラムを実行します．古い書式は，新しいものと以下の方式で異
+なります．オフセット差分数バイトで始まりヌルで終るそれぞれの項目の代わり
+に，-14から14までのオフセット差分数を示している，0から28の値になります．
+それ以上の大きなオフセット差分数を示すバイト値は，0x1e (30)で0x80ではあ
+りません．大きな数は，ホストのバイト順でソートされ，それはネットワークバ
+イトの順序である必要はなく，ホストのワード整数の大きさで，それは通常4バ
+イトです．その値が14より小さいものは表示されません．データベースの行には
+終端バイトがありません．次の行の先頭は，30より小さい値を持つバイトで示さ
+れます．
+
+更に，最初のダミー項目で始まる代わりに，古いデータベース書式は，ファイル
+リストで最も一般的な128のbigramを含んでいる，256バイトの表で始まります．
+bigramは調整されたバイトの組となっています．ハイビットセットを持つデータ
+ベースのバイトは，(ハイビットがクリアされている)bigram表内部の索引です．
+bigramとオフセット差分数の符合化は，これらのデータベースを，新しい書式よ
+り20から25%まで小さくしますが，8ビットクリーンにはなりません．特殊コード
+に使用される範囲にあるファイル名のあらゆるバイトは，データベース内では疑
+問符に置換され，それは，単一文字に一致するシェルのワイルドカードには一致
+しません．
+
+
+
+
+File: find-ja.info, Node: File Permissions, Next: Reference, Prev: Databases, Up: Top
+
+ファイルの許可
+**************
+
+それぞれのファイルには，ファイルに対してユーザ持つアクセスの種類を制御す
+る"許可"の設定があります．ファイルに対する許可は"アクセスモード" とも呼
+ばれます．それらは，抽象的な形式または8進数で表示可能です．
+
+* Menu:
+
+* Mode Structure::              Structure of file permissions.
+* Symbolic Modes::              Mnemonic permissions representation.
+* Numeric Modes::               Permissions as octal numbers.
+
+
+
+File: find-ja.info, Node: Mode Structure
+
+ファイルの許可の構造
+====================
+
+ユーザがファイルに対して持つ3種類の許可があります．
+
+  1. ファイルを読み込む許可です．ディレクトリに対しては，これはディレク
+     トリの内容をリストアップする許可という意味があります．
+  2. ファイルを書き込む(変更する)許可です．ディレクトリに対しては，これ
+     はディレクトリでのファイルの作成と削除の許可を意味します．
+  3. ファイルを実行(それをプログラムとして実行)する許可です．ディレクト
+     リに対しては，これはディレクトリのファイルにアクセスする許可を意味
+     します．
+
+ファイル上で上記のあらゆる処理を行うため，異なる許可を持つ，3つのユーザ
+の分類があります．
+
+  1. ファイルの所有者．
+  2. ファイルのグループにいるその他のユーザ．
+  3. その他全員．
+
+ファイルが作成されるとき，所有者とグループが与えられます．通常，所有者は
+現在のユーザで，グループはファイルがあるディレクトリのグループですが，こ
+れはオペレーティングシステム，ファイルが作成されるファイルシステム，そし
+てファイルが作成される方法で変化します．`chown'と`chgrp'コマンドを使用し
+てファイルの所有者とグループを変更可能です．
+
+上記でリストアップされた3つの許可の3つの設定に加えて，ファイルの許可は3 
+つの特別な構成部分があり，それは実行可能なファイル(プログラム)と，いくつ
+かのシステムのディレクトリにのみ効果があります．
+
+  1. プロセスの事実上のユーザIDを，実行時にファイルのものに設定します
+     ("setuid bit"と呼ばれます)．ディレクトリには効果がありません．
+  2. プロセスの事実上のグループIDを，実行時にファイルのものに設定します
+     ("setgid bit"と呼ばれます)．いくつかのシステムのディレクトリに対し
+     ては，そのディレクトリで作成されたファイルを同じグループのディレク
+     トリとして置いたとしても，それを作成したユーザのグループは問題あり
+     ません．
+  3. スワップデバイス上のプログラムのテキストイメージを保存するので，実
+     行時により速くロードされます("sticky bit"と呼ばれます)．いくつかの
+     システムのディレクトリに対しては，ユーザがそのディレクトリで所有し
+     ていないファイルを削除することを妨げます．これは"追加のみ"のディレ
+     クトリ作成と呼ばれます．
+
+
+
+File: find-ja.info, Node: Symbolic Modes
+
+象徴的なモード
+==============
+
+"象徴的なモード"は，単一文字のシンボルの処理として，ファイルの許可を変更
+することを表します．それは，ファイルの許可の部分のどれかまたは全てを編集
+可能にし，オプションでそれらに前置される値と，おそらく現在の`umask'にも
+基づきます(*Note Umask and Protection::)．
+
+抽象的なモードの書式は以下の通りです．
+
+     [ugoa...][[+-=][rwxXstugo...]...][,...]
+
+以下のセクションで，抽象的なモードのその他の詳細の処理を記述します．
+
+* Menu:
+
+* Setting Permissions::          Basic operations on permissions.
+* Copying Permissions::          Copying existing permissions.
+* Changing Special Permissions:: Special permissions.
+* Conditional Executability::    Conditionally affecting executability.
+* Multiple Changes::             Making multiple changes.
+* Umask and Protection::              The effect of the umask.
+
+
+
+File: find-ja.info, Node: Setting Permissions
+
+許可の設定
+----------
+
+ファイルの許可での基本的な抽象的処理で，特定ユーザのファイルの読み込み，
+書き込み，実行の許可を，加えたり，削除したり，設定します．これらの処理は
+以下の書式です．
+
+     USERS OPERATION PERMISSIONS
+
+上記の3つの部分の間のスペースは，可読性のみのために表示しています．抽象
+的なモードではスペースを含めることはできません．
+
+USERS部は，ファイルアクセスを変更されるユーザを伝えます．それは，一つ以
+上の以下の文字から成り立ちます(または，空にすることもできます．そのとき
+生じることは，*Note Umask and Protection::)．これらの文字の一つ以上が与
+えられたとき，その順番は重要ではありません．
+
+`u'
+     ファイルを所有しているユーザ．
+`g'
+     ファイルのグループのその他のユーザ．
+`o'
+     その他全部のユーザ．
+`a'
+     全てのユーザで，`ugo'と同じです．
+
+OPERATION部は，ファイルにアクセスするユーザの効果を変更する方法を伝え，
+以下のシンボルの一つになります．
+
+`+'
+     USERSが既に持つ，そのファイルに対するあらゆる許可に，PERMISSIONSを
+     加えます．
+`-'
+     USERSが既に持つ，そのファイルに対するあらゆる許可から，PERMISSIONS
+     を削除します．
+`='
+     USERSが持つ，そのファイルに対する許可を，PERMISSIONSのみにします．
+
+PERMISSIONS部は，ファイルが変更されるアクセスの種類を伝えます．ゼロ以上
+の文字になります．USERS部を用いた場合，1文字以上与えられたときは，その順
+序は重要ではありません．PERMISSIONS部の省略は，`='の時のみ役に立ち，それ
+は指定されたUSERSにそのファイルに対する全てのアクセス権を取り除きます．
+
+`r'
+     USERSがファイルを読み込むのに必要な許可です．
+`w'
+     USERSがファイルに書き込むのに必要な許可です．
+`x'
+     USERSがファイルを実行するのに必要な許可です．
+
+例えば，全員にファイルの読み込みと書き込みの許可を与え，実行を与えないた
+めに，以下を使用してください．
+
+     a=rw
+
+ファイルの所有者以外の全てのユーザから書き込み許可を削除するため，以下を
+使用してください．
+
+     go-w
+
+上記のコマンドは，ファイルの所有者のアクセス権に効果が無く，その他のユー
+ザが，ファイルの読み込みと実行が可能かどうかにも効果がありません．
+
+ファイルの所有者以外全員に，そのファイルに対しあらゆる許可を与えないため
+に，以下のモードを使用してください．他のユーザは，ファイルがあるディレク
+トリに書き込み許可がある場合，ファイルを削除可能です．
+
+     go=
+
+同じことを指定するもう1つの方法です．
+
+     og-rxw
+
+
+
+File: find-ja.info, Node: Copying Permissions
+
+既存の許可をコピー
+------------------
+
+ファイルの許可を，既存の許可の部分を基準にすることができます．こうするた
+めに，オペレータの後に`r'，`w'や`x'を使用する代わりに，文字`u'，`g'や`o'
+を使用します．例えば以下のモードです．
+
+     o+g
+
+それは，ファイルのグループにいるユーザに対する許可を，その他のユーザがそ
+のファイルに対して持っている許可に加えます．このため，ファイルが最初にモー
+ド664 (`rw-rw-r--')の場合，上記のモードは，それを666 (`rw-rw-rw-')に変更
+します．ファイルが最初にモード741 (`rwxr----x')の場合，上記のモードは，
+それを745 (`rwxr--r-x')に変更します．`-'と`='の処理は同様に働きます．
+
+
+
+
+File: find-ja.info, Node: Changing Special Permissions
+
+特定の許可を変更
+----------------
+
+ファイルの読み込み，書き込み，そして実行の許可の変更に加えて，特別な許可
+を変更できます．許可の概要は，*Note Mode Structure::.
+
+実行時にファイルの許可をユーザIDに設定するため，象徴的なモードのUSERS部
+での`u'と，PERMISSIONS部での`s'を使用してください．
+
+実行時にファイルの許可をグループIDに設定するため，象徴的なモードのUSERS
+部での`g'とPERMISSIONS部での`s'を使用してください．
+
+スワップデバイスに永久に残すファイルの許可を変更するため，象徴的なモード
+のUSERS部での`o'とPERMISSIONS部での`t'を使用してください．
+
+例えば，ユーザID許可をプログラムに加えるため，以下のモードを使用可能です．
+
+     u+s
+
+ユーザIDのとグループIDの許可の設定をそれから削除するため，以下のモードを
+使用可能です．
+
+     ug-s
+
+プログラムがスワップデバイスに保存されるようにするため，以下のモードを使
+用可能です．
+
+     o+t
+
+特別な許可は実行形式のファイルと，いくつかのシステムのディレクトリ(そこ
+では異なる意味を持ちます．*Note Mode Structure::)のみに効果があることを，
+覚えておいてください．象徴的なモードのUSERS部で`a'を持ちいた場合，特別な
+許可は効果がありません．このため，以下の例を考えます．
+
+     a+s
+
+これは，*全く効果がありません*．特別な許可を効果的にするために，`u'，`g'
+と，`o'を明示的に使用する必要があります．また，`u+t'，`g+t'と，`o+s'の組
+み合わせも効果がありません．
+
+`='オペレータは，特別な許可に用いる場合，全く役に立ちません．例えば，モー
+ドを以下のようにします．
+
+     o=t
+
+これは，ファイルをスワップデバイスに保存するようにしますが，それは，ファ
+イルのグループにいないユーザが持っている可能性のある，全ての，読み込み，
+書き込み，そして実行の許可を削除します．
+
+
+
+
+File: find-ja.info, Node: Conditional Executability
+
+実行可能の条件
+--------------
+
+象徴的な許可の特別な形式がもう1つあります．`x'の代わりに`X'を用いた場合，
+実行許可は，既に実行形式があるファイル，またはディレクトリのみに効果があ
+ります．それは，ディレクトリが最初にあらゆる実行許可を持っていない場合で
+も，ディレクトリの実行許可に効果があります．
+
+例えば，このようなモードにします．
+
+     a+X
+
+これは，全てのユーザに，それまでに持っていなかった，ファイルの実行(やディ
+レクトリの検索)の許可を与えます．
+
+
+
+
+File: find-ja.info, Node: Multiple Changes
+
+複数の変更
+----------
+
+象徴的なモードの書式は，実際に上記で記述したより複雑です(*Note Setting
+Permissions::)．それは，ファイルの許可を複数変更する2つの方法を提供しま
+す．
+
+最初の方法は，象徴的なモードで，複数のOPERATION部とPERMISSIONS部をUSERS
+部の後で指定する方法です．
+
+例えば，以下のようなモードにします．
+
+     og+rX-w
+
+これは，ファイルの所有者以外のユーザに，ファイルの読み込み許可を与え，そ
+れがディレクトリの場合や，既に誰かに実行形式の許可がある場合，実行許可を
+与えます．そして，それはファイルの書き込み許可を禁止します．それはファイ
+ルの所有者が持つ許可に影響しません．上記のモードは以下の2つのモードと同
+じです．
+
+     og+rX
+     og-w
+
+複数の変更をするための2番目の方法は，カンマで分けられた，単純な象徴的な
+モードを1つの以上の指定することです．例えば，以下のようなモードにします．
+
+     a+r,go-w
+
+これは，全員にファイルの読み込み許可を与え，所有者以外全員の書き込み許可
+を削除します．もう1つの例です．
+
+     u=rwx,g=rx,o=
+
+これは，ファイルに明示的に特別でない許可の全てを設定します．(それはファ
+イルのグループではないユーザに，許可を全く与えません．)
+
+2つの方法は組み合わせ可能です．以下のモードになります．
+
+     a+r,g+x-w
+
+これは，全てのユーザに，ファイルの読み込み許可を与え，ファイルのグループ
+にいるユーザに実行許可も与えますが，書き込み許可は与えません．上記のモー
+ドは異なる方法で書くこともできます．その1つは以下になります．
+
+     u+r,g+rx,o+r,g-w
+
+
+
+
+File: find-ja.info, Node: Umask and Protection
+
+umaskと保護
+-----------
+
+象徴的なモードのUSERS部が省略された場合，システム変数`umask' で*無効に**
+設定されている*あらゆる許可以外，デフォルトは`a'(で，全てのユーザに影響
+します)．`umask'の値は`umask'コマンドを使用して設定できます．そのデフォ
+ルト値は，システム毎に異なります．
+
+象徴的なモードのUSERS部の省略は，`+'以外のオペレーションでは一般に役に立
+ちません．希望しないファイルに対する余分な許可を与えるために，簡単にカス
+タマイズ可能な保護として`umask'が使用可能なので，それは`+'とともに用いる
+と役に立ちます．
+
+例として，`umask'の値が2の場合，それはファイルのグループ以外のユーザに対
+し書き込み許可を削除します．以下のモードを考えます．
+
+     +w
+
+これは，その所有者とファイルのグループのユーザに対する書き込み許可を加え
+ますが，それ以外のユーザには与え*ません*．対照的に，以下のモードを考えま
+す．
+
+     a+w
+
+これは`umask'を無視し，全てのユーザに対し，書き込み許可を与える*のです*．
+
+
+
+
+File: find-ja.info, Node: Numeric Modes
+
+数値的なモード
+==============
+
+ファイルの許可は，内部では16ビットの整数で保存されます．象徴的なモードの
+代わりとして，新しいモードの内部に対応した適切な8進数(基数8)で与えること
+ができます．この数は常に8進数で処理されます．Cで行うような，前置される0 
+は不要です．モード0055はモード55と同じです．
+
+数値的なモードは，通常対応する象徴的なモードより短くなりますが，ファイル
+の前の許可を考慮にいれることに制限があります．それは絶対的な設定が可能な
+だけです．
+
+ユーザ，ファイルのグループのその他のユーザ，そしてファイルのグループでは
+ないその他のユーザに応じた許可は，それぞれ3つのビットになり，それは1つの
+8進数として表現されます．ここに16ビットの整数にアレンジされたビットがあ
+り，最下位ビットからはじめます．
+
+     対応する値
+     モード    許可
+
+               ファイルのグループにいないその他のユーザ：
+        1      実行
+        2      書き込み
+        4      読み込み
+
+               ファイルのグループのその他のユーザ：
+       10      実行
+       20      書き込み
+       40      読み込み
+
+               ファイルの所有者：
+      100      実行
+      200      書き込み
+      400      読み込み
+
+               特別な許可：
+     1000      テキストイメージをスワップデバイスに保存
+     2000      実行時のグループIDを設定
+     4000      実行時のユーザIDを設定
+
+例えば，数値的なモードの4755は，象徴的なモードの`u=rwxs,go=rx'に，数値的
+なモードの664は，象徴的なモードの`ug=rw,o=r'に対応します．数値的なモード
+の0は，象徴的なモードの`ugo='に対応します．
+
+
+
+
+File: find-ja.info, Node: Reference, Next: Primary Index, Prev: File Permissions, Up: Top
+
+リファレンス
+************
+
+以下は，このマニュアルで示してきたプログラムに対する，コマンドラインの構
+文の概要です．
+
+* Menu:
+
+* Invoking find::
+* Invoking locate::
+* Invoking updatedb::
+* Invoking xargs::
+
+
+
+File: find-ja.info, Node: Invoking find, Next: Invoking locate, Prev: Reference, Up: Reference
+
+`find'の呼出
+============
+
+     find [FILE...] [EXPRESSION]
+
+`find'は，それぞれのファイル名FILEをルートとするディレクトリツリーを，そ
+のツリーで見つかったそれぞれのファイル上でEXPRESSIONを評価しながら検索し
+ます．
+
+`find'は，最初の引数は式の始まりとなる`-'，`(', `)'，`,'，または`!'で始
+まると考えます．それ以前のあらゆる引数は検索パスで，それ以降のあらゆる引
+数は式の残りとみなします．パスが与えられていない場合，現在のディレクトリ
+が使用されます．式が与えられていない場合，式`-print'が使用されます．
+
+`find'は，すべてのファイルが正しく処理された場合は0のステータスで，エラー
+が発生した場合は0より大きなステータスで終了します．
+
+式に含めることが可能なすべてのテスト，アクション，そしてオプションの概要
+は，*Note Primary Index::.
+
+`find'は，管理上で使用するため，2つのオプションも認識します．
+
+`--help'
+     コマンドライン引数の書式の概要を出力し，終了します．
+`--version'
+     `find'のバージョンナンバーを出力し，終了します．
+
+
+
+File: find-ja.info, Node: Invoking locate, Next: Invoking updatedb, Prev: Invoking find, Up: Reference
+
+`locate'の呼出
+==============
+
+     locate [OPTION...] PATTERN...
+
+`--database=PATH'
+`-d PATH'
+     デフォルトのファイル名のデータベースを検索する代わりに，PATHにある
+     ファイル名のデータベースを検索し，それはコロンで分離されたデータベー
+     スファイル名のリストになります．環境変数`LOCATE_PATH'を検索するデー
+     タベースファイルに設定する方法も使用可能です．両方使用されている場
+     合，オプションは環境変数に優先します．
+
+`--help'
+     `locate'へのオプションの概要を出力し，終了します．
+
+`--version'
+     `locate'のバージョンナンバーを出力し，終了します．
+
+
+
+
+File: find-ja.info, Node: Invoking updatedb, Next: Invoking xargs, Prev: Invoking locate, Up: Reference
+
+`updatedb'の呼出
+================
+
+     updatedb [OPTION...]
+
+`--localpaths='PATH...''
+     データベースに書き込むネットワーク以外のディレクトリです．デフォル
+     トは`/'です．
+
+`--netpaths='PATH...''
+     データベースに書き込むネットワーク(NFS，AFS，RFS，等々．)のディレク
+     トリです．デフォルトはありません．
+
+`--prunepaths='PATH...''
+     データベースに書き込まないディレクトリで，それ以外は書き込みます．
+     デフォルトは，`/tmp /usr/tmp /var/tmp /afs'です．
+
+`--output=DBFILE'
+     構築されるデータベースファイルです．デフォルトはシステムに依存しま
+     すが，通常は`/usr/local/var/locatedb'です．
+
+`--netuser=USER'
+     `su'(1)を使用しながら，ネットワークディレクトリを検索するユーザです．
+     デフォルトは`daemon'です．
+
+
+
+File: find-ja.info, Node: Invoking xargs, Prev: Invoking updatedb, Up: Reference
+
+`xargs'の呼出
+=============
+
+     xargs [OPTION...] [COMMAND [INITIAL-ARGUMENTS]]
+
+`xargs'は，以下のステータスで終了します．
+
+0
+     成功した場合．
+123
+     1-125のステータスで終了されたコマンドの呼出があった場合．
+124
+     コマンドが255のステータスで終了した場合．
+125
+     コマンドがシグナルでキルされた場合．
+126
+     コマンドが実行不可能な場合．
+127
+     コマンドが見つからない場合．
+1
+     その他のエラーが発生した場合．
+
+`--null'
+`-0，'
+     入力ファイル名を空白の代わりにヌル文字で終端し，引用符とバックスラッ
+     シュは特別扱いされません(すべての文字は，文字通りに扱われます)．他
+     の引数として扱われるような，ファイル文字列の終端 (1) (*Note
+     Invoking xargs-Footnotes::)を使用不可能にします．
+
+`--eof[=EOF-STR]'
+`-e[EOF-STR]'
+     ファイル文字列の終端をEOF-STRに設定します．ファイル文字列の終端が，
+     入力行に現れた場合，残りの入力は無視されます．EOF-STRが省略された場
+     合，ファイル文字列の終端はありません．このオプションが与えられてい
+     ない場合，ファイル文字列の終端はデフォルトで`_'になります．
+
+`--help'
+     `xargs'のオプションの概要を出力して，終了します．
+
+`--replace[=REPLACE-STR]'
+`-i[REPLACE-STR]'
+     最初から存在する引数にあるREPLACE-STRを，標準入力から読み込まれた名
+     前に置換します．また，引用符で囲まれていない空白は，引数の終りにな
+     りません．REPLACE-STRが省略されている場合，デフォルトは`{}'になりま
+     す(`find -exec'に似ています)．`-x'と`-l 1'を暗黙に指定します．
+
+`--max-lines[=MAX-LINES]'
+`-l[MAX-LINES]'
+     最大MAX-LINESの空白でない入力行を，コマンドライン毎に使用します．後
+     置されている空白は，入力行を論理的に次の行に続かせ，それは行を数え
+     る目的のためです．`-x'を暗黙に指定します．
+
+`--max-args=MAX-ARGS'
+`-n MAX-ARGS'
+     最大MAX-ARGSの引数を，コマンドライン毎に使用します．MAX-ARGS より引
+     数が少ない時は，サイズ(`-s'オプションを参照して下さい)を越ていても，
+     `-x'オプションが与えられていない場合はそれが使用され，それ以外では
+     `xargs'は終了します．
+
+`--interactive'
+`-p'
+     それぞれのコマンドラインを実行するかどうか，ユーザにプロンプトを表
+     示し，端末から一行読み込みます．応答が`y'や`Y'で始まっている場合の
+     み，コマンドラインを実行します．`-t'を暗黙に指定します．
+
+`--no-run-if-empty'
+`-r'
+     標準入力が全く空行を含まない場合，コマンドを実行しません．デフォル
+     トで，コマンドは入力が無い場合でも一度実行されます．
+
+`--max-chars=MAX-CHARS'
+`-s MAX-CHARS'
+     コマンドと最初からある引数と引数文字列の最後の終端のヌルを含め，最
+     大MAX-CHARS文字をコマンドライン毎に使用します．
+
+`--verbose'
+`-t'
+     コマンドラインを実行前に標準エラー出力に出力します．
+
+`--version'
+     `xargs'のバージョンナンバーを出力し，終了します．
+
+`--exit'
+`-x'
+     サイズ(-Sオプションを参照して下さい)を越えた場合，終了します．
+
+`--max-procs=MAX-PROCS'
+`-P MAX-PROCS'
+     一度にMAX-PROCSプロセスまで実行します．デフォルトは1です．MAX-PROCS
+     が0の場合，`xargs'は一度に実行可能な最大数のプロセスを実行します．
+
+
+
+File: find-ja.info  Node: Invoking xargs-Footnotes, Up: Invoking xargs
+
+(1) 訳注：ファイル名の終端を示す文字のこと．原文は the end of file
+string．
+
+
+
+File: find-ja.info, Node: Primary Index, Prev: Reference, Up: Top
+
+`find'のプライマリの索引
+************************
+
+これは，ファイルを検索するために`find'の式を作り上げる，(テスト，アクショ
+ン，そしてオプション) すべてのプライマリのリストです．式の詳細は，*Note
+find Expressions::.
+
+
+* Menu:
+
+* -ok:                          Querying.               10.
+* -fprint0:                     Safe File Name Handling.  16.
+* -print0:                      Safe File Name Handling.  13.
+* -exec:                        Single File.            9.
+* -fprintf:                     Print File Information.  55.
+* -printf:                      Print File Information.  50.
+* -fls:                         Print File Information.  46.
+* -ls:                          Print File Information.  7.
+* -fprint:                      Print File Name.        10.
+* -print:                       Print File Name.        7.
+* -false:                       Combining Primaries With Operators.  42.
+* -true:                        Combining Primaries With Operators.  39.
+* -fstype:                      Filesystems.            24.
+* -mount:                       Filesystems.            16.
+* -xdev:                        Filesystems.            15.
+* -noleaf:                      Directories.            40.
+* -prune:                       Directories.            28.
+* -depth:                       Directories.            21.
+* -mindepth:                    Directories.            16.
+* -maxdepth:                    Directories.            11.
+* -perm:                        Permissions.            10.
+* -nogroup:                     Owner.                  19.
+* -nouser:                      Owner.                  18.
+* -gid:                         Owner.                  13.
+* -uid:                         Owner.                  12.
+* -group:                       Owner.                  8.
+* -user:                        Owner.                  7.
+* -xtype:                       Type.                   25.
+* -type:                        Type.                   7.
+* -empty:                       Size.                   24.
+* -size:                        Size.                   7.
+* -used:                        Comparing Timestamps.   28.
+* -newer:                       Comparing Timestamps.   20.
+* -cnewer:                      Comparing Timestamps.   19.
+* -anewer:                      Comparing Timestamps.   18.
+* -daystart:                    Age Ranges.             26.
+* -mmin:                        Age Ranges.             17.
+* -cmin:                        Age Ranges.             16.
+* -amin:                        Age Ranges.             15.
+* -mtime:                       Age Ranges.             11.
+* -ctime:                       Age Ranges.             10.
+* -atime:                       Age Ranges.             9.
+* -links:                       Hard Links.             25.
+* -inum:                        Hard Links.             17.
+* -follow:                      Symbolic Links.         18.
+* -ilname:                      Symbolic Links.         8.
+* -lname:                       Symbolic Links.         7.
+* -iregex:                      Full Name Patterns.     15.
+* -regex:                       Full Name Patterns.     14.
+* -ipath:                       Full Name Patterns.     8.
+* -path:                        Full Name Patterns.     7.
+* -iname:                       Base Name Patterns.     8.
+* -name:                        Base Name Patterns.     7.
+
+
+
+Tag table:
+Node: Top1151
+Node: Introduction1906
+Node: Scope2668
+Node: Overview3813
+Node: find Expressions4957
+Node: Finding Files5799
+Node: Name6162
+Node: Base Name Patterns6634
+Node: Full Name Patterns7094
+Node: Fast Full Name Search7771
+Node: Shell Pattern Matching8988
+Node: Links10017
+Node: Symbolic Links10342
+Node: Hard Links11073
+Node: Time11765
+Node: Age Ranges12095
+Node: Comparing Timestamps12926
+Node: Size13726
+Node: Type14328
+Node: Owner14974
+Node: Permissions15566
+Node: Contents15991
+Node: Directories16730
+Node: Filesystems18287
+Node: Combining Primaries With Operators19200
+Node: Actions20052
+Node: Print File Name20403
+Node: Print File Information20806
+Node: Escapes22421
+Node: Format Directives22875
+Node: Name Directives23325
+Node: Ownership Directives23679
+Node: Size Directives23976
+Node: Location Directives24221
+Node: Time Directives24620
+Node: Time Formats25215
+Node: Time Components25524
+Node: Date Components25910
+Node: Combined Time Formats26432
+Node: Run Commands26782
+Node: Single File27056
+Node: Multiple Files27664
+Node: Unsafe File Name Handling28829
+Node: Safe File Name Handling29880
+Node: Limiting Command Size30401
+Node: Interspersing File Names31513
+Node: Querying32295
+Node: Adding Tests32855
+Node: Common Tasks34306
+Node: Viewing And Editing34618
+Node: Archiving34987
+Node: Cleaning Up36171
+Node: Strange File Names37334
+Node: Fixing Permissions38404
+Node: Classifying Files38739
+Node: Databases39278
+Node: Database Locations39679
+Node: Database Formats40696
+Node: New Database Format41153
+Node: Sample Database42496
+Node: Old Database Format43089
+Node: File Permissions44028
+Node: Mode Structure44454
+Node: Symbolic Modes45621
+Node: Setting Permissions46332
+Node: Copying Permissions47687
+Node: Changing Special Permissions48104
+Node: Conditional Executability49091
+Node: Multiple Changes49397
+Node: Umask and Protection50237
+Node: Numeric Modes50798
+Node: Reference51755
+Node: Invoking find52005
+Node: Invoking locate52668
+Node: Invoking updatedb53153
+Node: Invoking xargs53784
+Node: Primary Index55912
+
+End tag table

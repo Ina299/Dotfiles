@@ -1,0 +1,2123 @@
+Info file: fileutils-ja.info,    -*-Text-*-
+produced by `texinfo-format-buffer'
+from file `fileutils-ja.texi'
+using `texinfmt.el' version 2.38 of 3 July 1998.
+
+
+
+
+
+
+START-INFO-DIR-ENTRY
+* File utilities(ja): (fileutils-ja).  GNU file utilities.
+* chgrp(ja): (fileutils-ja)chgrp invocation.         Change file groups.
+* chown(ja): (fileutils-ja)chown invocation.         Change file owners/groups.
+* chmod(ja): (fileutils-ja)chmod invocation.         Change file permissions.
+* cp(ja): (fileutils-ja)cp invocation.               Copy files.
+* dd(ja): (fileutils-ja)dd invocation.               Copy and convert a file.
+* df(ja): (fileutils-ja)df invocation.               Report filesystem disk usage.
+* dir(ja): (fileutils-ja)dir invocation.             List directories briefly.
+* dircolors(ja): (fileutils-ja)dircolors invocation. Color setup for ls.
+* du(ja): (fileutils-ja)du invocation.               Report on disk usage.
+* install(ja): (fileutils-ja)install invocation.     Copy and change attributes.
+* ln(ja): (fileutils-ja)ln invocation.               Make links between files.
+* ls(ja): (fileutils-ja)ls invocation.               List directory contents.
+* mkdir(ja): (fileutils-ja)mkdir invocation.         Create directories.
+* mkfifo(ja): (fileutils-ja)mkfifo invocation.       Create FIFOs (named pipes).
+* mknod(ja): (fileutils-ja)mknod invocation.         Create special files.
+* mv(ja): (fileutils-ja)mv invocation.               Rename files.
+* rm(ja): (fileutils-ja)rm invocation.               Remove files.
+* rmdir(ja): (fileutils-ja)rmdir invocation.         Remove empty directories.
+* shred(ja): (fileutils-ja)shred invocation.         Remove files more securely.
+* sync(ja): (fileutils-ja)sync invocation.           Synchronize memory and disk.
+* touch(ja): (fileutils-ja)touch invocation.         Change file timestamps.
+* vdir(ja): (fileutils-ja)vdir invocation.           List directories verbosely.
+END-INFO-DIR-ENTRY
+
+This file documents the GNU set of file utilities.
+
+Copyright 1994, 95, 96, 1999, 2001 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.1 or
+any later version published by the Free Software Foundation; with no
+Invariant Sections, with no Front-Cover Texts, and with no Back-Cover
+Texts.  A copy of the license is included in the section entitled "GNU
+Free Documentation License".
+
+
+
+
+
+
+
+File: fileutils-ja.info, Node: mv invocation, Next: rm invocation, Prev: install invocation, Up: Basic operations
+
+`mv': ファイルの移動(名前の変更)
+================================
+
+
+`mv'は，ファイル(やディレクトリ)を移動したり名前を変更したりします．構文
+は以下のとおりです．
+
+     mv [OPTION]... SOURCE DEST
+     mv [OPTION]... SOURCE... DIRECTORY
+
+最後の引数が，既存のディレクトリを示す場合，`mv'は，それ以外の与えられた
+それぞれのファイルを，同じファイル名で，そのディレクトリに移動します．そ
+れ以外では，2つのファイルが与えられた場合，1番目の名前を2番目に変更しま
+す．最後の引数がディレクトリではなく，2つ以上のファイルが与えられた場合，
+エラーとなります．
+
+`mv'は，一つのファイルシステムから別のものへ，あらゆる形式のファイル移動
+が可能です．fileutilsのバージョン`4.0'以前では，`mv'は通常のファイルのみ
+ファイルシステム間で移動が可能でした．例えば，現在の`mv'は，一つのパーティ
+ションから別のものへ，特殊なデバイスファイルを含むディレクトリ階層全体を
+移動可能です．それは最初に，要求されたディレクトリとファイルをコピーする
+`cp -a'で使用されているものと同じコードを使用し，それから(コピーが成功し
+たと仮定して)それは元を削除します．コピーが失敗した場合，コピー先のパー
+ティションにコピーされた部分が削除されます．一つのパーティションから3つ
+のディレクトリを別のものにコピーし，最初のディレクトリが成功し，2番目が
+失敗した場合，最初のものはコピー先のパーティションにのこり，2番目と3番目
+は元のパーティションに残ります．
+
+コピー先のファイルが存在し通常の書き込みが不可で，標準入力が端末で，`-f'
+や`--force'オプションが与えられていない場合，`mv'はファイルを置換するか
+どうか，ユーザにプロンプトを表示します．(自分が所有するファイル，または，
+そのディレクトリに書き込み許可がある必要があります．) 応答が`y'または`Y'
+で始まらない場合，ファイルはスキップされます．
+
+*警告*：ディレクトリを示すシンボリックリンクを移動しようとし，スラッシュ
+を後置したシンボリックリンクを指定した場合，`mv'はシンボリックリンクを移
+動しませんが，その代わりにシンボリックリンクが参照するディレクトリを移動
+します．*Note Trailing slashes::.
+
+プログラムは以下のオプションも受け入れます．*Note Common options::,も参
+照してください．
+
+
+`-b'
+``--backup'[=METHOD]'
+     *Note Backup options::. 上書きされたり削除されたりするファイルのバッ
+     クアップを作成します．
+
+`-f'
+`--force'
+     コピー先のファイルを削除したり上書きしたりする前に，ユーザにプロン
+     プトを表示しません．
+
+`-i'
+`--interactive'
+     許可に因らず，それぞれの既存のコピー先のファイルを上書きするかどう
+     かプロンプトを表示します．`y'や`Y'で始まらない返答の場合，ファイル
+     は省略されます．
+
+`-u'
+`--update'
+     同じまたは新しい編集時間を持つ既存のコピー先にディレクトリ以外のも
+     のを移動しません．
+
+`-v'
+`--verbose'
+     移動する前にそれぞれのファイル名を出力します．
+
+``--strip-trailing-slashes''
+     それぞれのSOURCE引数から後置されるスラッシュを削除します．*Note
+     Trailing slashes::.
+
+`-S SUFFIX'
+`--suffix=SUFFIX'
+     `-b'で作成されるそれぞれのバックアップファイルに，SUFFIXを追加しま
+     す．*Note Backup options::.
+
+``--target-directory'=DIRECTORY'
+     コピー先のDIRECTORYを指定します．*Note Target directory::.
+
+`-V METHOD'
+`--version-control=METHOD'
+     `-b'で作成されるバックアップの形式を変更します．METHOD引数は，
+     `none' (または`off')，`numbered' (または`t')，`existing' (または
+     `nil')，または，`never' (または`simple')が可能です．*Note Backup
+     options::.
+
+
+
+
+
+File: fileutils-ja.info, Node: rm invocation, Next: shred invocation, Prev: mv invocation, Up: Basic operations
+
+`rm': ファイルやディレクトリの削除
+==================================
+
+
+`rm'は与えられたFILEを削除します．デフォルトでそれはディレクトリを削除し
+ません．構文は以下のとおりです．
+
+     rm [OPTION]... [FILE]...
+
+ファイルに書き込みができない，標準入力が端末，そして`-f'または`--force'
+オプションが与えられていない場合，または，`-i'または`--interactive'オプ
+ションが与えられて*いる*場合，`rm'はユーザにファイルを削除するかどうかを
+促すプロンプトを表示します．`y' や`Y'で始まらない返答の場合，ファイルは
+省略されます．
+
+プログラムは以下のオプションも受け入れます．*Note Common options::,も参
+照してください．
+
+
+`-d'
+`--directory'
+     `rmdir'の代わりに`unlink'を用いてディレクトリの削除を試み，アンリン
+     クを試みる前にディレクトリが空である必要はありません．適切な特権を
+     持ち，オペレーティングシステムがディレクトリに対する`unlink'をサポー
+     トしている場合のみ，これは動作します．ディレクトリのアンリンクはディ
+     レクトリ内のあらゆるファイルを参照できなくするため，この後でファイ
+     ルシステムに`fsck' した方が賢明です．
+
+`-f'
+`--force'
+     存在しないファイルを無視し，ユーザにプロンプトを表示しません．前に
+     ある`--interactive' (`-i')オプションを無視します．
+
+`-i'
+`--interactive'
+     それぞれのファイルを削除するかどうかプロンプトを表示します．`y'や
+     `Y'で始まらない返答の場合，ファイルは省略されます．前にある
+     `--force' (`-f')オプションを無視します．
+
+`-r'
+`-R'
+`--recursive'
+     ディレクトリの内容を再帰的に削除します．
+
+`-v'
+`--verbose'
+     削除する前にそれぞれのファイル名を出力します．
+
+
+よくある問題の一つは，`-'で始まる名前を持つファイルの削除の方法です．GNU
+`rm'では，引数を解析する`getopt'関数を使用するすべてのプログラムに似て，
+以下のすべての引数はオプションでないことを示す`--'オプションを使用します．
+現在のディレクトリの`-f'というファイル名を削除するため，以下のどちらかを
+入力できます．
+
+     rm -- -f
+
+または，
+
+     rm ./-f
+
+この目的に対する，Unix `rm'プログラムの単一の`-'の使用は，getoptの標準構
+文の開発以前のものです．
+
+
+
+
+File: fileutils-ja.info, Node: shred invocation, Prev: rm invocation, Up: Basic operations
+
+`shred': より安全なファイルの削除
+=================================
+
+
+`shred'は，非常に高価なハードディスクでのデータの回復を妨げを助けるため，
+デバイスやファイルを上書きします．
+
+通常，ファイルを削除するとき(*Note rm invocation::)，データは実際には破
+壊されません．ファイルが保存されている場所をリストアップしている索引のみ
+破壊し，記憶装置は再利用可能になります．索引の再構築を試み，その部分が再
+利用されていない場合，ファイルを元に戻すことが可能な，アンデリートユーティ
+リティがあります．
+
+ほとんど満タンのドライブを使用している忙しいシステムでは，スペースは数秒
+で再利用可能になります．しかし，それが確かであることを知る方法はありませ
+ん．機密データがあり，機密でないデータでファイルを実際に上書きすることで
+リカバリが不可能だということを確かめたいかもしれません．
+
+しかし，そうした後でも，研究所へディスクを持っていき，上書きされたデータ
+の下の元データのかすかな"残響"を探すために感度の高い(そして高価な)多くの
+機器を使用することが可能です．データが一度上書きされただけでは，それはさ
+ほど難しくありません．
+
+取り返しができないように何かを削除する最前の方法は，メディアに酸をかけて
+破壊する，溶かしてしまう，またはそれに似たことをすることです．フロッピー
+ディスクのような，安い着脱可能なメディアに対しては，これは好ましい方法で
+す．しかし，ハードドライブは高価で，溶かすのが難しいため，`shred'ユーティ
+リティは破壊することなく類似の効果を達成しようとします．
+
+これは，古いデータに対するダメージを最大にするように選ばれたデータパター
+ンで，上書き動作を何回も使用します．これがフロッピーディスクで動作してい
+る間，パターンはハードドライブで最適な効果があるよう設計されています．詳
+細は，ソースコードと，Sixth USENIX Security Symposium (San Jose,
+California, 22--25 July, 1996)の予稿から，Peter Gutmannの論文`Secure
+Deletion of Data from Magnetic and Solid-State Memory'を参照してください．
+論文は`http://www.cs.auckland.ac.nz/~pgut001/pubs/secure_del.html'で，オ
+ンラインでも利用可能です．
+
+`shred'は非常に重要な仮定に依存していることに*注意してください*．それは，
+ファイルシステムがその場所のデータを上書きするということです．これはそう
+するための伝統的な方法ですが，現代の多くのファイルシステムはこの仮定を満
+足するように設計されていません．例外は以下を含みます．
+
+
+   * AIXとSolarisが提供するような，Log-structureまたはjournalファイルシ
+     ステム．
+
+   * RAIDベースのファイルシステムのように，重複したデータを書き込み，書
+     き込みで失敗した場合でも続けるファイルシステム．
+
+   * Network ApplianceのNFSサーバのような，スナップショットを作成するファ
+     イルシステム．
+
+   * NFSのバージョン３のクライアントのような，一時的な位置にキャッシュを
+     作成するファイルシステム．
+
+   * 圧縮されているファイルシステム．
+
+ファイルシステムがどのように動作しているかよく分からない場合，その場所に
+上書きされないと仮定すべきで，それは，そのファイルシステムの通常のファイ
+ルで，`shred'が信頼できる動作を行うことができないことを意味します．
+
+一般的にいって，これは，上記の意味で設計されたファイルシステムの問題をバ
+イパスするため，ファイルではなくデバイスに`shred'することはより信頼でき
+ます．しかし，デバイスを`shred'してさえ，常に完全に信頼することはできま
+せん．例えば，ほとんどのディスクは，不良セクタがアプリケーションに見えな
+いようにをマッピングします．不良セクタが機密データを含む場合，`shred'は
+それを破壊することは不可能です．
+
+`shred'は，バックアップについて何もしないように，これらの問題の検出も報
+告も試みません．しかし，ファイルではなくデバイスに`shred'する方がより信
+頼できるので，`shred'はデフォルトで出力ファイルを切り詰めたり削除したり
+しません．このデフォルトはデバイスに対しより適していて，それは通常切り詰
+めもできませんし，削除もすべきではありません．
+
+     shred [OPTION]... FILE[...]
+
+プログラムは以下のオプションも受け入れます．*Note Common options::,も参
+照してください．
+
+
+`-f'
+`--force'
+     上書き可能が必要な場合，ファイルの許可に優先させます．
+
+`-NUMBER'
+`-n NUMBER'
+`--iterations=NUMBER'
+     デフォルトで，`shred'は25回の上書きを使用します．これで，少なくとも
+     1回の使用で使用される有用な上書きパターンの全てに対して十分になりま
+     す．時間の節約のため減らしたり，時間の無駄遣いをする場合に増やすこ
+     とが可能です．
+
+`-s BYTES'
+`--size=BYTES'
+     ファイルの最初のBYTESバイトを`shred'します．デフォルトはファイル全
+     体を`shred'します．BYTESは乗数を指定するために，`k'，`M'，または`G'
+     のようなサイズ指定を続けることができます．*Note Block size::.
+
+`-u'
+`--remove'
+     ファイルを`shred'した後，(可能な場合は)それを切り詰め，そして削除し
+     ます．ファイルが複数のリンクを持つ場合，指名されたリンクのみ削除さ
+     れます．
+
+`-v'
+`--verbose'
+     バイ菌の増殖のようにステータスの表示を更新します．
+
+`-x'
+`--exact'
+     通常，`shred'は，ファイルの最後のブロックまで完全に消去するため，ファ
+     イルのサイズを，ファイルシステムのブロックサイズの次の乗数まで増加
+     します．このオプションは，その動作を抑制します．このため，デフォル
+     トでは，512バイトのブロックを持つファイルシステム上の，10バイトのファ
+     イルを`shred'する場合，結果としてファイルは512バイトになります．こ
+     のオプションを用いると，`shred'はファイルのサイズを増加させません．
+
+`-z'
+`--zero'
+     通常，`shred'の書き込みの最終動作は，ランダムデータの作成です．これ
+     が(例えば，暗号化されたデータのように見えるため)ハードディスク上で
+     目立つ場合や，より整然としたいと考える場合，`--zero'オプションは全
+     てをゼロビットを用いる上書き動作を追加します．これは，
+     `--iterations'オプションで指定した動作の数に追加します．
+
+`-'
+     標準出力を`shred'します．
+
+     この引数はオプションと見なされます．一般的な`--'オプションはコマン
+     ドラインのオプションの終りを示すために使用されますが，`-'は普通のファ
+     イルとして解釈されます．
+
+     この使用目的は，削除された一時ファイルを`shred'することです．例です．
+
+          i=`tempfile -m 0600`
+          exec 3<>"$i"
+          rm -- "$i"
+          echo "Hello, world" >&3
+          shred - >&3
+          exec 3>-
+
+     シェルコマンド`shred - >file'は，`shred'の呼び出しの前に，それが
+     FILEを切り詰めるため，FILEの内容を`shred'しないことに注意してくださ
+     い．コマンド`shred file'，または(Bourne互換シェルを使用している場合
+     は)コマンド`shred - 1<>file'を代わりに使用してください．
+
+
+最初のドライブのフロッピーディスクに作成されたファイルシステムの，全ての
+記録を消去するために，以下のコマンドを使用するかもしれません．そのコマン
+ドは，1.44MBフロッピーを消去するために，約20分かかります．
+
+     shred --verbose /dev/fd0
+
+同様に，ハードディスクの選択されたパーティションの全てのデータを消去する
+ために，以下のようなコマンドを与えることが可能です．
+
+     shred --verbose /dev/sda5
+
+
+
+
+File: fileutils-ja.info, Node: Special file types, Next: Changing file attributes, Prev: Basic operations, Up: Top
+
+特殊ファイルの形式
+******************
+
+
+この章は，特殊な形式のファイルを作成する方法(と，特殊なファイル形式の一
+つのディレクトリを削除する`rmdir'方法)を記述します．
+
+Unixのようなオペレーティングシステムには，特殊なファイル形式は，他より著
+しく少ないのですが，*すべて*が"通常のファイル"と差のないバイトストリーム
+のみとして扱うことはできません．例えば，ファイルを作成したり削除したりす
+るとき，システムはこの情報を記録する必要があり，それは"ディレクトリ"---
+特殊な形式のファイル--で行います．ディレクトリを通常のファイルとして読み
+込むこともできますが，気になる場合は，システムがその仕事を行うために，ファ
+イルのバイト上で構造，特定の順序を強制する必要があります．このためそれは
+"特殊な"形式のファイルとなります．
+
+ディレクトリ以外では，特殊なファイル形式は，名前付きパイプ(FIFO)，シンボ
+リックリンク，ソケット，そして"特殊ファイル"と呼ばれるものを含みます．
+
+* Menu:
+
+* ln invocation::               Make links between files.
+* mkdir invocation::            Make directories.
+* mkfifo invocation::           Make FIFOs (named pipes).
+* mknod invocation::            Make block or character special files.
+* rmdir invocation::            Remove empty directories.
+
+
+
+
+File: fileutils-ja.info, Node: ln invocation, Next: mkdir invocation, Prev: Special file types, Up: Special file types
+
+`ln': ファイル間にリンクを作成
+==============================
+
+
+`ln'は，ファイル間のリンクを作成します．デフォルトで，それはハードリンク
+を作成します．`-s'を用いると，シンボリック(または"ソフト") リンクを作成
+します．構文は以下のとおりです．
+
+     ln [OPTION]... TARGET [LINKNAME]
+     ln [OPTION]... TARGET... DIRECTORY
+
+
+   * 最後の引数が既存のディレクトリを示す場合，`ln'はそのディレクトリ内
+     のそれぞれのTARGETファイルに，TARGETの名前を使用しながらリンクを作
+     成します．(しかし，以下の`--no-dereference'オプションの記述を参照し
+     てください．)
+
+   * 2つのファイル名が与えられた場合，`ln'は2番目から1番目へのリンクを作
+     成します．
+
+   * 一つのTARGETが与えられた場合，`ln'は，現在のディレクトリのそのファ
+     イルにリンクを作成します．
+
+   * 最後の引数がディレクトリでなく，2つ以上のファイルが与えられた場合は
+     エラーとなります．`-f'や`-i' (以下を参照)を用いない場合, `ln'は既存
+     のファイルを削除しません．`ln'に既存のファイルの名前を変えさせるた
+     めに，`--backup'オプションを使用してください．
+
+
+"ハードリンク"は，既存のファイルの別名です．リンクとオリジナルは区別でき
+ません．技術的には，それらは同じinodeを共有し，inodeはファイルに関する必
+要な情報をすべて含みます--実際，inodeがファイル*である*と言っても間違い
+ではありません．既存のすべての実装では，ディレクトリにハードリンクを作成
+できず，ハードリンクはファイルシステム間をまたぐことができません．(しか
+しながら，これらの制限はPOSIXと一致しません．)
+
+一方，"シンボリックリンク" (短く言うと"symlinks")は，リンクファイルが実
+際には名前の異なるファイルを参照する特殊なファイル形式です(すべてのカー
+ネルがサポートしているわけではありません．System V release 3(とそれより
+古いもの)はsymlinkがありません)．ほとんどの処理(開く，読み込む，書き出す
+等)は，シンボリックリンクを通じて行われ，カーネルは自動的にリンクを
+"dereferences"し，リンク先を処理します．しかし，リンク先ではなくリンクファ
+イル自身に作用する(例えば削除)処理もあります．*Note Symbolic Links:
+(library)Symbolic Links.
+
+プログラムは以下のオプションも受け入れます．*Note Common options::,も参
+照してください．
+
+
+`-b'
+``--backup'[=METHOD]'
+     *Note Backup options::. 上書きされたり削除されたりするそれぞれのファ
+     イルのバックアップを作成します．
+
+`-d'
+`-F'
+`--directory'
+     スーパーユーザがディレクトリのハードリンクを作成できるようにします．
+
+`-f'
+`--force'
+     既存のリンク先ファイルを削除します．
+
+`-i'
+`--interactive'
+     既存リンク先ファイルを削除するかどうか，プロンプトを表示します．
+
+`-n'
+`--no-dereference'
+     明示的な，ディレクトリへのシンボリックリンクとなるリンク先が与えら
+     れたとき，リンク先を通常のファイルとして扱います．
+
+     リンク先が(シンボリックリンクではない)実際のディレクトリのとき，不
+     明瞭なものはありません．しかし，指定されたリンク先がディレクトリへ
+     のシンボリックリンクの時，ユーザの要求の扱い方は，二通りあります．
+     `ln'は，リンク先を通常のディレクトリとして扱い，それに対するリンク
+     を作成することができます．一方，リンク先を非ディレクトリ--シンボリッ
+     クリンク--として見ることもできます．その場合，`ln'は，新しいリンク
+     を作成する前に，そのシンボリックリンクを削除またはバックアップする
+     必要があります．デフォルトでは，ディレクトリへのシンボリックリンク
+     であるリンク先を，ディレクトリと同様に扱います．
+
+`-s'
+`--symbolic'
+     ハードリンクの代わりにシンボリックリンクを作成します．このオプショ
+     ンは，シンボリックリンクをサポートしていないシステムでは，単にエラー
+     メッセージを生成します．
+
+`-S SUFFIX'
+`--suffix=SUFFIX'
+     `-b'を用いて生成されるそれぞれのバックアップファイルにSUFFIX を追加
+     します．*Note Backup options::.
+
+``--target-directory'=DIRECTORY'
+     リンク先DIRECTORYを指定します．*Note Target directory::.
+
+`-v'
+`--verbose'
+     リンクする前にそれぞれのファイル名を出力します．
+
+`-V METHOD'
+`--version-control=METHOD'
+     `-b'で作成されるバックアップの形式を変更します．METHOD引数は，
+     `none' (または`off')，`numbered' (または`t')，`existing' (または
+     `nil')，または，`never' (または`simple')が可能です．*Note Backup
+     options::.
+
+
+以下は例です．
+
+     ln -s /some/name  # creates link ./name pointing to /some/name
+     ln -s /some/name myname  # creates link ./myname pointing to /some/name
+     ln -s a b ..      # creates links ../a and ../b pointing to ./a and ./b
+
+
+
+
+File: fileutils-ja.info, Node: mkdir invocation, Next: mkfifo invocation, Prev: ln invocation, Up: Special file types
+
+`mkdir': ディレクトリの作成
+===========================
+
+
+`mkdir'は指定された名前でディレクトリを作成します．構文は以下のとおりで
+す．
+
+     mkdir [OPTION]... NAME...
+
+NAMEが既存のファイルでディレクトリではない場合，`mkdir'は標準エラー出力
+に警告メッセージを出力し，残っているNAMEを処理した後，1 のステータスで終
+了します．NAMEが既存のディレクトリで，-p オプションが与えられていないと
+きも同じです．NAMEが既存のディレクトリで，-p オプションが与えられている
+場合，`mkdir'はそれを無視します．すなわち，`mkdir'は警告の出力も，エラー
+の発生も，(-m オプションが与えられていても)ディレクトリのモードの変更も
+せず，残りのNAMEの処理を続けます．
+
+プログラムは以下のオプションも受け入れます．*Note Common options::,も参
+照してください．
+
+
+`-m MODE'
+`--mode=MODE'
+     作成されるディレクトリのモードをMODEで設定し，それは`chmod'で設定す
+     る抽象的なもので，(読み書きと実行を全員に許可する)`a=rwx'から目的の
+     ポイントのためにumaskのビットセットを引いたものを使用します．*Note
+     File permissions::.
+
+`-p'
+`--parents'
+     それぞれの引数に対し，足りない親ディレクトリを作成します．親ディレ
+     クトリのモードは`u+wx'で編集されたumaskに設定します．既存のディレク
+     トリに対する引数は無視します．
+
+`-v'
+`--verbose'
+     作成されるそれぞれのディレクトリに対しメッセージを出力します．これ
+     は`--parents'とともに用いると最も便利です．
+
+
+
+
+File: fileutils-ja.info, Node: mkfifo invocation, Next: mknod invocation, Prev: mkdir invocation, Up: Special file types
+
+`mkfifo': FIFO(名前付きパイプ)の作成
+====================================
+
+
+`mkfifo'はFIFO("名前付きパイプ"とも呼ばれる)を指定された名前で作成します．
+構文は以下のとおりです．
+
+     mkfifo [OPTION] NAME...
+
+"FIFO"は，通信に依存するプロセスを可能にする特殊なファイル形式です．一つ
+のプロセスは書き込みで，もう一つは読み込みでFIFOを開き，データは，シェル
+やその他の通常の名前なしパイプのように流れます．
+
+プログラムは以下のオプションも受け入れます．*Note Common options::,も参
+照してください．
+
+
+`-m MODE'
+`--mode=MODE'
+     作成されるFIFOのモードをMODEに設定し，それは`chmod'で設定する抽象的
+     なもので，(読み込みと書き出しを全員に許可する)`a=rw'から目的のポイ
+     ントのためにumaskのビットセットを引いたものを使用します．*Note File
+     permissions::.
+
+
+
+
+
+File: fileutils-ja.info, Node: mknod invocation, Next: rmdir invocation, Prev: mkfifo invocation, Up: Special file types
+
+`mknod': ブロックやキャラクタ特殊ファイルの作成
+===============================================
+
+
+`mknod'は，FIFO，キャラクタ特殊ファイルや，ブロック特殊ファイルを指定さ
+れた名前で作成します．構文は以下のとおりです．
+
+     mknod [OPTION]... NAME TYPE [MAJOR MINOR]
+
+上記の"特殊ファイル形式"と異なり，"特殊ファイル"という用語は，Unix 上で
+技術的な意味があります．それはデータを生成または受信するものです．これは
+通常，ハードウェアの物理的な部分に対応します．(これらのファイルは通常シ
+ステム設定時に作成されます．) `mknod'コマンドは，この形式のファイルを作
+成するものです．そのようなデバイスは，一度に一文字または一度に一"ブロッ
+ク"(多くの文字)読み込むことができ，そのため，"ブロック特殊" ファイルと"
+キャラクタ特殊"ファイルがあると言っているのです．
+
+NAMEの後の引数は作成するファイルの形式を指定します．
+
+
+`p'
+     FIFOに対応します．
+
+`b'
+     ブロック特殊ファイルに対応します．
+
+`c'
+     キャラクタ特殊ファイルに対応します．
+
+
+ブロックやキャラクタ特殊ファイルを作成しているとき，メジャーとマイナーデ
+バイス番号をファイル形式の後に与える必要があります．
+
+プログラムは以下のオプションも受け入れます．*Note Common options::,も参
+照してください．
+
+
+
+`-m MODE'
+`--mode=MODE'
+     作成されるファイルのモードをMODEに設定し，それは`chmod'で設定する抽
+     象的なもので，`a=rw'から目的のポイントのためにumaskのビットセットを
+     引いたものを使用します．*Note File permissions::.
+
+
+
+
+
+File: fileutils-ja.info, Node: rmdir invocation, Prev: mknod invocation, Up: Special file types
+
+`rmdir': 空のディレクトリの削除
+===============================
+
+
+`rmdir'は空のディレクトリを削除します．構文は以下のとおりです．
+
+     rmdir [OPTION]... DIRECTORY...
+
+DIRECTORY引数が既存の空のディレクトリを参照していない場合，エラーとなり
+ます．
+
+プログラムは以下のオプションも受け入れます．*Note Common options::,も参
+照してください．
+
+
+`--ignore-fail-on-non-empty'
+     ディレクトリが空でないため，それぞれ単独であるディレクトリ削除の失
+     敗を無視します．
+
+`-p'
+`--parents'
+     DIRECTORYを削除し，それぞれのDIRECTORYの構成要素の削除を試みます．
+     そのため，例えば，`rmdir -p a/b/c'は`rmdir a/b/c a/b a' ににていま
+     す．同様に，これらのディレクトリが空でないと判明した場合は失敗しま
+     す．そのような失敗で，診断を引き起こし，`rmdir'を失敗で終了させない
+     ため，`--ignore-fail-on-non-empty'オプションを使用してください．
+
+`-v'
+`--verbose'
+     削除に成功したそれぞれの診断を与えます．DIRECTORYは削除されます．
+
+
+空でないディレクトリの(再帰的な)削除方法は，*Note rm invocation::.
+
+
+
+
+File: fileutils-ja.info, Node: Changing file attributes, Next: Disk usage, Prev: Special file types, Up: Top
+
+ファイル属性の変更
+******************
+
+
+ファイルは，その内容，名前，そしてファイル形式(*Note Special file
+types::)のみではありません．ファイルには，所有者(ユーザID)，グループ(グ
+ループID)，許可(所有者がファイルに行えること，グループの人ができること，
+そして，その他誰でもできること)，様々なタイムスタンプ，そしてその他の情
+報があります．まとめて，これらをファイルの"属性"と呼びます．
+
+これらのコマンドはファイルの属性を変更します．
+
+* Menu:
+
+* chown invocation::            Change file owners and groups.
+* chgrp invocation::            Change file groups.
+* chmod invocation::            Change access permissions.
+* touch invocation::            Change file timestamps.
+
+
+
+
+File: fileutils-ja.info, Node: chown invocation, Next: chgrp invocation, Prev: Changing file attributes, Up: Changing file attributes
+
+`chown': ファイルの所有者とグループの変更
+=========================================
+
+
+`chown'は，与えられたそれぞれのFILEのユーザと/やグループの所有権を，
+NEW-OWNERや，既存の参照ファイルのユーザとグループに変更します，構文は以
+下のとおりです．
+
+     chown [OPTION]... {NEW-OWNER | --reference=REF_FILE} FILE...
+
+NEW-OWNERが使用された場合，新しい所有者と/やグループを以下のように指定し
+ます(空白は含みません)．
+
+     [OWNER] [ [:] [GROUP] ]
+
+具体例です．
+
+OWNER
+     OWNER (ユーザ名または数値的なユーザID)のみ与えられた場合，そのユー
+     ザが与えられたそれぞれのファイルの所有者になり，ファイルのグループ
+     は変更されません．
+
+OWNER`:'GROUP
+     OWNERにコロンとGROUP (グループ名または数値的なグループID)が，それら
+     間にスペースを置かずに続く場合，ファイルのグループ所有権を(GROUPに)
+     同様に変更します．
+
+OWNER`:'
+     コロンはあるが，グループ名がOWNERに続かない場合，ユーザがファイルの
+     所有者になり，ファイルのグループはOWNERのログイングループに変更され
+     ます．
+
+`:'GROUP
+     コロンとそれに続くGROUPが与えられているが所有者が省略された場合，ファ
+     イルのグループのみ変更されます．この場合，`chown'は`chgrp' と同じ機
+     能を果たします．
+
+
+`:'セパレータの場所に`.'を使用することが可能です．これは古いスクリプトへ
+の互換性のためのGNUの拡張です．GNU `chown'は，OWNERが`.'文字を含む場合は
+失敗する可能性があるので，新しいスクリプトでは`.'の使用を避けるべきです．
+
+プログラムは以下のオプションも受け入れます．*Note Common options::,も参
+照してください．
+
+
+`-c'
+`--changes'
+     所有権が実際に変更されるそれぞれのFILEに対する動作を，冗長に記述し
+     ます．
+
+`-f'
+`--silent'
+`--quiet'
+     所有権を変更できないファイルについてのエラーメッセージを出力しませ
+     ん．
+
+``--from'=OLD-OWNER'
+     OLD-OWNERで指定されている現在の属性がある場合，FILEの所有権を変更し
+     ます．OLD-OWNERは，上記のNEW-OWNERの記述と同じ形式です．このオプショ
+     ンは，潜在的な悪習の窓をかなり狭めるという点で，セキュリティの立場
+     から主に役に立ちます．例えば，以下のように，このオプションを使用し
+     ないで，ユーザのファイルに対してUIDの変更を反映させるために，`root'
+     が実行したとします．
+
+          find / -owner OLDUSER -print0 | xargs -0 chown NEWUSER
+
+     しかし，`find'が既存のファイルの所有者をテストしたときと，`chown'が
+     実際に事項したときの間が非常に長い可能性があるので，それは危険です．
+     ギャップを小さくするひとつの方法は，それぞれのファイルに対し見つかっ
+     たときに`chown'を呼び出すことです．
+
+          find / -owner OLDUSER -exec chown NEWUSER {} \;
+
+     しかし，影響されるファイルが多い場合は，それは非常に遅くなります．
+     このオプションを用いると，(ギャップを狭めたままで)完全ではありませ
+     んが，それは安全になります．
+
+          chown -R --from=OLDUSER NEWUSER /
+
+`--dereference'
+     シンボリックリンク自身に動作せず，それが示すものに動作します．
+
+`-h'
+`--no-dereference'
+     シンボリックリンクが示すものではなく，それ自身に動作します．これは
+     デフォルトです．このモードは`lchown'システムコールに依存します．
+     `lchown'システムコールが提供されていないシステムでは，コマンドライ
+     ンで指定されるファイルがシンボリックリンクの時，`chown'は失敗します．
+     デフォルトで，再帰的な処理の間に発見されるシンボリックリンクに対す
+     る診断結果は発行されませんが，それについては`--verbose'は参照してく
+     ださい．
+
+`--reference=REF_FILE'
+     それぞれのFILEのユーザとグループを，REF_FILEと同じになるように変更
+     します．REF_FILEがシンボリックリンクの場合，シンボリックリンクのユー
+     ザとグループではなく，それが参照するファイルのものを使用します．
+
+`-v'
+`--verbose'
+     処理された全てのファイルに対し，診断結果を出力します．`lchown'シス
+     テムコールがないシステムで，再帰的な処理の間にシンボリックリンクが
+     見つかり，`--no-dereference'の影響がある場合，シンボリックリンクも
+     その参照先も変更されないことを告げる診断結果を発行します．
+
+`-R'
+`--recursive'
+     ディレクトリとその内容の所有権を再帰的に変更します．
+
+
+
+
+
+File: fileutils-ja.info, Node: chgrp invocation, Next: chmod invocation, Prev: chown invocation, Up: Changing file attributes
+
+`chgrp': グループの所有権の変更
+===============================
+
+
+`chgrp'は，それぞれの与えられたFILEのグループ所有権をGROUP(グループ名ま
+たはグループIDのどちらかで与えられるはずです)，または，既存の参照ファイ
+ルのグループに変更します．構文は以下のとおりです．
+
+     chgrp [OPTION]... {GROUP | --reference=REF_FILE} FILE...
+
+プログラムは以下のオプションも受け入れます．*Note Common options::,も参
+照してください．
+
+
+`-c'
+`--changes'
+     グループが実際に変更されているそれぞれのFILEに対し，動作を冗長に記
+     述します．
+
+`-f'
+`--silent'
+`--quiet'
+     グループを変更できなかったファイルに関するエラーメッセージを出力し
+     ません．
+
+`--dereference'
+     シンボリックリンク自身に作用するのではなく，それが指し示すものに作
+     用します．
+
+`-h'
+`--no-dereference'
+     シンボリックリンクを，それが指し示すものの代わりにそれ自身に動作し
+     ます．これはデフォルトです．このモードは`lchown'システムコールに依
+     存します．コマンドラインで指定されているファイルがシンボリックリン
+     クの時，`chgrp'は失敗します．デフォルトで，再帰的な変換の間に見つかっ
+     たシンボリックリンクに対し診断結果は発行されませんが，それについて
+     は`--verbose'を参照してください．
+
+`--reference=REF_FILE'
+     それぞれのFILEのグループを，REF_FILEと同じになるように変更します．
+     REF_FILEがシンボリックリンクの場合，シンボリックリンクのグループで
+     はなく，それが参照するファイルのものを使用します．
+
+`-v'
+`--verbose'
+     処理した全てのファイルに対し，診断結果を出力します．`lchown'システ
+     ムコールがないシステムで，再帰的な変換の間にシンボリックリンクが見
+     つかり，`--no-dereference'が有効でない場合，シンボリックリンクも参
+     照するものも変更されないことを告げる診断結果を発行します．
+
+`-R'
+`--recursive'
+     ディレクトリとその内容のグループ所有権を再帰的に変更します．
+
+
+
+
+
+File: fileutils-ja.info, Node: chmod invocation, Next: touch invocation, Prev: chgrp invocation, Up: Changing file attributes
+
+`chmod': アクセス許可の変更
+===========================
+
+
+`chmod'は指名されたファイルのアクセス許可を変更します．構文は以下のとお
+りです．
+
+     chmod [OPTION]... {MODE | --reference=REF_FILE} FILE...
+
+`chmod'システムコールはシンボリックリンクの許可を変更できないため，
+`chmod'はそれらのの許可を決して変更しません．シンボリックリンクの許可は
+決して使用されないので，これは問題ではありません．しかし，コマンドライン
+でリストアップされたそれぞれのシンボリックリンクに対し，`chmod' は指し示
+されたファイルの許可を変更します．そのかわり，再帰的にディレクトリを横断
+している間，`chmod'は，遭遇したシンボリックリンクを無視します．
+
+MODEが使用された場合，それは新しい許可を指定します．詳細は*Note File
+permissions::,のセクションを参照してください．
+
+プログラムは以下のオプションも受け入れます．*Note Common options::,も参
+照してください．
+
+
+`-c'
+`--changes'
+     許可が実際に変更されているそれぞれのFILEに対し，動作を冗長に記述し
+     ます．
+
+`-f'
+`--silent'
+`--quiet'
+     許可を変更できなかったファイルに関するエラーメッセージを出力しませ
+     ん．
+
+`-v'
+`--verbose'
+     与えられたすべてのFILEに対し，動作，非動作の冗長な記述を行います．
+
+`--reference=REF_FILE'
+     それぞれのFILEのモードを，REF_FILEと同じになるように変更します．
+     *Note File permissions::. REF_FILEがシンボリックリンクの場合，シン
+     ボリックリンクのモードではなく，それが参照するファイルのものを使用
+     します．
+
+`-R'
+`--recursive'
+     ディレクトリとその内容の許可を再帰的に変更します．
+
+
+
+
+
+File: fileutils-ja.info, Node: touch invocation, Prev: chmod invocation, Up: Changing file attributes
+
+`touch': ファイルのタイプスタンプの変更
+=======================================
+
+
+`touch'は，指定されたファイルのアクセスと/や編集された時間を変更します．
+構文は以下のとおりです．
+
+     touch [OPTION]... FILE...
+
+最初のFILEが`-t'オプションの有効な引数で，タイムスタンプが`-d'，`-r'や，
+`-t'オプションで全く与えられておらず，`--'引数が与えられていない場合，そ
+の引数はその他のファイルに対するファイル名としてではなく，時間として解釈
+されます．警告：この使用方法は時代遅れで，POSIXの将来のバージョンではそ
+れを取り消したサポートが要求されるでしょう．代わりに`-t'を使用してくださ
+い．
+
+存在しないFILEはすべて空として作成されます．
+
+アクセスと編集の時間の両方を現在の時間に変更するとき，`touch'は実行して
+いるユーザがファイルの所有者で無いが，書き込み許可があるもののタイムスタ
+ンプを変更することができます．それ以外では，ユーザはそのファイルの所有者
+である必要があります．
+
+`touch'は，ファイルの２つの時間 -- 最後のアクセスと編集 -- を変更するオ
+プションを提供しますが，実際には3番目のinodeの変更時間も同じです．これは
+ファイルの`ctime'としてよく参照されます．inodeの変更時間は，ファイルのメ
+タ情報を最後に変更された時間を表現します．一般的な例の一つは，ファイルの
+許可を変更したときです．許可の変更はファイルにアクセスしないので，atime
+を変更しませんし，ファイルも編集しないので，mtimeも変更しません．依然と
+してファイル自身の何かは変っていますが，これはどこかに記録する必要があり
+ます．これはctimeフィールドの仕事です．例えば，バックアッププログラムが
+新しい許可値まで含めてファイルの新しいコピーを作成することを可能にするた
+めに，これは必要です．他に影響しないようにファイルのctimeを編集するもう
+一つの処理は，名前の変更です．通常の処理では，ユーザがctimeフィールドを
+ユーザが指定した値に変更することは，いかなる場合でも不可能です．
+
+プログラムは以下のオプションも受け入れます．*Note Common options::,も参
+照して下さい．
+
+
+`-a'
+`--time=atime'
+`--time=access'
+`--time=use'
+     アクセス時間のみ変更します．
+
+`-c'
+`--no-create'
+     存在していないファイルを作成しません．
+
+`-d'
+`--date=time'
+     現在の時間の代わりにTIMEを指定します．それは，月名，タイムゾーン，
+     `am'と`pm'等を含むことができます．*Note Date input formats::.
+
+`-f'
+     無視されます．BSD版の`touch'の互換性のためです．
+
+`-m'
+`--time=mtime'
+`--time=modify'
+     編集時間のみ変更します．
+
+`-r FILE'
+`--reference=FILE'
+     現在の時間の代わりに参照FILEの時間を使用します．
+
+`-t [[CC]YY]MMDDhhmm[.ss]'
+     現在の時間の代わりに引数(オプションの4桁または2桁の年，月，日，時間，分，
+     オプションの秒)を使用します．年が2桁のみで指定された場合，CCは，0
+     ... 68に対し20，69 ... 99に対し19になります．年の数字が指定され
+     ない場合，今年の日付として解釈されます．
+
+
+
+
+
+File: fileutils-ja.info, Node: Disk usage, Next: Index, Prev: Changing file attributes, Up: Top
+
+ディクスの使用
+**************
+
+
+無限の量のデータを保てるディスクはありません．これらのコマンドは，ディス
+クストレージの使用や利用可能な量を報告します．(これは*メインメモリ*，す
+なわち，プログラムが実行時に使用するRAMの量に対しては重要なことはしませ
+ん．そのため，`ps'や`pstat'や`swap'やそのようなコマンドが必要です．)
+
+* Menu:
+
+* df invocation::               Report filesystem disk space usage.
+* du invocation::               Estimate file space usage.
+* sync invocation::             Synchronize memory and disk.
+
+
+
+
+File: fileutils-ja.info, Node: df invocation, Next: du invocation, Prev: Disk usage, Up: Disk usage
+
+`df': ファイルシステムのディスクスペースの使用の報告
+====================================================
+
+
+`df'は，ファイルシステムの使用されているディスクスペースと利用可能なディ
+スクスペースの量を報告します．構文は以下のとおりです．
+
+     df [OPTION]... [FILE]...
+
+引数を用いない場合，`df'は現在マウントされている(すべての形式の)すべての
+ファイルシステムの使用されている，そして利用可能な空間を報告します．それ
+以外では，`df'はそれぞれの引数のFILEを含むファイルシステム上の内容を報告
+します．
+
+通常ディスクスペースは1024単位で出力されますが，これに優先することもでき
+ます(*Note Block size::)．
+
+引数のFILEがマウントされているファイルシステムを含むディスクデバイスファ
+イルの場合，`df'はデバイスノードを含むファイルシステム(すなわちルートファ
+イルシステム)ではなく，そのファイルシステムの利用可能な空間を表示します．
+GNU `df'は，マウントしていないファイルシステムのディスクの使用を決定する
+ことは，ほとんどのシステムでファイルシステム構造の極めて移植性のない緻密
+な知識を必要とするため，そうしようとしません．
+
+プログラムは以下のオプションも受け入れます．*Note Common options::,も参
+照してください．
+
+
+`-a'
+`--all'
+     0ブロックの大きさのファイルシステムをリストに含め，それはデフォルト
+     では省略されます．そのようなファイルシステムは，通常は自動マウント
+     エントリーのような，特定の目的の疑似ファイルシステムです．また，サ
+     ポートされているシステムもある"ignore"や"auto"形式のファイルシステ
+     ムは，このオプションが指定されたときのみ含まれます．
+
+`-h'
+`--human-readable'
+     それぞれのサイズに，メガバイトに対する`M'のようなサイズ文字を追加し
+     ます．1024倍が使用され，1000ではありません．`M'は1,048,576バイトを
+     意味します．1000倍を好む場合は`-H'や`--si'オプションを使用してくだ
+     さい．
+
+`-H'
+`--si'
+     それぞれのサイズに，メガバイトに対する`M'のようなサイズ文字を追加し
+     ます．(SIは国際単位系で，それはこれらの文字をの接頭辞として定義して
+     います．)1000倍が使用され，1024ではありません．`M'は1,000,000バイト
+     を意味します．1024倍を好む場合は`-h'や`--human-readable'オプション
+     を使用してください．
+
+`-i'
+`--inodes'
+     ブロックの使用の代わりに，inode使用の情報をリストアップします．
+     inode(index nodeの省略)は，ファイルに関する，所有者，許可，タイムス
+     タンプ，そしてディスクの位置のような情報を含みます．
+
+`-k'
+`--kilobytes'
+     1024バイトブロックで出力し，デフォルトのブロックサイズに優先します
+     (*Note Block size::)．
+
+`-l'
+`--local'
+     ローカルファイルシステムのリストに制限します．デフォルトではリモー
+     トファイルシステムもリストアップされます．
+
+`-m'
+`--megabytes'
+     メガバイト(すなわち1,048,576バイト)ブロックでサイズを出力します．
+
+`--no-sync'
+     あらゆる使用データの取得前に`sync'システムコールを呼び出しません．
+     これは多くのディスクを持つシステム上で`df'の実行をかなり速くするか
+     もしれませんが，システム(特にSunOS)によっては，結果がわずかに時代遅
+     れになるかもしれません．これはデフォルトです．
+
+`-P'
+`--portability'
+     POSIX出力形式を使用します．これは，以下を除いてデフォルトの書式に似
+     ています．
+
+       1. それぞれのファイルシステムの情報は常に正確に1行で出力されます．
+          マウントデバイスはその行に置かれません．これはマウントデバイス
+          の名前が20文字以上(例えば，いくつかのネットワークマウント)の場
+          合，列がきちんと並ばないことを意味します．
+
+       2. 整数でない値は，切り捨てや，最も近い整数にされるのではなく，切
+          り上げられます．
+
+       3. ヘッダ出力行のラベルは，POSIXに従い変更されます．
+
+`--sync'
+     あらゆる使用データの取得前に`sync'システムコールを呼び出します．シ
+     ステム(特にSunOS)によっては，こうすることで結果がより最新のものにな
+     りますが，一般的に言って，特に多くのまたは非常に忙しいファイルシス
+     テムがあるとき，このオプションで`df'はかなり遅くなります．
+
+`-t FSTYPE'
+`--type=FSTYPE'
+     FSTYPE形式のファイルシステムのリストに制限します．複数のファイルシ
+     ステム形式は，複数の`-t'オプションを与えることで指定できます．デフォ
+     ルトでは何も省略されません．
+
+`-T'
+`--print-type'
+     それぞれのファイルシステムの形式を出力します．ここで出力される形式
+     は，`-t'と`-x'オプションで含めたり除外したりできるものと同じです．
+     出力される特定の形式は，システムでサポートしているものすべてです．
+     ここに共通の名前がいくつかあります(このリストはもちろん網羅的なもの
+     ではありません)．
+
+
+     `nfs'
+          NFSファイルシステム，すなわち，他のマシンからネットワークでマ
+          ウントされたものです．これは，すべてのシステムで同じように使用
+          されると思われる，一つの形式の名前です．
+
+     `4.2, ufs, efs...'
+          ローカルにマウントされたハードディスクのファイルシステムです．
+          (システムはこれらの一つ以上のものをサポートするかもしれません．
+          Linuxはそうです．)
+
+     `hsfs, cdfs'
+          CD-ROMドライブのファイルシステムです．HP-UXは`cdfs'を使用し，
+          その他のほとんどのシステムは`hsfs' (`hs'は"High Sierra"です)を
+          使用します．
+
+     `pcfs'
+          MS-DOSのファイルシステムで，通常ディスケット上です．
+
+
+`-x FSTYPE'
+`--exclude-type=FSTYPE'
+     FSTYPE形式でないファイルシステムにリストを制限します．複数のファイ
+     ルシステムの形式は，複数の`-x'オプションを使用することで排除できま
+     す．デフォルトでは省略されるファイルシステム形式はありません．
+
+`-v'
+     無視されます．System V版の`df'への互換性のためです．
+
+
+
+
+
+File: fileutils-ja.info, Node: du invocation, Next: sync invocation, Prev: df invocation, Up: Disk usage
+
+`du': ファイルスペースの使用を推定
+==================================
+
+
+`du'は，指定されたファイルとそれぞれの(ディレクトリ引数の)サブディレクト
+リが使用しているディスクスペースの量を報告します．構文は以下のとおりです．
+
+     du [OPTION]... [FILE]...
+
+引数を用いない場合，`du'は現在のディレクトリのディスクスペースを報告しま
+す．通常，ディスクスペースは1024バイト単位で出力されますが，これに優先す
+ることもできます(*Note Block size::)．
+
+プログラムは以下のオプションも受け入れます．*Note Common options::,も参
+照してください．
+
+
+`-a'
+`--all'
+     ディレクトリだけでなく，すべてのファイルを数えたものを表示します．
+
+`-b'
+`--bytes'
+     バイトで大きさを出力し，それはデフォルトのブロックサイズに優先しま
+     す(*Note Block size::)．
+
+`-c'
+`--total'
+     すべての引数を処理した後，すべての引数の合計を出力します．これは，
+     与えられたファイルやディレクトリの集合の，ディスク使用の合計を知る
+     ために使用可能です．
+
+`-D'
+`--dereference-args'
+     コマンドライン引数のシンボリックリンク自身を参照しません．その他の
+     シンボリックリンクには影響しません．これは，`/usr/tmp'のようにシン
+     ボリックリンクにされることが多いディレクトリのディスク使用を知りた
+     いとき，役に立ちます．
+
+`-h'
+`--human-readable'
+     それぞれのサイズに，メガバイトに対する`M'のようなサイズ文字を追加し
+     ます．1024倍が使用され，1000ではありません．`M'は1,048,576バイトを
+     意味します．1000倍を好む場合は`-H'や`--si'オプションを使用してくだ
+     さい．
+
+`-H'
+`--si'
+     それぞれのサイズに，メガバイトに対する`M'のようなサイズ文字を追加し
+     ます．(SIは国際単位系で，それはこれらの文字をの接頭辞として定義して
+     います．)1000倍が使用され，1024ではありません．`M'は1,000,000バイト
+     を意味します．1024倍を好む場合は`-h'や`--human-readable'オプション
+     を使用してください．
+
+`-k'
+`--kilobytes'
+     1024バイトブロックで出力し，デフォルトのブロックサイズに優先します
+     (*Note Block size::)．
+
+`-l'
+`--count-links'
+     すでに(ハードリンクとして)現れていた場合でも，すべてのファイルのサ
+     イズを計算します．
+
+`-L'
+`--dereference'
+     シンボリックリンク自身を参照しません(リンクで使用しているスペースの
+     代わりに，リンクが示すファイルやディレクトリが使用しているディスク
+     スペースを表示します)．
+
+`--max-depth=DEPTH'
+     階層のルートから最大MAX_DEPTHレベルまで降りて，それぞれのディレクトリ(と--
+     allの場合はファイル)の合計を表示します．ルートはレベル０なので，`du
+     --max-depth=0'は`du -s'と同じです．
+
+`-m'
+`--megabytes'
+     メガバイト(すなわち1,048,576バイト)ブロックでサイズを出力します．
+
+
+`-s'
+`--summarize'
+     それぞれの引数の合計のみ表示します．
+
+`-S'
+`--separate-dirs'
+     サブディレクトリのサイズを含めず，それぞれのディレクトリのサイズを
+     別々に報告します．
+
+`-x'
+`--one-file-system'
+     処理を開始した引数のディレクトリと異なるファイルシステムを省略しま
+     す．
+
+`--exclude=PAT'
+     循環しているとき，PATに一致するサブディレクトリやファイルを省略しま
+     す．例えば，`du --exclude='*.o''は`.o'で終わる名前のファイルを除外
+     します．
+
+`-X FILE'
+`--exclude-from=FILE'
+     除外するパターンをFILEから受け取る以外，`--exclude'に似ています．
+     FILEが`-'の場合，標準入力からパターンを受け取ります．
+
+
+BSDシステムでは，HP-UXシステムからのNFSマウントされているファイルの正し
+い値の半分のサイズを，`du'は報告します．HP-UXシステムでは，BSDシステムか
+らのNFSマウントされているファイルの正しい値の２倍のサイズを報告します．
+これはHP-UXの欠陥です．それはHP-UX `du'プログラムにも影響します．
+
+
+
+
+File: fileutils-ja.info, Node: sync invocation, Prev: du invocation, Up: Disk usage
+
+`sync': ディスクのデータとメモリの同期
+======================================
+
+
+`sync'は，メモリに蓄えられたあらゆるデータをディスクに書き出します．これ
+は，(制限はあるものの)編集されたスーパーブロック，編集されたinode，そし
+て遅延された読み書きを含むはずです．これはカーネルで実装されている必要が
+あります．`sync'プログラムは，`sync'システムコールの行使以外，何もしませ
+ん．
+
+カーネルは，(相対的に遅い)ディクスの読み書きを避けるため，メモリのデータ
+をそのままにします．これはパフォーマンスを改善しますが，コンピュータが壊
+れた場合，結果としてデータが失われたり，ファイルシステムが壊れるかもしれ
+ません．`sync'は，メモリにあるものすべてがディスクに書かれることを確実に
+します．
+
+単独の`--help'や`--version' (*Note Common options::)以外のあらゆるオプショ
+ンは無視されます．
+
+
+
+
+File: fileutils-ja.info, Node: Index, Prev: Disk usage, Up: Top
+
+索引
+****
+
+
+* Menu:
+
+* crashes and corruption:       sync invocation.        12.
+* inodes, written buffered:     sync invocation.        6.
+* superblock, writing:          sync invocation.        6.
+* synchronize disk and memory:  sync invocation.        5.
+* sync:                         sync invocation.        5.
+* NFS mounts from BSD to HP-UX: du invocation.          107.
+* excluding files from `du':    du invocation.          133.
+* --exclude-from=FILE:          du invocation.          133.
+* -X FILE:                      du invocation.          133.
+* excluding files from `du':    du invocation.          125.
+* --exclude=PAT:                du invocation.          125.
+* one filesystem, restricting `du' to: du invocation.   120.
+* --one-file-system:            du invocation.          120.
+* -x:                           du invocation.          120.
+* --separate-dirs:              du invocation.          113.
+* -S:                           du invocation.          113.
+* --summarize:                  du invocation.          107.
+* -s:                           du invocation.          107.
+* megabytes for filesystem sizes: du invocation.        100.
+* --megabytes:                  du invocation.          100.
+* -m:                           du invocation.          100.
+* limiting output of `du':      du invocation.          92.
+* --max-depth=DEPTH:            du invocation.          92.
+* symbolic links, dereferencing in `du': du invocation.  86.
+* --dereference:                du invocation.          86.
+* -L:                           du invocation.          86.
+* hard links, counting in `du': du invocation.          79.
+* --count-links:                du invocation.          79.
+* -l:                           du invocation.          79.
+* --kilobytes:                  du invocation.          72.
+* -k:                           du invocation.          72.
+* SI output:                    du invocation.          62.
+* --si:                         du invocation.          62.
+* -H:                           du invocation.          62.
+* human-readable output:        du invocation.          53.
+* --human-readable:             du invocation.          53.
+* -h:                           du invocation.          53.
+* --dereference-args:           du invocation.          44.
+* -D:                           du invocation.          44.
+* grand total of disk space:    du invocation.          36.
+* --total:                      du invocation.          36.
+* -c:                           du invocation.          36.
+* --bytes:                      du invocation.          29.
+* -b:                           du invocation.          29.
+* --all:                        du invocation.          23.
+* -a:                           du invocation.          23.
+* disk usage for files:         du invocation.          5.
+* file space usage:             du invocation.          5.
+* du:                           du invocation.          5.
+* --exclude-type:               df invocation.          160.
+* -x:                           df invocation.          160.
+* pcfs:                         df invocation.          157.
+* diskette filesystem:          df invocation.          157.
+* MS-DOS filesystem:            df invocation.          157.
+* DOS filesystem:               df invocation.          157.
+* PC filesystem:                df invocation.          157.
+* cdfs filesystem type:         df invocation.          151.
+* hsfs filesystem type:         df invocation.          151.
+* High Sierra filesystem:       df invocation.          151.
+* CD-ROM filesystem type:       df invocation.          151.
+* efs filesystem type:          df invocation.          145.
+* ufs filesystem type:          df invocation.          145.
+* 4.2 filesystem type:          df invocation.          145.
+* local filesystem types:       df invocation.          145.
+* Linux filesystem types:       df invocation.          145.
+* NFS filesystem type:          df invocation.          139.
+* filesystem types, printing:   df invocation.          130.
+* --print-type:                 df invocation.          130.
+* -T:                           df invocation.          130.
+* filesystem types, limiting output to certain: df invocation.  122.
+* --type:                       df invocation.          122.
+* -t:                           df invocation.          122.
+* filesystem space, retrieving current data more slowly: df invocation.  113.
+* --sync:                       df invocation.          113.
+* output format, portable:      df invocation.          98.
+* portable output format:       df invocation.          98.
+* POSIX output format:          df invocation.          98.
+* one-line output format:       df invocation.          98.
+* --portability:                df invocation.          98.
+* -P:                           df invocation.          98.
+* filesystem space, retrieving old data more quickly: df invocation.  89.
+* --no-sync:                    df invocation.          89.
+* megabytes for filesystem sizes: df invocation.        85.
+* --megabytes:                  df invocation.          85.
+* -m:                           df invocation.          85.
+* filesystem types, limiting output to certain: df invocation.  78.
+* --local:                      df invocation.          78.
+* -l:                           df invocation.          78.
+* kilobytes for filesystem sizes: df invocation.        71.
+* --kilobytes:                  df invocation.          71.
+* -k:                           df invocation.          71.
+* inode usage:                  df invocation.          63.
+* --inodes:                     df invocation.          63.
+* -i:                           df invocation.          63.
+* SI output:                    df invocation.          53.
+* --si:                         df invocation.          53.
+* -H:                           df invocation.          53.
+* human-readable output:        df invocation.          44.
+* --human-readable:             df invocation.          44.
+* -h:                           df invocation.          44.
+* ignore filesystems:           df invocation.          34.
+* automounter filesystems:      df invocation.          34.
+* --all:                        df invocation.          34.
+* -a:                           df invocation.          34.
+* device file, disk:            df invocation.          19.
+* disk device file:             df invocation.          19.
+* disk usage by filesystem:     df invocation.          5.
+* filesystem disk usage:        df invocation.          5.
+* df:                           df invocation.          5.
+* disk usage:                   Disk usage.             5.
+* --reference:                  touch invocation.       81.
+* -r:                           touch invocation.       81.
+* modify time, changing:        touch invocation.       75.
+* mtime, changing:              touch invocation.       75.
+* --time:                       touch invocation.       75.
+* -m:                           touch invocation.       75.
+* BSD `touch' compatibility:    touch invocation.       67.
+* -f:                           touch invocation.       67.
+* time:                         touch invocation.       62.
+* --date:                       touch invocation.       62.
+* -d:                           touch invocation.       62.
+* --no-create:                  touch invocation.       56.
+* -c:                           touch invocation.       56.
+* use time, changing:           touch invocation.       50.
+* access time, changing:        touch invocation.       50.
+* atime, changing:              touch invocation.       50.
+* --time:                       touch invocation.       50.
+* -a:                           touch invocation.       50.
+* permissions, for changing file timestamps: touch invocation.  20.
+* empty files, creating:        touch invocation.       18.
+* timestamps, changing file:    touch invocation.       5.
+* file timestamps, changing:    touch invocation.       5.
+* changing file timestamps:     touch invocation.       5.
+* touch:                        touch invocation.       5.
+* recursively changing access permissions: chmod invocation.  58.
+* --recursive:                  chmod invocation.       58.
+* -R:                           chmod invocation.       58.
+* --reference:                  chmod invocation.       49.
+* --verbose:                    chmod invocation.       45.
+* -v:                           chmod invocation.       45.
+* error messages, omitting:     chmod invocation.       38.
+* --quiet:                      chmod invocation.       38.
+* --silent:                     chmod invocation.       38.
+* -f:                           chmod invocation.       38.
+* --changes:                    chmod invocation.       29.
+* -c:                           chmod invocation.       29.
+* symbolic links, permissions of: chmod invocation.     11.
+* permissions, changing access: chmod invocation.       5.
+* access permissions, changing: chmod invocation.       5.
+* changing access permissions:  chmod invocation.       5.
+* chmod:                        chmod invocation.       5.
+* recursively changing group ownership: chgrp invocation.  67.
+* --recursive:                  chgrp invocation.       67.
+* -R:                           chgrp invocation.       67.
+* --verbose:                    chgrp invocation.       58.
+* -v:                           chgrp invocation.       58.
+* --reference:                  chgrp invocation.       50.
+* lchown:                       chgrp invocation.       41.
+* symbolic links, changing group: chgrp invocation.     41.
+* --no-dereference:             chgrp invocation.       41.
+* -h:                           chgrp invocation.       41.
+* lchown:                       chgrp invocation.       34.
+* symbolic links, changing owner: chgrp invocation.     34.
+* --dereference:                chgrp invocation.       34.
+* error messages, omitting:     chgrp invocation.       29.
+* --quiet:                      chgrp invocation.       29.
+* --silent:                     chgrp invocation.       29.
+* -f:                           chgrp invocation.       29.
+* changed files, verbosely describing: chgrp invocation.  20.
+* --changes:                    chgrp invocation.       20.
+* -c:                           chgrp invocation.       20.
+* changing group ownership:     chgrp invocation.       5.
+* group ownership, changing:    chgrp invocation.       5.
+* chgrp:                        chgrp invocation.       5.
+* recursively changing file ownership: chown invocation.  123.
+* --recursive:                  chown invocation.       123.
+* -R:                           chown invocation.       123.
+* --verbose:                    chown invocation.       114.
+* -v:                           chown invocation.       114.
+* --reference:                  chown invocation.       106.
+* lchown:                       chown invocation.       96.
+* symbolic links, changing owner: chown invocation.     96.
+* --no-dereference:             chown invocation.       96.
+* -h:                           chown invocation.       96.
+* lchown:                       chown invocation.       90.
+* symbolic links, changing owner: chown invocation.     90.
+* --dereference:                chown invocation.       90.
+* symbolic links, changing owner: chown invocation.     66.
+* --from:                       chown invocation.       66.
+* error messages, omitting:     chown invocation.       61.
+* --quiet:                      chown invocation.       61.
+* --silent:                     chown invocation.       61.
+* -f:                           chown invocation.       61.
+* changed owners, verbosely describing: chown invocation.  52.
+* --changes:                    chown invocation.       52.
+* -c:                           chown invocation.       52.
+* changing group ownership:     chown invocation.       5.
+* changing file ownership:      chown invocation.       5.
+* group ownership, changing:    chown invocation.       5.
+* file ownership, changing:     chown invocation.       5.
+* chown:                        chown invocation.       5.
+* attributes, file:             Changing file attributes.  5.
+* file attributes, changing:    Changing file attributes.  5.
+* changing file attributes:     Changing file attributes.  5.
+* directory deletion, reporting: rmdir invocation.      36.
+* --verbose:                    rmdir invocation.       36.
+* -v:                           rmdir invocation.       36.
+* parent directories, removing: rmdir invocation.       26.
+* --parents:                    rmdir invocation.       26.
+* -p:                           rmdir invocation.       26.
+* directory deletion, ignoring failures: rmdir invocation.  19.
+* --ignore-fail-on-non-empty:   rmdir invocation.       19.
+* directories, removing empty:  rmdir invocation.       5.
+* removing empty directories:   rmdir invocation.       5.
+* rmdir:                        rmdir invocation.       5.
+* --mode:                       mknod invocation.       44.
+* -m:                           mknod invocation.       44.
+* c for character special file: mknod invocation.       32.
+* b for block special file:     mknod invocation.       28.
+* p for FIFO file:              mknod invocation.       24.
+* character special files:      mknod invocation.       11.
+* block special files:          mknod invocation.       11.
+* special files:                mknod invocation.       11.
+* character special files, creating: mknod invocation.  5.
+* block special files, creating: mknod invocation.      5.
+* mknod:                        mknod invocation.       5.
+* modes of created FIFOs, setting: mkfifo invocation.   23.
+* --mode:                       mkfifo invocation.      23.
+* -m:                           mkfifo invocation.      23.
+* creating FIFOs (named pipes): mkfifo invocation.      5.
+* named pipes, creating:        mkfifo invocation.      5.
+* FIFOs, creating:              mkfifo invocation.      5.
+* mkfifo:                       mkfifo invocation.      5.
+* --verbose:                    mkdir invocation.       44.
+* -v:                           mkdir invocation.       44.
+* parent directories, creating: mkdir invocation.       36.
+* --parents:                    mkdir invocation.       36.
+* -p:                           mkdir invocation.       36.
+* modes of created directories, setting: mkdir invocation.  27.
+* --mode:                       mkdir invocation.       27.
+* -m:                           mkdir invocation.       27.
+* creating directories:         mkdir invocation.       5.
+* directories, creating:        mkdir invocation.       5.
+* mkdir:                        mkdir invocation.       5.
+* --version-control:            ln invocation.          124.
+* -V:                           ln invocation.          124.
+* --verbose:                    ln invocation.          118.
+* -v:                           ln invocation.          118.
+* destination directory:        ln invocation.          112.
+* target directory:             ln invocation.          112.
+* --target-directory:           ln invocation.          112.
+* --suffix:                     ln invocation.          107.
+* -S:                           ln invocation.          107.
+* --symbolic:                   ln invocation.          99.
+* -s:                           ln invocation.          99.
+* --no-dereference:             ln invocation.          82.
+* -n:                           ln invocation.          82.
+* prompting, and `ln':          ln invocation.          76.
+* --interactive:                ln invocation.          76.
+* -i:                           ln invocation.          76.
+* --force:                      ln invocation.          70.
+* -f:                           ln invocation.          70.
+* hard links to directories:    ln invocation.          64.
+* --directory:                  ln invocation.          64.
+* -F:                           ln invocation.          64.
+* -d:                           ln invocation.          64.
+* backups, making:              ln invocation.          55.
+* VERSION_CONTROL:              ln invocation.          55.
+* --backup:                     ln invocation.          55.
+* -b:                           ln invocation.          55.
+* symbolic link, defined:       ln invocation.          38.
+* dereferencing symbolic links: ln invocation.          38.
+* inode, and hard links:        ln invocation.          31.
+* hard link, defined:           ln invocation.          31.
+* filesystems and hard links:   ln invocation.          6.
+* creating links (hard or soft): ln invocation.         5.
+* symbolic (soft) links, creating: ln invocation.       5.
+* hard links, creating:         ln invocation.          5.
+* links, creating:              ln invocation.          5.
+* ln:                           ln invocation.          5.
+* file types:                   Special file types.     9.
+* special file types:           Special file types.     9.
+* file types, special:          Special file types.     5.
+* special file types:           Special file types.     5.
+* -:                            shred invocation.       145.
+* --zero:                       shred invocation.       137.
+* -z:                           shred invocation.       137.
+* --exact:                      shred invocation.       126.
+* -x:                           shred invocation.       126.
+* --verbose:                    shred invocation.       120.
+* -v:                           shred invocation.       120.
+* removing files after shredding: shred invocation.     112.
+* --remove:                     shred invocation.       112.
+* -u:                           shred invocation.       112.
+* size of file to shred:        shred invocation.       104.
+* --size=BYTES:                 shred invocation.       104.
+* -s BYTES:                     shred invocation.       104.
+* iterations, selecting the number of: shred invocation.  95.
+* --iterations=NUMBER:          shred invocation.       95.
+* -n NUMBER:                    shred invocation.       95.
+* force deletion:               shred invocation.       87.
+* --force:                      shred invocation.       87.
+* -f:                           shred invocation.       87.
+* erasing data:                 shred invocation.       5.
+* data, erasing:                shred invocation.       5.
+* shred:                        shred invocation.       5.
+* - and Unix `rm':              rm invocation.          63.
+* `-', removing files beginning with: rm invocation.    51.
+* files beginning with `-', removing: rm invocation.    51.
+* --verbose:                    rm invocation.          59.
+* -v:                           rm invocation.          59.
+* directories, removing (recursively): rm invocation.   53.
+* --recursive:                  rm invocation.          53.
+* -R:                           rm invocation.          53.
+* -r:                           rm invocation.          53.
+* --interactive:                rm invocation.          43.
+* -i:                           rm invocation.          43.
+* --force:                      rm invocation.          36.
+* -f:                           rm invocation.          36.
+* fsck:                         rm invocation.          25.
+* unlink:                       rm invocation.          25.
+* directories, removing with `unlink': rm invocation.   25.
+* --directory:                  rm invocation.          25.
+* -d:                           rm invocation.          25.
+* prompting, and `rm':          rm invocation.          11.
+* removing files or directories: rm invocation.         5.
+* rm:                           rm invocation.          5.
+* --version-control:            mv invocation.          100.
+* -V:                           mv invocation.          100.
+* destination directory:        mv invocation.          94.
+* target directory:             mv invocation.          94.
+* --target-directory:           mv invocation.          94.
+* --suffix:                     mv invocation.          89.
+* -S:                           mv invocation.          89.
+* stripping trailing slashes:   mv invocation.          82.
+* --strip-trailing-slashes:     mv invocation.          82.
+* --verbose:                    mv invocation.          78.
+* -v:                           mv invocation.          78.
+* newer files, moving only:     mv invocation.          71.
+* --update:                     mv invocation.          71.
+* -u:                           mv invocation.          71.
+* prompts, forcing:             mv invocation.          63.
+* --interactive:                mv invocation.          63.
+* -i:                           mv invocation.          63.
+* prompts, omitting:            mv invocation.          56.
+* --force:                      mv invocation.          56.
+* -f:                           mv invocation.          56.
+* backups, making:              mv invocation.          49.
+* VERSION_CONTROL:              mv invocation.          49.
+* --backup:                     mv invocation.          49.
+* -b:                           mv invocation.          49.
+* prompting, and `mv':          mv invocation.          30.
+* mv:                           mv invocation.          5.
+* --version-control:            install invocation.     113.
+* -V:                           install invocation.     113.
+* --verbose:                    install invocation.     107.
+* -v:                           install invocation.     107.
+* destination directory:        install invocation.     101.
+* target directory:             install invocation.     101.
+* --target-directory:           install invocation.     101.
+* --suffix:                     install invocation.     96.
+* -S:                           install invocation.     96.
+* stripping symbol table information: install invocation.  89.
+* symbol table information, stripping: install invocation.  89.
+* --strip:                      install invocation.     89.
+* -s:                           install invocation.     89.
+* timestamps of installed files, preserving: install invocation.  77.
+* --preserve-timestamps:        install invocation.     77.
+* -p:                           install invocation.     77.
+* root as default owner:        install invocation.     69.
+* appropriate privileges:       install invocation.     69.
+* ownership of installed files, setting: install invocation.  69.
+* --owner:                      install invocation.     69.
+* -o:                           install invocation.     69.
+* permissions of installed files, setting: install invocation.  60.
+* --mode:                       install invocation.     60.
+* -m:                           install invocation.     60.
+* group ownership of installed files, setting: install invocation.  52.
+* --group:                      install invocation.     52.
+* -g:                           install invocation.     52.
+* leading directories, creating missing: install invocation.  42.
+* parent directories, creating missing: install invocation.  42.
+* directories, creating with given attributes: install invocation.  42.
+* --directory:                  install invocation.     42.
+* -d:                           install invocation.     42.
+* -c:                           install invocation.     36.
+* backups, making:              install invocation.     31.
+* VERSION_CONTROL:              install invocation.     31.
+* --backup:                     install invocation.     31.
+* -b:                           install invocation.     31.
+* Makefiles, installing programs in: install invocation.  18.
+* copying files and setting attributes: install invocation.  5.
+* install:                      install invocation.     5.
+* sync (padding with nulls):    dd invocation.          129.
+* truncating output file, avoiding: dd invocation.      125.
+* notrunc:                      dd invocation.          125.
+* read errors, ignoring:        dd invocation.          121.
+* noerror:                      dd invocation.          121.
+* byte-swapping:                dd invocation.          115.
+* swab (byte-swapping):         dd invocation.          115.
+* ucase, converting to:         dd invocation.          111.
+* lcase, converting to:         dd invocation.          107.
+* unblock:                      dd invocation.          102.
+* block (space-padding):        dd invocation.          97.
+* alternate ebcdic, converting to: dd invocation.       93.
+* ebcdic, converting to:        dd invocation.          89.
+* ascii, converting to:         dd invocation.          85.
+* conv:                         dd invocation.          77.
+* count:                        dd invocation.          72.
+* seek:                         dd invocation.          67.
+* skip:                         dd invocation.          62.
+* conversion block size:        dd invocation.          58.
+* block size of conversion:     dd invocation.          58.
+* cbs:                          dd invocation.          58.
+* block size:                   dd invocation.          54.
+* bs:                           dd invocation.          54.
+* output block size:            dd invocation.          50.
+* block size of output:         dd invocation.          50.
+* obs:                          dd invocation.          50.
+* input block size:             dd invocation.          46.
+* block size of input:          dd invocation.          46.
+* ibs:                          dd invocation.          46.
+* of:                           dd invocation.          40.
+* if:                           dd invocation.          36.
+* multipliers after numbers:    dd invocation.          15.
+* converting while copying a file: dd invocation.       5.
+* dd:                           dd invocation.          5.
+* filesystems, omitting copying to different: cp invocation.  237.
+* --one-file-system:            cp invocation.          237.
+* -x:                           cp invocation.          237.
+* --version-control:            cp invocation.          229.
+* -V:                           cp invocation.          229.
+* --verbose:                    cp invocation.          223.
+* -v:                           cp invocation.          223.
+* destination directory:        cp invocation.          217.
+* target directory:             cp invocation.          217.
+* --target-directory:           cp invocation.          217.
+* --suffix:                     cp invocation.          212.
+* -S:                           cp invocation.          212.
+* symbolic links, copying with: cp invocation.          202.
+* --symbolic-link:              cp invocation.          202.
+* -s:                           cp invocation.          202.
+* stripping trailing slashes:   cp invocation.          195.
+* --strip-trailing-slashes:     cp invocation.          195.
+* read system call, and holes:  cp invocation.          170.
+* holes, copying files with:    cp invocation.          170.
+* sparse files, copying:        cp invocation.          170.
+* --sparse=WHEN:                cp invocation.          170.
+* --remove-destination:         cp invocation.          165.
+* --recursive:                  cp invocation.          160.
+* -R:                           cp invocation.          160.
+* non-directories, copying as special files: cp invocation.  144.
+* recursively copying directories: cp invocation.       144.
+* copying directories recursively: cp invocation.       144.
+* directories, copying recursively: cp invocation.      144.
+* parent directories and `cp':  cp invocation.          128.
+* --parents:                    cp invocation.          128.
+* -P:                           cp invocation.          128.
+* file information, preserving: cp invocation.          119.
+* --preserve:                   cp invocation.          119.
+* -p:                           cp invocation.          119.
+* --dereference:                cp invocation.          113.
+* -L:                           cp invocation.          113.
+* --link:                       cp invocation.          107.
+* -l:                           cp invocation.          107.
+* --interactive:                cp invocation.          100.
+* -i:                           cp invocation.          100.
+* -H:                           cp invocation.          91.
+* --force:                      cp invocation.          81.
+* -f:                           cp invocation.          81.
+* hard links, preserving:       cp invocation.          73.
+* symbolic links, copying:      cp invocation.          73.
+* --no-dereference:             cp invocation.          73.
+* -d:                           cp invocation.          73.
+* backups, making:              cp invocation.          55.
+* VERSION_CONTROL:              cp invocation.          55.
+* --backup:                     cp invocation.          55.
+* -b:                           cp invocation.          55.
+* --archive:                    cp invocation.          46.
+* -a:                           cp invocation.          46.
+* backups, making only:         cp invocation.          33.
+* self-backups:                 cp invocation.          33.
+* directories, copying:         cp invocation.          5.
+* files, copying:               cp invocation.          5.
+* copying files and directories: cp invocation.         5.
+* cp:                           cp invocation.          5.
+* manipulating files:           Basic operations.       5.
+* printing color database:      dircolors invocation.   45.
+* database for color setup, printing: dircolors invocation.  45.
+* color database, printing:     dircolors invocation.   45.
+* --print-database:             dircolors invocation.   45.
+* -p:                           dircolors invocation.   45.
+* `csh' syntax for color setup: dircolors invocation.   38.
+* C shell syntax for color setup: dircolors invocation.  38.
+* --c-shell:                    dircolors invocation.   38.
+* --csh:                        dircolors invocation.   38.
+* -c:                           dircolors invocation.   38.
+* `sh' syntax for color setup:  dircolors invocation.   29.
+* Bourne shell syntax for color setup: dircolors invocation.  29.
+* --bourne-shell:               dircolors invocation.   29.
+* --sh:                         dircolors invocation.   29.
+* -b:                           dircolors invocation.   29.
+* SHELL environment variable, and color: dircolors invocation.  16.
+* LS_COLORS:                    dircolors invocation.   16.
+* setup for color:              dircolors invocation.   5.
+* color setup:                  dircolors invocation.   5.
+* dircolors:                    dircolors invocation.   5.
+* directory listing, verbose:   vdir invocation.        5.
+* vdir:                         vdir invocation.        5.
+* directory listing, brief:     dir invocation.         5.
+* dir:                          dir invocation.         5.
+* --show-control-chars:         Formatting the file names.  71.
+* quoting style:                Formatting the file names.  41.
+* --quoting-style:              Formatting the file names.  41.
+* --quoting-style:              Formatting the file names.  36.
+* --quote-name:                 Formatting the file names.  36.
+* -Q:                           Formatting the file names.  36.
+* --hide-control-chars:         Formatting the file names.  27.
+* -q:                           Formatting the file names.  27.
+* --literal:                    Formatting the file names.  21.
+* -N:                           Formatting the file names.  21.
+* backslash sequences for file names: Formatting the file names.  14.
+* --quoting-style:              Formatting the file names.  14.
+* --escape:                     Formatting the file names.  14.
+* -b:                           Formatting the file names.  14.
+* COLUMNS:                      General output formatting.  122.
+* --width:                      General output formatting.  122.
+* -w:                           General output formatting.  122.
+* --tabsize:                    General output formatting.  114.
+* -T:                           General output formatting.  114.
+* horizontal, listing files:    General output formatting.  108.
+* across, listing files:        General output formatting.  108.
+* --format:                     General output formatting.  108.
+* -x:                           General output formatting.  108.
+* file type, marking:           General output formatting.  99.
+* --indicator-style:            General output formatting.  99.
+* --file-type:                  General output formatting.  99.
+* numeric uid and gid:          General output formatting.  91.
+* --numeric-uid-gid:            General output formatting.  91.
+* -n:                           General output formatting.  91.
+* commas, outputting between files: General output formatting.  84.
+* --format:                     General output formatting.  84.
+* -m:                           General output formatting.  84.
+* --kilobytes:                  General output formatting.  77.
+* -k:                           General output formatting.  77.
+* --indicator-style:            General output formatting.  62.
+* --full-time:                  General output formatting.  47.
+* executables and file type, marking: General output formatting.  40.
+* file type and executables, marking: General output formatting.  40.
+* --indicator-style:            General output formatting.  40.
+* --classify:                   General output formatting.  40.
+* -F:                           General output formatting.  40.
+* always color option:          General output formatting.  36.
+* terminal, using color iff:    General output formatting.  33.
+* auto color option:            General output formatting.  33.
+* none color option:            General output formatting.  30.
+* color, distinguishing file types with: General output formatting.  26.
+* --color:                      General output formatting.  26.
+* vertical sorted files in columns: General output formatting.  19.
+* --format:                     General output formatting.  19.
+* -C:                           General output formatting.  19.
+* single-column output of files: General output formatting.  12.
+* --format:                     General output formatting.  12.
+* -1:                           General output formatting.  12.
+* extension, sorting files by:  Sorting the output.     82.
+* --sort:                       Sorting the output.     82.
+* -X:                           Sorting the output.     82.
+* version, sorting option for `ls': Sorting the output.  73.
+* --sort:                       Sorting the output.     73.
+* -v:                           Sorting the output.     73.
+* none, sorting option for `ls': Sorting the output.    64.
+* --sort:                       Sorting the output.     64.
+* -U:                           Sorting the output.     64.
+* access time, printing or sorting files by: Sorting the output.  55.
+* atime, printing or sorting files by: Sorting the output.  55.
+* use time, printing or sorting files by: Sorting the output.  55.
+* --time:                       Sorting the output.     55.
+* -u:                           Sorting the output.     55.
+* modification time, sorting files by: Sorting the output.  47.
+* --sort:                       Sorting the output.     47.
+* -t:                           Sorting the output.     47.
+* size of files, sorting files by: Sorting the output.  41.
+* --sort:                       Sorting the output.     41.
+* -S:                           Sorting the output.     41.
+* reverse sorting:              Sorting the output.     33.
+* --reverse:                    Sorting the output.     33.
+* -r:                           Sorting the output.     33.
+* directory order, listing by:  Sorting the output.     24.
+* unsorted directory listing:   Sorting the output.     24.
+* -f:                           Sorting the output.     24.
+* use time, printing or sorting files by: Sorting the output.  17.
+* status time, printing or sorting by: Sorting the output.  17.
+* ctime, printing or sorting by: Sorting the output.    17.
+* --time:                       Sorting the output.     17.
+* -c:                           Sorting the output.     17.
+* sorting `ls' output:          Sorting the output.     5.
+* NFS mounts from BSD to HP-UX: What information is listed.  137.
+* size of files, reporting:     What information is listed.  129.
+* disk allocation:              What information is listed.  129.
+* --size:                       What information is listed.  129.
+* -s:                           What information is listed.  129.
+* -o:                           What information is listed.  120.
+* permissions, output by `ls':  What information is listed.  90.
+* verbose ls format:            What information is listed.  75.
+* long ls format:               What information is listed.  75.
+* --format:                     What information is listed.  75.
+* -l:                           What information is listed.  75.
+* inode number, printing:       What information is listed.  64.
+* --inode:                      What information is listed.  64.
+* -i:                           What information is listed.  64.
+* SI output:                    What information is listed.  51.
+* --si:                         What information is listed.  51.
+* -H:                           What information is listed.  51.
+* human-readable output:        What information is listed.  43.
+* --human-readable:             What information is listed.  43.
+* -h:                           What information is listed.  43.
+* --no-group:                   What information is listed.  35.
+* -G:                           What information is listed.  35.
+* dired Emacs mode support:     What information is listed.  13.
+* --dired:                      What information is listed.  13.
+* -D:                           What information is listed.  13.
+* directory listing, recursive: Which files are listed.  64.
+* recursive directory listing:  Which files are listed.  64.
+* --recursive:                  Which files are listed.  64.
+* -R:                           Which files are listed.  64.
+* symbolic links, dereferencing: Which files are listed.  57.
+* --dereference:                Which files are listed.  57.
+* -L:                           Which files are listed.  57.
+* --ignore=PATTERN:             Which files are listed.  41.
+* -I:                           Which files are listed.  41.
+* --directory:                  Which files are listed.  34.
+* -d:                           Which files are listed.  34.
+* backup files, ignoring:       Which files are listed.  27.
+* --ignore-backups:             Which files are listed.  27.
+* -B:                           Which files are listed.  27.
+* --almost-all:                 Which files are listed.  21.
+* -A:                           Which files are listed.  21.
+* --all:                        Which files are listed.  14.
+* -a:                           Which files are listed.  14.
+* -g (ignored):                 ls invocation.          27.
+* directory listing:            ls invocation.          5.
+* ls:                           ls invocation.          5.
+* Berry, K.:                    Authors of getdate.     12.
+* Pinard, F.:                   Authors of getdate.     12.
+* Eggert, Paul:                 Authors of getdate.     6.
+* Meyering, Jim:                Authors of getdate.     6.
+* MacKenzie, David:             Authors of getdate.     6.
+* Berets, Jim:                  Authors of getdate.     6.
+* Salz, Rich:                   Authors of getdate.     6.
+* Bellovin, Steven M.:          Authors of getdate.     6.
+* authors of `getdate':         Authors of getdate.     5.
+* pure numbers in date strings: Pure numbers in date strings.  5.
+* this in date strings:         Relative items in date strings.  29.
+* today in date strings:        Relative items in date strings.  29.
+* now in date strings:          Relative items in date strings.  29.
+* yesterday in date strings:    Relative items in date strings.  26.
+* tomorrow in date strings:     Relative items in date strings.  26.
+* day in date strings:          Relative items in date strings.  26.
+* ago in date strings:          Relative items in date strings.  21.
+* minute in date strings:       Relative items in date strings.  14.
+* hour in date strings:         Relative items in date strings.  14.
+* day in date strings:          Relative items in date strings.  14.
+* week in date strings:         Relative items in date strings.  14.
+* fortnight in date strings:    Relative items in date strings.  14.
+* month in date strings:        Relative items in date strings.  14.
+* year in date strings:         Relative items in date strings.  14.
+* displacement of dates:        Relative items in date strings.  5.
+* relative items in date strings: Relative items in date strings.  5.
+* last DAY:                     Day of week items.      15.
+* next DAY:                     Day of week items.      15.
+* day of week item:             Day of week items.      5.
+* time zone item:               Time zone items.        5.
+* minutes, time zone correction by: Time of day items.  25.
+* time zone correction:         Time of day items.      25.
+* noon in date strings:         Time of day items.      18.
+* midnight in date strings:     Time of day items.      18.
+* pm in date strings:           Time of day items.      18.
+* am in date strings:           Time of day items.      18.
+* time of day item:             Time of day items.      5.
+* abbreviations for months:     Calendar date items.    37.
+* month names in date strings:  Calendar date items.    37.
+* date format, ISO 8601:        Calendar date items.    30.
+* ISO 8601 date format:         Calendar date items.    30.
+* calendar date item:           Calendar date items.    5.
+* comments, in dates:           General date syntax.    52.
+* case, ignored in dates:       General date syntax.    52.
+* time zone item:               General date syntax.    35.
+* language, in dates:           General date syntax.    35.
+* language, in dates:           General date syntax.    31.
+* months, written-out:          General date syntax.    28.
+* last in date strings:         General date syntax.    20.
+* next in date strings:         General date syntax.    20.
+* first in date strings:        General date syntax.    20.
+* ordinal numbers:              General date syntax.    20.
+* numbers, written-out:         General date syntax.    20.
+* items in date strings:        General date syntax.    6.
+* general date syntax:          General date syntax.    5.
+* epoch, for POSIX:             Date input formats.     34.
+* beginning of time, for POSIX: Date input formats.     34.
+* getdate:                      Date input formats.     5.
+* date input formats:           Date input formats.     5.
+* octal numbers for file modes: Numeric Modes.          5.
+* file permissions, numeric:    Numeric Modes.          5.
+* numeric modes:                Numeric Modes.          5.
+* giving away permissions:      Umask and Protection.   10.
+* modes and umask:              Umask and Protection.   5.
+* umask and modes:              Umask and Protection.   5.
+* multiple changes to permissions: Multiple Changes.    5.
+* conditional executability:    Conditional Executability.  5.
+* changing special permissions: Changing Special Permissions.  5.
+* permissions, copying existing: Copying Permissions.   5.
+* copying existing permissions: Copying Permissions.    5.
+* execute permission, symbolic: Setting Permissions.    53.
+* write permission, symbolic:   Setting Permissions.    50.
+* read permission, symbolic:    Setting Permissions.    47.
+* setting permissions:          Setting Permissions.    41.
+* subtracting permissions:      Setting Permissions.    37.
+* removing permissions:         Setting Permissions.    37.
+* adding permissions:           Setting Permissions.    33.
+* other permissions:            Setting Permissions.    27.
+* group, permissions for:       Setting Permissions.    24.
+* owner of file, permissions for: Setting Permissions.  21.
+* symbolic modes:               Symbolic Modes.         5.
+* restricted deletion flag:     Mode Structure.         42.
+* text image, saving in swap space: Mode Structure.     42.
+* swap space, saving text image in: Mode Structure.     42.
+* sticky:                       Mode Structure.         42.
+* setgid:                       Mode Structure.         36.
+* setuid:                       Mode Structure.         33.
+* group owner, default:         Mode Structure.         22.
+* owner, default:               Mode Structure.         22.
+* execute permission:           Mode Structure.         14.
+* write permission:             Mode Structure.         11.
+* read permission:              Mode Structure.         8.
+* permissions of files:         File permissions.       5.
+* file permissions:             File permissions.       5.
+* trailing slashes:             Trailing slashes.       5.
+* destination directory:        Target directory.       12.
+* target directory:             Target directory.       12.
+* --target-directory:           Target directory.       12.
+* target directory:             Target directory.       5.
+* --si:                         Block size.             83.
+* --human-readable:             Block size.             83.
+* -h:                           Block size.             83.
+* --kilobytes:                  Block size.             83.
+* -k:                           Block size.             83.
+* SI output:                    Block size.             36.
+* human-readable output:        Block size.             36.
+* POSIXLY_CORRECT, and block size: Block size.          14.
+* LS_BLOCK_SIZE:                Block size.             14.
+* DU_BLOCK_SIZE:                Block size.             14.
+* DF_BLOCK_SIZE:                Block size.             14.
+* BLOCK_SIZE:                   Block size.             14.
+* --block-size=SIZE:            Block size.             14.
+* block size:                   Block size.             5.
+* --version-control:            Backup options.         61.
+* SIMPLE_BACKUP_SUFFIX:         Backup options.         54.
+* backup suffix:                Backup options.         54.
+* --suffix:                     Backup options.         54.
+* -S:                           Backup options.         54.
+* simple backup method:         Backup options.         55.
+* existing backup method:       Backup options.         48.
+* numbered backup method:       Backup options.         42.
+* none backup method:           Backup options.         36.
+* version-control Emacs variable: Backup options.       27.
+* backups, making:              Backup options.         16.
+* VERSION_CONTROL:              Backup options.         16.
+* --backup:                     Backup options.         16.
+* -b:                           Backup options.         16.
+* backup options:               Backup options.         5.
+* version number, finding:      Common options.         17.
+* --version:                    Common options.         17.
+* help, online:                 Common options.         12.
+* --help:                       Common options.         12.
+* common options:               Common options.         5.
+* history:                      Introduction.           18.
+* bugs, reporting:              Introduction.           12.
+* POSIX.2:                      Introduction.           10.
+* introduction:                 Introduction.           5.
+* utilities for file handling:  Top.                    5.
+* file utilities:               Top.                    5.
+
+
+

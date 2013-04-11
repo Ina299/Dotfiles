@@ -1,0 +1,121 @@
+Info file: libtool-ja.info,    -*-Text-*-
+produced by `texinfo-format-buffer'
+from file `libtool-ja.texi'
+using `texinfmt.el' version 2.38 of 3 July 1998.
+
+
+
+
+INFO-DIR-SECTION GNU programming tools
+START-INFO-DIR-ENTRY
+* Libtool(ja): (libtool-ja).           Generic shared library support script.
+END-INFO-DIR-ENTRY
+
+
+INFO-DIR-SECTION Individual utilities
+START-INFO-DIR-ENTRY
+* libtoolize(ja): (libtool-ja)Invoking libtoolize.     Adding libtool support.
+END-INFO-DIR-ENTRY
+
+
+This file documents GNU Libtool 1.4.2
+
+このファイルは，GNU Libtool 1.4.2を説明します．
+
+Copyright (C) 1996-2000 Free Software Foundation, Inc.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.1 or
+any later version published by the Free Software Foundation; with the no
+Invariant Sections, with no Front-Cover Texts, and with no Back-Cover
+Texts.  A copy of the license is included in the section entitled "GNU
+Free Documentation License".
+
+
+
+
+
+
+Indirect:
+libtool-ja.info-1: 994
+libtool-ja.info-2: 50134
+libtool-ja.info-3: 100696
+
+Tag table:
+(Indirect)
+Node: Top994
+Node: Introduction6633
+Node: Motivation7783
+Node: Issues8501
+Node: Other implementations9403
+Node: Postmortem9727
+Node: Libtool paradigm10546
+Node: Using libtool11109
+Node: Creating object files12623
+Node: Linking libraries14388
+Node: Linking executables16668
+Node: Debugging executables20517
+Node: Installing libraries22827
+Node: Installing executables25550
+Node: Static libraries26171
+Node: Invoking libtool28130
+Node: Compile mode30040
+Node: Link mode31236
+Node: Execute mode35012
+Node: Install mode35457
+Node: Finish mode35759
+Node: Uninstall mode36071
+Node: Clean mode36376
+Node: Integrating libtool36677
+Node: Makefile rules37257
+Node: Using Automake38000
+Node: Configuring39964
+Node: AC_PROG_LIBTOOL40738
+Node: Distributing46300
+Node: Invoking libtoolize46920
+Node: Autoconf .o macros48173
+Node: Static-only libraries49099
+Node: Versioning50312
+Node: Interfaces51226
+Node: Libtool versioning51592
+Node: Updating version info52948
+Node: Release numbers54105
+Node: Library tips55255
+Node: C header files56552
+Node: Inter-library dependencies59408
+Node: Dlopened modules60857
+Node: Building modules62264
+Node: Dlpreopening63108
+Node: Finding the dlname64796
+Node: Dlopen issues65721
+Node: Using libltdl66370
+Node: Libltdl interface67697
+Node: Modules for libltdl73286
+Node: Thread Saftey in libltdl74968
+Node: User defined module data76403
+Node: Module loaders for libltdl79818
+Node: Distributing libltdl86788
+Node: Other languages91205
+Node: C++ libraries91569
+Node: Troubleshooting92649
+Node: Libtool test suite93047
+Node: Test descriptions93564
+Node: When tests fail98442
+Node: Reporting bugs98977
+Node: Maintaining100125
+Node: New ports100696
+Node: Information sources101203
+Node: Porting inter-library dependencies102508
+Node: Tested platforms104147
+Node: Platform quirks112327
+Node: References113046
+Node: Compilers113790
+Node: Reloadable objects115128
+Node: Multiple dependencies115419
+Node: Archivers116001
+Node: libtool script contents116390
+Node: Cheap tricks126667
+Node: GNU Free Documentation License127784
+Node: Index146383
+
+End tag table

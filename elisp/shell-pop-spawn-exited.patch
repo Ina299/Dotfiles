@@ -1,0 +1,30 @@
+--- shell-pop.el	2010-02-21 23:20:56.000000000 +0900
++++ shell-pop.el.new	2010-04-05 12:53:56.000000000 +0900
+@@ -120,6 +120,17 @@
+                                            shell-pop-internal-mode-shell)))
+   (setq shell-pop-internal-mode-shell shell))
+ 
++(defun shell-pop-get-living-internal-mode-buffer ()
++  "Find `shell-pop-set-internal-mode' buffer and return it.
++When no buffer is found or or no process is associated with found buffer,
++kill it and return nil.
++"
++  (let ((buf (get-buffer shell-pop-internal-mode-buffer)))
++    (when buf
++      (if (term-check-proc buf)
++          buf
++        (kill-buffer buf) nil))))
++
+ (defun shell-pop ()
+   (interactive)
+   (if (equal (buffer-name) shell-pop-internal-mode-buffer)
+@@ -127,7 +138,8 @@
+     (shell-pop-up)))
+ 
+ (defun shell-pop-up ()
+-  (let ((w (get-buffer-window shell-pop-internal-mode-buffer)))
++  (let* ((b (shell-pop-get-living-internal-mode-buffer))
++         (w (and b (get-buffer-window b))))
+     (if w
+         (select-window w)
+       (progn

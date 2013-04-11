@@ -1,0 +1,156 @@
+Info file: sh-utils-ja.info,    -*-Text-*-
+produced by `texinfo-format-buffer'
+from file `sh-utils-ja.texi'
+using `texinfmt.el' version 2.38 of 3 July 1998.
+
+
+
+
+
+
+
+START-INFO-DIR-ENTRY
+* Shell utilities(ja): (sh-utils-ja).             GNU shell utilities.
+* basename(ja): (sh-utils-ja)basename invocation. Strip directory and suffix.
+* chroot(ja): (sh-utils-ja)chroot invocation.     Specify the root directory.
+* date(ja): (sh-utils-ja)date invocation.         Print/set system date and time.
+* dirname(ja): (sh-utils-ja)dirname invocation.   Strip non-directory suffix.
+* echo(ja): (sh-utils-ja)echo invocation.         Print a line of text.
+* env(ja): (sh-utils-ja)env invocation.           Modify the environment.
+* expr(ja): (sh-utils-ja)expr invocation.         Evaluate expressions.
+* factor(ja): (sh-utils-ja)factor invocation.     Print prime factors
+* false(ja): (sh-utils-ja)false invocation.       Do nothing, unsuccessfully.
+* groups(ja): (sh-utils-ja)groups invocation.     Print group names a user is in.
+* hostname(ja): (sh-utils-ja)hostname invocation. Print or set system name.
+* id(ja): (sh-utils-ja)id invocation.             Print real/effective uid/gid.
+* logname(ja): (sh-utils-ja)logname invocation.   Print current login name.
+* nice(ja): (sh-utils-ja)nice invocation.         Modify scheduling priority.
+* nohup(ja): (sh-utils-ja)nohup invocation.       Immunize to hangups.
+* pathchk(ja): (sh-utils-ja)pathchk invocation.   Check file name portability.
+* printenv(ja): (sh-utils-ja)printenv invocation. Print environment variables.
+* printf(ja): (sh-utils-ja)printf invocation.     Format and print data.
+* pwd(ja): (sh-utils-ja)pwd invocation.           Print working directory.
+* seq(ja): (sh-utils-ja)seq invocation.           Print numeric sequences
+* sleep(ja): (sh-utils-ja)sleep invocation.       Delay for a specified time.
+* stty(ja): (sh-utils-ja)stty invocation.         Print/change terminal settings.
+* su(ja): (sh-utils-ja)su invocation.             Modify user and group id.
+* tee(ja): (sh-utils-ja)tee invocation.           Redirect to multiple files.
+* test(ja): (sh-utils-ja)test invocation.         File/string tests.
+* true(ja): (sh-utils-ja)true invocation.         Do nothing, successfully.
+* tty(ja): (sh-utils-ja)tty invocation.           Print terminal name.
+* uname(ja): (sh-utils-ja)uname invocation.       Print system information.
+* users(ja): (sh-utils-ja)users invocation.       Print current user names.
+* who(ja): (sh-utils-ja)who invocation.           Print who is logged in.
+* whoami(ja): (sh-utils-ja)whoami invocation.     Print effective user id.
+* yes(ja): (sh-utils-ja)yes invocation.           Print a string indefinitely.
+END-INFO-DIR-ENTRY
+
+このファイルは，GNUシェルユーティリティを説明します．
+
+Copyright (C) 1994, 95, 96 Free Software Foundation, Inc.
+
+Permission is granted to make and distribute verbatim copies of this
+manual provided the copyright notice and this permission notice are
+preserved on all copies.
+
+Permission is granted to copy and distribute modified versions of this
+manual under the conditions for verbatim copying, provided that the
+entire resulting derived work is distributed under the terms of a
+permission notice identical to this one.
+
+Permission is granted to copy and distribute translations of this manual
+into another language, under the above conditions for modified versions,
+except that this permission notice may be stated in a translation
+approved by the Foundation.
+
+
+
+
+
+Indirect:
+sh-utils-ja.info-1: 3454
+sh-utils-ja.info-2: 51139
+
+Tag table:
+(Indirect)
+Node: Top3454
+Node: Introduction4350
+Node: Common options5255
+Node: Date input formats5709
+Node: General date syntax7358
+Node: Calendar date item8161
+Node: Time of day item9353
+Node: Time zone item10167
+Node: Day of week item12060
+Node: Relative item in date strings12567
+Node: Pure numbers in date strings13503
+Node: Authors of getdate13934
+Node: Printing text14389
+Node: echo invocation14734
+Node: printf invocation15533
+Node: yes invocation16194
+Node: Conditions16492
+Node: false invocation16943
+Node: true invocation17550
+Node: test invocation18193
+Node: File type tests18989
+Node: Access permission tests19600
+Node: File characteristics tests20191
+Node: String tests20669
+Node: Numeric tests21106
+Node: Connectives for test21685
+Node: expr invocation21962
+Node: String expressions22741
+Node: Numeric expressions24291
+Node: Relations for expr24655
+Node: Examples of expr25167
+Node: Redirection25713
+Node: tee invocation26043
+Node: File name manipulation26581
+Node: basename invocation26974
+Node: dirname invocation27411
+Node: pathchk invocation27839
+Node: Working context28571
+Node: pwd invocation29095
+Node: stty invocation29506
+Node: Control31190
+Node: Input31742
+Node: Output32654
+Node: Local33533
+Node: Combination34638
+Node: Characters36366
+Node: Special37319
+Node: printenv invocation38182
+Node: tty invocation38724
+Node: User information39234
+Node: id invocation39819
+Node: logname invocation40580
+Node: whoami invocation40956
+Node: groups invocation41249
+Node: users invocation41701
+Node: who invocation42252
+Node: System context43567
+Node: date invocation43954
+Node: Time directives44862
+Node: Date directives45692
+Node: Literal directives46626
+Node: Padding46837
+Node: Setting the time47366
+Node: Options for date47905
+Node: Examples of date49282
+Node: uname invocation51139
+Node: hostname invocation52022
+Node: Modified command invocation52374
+Node: chroot invocation52896
+Node: env invocation53523
+Node: nice invocation54286
+Node: nohup invocation55054
+Node: su invocation55809
+Node: Delaying58454
+Node: sleep invocation58649
+Node: Numeric operations59073
+Node: factor invocation59339
+Node: seq invocation59715
+Node: Index60435
+
+End tag table

@@ -1,0 +1,89 @@
+mode-info ----- Commands to show Info descriptions.
+
+
+1. Introduction
+
+   This package provides improved describe-function and
+   describe-variable and combines major modes to edit programming
+   languages and its Info closely.
+
+   `mode-info-describe-function' which is one of commands defined by
+   this package, is very similar to `describe-function', but can select
+   the appropriate document based on major-mode.  For example, when it
+   is called in c-mode buffers, it retrieves the documentation of the
+   specified function from GNU C Library Reference Manual and shows it.
+   When it is called in emacs-lisp-mode buffers, it retrieves the
+   documentation from Emacs Lisp Reference Manual and shows it.  If
+   failure it shows a documentation string.
+
+   The latest version of this package can be downloaded from:
+
+       http://namazu.org/~tsuchiya/elisp/mode-info.tar.gz
+
+
+2. Available documents
+
+   Following texinfo documents are supported.
+
+       Emacs Lisp Reference Manual
+       Emacs Manual
+       GNU C Library Reference Manual
+       Ruby Reference Manual (Japanese)
+       Perl Reference Manual (Japanese)
+       Octave Reference Manual
+       SLIB Reference Manual
+       Guile Reference Manual
+       Gauche Reference Manual
+       Make Manual
+
+
+3. Install
+
+   Before installation, Info documents will have to be installed.
+
+   (1) Run configure script:
+
+           ./configure
+
+       This should setup stuffs to build mode-info.  If Info documents
+       are installed to an unusual directory, the installer will miss
+       them.  In this case, it is necessary to tell their place to the
+       installer, as follows:
+
+           ./configure --with-info-addpath=DIR1:DIR2
+
+       For more detail, see the help message of configure script.
+
+   (2) Execute these commands to byte compile emacs-lisp programs and to
+       install them.
+
+           make
+           make install
+
+   (3) Execute these commands to make indices of all available Info
+       documents and to install them.
+
+           make index
+           make install-index
+
+       If you want to keep old indices, you can skip this step.
+
+   (4) Put these following expressions to your ~/.emacs.
+
+          (require 'mi-config)
+          (global-set-key "\C-hf" 'mode-info-describe-function)
+          (global-set-key "\C-hv" 'mode-info-describe-variable)
+          (global-set-key "\M-." 'mode-info-find-tag)
+
+
+4. Contact Address
+
+   TSUCHIYA Masatoshi <tsuchiya@namazu.org>
+
+
+
+Local Variables:
+mode: indented-text
+coding: ascii
+fill-column: 72
+End:

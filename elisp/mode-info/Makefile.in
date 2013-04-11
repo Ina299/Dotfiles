@@ -1,0 +1,78 @@
+INSTALL      = @INSTALL@
+INSTALL_DATA = @INSTALL_DATA@
+prefix       = @prefix@
+datadir      = @datadir@
+lispdir      = @lispdir@
+INDEXDIR     = @INDEXDIR@
+
+SHELL        = /bin/sh
+
+@SET_MAKE@
+EMACS   = @EMACS@
+FLAGS   = -q -no-site-file -batch -l elisp-comp
+
+PACKAGE = mode-info
+TARBALL = $(PACKAGE)-$(VERSION).tar.gz
+DISTDIR = $(PACKAGE)-$(VERSION)
+DOCS    = COPYING ChangeLog README README.ja
+DISTS   = Makefile.in aclocal.m4 configure configure.in install-sh mkinstalldirs elisp-comp.in
+
+default: Makefile elisp-comp
+	env test ! -f mi-util.elc -o mi-util.elc -nt mi-util.el || $(MAKE) clean
+	$(MAKE) `$(EMACS) $(FLAGS) -f elisp-comp-target 2>/dev/null`
+
+install: default
+	@$(SHELL) ./mkinstalldirs $(lispdir);\
+	for p in ChangeLog* *.el *.elc ; do\
+	  echo " $(INSTALL_DATA) $$p $(lispdir)/$$p";\
+	  $(INSTALL_DATA) $$p $(lispdir)/$$p;\
+	done
+
+index: elisp-comp
+	$(EMACS) $(FLAGS) -f elisp-comp-index
+
+install-index: index
+	for p in *.idx ; do\
+	  echo " $(INSTALL_DATA) $$p $(INDEXDIR)/$$p";\
+	  $(INSTALL_DATA) $$p $(INDEXDIR)/$$p;\
+	done
+
+dist: Makefile
+	$(MAKE) VERSION=`$(EMACS) $(FLAGS) -f elisp-comp-version 2>/dev/null` tarball
+
+Makefile: Makefile.in config.status
+	./config.status
+
+elisp-comp: elisp-comp.in config.status
+	./config.status
+
+config.status: configure
+	./config.status --recheck
+
+configure: configure.in aclocal.m4
+	autoconf
+
+tarball: $(DOCS) $(DISTS)
+	-rm -f $(TARBALL) `basename $(TARBALL) .gz`
+	mkdir $(DISTDIR)
+	cp -p *.el $(DOCS) $(DISTS) $(DISTDIR)
+	find $(DISTDIR) -type d | xargs chmod 755
+	find $(DISTDIR) -type f | xargs chmod 644
+	chmod 755 $(DISTDIR)/configure $(DISTDIR)/install-sh
+	tar -cf `basename $(TARBALL) .gz` $(DISTDIR)
+	gzip -9 `basename $(TARBALL) .gz`
+	rm -rf $(DISTDIR)
+
+clean:
+	-rm -rf *~ *.elc $(PACKAGE)-*.tar.gz
+
+distclean: clean
+	-rm -f *.idx
+	-rm -f config.log config.status config.cache Makefile elisp-comp
+	-rm -fr autom4te*.cache
+
+## Rule for the developers to check a portability for each module.
+.SUFFIXES: .elc .el
+
+.el.elc:
+	$(EMACS) $(FLAGS) -f batch-byte-compile $*.el

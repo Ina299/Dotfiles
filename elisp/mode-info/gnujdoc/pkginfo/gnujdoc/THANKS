@@ -1,0 +1,15 @@
+Gnujdoc would not be what it is today without the invaluable help of
+everybody who was kind enough to spend time testing it and reporting
+bugs.
+
+The following people made especially gracious contributions of their
+time and energy in helping to track down bugs, add new features, and
+generally assist in the gnujdoc maintainership process:
+
+HAGINO "itojun" Junichiro <itojun@iijlab.net> contributed Japanese
+translation of autoconf manual.
+
+IIDA Yosiaki made many contributions to GDB translation.
+
+SAWADA Hodaka <hoda@ellis.cc.kogakuin.ac.jp> contributed the machine
+for the CVS server.

@@ -1,0 +1,1191 @@
+Info file: sh-utils-ja.info,    -*-Text-*-
+produced by `texinfo-format-buffer'
+from file `sh-utils-ja.texi'
+using `texinfmt.el' version 2.38 of 3 July 1998.
+
+
+
+
+
+
+
+START-INFO-DIR-ENTRY
+* Shell utilities(ja): (sh-utils-ja).             GNU shell utilities.
+* basename(ja): (sh-utils-ja)basename invocation. Strip directory and suffix.
+* chroot(ja): (sh-utils-ja)chroot invocation.     Specify the root directory.
+* date(ja): (sh-utils-ja)date invocation.         Print/set system date and time.
+* dirname(ja): (sh-utils-ja)dirname invocation.   Strip non-directory suffix.
+* echo(ja): (sh-utils-ja)echo invocation.         Print a line of text.
+* env(ja): (sh-utils-ja)env invocation.           Modify the environment.
+* expr(ja): (sh-utils-ja)expr invocation.         Evaluate expressions.
+* factor(ja): (sh-utils-ja)factor invocation.     Print prime factors
+* false(ja): (sh-utils-ja)false invocation.       Do nothing, unsuccessfully.
+* groups(ja): (sh-utils-ja)groups invocation.     Print group names a user is in.
+* hostname(ja): (sh-utils-ja)hostname invocation. Print or set system name.
+* id(ja): (sh-utils-ja)id invocation.             Print real/effective uid/gid.
+* logname(ja): (sh-utils-ja)logname invocation.   Print current login name.
+* nice(ja): (sh-utils-ja)nice invocation.         Modify scheduling priority.
+* nohup(ja): (sh-utils-ja)nohup invocation.       Immunize to hangups.
+* pathchk(ja): (sh-utils-ja)pathchk invocation.   Check file name portability.
+* printenv(ja): (sh-utils-ja)printenv invocation. Print environment variables.
+* printf(ja): (sh-utils-ja)printf invocation.     Format and print data.
+* pwd(ja): (sh-utils-ja)pwd invocation.           Print working directory.
+* seq(ja): (sh-utils-ja)seq invocation.           Print numeric sequences
+* sleep(ja): (sh-utils-ja)sleep invocation.       Delay for a specified time.
+* stty(ja): (sh-utils-ja)stty invocation.         Print/change terminal settings.
+* su(ja): (sh-utils-ja)su invocation.             Modify user and group id.
+* tee(ja): (sh-utils-ja)tee invocation.           Redirect to multiple files.
+* test(ja): (sh-utils-ja)test invocation.         File/string tests.
+* true(ja): (sh-utils-ja)true invocation.         Do nothing, successfully.
+* tty(ja): (sh-utils-ja)tty invocation.           Print terminal name.
+* uname(ja): (sh-utils-ja)uname invocation.       Print system information.
+* users(ja): (sh-utils-ja)users invocation.       Print current user names.
+* who(ja): (sh-utils-ja)who invocation.           Print who is logged in.
+* whoami(ja): (sh-utils-ja)whoami invocation.     Print effective user id.
+* yes(ja): (sh-utils-ja)yes invocation.           Print a string indefinitely.
+END-INFO-DIR-ENTRY
+
+このファイルは，GNUシェルユーティリティを説明します．
+
+Copyright (C) 1994, 95, 96 Free Software Foundation, Inc.
+
+Permission is granted to make and distribute verbatim copies of this
+manual provided the copyright notice and this permission notice are
+preserved on all copies.
+
+Permission is granted to copy and distribute modified versions of this
+manual under the conditions for verbatim copying, provided that the
+entire resulting derived work is distributed under the terms of a
+permission notice identical to this one.
+
+Permission is granted to copy and distribute translations of this manual
+into another language, under the above conditions for modified versions,
+except that this permission notice may be stated in a translation
+approved by the Foundation.
+
+
+
+
+
+File: sh-utils-ja.info, Node: uname invocation, Next: hostname invocation, Prev: date invocation, Up: System context
+
+`uname': システム情報の出力
+===========================
+
+
+`uname'は，実行しているマシンとオペレーティングシステムの情報を出力しま
+す．オプションが与えられない場合，`uname'は`-s'オプションが与えられたか
+のように動作します．構文は以下のとおりです．
+
+     uname [OPTION]...
+
+複数のオプションや`-a'が与えられた場合，選択された情報は，この順番で出力
+されます．
+
+     SYSNAME NODENAME RELEASE OSVERSION MACHINE
+
+少なくとも，OSVERSIONは複数の単語となります．例えば，以下のようになりま
+す．
+
+     uname -a
+     => Linux hayley 1.0.4 #3 Thu May 12 18:06:34 1994 i486
+
+プログラムは，以下のオプションも受け入れます．*Note Common options::,も
+参照してください．
+
+
+`-a'
+`--all'
+     以下の情報すべてを出力します．
+
+`-m'
+`--machine'
+     マシン(ハードウェア)タイプを出力します．
+
+`-n'
+`--nodename'
+     マシンのネットワークノードのホスト名を出力します．
+
+`-p'
+`--processor'
+     マシンのプロセッサタイプを出力します．
+
+`-r'
+`--release'
+     オペレーティングシステムのリリースを出力します．
+
+`-s'
+`--sysname'
+     オペレーティングシステムの名前を出力します．
+
+`-v'
+     オペレーティングシステムのバージョンを出力します．
+
+
+
+
+
+File: sh-utils-ja.info, Node: hostname invocation, Prev: uname invocation, Up: System context
+
+`hostname': システム名の出力や設定
+==================================
+
+
+引数がない場合，`hostname'は現在のホストシステムの名前を出力します．1つ
+の引数を用いた場合，それは現在のホスト名を指定された文字列に設定します．
+ホスト名の設定には適切な特権が必要です．構文は以下のとおりです．
+
+     hostname [NAME]
+
+オプションは，`--help'と`--version'だけです．*Note Common options::.
+
+
+
+
+File: sh-utils-ja.info, Node: Modified command invocation, Next: Delaying, Prev: System context, Up: Top
+
+変更されたコマンドの呼び出し
+****************************
+
+
+このセクションは，現在と異なる状況で他のコマンドを実行するコマンドを記述
+します．異なるユーザとして環境を変更するなどです．
+
+* Menu:
+
+* chroot invocation::           Modify the root directory.
+* env invocation::              Modify environment variables.
+* nice invocation::             Modify scheduling priority.
+* nohup invocation::            Immunize to hangups.
+* su invocation::               Modify user and group id.
+
+
+
+
+File: sh-utils-ja.info, Node: chroot invocation, Next: env invocation, Prev: Modified command invocation, Up: Modified command invocation
+
+`chroot': 異なるルートディレクトリでコマンドを実行
+==================================================
+
+
+`chroot'は，指定されたルートディレクトリでコマンドを実行します．多くのシ
+ステムでは，スーパーユーザのみこれが可能です．構文は以下のとおりです．
+
+     chroot NEWROOT [COMMAND [ARGS]...]
+     chroot OPTION
+
+通常，ファイル名は，ディレクトリ構造のルート，すなわち`/'を起点として調
+べられます．`chroot'は，ルートをNEWROOTディレクトリ(存在する必要がありま
+す)に変更し，オプションのARGSを用いてCOMMAND を実行します．COMMANDが指定
+されていない場合，デフォルトは，`SHELL' 環境変数や，設定されていない場合
+は`/bin/sh'の値が，`-i'オプションで呼び出されますす．
+
+オプションは`--help'と`--version'だけです．*Note Common options::.
+
+
+
+
+File: sh-utils-ja.info, Node: env invocation, Next: nice invocation, Prev: chroot invocation, Up: Modified command invocation
+
+`env': 変更された環境でコマンドを実行
+=====================================
+
+
+`env'は，変更された環境でコマンドを実行します．構文は以下のとおりです．
+
+     env [OPTION]... [NAME=VALUE]... [COMMAND [ARGS]...]
+     env
+
+`VARIABLE=VALUE'の形式の引数は，環境変数VARIABLE を値VALUEに設定します．
+VALUEは空にもできます(`VARIABLE=')．変数をからの値に設定することは，アン
+セットすることとは異なります．
+
+残りの最初の引数は，呼び出すプログラム名を指定します．それは`PATH'環境変
+数によって検索されます．あらゆる残りの引数は，引数としてそのプログラムに
+渡されます．
+
+
+環境指定に続いてコマンド名が指定されていない場合，結果となる環境が出力さ
+れます．これは，`printenv'のコマンド名を指定することに似ています．
+
+プログラムは以下のオプションも受け入れます．*Note Common options::,も参
+照してください．
+
+
+`-u NAME'
+`--unset=NAME'
+     変数NAMEが環境の場合，それを環境から削除します．
+
+`-'
+`-i'
+`--ignore-environment'
+     継承された環境を無視して，空の環境を用いて開始します．
+
+
+
+
+
+File: sh-utils-ja.info, Node: nice invocation, Next: nohup invocation, Prev: env invocation, Up: Modified command invocation
+
+`nice': 変更されたスケジュール優先順位でコマンドを実行
+======================================================
+
+
+`nice'は，ジョブのスケジュールの優先順位を出力または変更します．構文は以
+下のとおりです．
+
+     nice [OPTION]... [COMMAND [ARG]...]
+
+引数が与えられていない場合，`nice'は現在のスケジュールの優先順位を出力し，
+それは継承されます．それ以外の場合，`nice'は，与えられたコマンドをそのス
+ケジュール優先順位を調整しながら実行します．ADJUSTMENTが与えられていない
+場合，コマンドの優先順位は10増加します．負の調整を指定するためには適切な
+特権が必要です．`nice'が調整可能な優先順位は，-20(最優先)から19(最低)ま
+でです．
+
+ほとんどのシェルには同じ名前のシェル組み込みコマンドがあるので，装飾なし
+のスクリプトのコマンド名や対話的に使用すると，ここで記述されていない異な
+る機能を得る可能性があります．
+
+プログラムは以下のオプションも受け入れます．*Note Common options::,も参
+照してください．
+
+`-n ADJUSTMENT'
+`-ADJUSTMENT'
+`--adjustment=ADJUSTMENT'
+     コマンドの優先順位に，10の代わりにADJUSTMENTを加えます．
+
+
+
+
+File: sh-utils-ja.info, Node: nohup invocation, Next: su invocation, Prev: nice invocation, Up: Modified command invocation
+
+`nohup': ハングアップを免除したコマンドの実行
+=============================================
+
+
+`nohup'は，ログアウト後にバックグランドでコマンドを実行し続けることを可
+能にするため，ハングアップシグナルを無視して，与えられたコマンドを実行し
+ます．構文は以下のとおりです．
+
+     nohup COMMAND [ARG]...
+
+`nohup'は，COMMANDのスケジュールの優先順位を5増加するので，実行が若干小
+さく変更されます．標準出力が端末の場合，それとその標準エラーは，ファイル
+`nohup.out'に追加するようにリダイレクトされます．書き込み不可能な場合，
+それらはファイル`$HOME/nohup.out'に追加します．それも書き込み不可能な場
+合，コマンドは実行されません．
+
+`nohup'が`nohup.out'や`$HOME/nohup.out'を作成する場合，"group"や"other"
+のアクセス許可を用いてそれを作成しません．出力ファイルが既存の場合は，そ
+の許可を変更しません．
+
+`nohup'は，バックグランドで実行するようにするコマンドを，自動的に配置し
+ません．コマンド行の終りに`&'を用いて，明示する必要があります．
+
+オプションは`--help'と`--version'のみです．*Note Common options::.
+
+
+
+
+File: sh-utils-ja.info, Node: su invocation, Prev: nohup invocation, Up: Modified command invocation
+
+`su': 適切なユーザとグループidを用いてコマンドを実行
+====================================================
+
+
+`su'は，あるユーザが一時的に他のユーザになることを可能とします．それは実
+際の実効ユーザidと，与えられたUSERの追加グループでコマンドを(しばしば対
+話的シェルで)実行します．構文は以下のとおりです．
+
+     su [OPTION]... [USER [ARG]...]
+
+USERが与えられない場合，デフォルトは`root'のスーパーユーザです．使用する
+シェルは，USERの`passwd'項目から得られたもの，または，そこで指定されてい
+ない場合は`/bin/sh'を使用します．USER にパスワードを持つ場合，実行ユーザ
+idがゼロ(スーパーユーザ)の実行でなければ，`su'はパスワードの入力を促しま
+す．
+
+デフォルトで，`su'はカレントディレクトリを変更しません．それは環境変数
+`HOME'と`SHELL'をUSERのパスワード項目から設定し，USERがスーパーユーザで
+ない場合，`USER'と`LOGNAME'をUSERに設定します．デフォルトでシェルはログ
+インシェルではありません．
+
+追加のARGは，シェルの追加の引数として与えられます．
+
+GNU `su'は，`/bin/sh'や他の特殊なものを扱いません(例えば，`argv[0]'を
+`-su'に設定する，`-c'をあるシェルに渡す等です．)．
+
+`su'は，`su'の試みに対し，オプションの失敗とオプションの成功を報告するた
+めに`syslog'を使用するようにコンパイル可能です．(システムが`syslog'をサ
+ポートしている場合です．)しかし，GNU `su'は，ユーザが`wheel'グループのメ
+ンバーかどうか調査しません．以下を参照してください．
+
+プログラムは，以下のオプションを受け入れます．*Note Common options::,も
+参照してください．
+
+`-c COMMAND'
+`--command=COMMAND'
+     単一のコマンドラインで実行するCOMMANDを，対話的シェルを開始する代わ
+     りに，`-c'オプションを用いて渡します．
+
+`-f'
+`--fast'
+     シェルに`-f'オプションを渡します．これはおそらく，シェルの実行が
+     `csh'や`tcsh'の場合にのみ意味があり，それらに対する`-f'オプションは，
+     スタートアップファイル(`.cshrc')の読み込みを妨げます．Bourneのよう
+     なシェルを用いた場合，`-f'オプションはファイル名のパターン拡張
+     (glob)を利用不可能にし，それは役に立つとは思えません．
+
+`-'
+`-l'
+`--login'
+     シェルをログインシェルにします．これは以下のことを意味します．
+     `TERM'，`HOME'，そして`SHELL'(上記で記述されるように設定されている)，
+     そして`USER'と`LOGNAME'(スーパーユーザでも，上記で記述されるように
+     設定されている)以外の，すべての環境変数をアンセットし，`PATH'をコン
+     パイルされているデフォルト値に設定します．USERのホームディレクトリ
+     に変更します．ログインスタートアップファイルを読み込ませるために，
+     `-'をシェルの名前の前に前置してください．
+
+`-m'
+`-p'
+`--preserve-environment'
+     環境変数`HOME'，`USER'，`LOGNAME'，または`SHELL'を変更しません．
+     `su'を実行しているユーザがスーパーユーザで，USERのシェルが制限され
+     ていない場合は，USERのパスワード項目から得られるシェルの代わりに，
+     環境変数`SHELL'で与えられたシェルを実行します．"制限されているシェ
+     ル"は，ファイル`/etc/shells'や，そのファイルが存在しない場合はコン
+     パイルされたリストにリストアップされていないものです．このオプショ
+     ンが行うことの一部は，`--login'と`--shell'で優先可能です．
+
+`-s SHELL'
+`--shell=SHELL'
+     `su'を実行しているユーザがスーパーユーザで，USERのシェルが限定され
+     ていない(真上の`-m'を参照してください)場合は，USERのパスワード項目
+     から得られるシェルの代わりに，SHELLを実行します．
+
+
+
+GNU `su'が`wheel'グループをサポートしない理由
+=============================================
+
+(このセクションは，Richard Stallmanが作成しました．)
+
+数人のユーザが，残り全員以上の総合的な権力を持ちたいと思うときもあります．
+例えば，1984年に，MIT AI labの数人のユーザが，Twenexシステムのオペレータ
+パスワードを変更し，他の全員に秘密にし続けることで，権力を占有しようとし
+ました．(私は，このクーデターを妨害し，カーネルにパッチを行いユーザに力
+を取り戻させようとしましたが，Unixでそうする方法を知りませんでした．)
+
+しかし，支配者がだれかに告げることもあります．通常の`su'メカニズムでは，
+一旦，普通のユーザに同情する誰かが，ルートのパスワードを知ると，彼または
+彼女は残りを伝えることができます．"wheel group"の特徴は，これを不可能に
+し，そのため支配者の権力は固まります．
+
+私は多数の味方で支配者の味方ではありません．ボスとシスアドのあらゆる作業
+をサポートすることに慣れている場合，最初にこの考えが奇妙だと分かることで
+しょう．
+
+
+
+
+File: sh-utils-ja.info, Node: Delaying, Next: Numeric operations, Prev: Modified command invocation, Up: Top
+
+遅延
+****
+
+
+
+* Menu:
+
+* sleep invocation::            Delay for a specified time.
+
+
+
+
+File: sh-utils-ja.info, Node: sleep invocation, Prev: Delaying, Up: Delaying
+
+`sleep': 指定した時間の遅延(Delay for a specified time)
+=======================================================
+
+
+`sleep'は，コマンドライン引数の値の合計で指定された時間，一時停止します．
+構文は以下のとおりです．
+
+     sleep [NUMBER[smhd]]...
+
+それぞれの引数は，オプションの単位が続く数字です．デフォルトは秒です．単
+位は以下のとおりです．
+
+`s'
+     秒
+`m'
+     分
+`h'
+     時間
+`d'
+     日
+
+オプションは`--help'と`--version'だけです．*Note Common options::.
+
+
+
+
+File: sh-utils-ja.info, Node: Numeric operations, Next: Index, Prev: Delaying, Up: Top
+
+数値処理
+********
+
+これらのプログラムは数値に関する処理を行います．
+
+* Menu:
+
+* factor invocation::              Show factors of numbers.
+* seq invocation::                 Print sequences of numbers.
+
+
+
+
+File: sh-utils-ja.info, Node: factor invocation, Next: seq invocation, Prev: Numeric operations, Up: Numeric operations
+
+`factor': 素因数を出力
+======================
+
+
+`factor'は，素因数を出力します．構文は以下のとおりです．
+
+     factor [NUMBER]...
+     factor OPTION
+
+コマンドラインにNUMBERが指定されない場合，`factor'は標準入力から読み込み，
+それは，改行，タブ，またはスペースで区切られています．
+
+オプションは，`--help'と`--version'のみです．*Note Common options::.
+
+
+
+
+File: sh-utils-ja.info, Node: seq invocation, Prev: factor invocation, Up: Numeric operations
+
+`seq': 数列を出力
+=================
+
+
+`seq'は，数字の列を標準出力に出力します．構文は以下のとおりです．
+
+     seq [OPTION]... [FIRST [STEP]] LAST...
+
+`seq'は，FIRSTからLASTまでSTEPおきに，数字を出力します．デフォルトで，
+FIRSTとSTEPは両方とも1で，それぞれの数字は単独行に出力されます．すべての
+数字は実数ですが，整数のみではありません．
+
+プログラムは以下のオプションを受け入れます．*Note Common options::,も参
+照してください．
+
+`-f FORMAT'
+`--format=FORMAT'
+     すべての数字をFORMATを使用して出力します．デフォルトは`%g'です．
+     FORMATは，標準的な浮動小数点出力書式の，`%e'，`%f'，または`%g'の内，
+     ただ1つだけを含む必要があります．
+
+`-s STRING'
+`--separator=STRING'
+     数字をSTRINGで分離します．デフォルトは改行です．出力は，常に改行で
+     終了します．
+
+`-w'
+`--equal-width'
+     すべての数字を同じ幅で出力し，ゼロを前置してパディングします．(他の
+     種類のパディングをするため，`--format'を使用してください)．
+
+
+
+
+
+File: sh-utils-ja.info, Node: Index, Prev: Numeric operations, Up: Top
+
+索引
+****
+
+
+* Menu:
+
+* separator for numbers in `seq': seq invocation.       29.
+* formatting of numbers in `seq': seq invocation.       21.
+* --format=FORMAT:              seq invocation.         21.
+* -f FORMAT:                    seq invocation.         21.
+* sequence of numbers:          seq invocation.         5.
+* numeric sequences:            seq invocation.         5.
+* seq:                          seq invocation.         5.
+* prime factors:                factor invocation.      5.
+* factor:                       factor invocation.      5.
+* numeric operations:           Numeric operations.     5.
+* time units:                   sleep invocation.       11.
+* delay for a specified time:   sleep invocation.       5.
+* sleep:                        sleep invocation.       5.
+* commands for delaying:        Delaying.               5.
+* delaying commands:            Delaying.               5.
+* MIT AI lab:                   su invocation.          84.
+* Twenex:                       su invocation.          84.
+* fascism:                      su invocation.          78.
+* group wheel, not supported:   su invocation.          78.
+* wheel group, not supported:   su invocation.          78.
+* --shell:                      su invocation.          85.
+* -s:                           su invocation.          85.
+* restricted shell:             su invocation.          73.
+* /etc/shells:                  su invocation.          73.
+* environment, preserving:      su invocation.          73.
+* --preserve-environment:       su invocation.          73.
+* -p:                           su invocation.          73.
+* -m:                           su invocation.          73.
+* login shell, creating:        su invocation.          59.
+* PATH:                         su invocation.          59.
+* TERM:                         su invocation.          59.
+* --login:                      su invocation.          59.
+* -l:                           su invocation.          59.
+* -:                            su invocation.          59.
+* globbing, disabled:           su invocation.          47.
+* file name pattern expansion, disabled: su invocation.  47.
+* .cshrc:                       su invocation.          47.
+* --fast:                       su invocation.          47.
+* -f:                           su invocation.          47.
+* --command:                    su invocation.          40.
+* -c:                           su invocation.          40.
+* syslog:                       su invocation.          28.
+* `-su':                        su invocation.          25.
+* login shell:                  su invocation.          18.
+* LOGNAME:                      su invocation.          18.
+* USER:                         su invocation.          18.
+* SHELL:                        su invocation.          18.
+* HOME:                         su invocation.          18.
+* /etc/passwd:                  su invocation.          12.
+* /bin/sh:                      su invocation.          12.
+* passwd entry, and `su' shell: su invocation.          12.
+* root, becoming:               su invocation.          5.
+* super-user, becoming:         su invocation.          5.
+* user id, switching:           su invocation.          5.
+* substitute user and group ids: su invocation.         5.
+* su:                           su invocation.          5.
+* nohup.out:                    nohup invocation.       12.
+* nohup.out:                    nohup invocation.       6.
+* logging out and continuing to run: nohup invocation.  5.
+* immunity to hangups:          nohup invocation.       5.
+* hangups, immunity to:         nohup invocation.       5.
+* nohup:                        nohup invocation.       5.
+* -ADJUSTMENT:                  nice invocation.        31.
+* --adjustment:                 nice invocation.        31.
+* -n:                           nice invocation.        31.
+* built-in shell commands, conflicts with: nice invocation.  18.
+* conflicts with shell built-ins: nice invocation.      18.
+* appropriate privileges:       nice invocation.        5.
+* priority, modifying:          nice invocation.        5.
+* scheduling priority, modifying: nice invocation.      5.
+* modifying scheduling priority: nice invocation.       5.
+* nice:                         nice invocation.        5.
+* --ignore-environment:         env invocation.         39.
+* -i:                           env invocation.         39.
+* -:                            env invocation.         39.
+* -unset:                       env invocation.         31.
+* -u:                           env invocation.         31.
+* environment, printing:        env invocation.         19.
+* PATH:                         env invocation.         15.
+* running a program in a modified environment: env invocation.  5.
+* modified environment, running a program in a: env invocation.  5.
+* environment, running a program in a modified: env invocation.  5.
+* env:                          env invocation.         5.
+* root directory, running a program in a specified: chroot invocation.  5.
+* running a program in a specified root directory: chroot invocation.  5.
+* chroot:                       chroot invocation.      5.
+* commands for invoking other commands: Modified command invocation.  5.
+* invocation of commands, modified: Modified command invocation.  5.
+* modified command invocation:  Modified command invocation.  5.
+* appropriate privileges:       hostname invocation.    5.
+* system name, printing:        hostname invocation.    5.
+* printing the hostname:        hostname invocation.    5.
+* setting the hostname:         hostname invocation.    5.
+* hostname:                     hostname invocation.    5.
+* version of operating system:  uname invocation.       65.
+* operating system version:     uname invocation.       65.
+* -v:                           uname invocation.       65.
+* name of operating system:     uname invocation.       61.
+* operating system name:        uname invocation.       61.
+* --sysname:                    uname invocation.       61.
+* -s:                           uname invocation.       61.
+* release of operating system:  uname invocation.       55.
+* operating system release:     uname invocation.       55.
+* --release:                    uname invocation.       55.
+* -r:                           uname invocation.       55.
+* host processor type:          uname invocation.       49.
+* --processor:                  uname invocation.       49.
+* -p:                           uname invocation.       49.
+* network node name:            uname invocation.       43.
+* node name:                    uname invocation.       43.
+* hostname:                     uname invocation.       43.
+* --nodename:                   uname invocation.       43.
+* -n:                           uname invocation.       43.
+* hardware type:                uname invocation.       37.
+* machine type:                 uname invocation.       37.
+* --machine:                    uname invocation.       37.
+* -m:                           uname invocation.       37.
+* --all:                        uname invocation.       31.
+* -a:                           uname invocation.       31.
+* system information, printing: uname invocation.       5.
+* print system information:     uname invocation.       5.
+* uname:                        uname invocation.       5.
+* examples of `date':           Examples of date.       5.
+* Greenwich Mean Time:          Options for date.       75.
+* coordinated universal time:   Options for date.       75.
+* --universal:                  Options for date.       75.
+* --utc:                        Options for date.       75.
+* -u:                           Options for date.       75.
+* --set:                        Options for date.       67.
+* -s:                           Options for date.       67.
+* --reference:                  Options for date.       60.
+* -r:                           Options for date.       60.
+* --rfc-822:                    Options for date.       52.
+* -R:                           Options for date.       52.
+* --iso-8601[=TIMESPEC]:        Options for date.       32.
+* -I[TIMESPEC]:                 Options for date.       32.
+* --file:                       Options for date.       23.
+* -f:                           Options for date.       23.
+* last DAY:                     Options for date.       14.
+* next DAY:                     Options for date.       14.
+* tomorrow:                     Options for date.       14.
+* yesterday:                    Options for date.       14.
+* arbitrary date strings, parsing: Options for date.    14.
+* date strings, parsing:        Options for date.       14.
+* parsing date strings:         Options for date.       14.
+* --date:                       Options for date.       14.
+* -d:                           Options for date.       14.
+* options for `date':           Options for date.       5.
+* `date' options:               Options for date.       5.
+* appropriate privileges:       Setting the time.       5.
+* time setting:                 Setting the time.       5.
+* setting the time:             Setting the time.       5.
+* fields, padding numeric:      Padding.                5.
+* padding of numeric fields:    Padding.                5.
+* numeric field padding:        Padding.                5.
+* directives, literal:          Literal directives.     5.
+* literal directives:           Literal directives.     5.
+* directives, date:             Date directives.        5.
+* date directives:              Date directives.        5.
+* beginning of time:            Time directives.        31.
+* seconds since the epoch:      Time directives.        31.
+* epoch, seconds since:         Time directives.        31.
+* directives, time:             Time directives.        5.
+* time directives:              Time directives.        5.
+* formatting times:             date invocation.        12.
+* time formats:                 date invocation.        12.
+* strftime and `date':          date invocation.        12.
+* printing the current time:    date invocation.        5.
+* time, printing or setting:    date invocation.        5.
+* date:                         date invocation.        5.
+* commands for system context:  System context.         5.
+* context, system:              System context.         5.
+* system context:               System context.         5.
+* write, allowed:               who invocation.         76.
+* message status:               who invocation.         76.
+* --writable:                   who invocation.         76.
+* --message:                    who invocation.         76.
+* --mesg:                       who invocation.         76.
+* -T:                           who invocation.         76.
+* -w:                           who invocation.         76.
+* --heading:                    who invocation.         64.
+* -H:                           who invocation.         64.
+* --lookup:                     who invocation.         56.
+* -l:                           who invocation.         56.
+* idle time:                    who invocation.         48.
+* --idle:                       who invocation.         48.
+* -u:                           who invocation.         48.
+* -i:                           who invocation.         48.
+* -s:                           who invocation.         40.
+* --count:                      who invocation.         35.
+* -q:                           who invocation.         35.
+* -m:                           who invocation.         29.
+* who am i:                     who invocation.         20.
+* am i:                         who invocation.         20.
+* /etc/wtmp:                    who invocation.         16.
+* /etc/utmp:                    who invocation.         16.
+* remote hostname:              who invocation.         11.
+* login time:                   who invocation.         11.
+* terminal lines, currently used: who invocation.       11.
+* information, about current users: who invocation.     5.
+* printing current user information: who invocation.    5.
+* who:                          who invocation.         5.
+* /etc/wtmp:                    users invocation.       13.
+* /etc/utmp:                    users invocation.       13.
+* login sessions, printing users with: users invocation.  6.
+* usernames, printing current:  users invocation.       5.
+* printing current usernames:   users invocation.       5.
+* users:                        users invocation.       5.
+* supplementary groups, printing: groups invocation.    5.
+* printing groups a user is in: groups invocation.      5.
+* groups:                       groups invocation.      5.
+* printing the effective UID:   whoami invocation.      5.
+* effective UID, printing:      whoami invocation.      5.
+* whoami:                       whoami invocation.      5.
+* utmp:                         logname invocation.     6.
+* /etc/utmp:                    logname invocation.     6.
+* user name, printing:          logname invocation.     5.
+* login name, printing:         logname invocation.     5.
+* printing user's login name:   logname invocation.     5.
+* logname:                      logname invocation.     5.
+* --user:                       id invocation.          52.
+* -u:                           id invocation.          52.
+* --real:                       id invocation.          44.
+* -r:                           id invocation.          44.
+* --name:                       id invocation.          37.
+* -n:                           id invocation.          37.
+* --groups:                     id invocation.          31.
+* -G:                           id invocation.          31.
+* --group:                      id invocation.          25.
+* -g:                           id invocation.          25.
+* printing real and effective uid and gid: id invocation.  5.
+* effective uid and gid, printing: id invocation.       5.
+* real uid and gid, printing:   id invocation.          5.
+* id:                           id invocation.          5.
+* commands for printing user information: User information.  5.
+* user information, commands for: User information.     5.
+* exit status of `tty':         tty invocation.         20.
+* --quiet:                      tty invocation.         21.
+* --silent:                     tty invocation.         21.
+* -s:                           tty invocation.         21.
+* terminal file name, printing: tty invocation.         5.
+* print terminal file name:     tty invocation.         5.
+* tty:                          tty invocation.         5.
+* exit status of `printenv':    printenv invocation.    17.
+* environment variables, printing: printenv invocation.  5.
+* printing all or some environment variables: printenv invocation.  5.
+* printenv:                     printenv invocation.    5.
+* baud rate, setting:           Special.                51.
+* speed:                        Special.                47.
+* line:                         Special.                43.
+* COLUMNS:                      Special.                36.
+* LINES:                        Special.                36.
+* size:                         Special.                36.
+* columns:                      Special.                32.
+* cols:                         Special.                32.
+* rows:                         Special.                26.
+* ospeed:                       Special.                22.
+* ispeed:                       Special.                18.
+* time:                         Special.                13.
+* min:                          Special.                8.
+* special settings:             Special.                5.
+* lnext:                        Characters.             75.
+* werase:                       Characters.             71.
+* rprnt:                        Characters.             67.
+* dsusp:                        Characters.             63.
+* susp:                         Characters.             59.
+* stop:                         Characters.             55.
+* start:                        Characters.             51.
+* swtch:                        Characters.             47.
+* eol2:                         Characters.             43.
+* eol:                          Characters.             39.
+* eof:                          Characters.             35.
+* kill:                         Characters.             31.
+* erase:                        Characters.             27.
+* quit:                         Characters.             23.
+* intr:                         Characters.             19.
+* u, and disabling special characters: Characters.      11.
+* disabling special characters: Characters.             11.
+* characters, special:          Characters.             5.
+* special characters:           Characters.             5.
+* dec:                          Combination.            86.
+* crt:                          Combination.            82.
+* LCASE:                        Combination.            78.
+* lcase:                        Combination.            78.
+* tabs:                         Combination.            71.
+* decctlq:                      Combination.            67.
+* litout:                       Combination.            62.
+* eight-bit characters:         Combination.            57.
+* pass8:                        Combination.            57.
+* cbreak:                       Combination.            52.
+* raw:                          Combination.            45.
+* cooked:                       Combination.            38.
+* sane:                         Combination.            30.
+* ek:                           Combination.            26.
+* nl:                           Combination.            21.
+* oddp:                         Combination.            16.
+* parity:                       Combination.            11.
+* evenp:                        Combination.            9.
+* combination settings:         Combination.            5.
+* crtkill:                      Local.                  73.
+* echoke:                       Local.                  73.
+* hat notation for control characters: Local.           66.
+* control characters, using `^C': Local.                66.
+* ctlecho:                      Local.                  66.
+* echoctl:                      Local.                  66.
+* prterase:                     Local.                  59.
+* echoprt:                      Local.                  59.
+* background jobs, stopping at terminal write: Local.   52.
+* tostop:                       Local.                  52.
+* case translation:             Local.                  47.
+* xcase:                        Local.                  47.
+* flushing, disabling:          Local.                  42.
+* noflsh:                       Local.                  42.
+* newline, echoing:             Local.                  37.
+* echonl:                       Local.                  37.
+* newline echoing after `kill': Local.                  33.
+* echok:                        Local.                  33.
+* crterase:                     Local.                  28.
+* echoe:                        Local.                  28.
+* echo:                         Local.                  22.
+* iexten:                       Local.                  18.
+* icanon:                       Local.                  13.
+* isig:                         Local.                  8.
+* local settings:               Local.                  5.
+* ffN:                          Output.                 87.
+* vtN:                          Output.                 81.
+* bsN:                          Output.                 75.
+* tabN:                         Output.                 69.
+* crN:                          Output.                 59.
+* nlN:                          Output.                 49.
+* pad character:                Output.                 42.
+* ofdel:                        Output.                 42.
+* pad instead of timing for delaying: Output.           37.
+* ofill:                        Output.                 37.
+* onlret:                       Output.                 32.
+* onocr:                        Output.                 27.
+* newline, translating to crlf: Output.                 22.
+* onlcr:                        Output.                 22.
+* return, translating to newline: Output.               17.
+* ocrnl:                        Output.                 17.
+* lowercase, translating to output: Output.             13.
+* olcuc:                        Output.                 13.
+* opost:                        Output.                 9.
+* output settings:              Output.                 5.
+* beeping at input buffer full: Input.                  65.
+* imaxbel:                      Input.                  65.
+* ixany:                        Input.                  60.
+* uppercase, translating to lowercase: Input.           56.
+* iuclc:                        Input.                  56.
+* flow control, software:       Input.                  51.
+* software flow control:        Input.                  51.
+* tandem:                       Input.                  51.
+* ixoff:                        Input.                  51.
+* XON/XOFF flow control:        Input.                  44.
+* C-s/C-q flow control:         Input.                  44.
+* ixon:                         Input.                  44.
+* return, translating to newline: Input.                40.
+* icrnl:                        Input.                  40.
+* return, ignoring:             Input.                  36.
+* igncr:                        Input.                  36.
+* newline, translating to return: Input.                32.
+* inlcr:                        Input.                  32.
+* eight-bit input:              Input.                  28.
+* istrip:                       Input.                  28.
+* inpck:                        Input.                  24.
+* parity errors, marking:       Input.                  20.
+* parmrk:                       Input.                  20.
+* parity, ignoring:             Input.                  16.
+* ignpar:                       Input.                  16.
+* breaks, cause interrupts:     Input.                  12.
+* brkint:                       Input.                  12.
+* breaks, ignoring:             Input.                  8.
+* ignbrk:                       Input.                  8.
+* input settings:               Input.                  5.
+* RTS/CTS flow control:         Control.                48.
+* flow control, hardware:       Control.                48.
+* hardware flow control:        Control.                48.
+* crtscts:                      Control.                48.
+* modem control:                Control.                44.
+* clocal:                       Control.                44.
+* cread:                        Control.                40.
+* stop bits:                    Control.                35.
+* cstopb:                       Control.                35.
+* hup[cl]:                      Control.                30.
+* eight-bit characters:         Control.                24.
+* character size:               Control.                24.
+* csN:                          Control.                24.
+* even parity:                  Control.                14.
+* odd parity:                   Control.                14.
+* parodd:                       Control.                14.
+* two-way parity:               Control.                9.
+* parenb:                       Control.                9.
+* control settings:             Control.                5.
+* machine-readable `stty' output: stty invocation.      45.
+* --save:                       stty invocation.        45.
+* -g:                           stty invocation.        45.
+* --file:                       stty invocation.        34.
+* -F:                           stty invocation.        34.
+* --all:                        stty invocation.        27.
+* -a:                           stty invocation.        27.
+* line settings of terminal:    stty invocation.        5.
+* terminal settings:            stty invocation.        5.
+* change or print terminal settings: stty invocation.   5.
+* stty:                         stty invocation.        5.
+* built-in shell commands, conflicts with: pwd invocation.  10.
+* conflicts with shell built-ins: pwd invocation.       10.
+* symbolic links and `pwd':     pwd invocation.         6.
+* working directory, printing:  pwd invocation.         5.
+* current working directory, printing: pwd invocation.  5.
+* print name of current directory: pwd invocation.      5.
+* pwd:                          pwd invocation.         5.
+* commands for printing the working context: Working context.  5.
+* working context:              Working context.        5.
+* exit status of `pathchk':     pathchk invocation.     30.
+* --portability:                pathchk invocation.     26.
+* -p:                           pathchk invocation.     26.
+* portable file names, checking for: pathchk invocation.  5.
+* valid file names, checking for: pathchk invocation.   5.
+* file names, checking validity and portability: pathchk invocation.  5.
+* pathchk:                      pathchk invocation.     5.
+* non-directory suffix, stripping: dirname invocation.  5.
+* stripping non-directory suffix: dirname invocation.   5.
+* directory components, printing: dirname invocation.   5.
+* dirname:                      dirname invocation.     5.
+* leading directory components, stripping: basename invocation.  5.
+* file names, stripping directory and suffix: basename invocation.  5.
+* suffix, stripping from file names: basename invocation.  5.
+* directory, stripping from file names: basename invocation.  5.
+* strip directory and suffix from file names: basename invocation.  5.
+* basename:                     basename invocation.    5.
+* commands for file name manipulation: File name manipulation.  5.
+* manipulation of file names:   File name manipulation.  5.
+* file name manipulation:       File name manipulation.  5.
+* --ignore-interrupts:          tee invocation.         29.
+* -i:                           tee invocation.         29.
+* --append:                     tee invocation.         23.
+* -a:                           tee invocation.         23.
+* read from stdin and write to stdout and files: tee invocation.  5.
+* destinations, multiple output: tee invocation.        5.
+* pipe fitting:                 tee invocation.         5.
+* tee:                          tee invocation.         5.
+* commands for redirection:     Redirection.            5.
+* redirection:                  Redirection.            5.
+* examples of `expr':           Examples of expr.       5.
+* comparison operators:         Relations for expr.     23.
+* >=:                           Relations for expr.     23.
+* >:                            Relations for expr.     23.
+* ==:                           Relations for expr.     23.
+* =:                            Relations for expr.     23.
+* <=:                           Relations for expr.     23.
+* <:                            Relations for expr.     23.
+* and operator:                 Relations for expr.     18.
+* logical and operator:         Relations for expr.     18.
+* &:                            Relations for expr.     18.
+* or operator:                  Relations for expr.     13.
+* logical or operator:          Relations for expr.     13.
+* |:                            Relations for expr.     13.
+* relations, numeric or string: Relations for expr.     5.
+* logical connectives:          Relations for expr.     5.
+* connectives, logical:         Relations for expr.     5.
+* remainder:                    Numeric expressions.    18.
+* division:                     Numeric expressions.    18.
+* multiplication:               Numeric expressions.    18.
+* %:                            Numeric expressions.    18.
+* /:                            Numeric expressions.    18.
+* *:                            Numeric expressions.    18.
+* subtraction:                  Numeric expressions.    13.
+* addition:                     Numeric expressions.    13.
+* -:                            Numeric expressions.    13.
+* +:                            Numeric expressions.    13.
+* expressions, numeric:         Numeric expressions.    5.
+* numeric expressions:          Numeric expressions.    5.
+* quote:                        String expressions.     54.
+* length:                       String expressions.     50.
+* index:                        String expressions.     45.
+* substr:                       String expressions.     39.
+* match:                        String expressions.     34.
+* \| regexp operator:           String expressions.     26.
+* \? regexp operator:           String expressions.     26.
+* \+ regexp operator:           String expressions.     26.
+* \( regexp operator:           String expressions.     23.
+* matching patterns:            String expressions.     12.
+* regular expression matching:  String expressions.     12.
+* pattern matching:             String expressions.     12.
+* expressions, string:          String expressions.     5.
+* string expressions:           String expressions.     5.
+* exit status of `expr':        expr invocation.        21.
+* parentheses for grouping:     expr invocation.        17.
+* evaluation of expressions:    expr invocation.        5.
+* expression evaluation:        expr invocation.        5.
+* expr:                         expr invocation.        5.
+* or operator:                  Connectives for test.   19.
+* logical or operator:          Connectives for test.   19.
+* -o:                           Connectives for test.   19.
+* and operator:                 Connectives for test.   15.
+* logical and operator:         Connectives for test.   15.
+* -a:                           Connectives for test.   15.
+* !:                            Connectives for test.   11.
+* connectives, logical:         Connectives for test.   5.
+* logical connectives:          Connectives for test.   5.
+* -ge:                          Numeric tests.          22.
+* -gt:                          Numeric tests.          22.
+* -le:                          Numeric tests.          22.
+* -lt:                          Numeric tests.          22.
+* -ne:                          Numeric tests.          22.
+* -eq:                          Numeric tests.          22.
+* arithmetic tests:             Numeric tests.          5.
+* numeric tests:                Numeric tests.          5.
+* not-equal string check:       String tests.           27.
+* !=:                           String tests.           27.
+* equal string check:           String tests.           23.
+* =:                            String tests.           23.
+* nonzero-length string check:  String tests.           19.
+* -n:                           String tests.           19.
+* zero-length string check:     String tests.           13.
+* -z:                           String tests.           13.
+* string tests:                 String tests.           5.
+* hard link check:              File characteristics tests.  28.
+* same file check:              File characteristics tests.  28.
+* -ef:                          File characteristics tests.  28.
+* older-than file check:        File characteristics tests.  23.
+* -ot:                          File characteristics tests.  23.
+* newer-than file check:        File characteristics tests.  19.
+* -nt:                          File characteristics tests.  19.
+* nonempty file check:          File characteristics tests.  15.
+* -s:                           File characteristics tests.  15.
+* existence-of-file check:      File characteristics tests.  11.
+* -e:                           File characteristics tests.  11.
+* file characteristics tests:   File characteristics tests.  5.
+* owned by effective gid check: Access permission tests.  40.
+* -G:                           Access permission tests.  40.
+* owned by effective uid check: Access permission tests.  36.
+* -O:                           Access permission tests.  36.
+* executable file check:        Access permission tests.  32.
+* -x:                           Access permission tests.  32.
+* writable file check:          Access permission tests.  28.
+* -w:                           Access permission tests.  28.
+* set-user-id check:            Access permission tests.  24.
+* -u:                           Access permission tests.  24.
+* readable file check:          Access permission tests.  20.
+* -r:                           Access permission tests.  20.
+* sticky bit check:             Access permission tests.  16.
+* -k:                           Access permission tests.  16.
+* set-group-id check:           Access permission tests.  11.
+* -g:                           Access permission tests.  11.
+* permission tests:             Access permission tests.  5.
+* access permission tests:      Access permission tests.  5.
+* terminal check:               File type tests.        42.
+* -t:                           File type tests.        42.
+* socket check:                 File type tests.        38.
+* -S:                           File type tests.        38.
+* named pipe check:             File type tests.        34.
+* -p:                           File type tests.        34.
+* symbolic link check:          File type tests.        30.
+* -h:                           File type tests.        30.
+* -L:                           File type tests.        30.
+* regular file check:           File type tests.        24.
+* -f:                           File type tests.        24.
+* directory check:              File type tests.        20.
+* -d:                           File type tests.        20.
+* character special check:      File type tests.        16.
+* -c:                           File type tests.        16.
+* block special check:          File type tests.        12.
+* -b:                           File type tests.        12.
+* file type tests:              File type tests.        5.
+* built-in shell commands, conflicts with: test invocation.  12.
+* conflicts with shell built-ins: test invocation.      12.
+* expression evaluation:        test invocation.        5.
+* compare values:               test invocation.        5.
+* check file types:             test invocation.        5.
+* test:                         test invocation.        5.
+* exit status of `true':        true invocation.        5.
+* successful exit:              true invocation.        5.
+* no-op:                        true invocation.        5.
+* do nothing, successfully:     true invocation.        5.
+* true:                         true invocation.        5.
+* exit status of `false':       false invocation.       5.
+* failure exit status:          false invocation.       5.
+* do nothing, unsuccessfully:   false invocation.       5.
+* false:                        false invocation.       5.
+* exit status commands:         Conditions.             5.
+* commands for exit status:     Conditions.             5.
+* conditions:                   Conditions.             5.
+* repeated output of a string:  yes invocation.         5.
+* yes:                          yes invocation.         5.
+* \c:                           printf invocation.      20.
+* \0xhhh:                       printf invocation.      16.
+* \0ooo:                        printf invocation.      16.
+* printf:                       printf invocation.      5.
+* backslash escapes:            echo invocation.        21.
+* -e:                           echo invocation.        21.
+* -n:                           echo invocation.        17.
+* arbitrary text, displaying:   echo invocation.        5.
+* text, displaying:             echo invocation.        5.
+* printing text:                echo invocation.        5.
+* displaying text:              echo invocation.        5.
+* echo:                         echo invocation.        5.
+* commands for printing text:   Printing text.          5.
+* printing text, commands for:  Printing text.          5.
+* Berry, K.:                    Authors of getdate.     12.
+* Pinard, F.:                   Authors of getdate.     12.
+* Meyering, Jim:                Authors of getdate.     6.
+* MacKenzie, David:             Authors of getdate.     6.
+* Berets, Jim:                  Authors of getdate.     6.
+* Salz, Rich:                   Authors of getdate.     6.
+* Bellovin, Steven M.:          Authors of getdate.     6.
+* authors of `getdate':         Authors of getdate.     5.
+* pure numbers in date strings: Pure numbers in date strings.  5.
+* this in date strings:         Relative item in date strings.  29.
+* today in date strings:        Relative item in date strings.  29.
+* now in date strings:          Relative item in date strings.  29.
+* yesterday in date strings:    Relative item in date strings.  26.
+* tomorrow in date strings:     Relative item in date strings.  26.
+* day in date strings:          Relative item in date strings.  26.
+* ago in date strings:          Relative item in date strings.  21.
+* minute in date strings:       Relative item in date strings.  14.
+* hour in date strings:         Relative item in date strings.  14.
+* day in date strings:          Relative item in date strings.  14.
+* week in date strings:         Relative item in date strings.  14.
+* fortnight in date strings:    Relative item in date strings.  14.
+* month in date strings:        Relative item in date strings.  14.
+* year in date strings:         Relative item in date strings.  14.
+* displacement of dates:        Relative item in date strings.  5.
+* relative items in date strings: Relative item in date strings.  5.
+* last DAY:                     Day of week item.       15.
+* next DAY:                     Day of week item.       15.
+* day of week item:             Day of week item.       5.
+* daylight-saving time:         Time zone item.         70.
+* Universal Time (Coordinated): Time zone item.         55.
+* Universal Coordinated Time:   Time zone item.         55.
+* Coordinated Universal Time:   Time zone item.         55.
+* Greenwich Mean Time:          Time zone item.         55.
+* time zone item:               Time zone item.         5.
+* minutes, time zone correction by: Time of day item.   22.
+* time zone correction:         Time of day item.       22.
+* noon in date strings:         Time of day item.       17.
+* midnight in date strings:     Time of day item.       17.
+* pm in date strings:           Time of day item.       17.
+* am in date strings:           Time of day item.       17.
+* time of day item:             Time of day item.       5.
+* abbreviations for months:     Calendar date item.     36.
+* month names in date strings:  Calendar date item.     36.
+* date format, ISO 8601:        Calendar date item.     29.
+* ISO 8601 date format:         Calendar date item.     29.
+* calendar date item:           Calendar date item.     5.
+* comments, in dates:           General date syntax.    31.
+* case, ignored in dates:       General date syntax.    31.
+* months, written-out:          General date syntax.    28.
+* last in date strings:         General date syntax.    20.
+* next in date strings:         General date syntax.    20.
+* first in date strings:        General date syntax.    20.
+* ordinal numbers:              General date syntax.    20.
+* numbers, written-out:         General date syntax.    20.
+* items in date strings:        General date syntax.    6.
+* general date syntax:          General date syntax.    5.
+* epoch, for Unix:              Date input formats.     34.
+* beginning of time, for Unix:  Date input formats.     34.
+* getdate:                      Date input formats.     5.
+* date input formats:           Date input formats.     5.
+* version number, finding:      Common options.         22.
+* --version:                    Common options.         22.
+* help, online:                 Common options.         17.
+* --help:                       Common options.         17.
+* common options:               Common options.         5.
+* Stallman, Richard:            Introduction.           25.
+* Berry, Karl:                  Introduction.           25.
+* Pinard,  Fran@,{c}ois:        Introduction.           25.
+* Meyering, Jim:                Introduction.           25.
+* MacKenzie, David:             Introduction.           25.
+* history:                      Introduction.           25.
+* bugs, reporting:              Introduction.           19.
+* POSIX.2:                      Introduction.           17.
+* introduction:                 Introduction.           5.
+* utilities for shell programming: Top.                 5.
+* shell utilities:              Top.                    5.
+
+
+

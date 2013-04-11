@@ -1,0 +1,2289 @@
+Info file: cvs-ja.info,    -*-Text-*-
+produced by `texinfo-format-buffer'
+from file `cvs-ja.texinfo'
+using `texinfmt.el' version 2.38 of 3 July 1998.
+
+
+
+START-INFO-DIR-ENTRY
+* CVS-JA: (cvs-ja).        Concurrent Versions System (Japanese)
+END-INFO-DIR-ENTRY
+
+Copyright (C) 1992, 1993 Signum Support AB Copyright (C) 1993, 1994
+Free Software Foundation, Inc.  Copyright (C) 1995-1999 Makoto
+Hiroyasu Copyright (C) 1999 Yoshiki Hayashi
+
+Permission is granted to make and distribute verbatim copies of this
+manual provided the copyright notice and this permission notice are
+preserved on all copies.
+
+Permission is granted to copy and distribute modified versions of this
+manual under the conditions for verbatim copying, provided also that
+the entire resulting derived work is distributed under the terms of a
+permission notice identical to this one.
+
+Permission is granted to copy and distribute translations of this
+manual into another language, under the above conditions for modified
+versions, except that this permission notice may be stated in a
+translation approved by the Free Software Foundation.
+
+
+
+
+
+File: cvs-ja.info, Node: checkout examples, Prev: checkout options, Up: checkout
+
+checkout の使用例
+-----------------
+
+モジュール `tc' のコピーを取り出します:
+
+     $ cvs checkout tc
+
+モジュール `tc' を昨日の状態で取り出します:
+
+     $ cvs checkout -D yesterday tc
+
+
+
+File: cvs-ja.info, Node: commit, Next: diff, Prev: checkout, Up: CVS commands
+
+commit--ファイルをリポジトリに格納する
+======================================
+
+   * 書式: commit [-lnRf] [-m 'log_message' |
+     -F file] [-r revision] [files...]
+   * 必須: 作業ディレクトリ, リポジトリ
+   * 変更: リポジトリ
+   * 別名: ci
+
+`commit' は、作業ファイルに対する変更をリポジトリに組み入れる際に使用
+します。
+
+格納するファイルを特に指定しなければ、現在の作業ディレクトリの全ファイ
+ルが調査され、変更が加えられたファイルだけがリポジトリに格納されます。
+既定 (もしくは明示的にオプション `-R' が指定された場合) では、サブディ
+レクトリのファイルも調査され、変更されていれば格納されます。オプション 
+`-l' を指定して、`commit' の動作を現在のディレクトリだけに留めることも
+可能です。
+
+`commit' は、選択されたファイルがリポジトリの最新リビジョンであるかど
+うか確認します。指定されたファイルの中に `update' (*Note update::) が
+必要なものが一つでもあれば、その旨が表示され、格納せずに終了します。
+`commit' はあえて `update' コマンドを呼び出さず、開発者自身に適切な時
+期を判断してもらいます。
+
+全てが正常ならば、ログ・メッセージを記すためにエディタが起動されます。
+ログ・メッセージは幾つかの処理プログラムに送られると同時に (*Note
+modules:: と *Note loginfo:: を参照)、リポジトリ中の RCS ファイルにも
+記録されます。このログ・メッセージを参照するには `log' コマンドを用い
+て下さい。*Note log:: 参照。オプション `-m MESSAGE' でコマンド行にログ・
+メッセージを記述したり、オプション `-F FILE' でログ・メッセージを記述
+したファイルを指定すれば、エディタを起動しなくて済みます。
+
+* Menu:
+
+* commit options::              commit のオプション
+* commit examples::             commit の使用例
+
+
+
+File: cvs-ja.info, Node: commit options, Next: commit examples, Prev: commit, Up: commit
+
+commit のオプション
+-------------------
+
+`commit' では、以下の標準オプションが利用できます (完全な記述は *Note
+Common options::):
+
+`-l'
+     Local、つまり現在の作業ディレクトリでのみコマンドが実行されます。
+
+`-n'
+     モジュールのプログラムを実行しません。
+
+`-R'
+     ディレクトリを再帰的に格納します。このオプションは指定しなくても
+     実行されます。
+
+`-r REVISION'
+     REVISION に格納します。REVISION には、枝もしくは、既存の全てのリ
+     ビジョン番号よりも大きい番号を持つ幹上のリビジョンを指定しなくて
+     はいけません (*Note Assigning revisions::)。枝上のリビジョンを指
+     定して格納することはできません。
+
+さらに `commit' では以下のオプションも使用可能です:
+
+`-F FILE'
+     エディタを起動せず FILE からログ・メッセージを読み込みます。
+
+`-f'
+     これは *Note Common options:: のオプション `-f' に記述される標準
+     的な動作とは異なることに注意して下さい。
+
+     作業ファイルに何も変更を加えていない場合でも、無理矢理新しいリビ
+     ジョンとして格納します。現在の FILE のリビジョンを 1.7 と仮定した
+     とき、次の二つのコマンドの実行結果は同じになります:
+
+          $ cvs commit -f FILE
+          $ cvs commit -r 1.8 FILE
+
+     `-f' オプションは再帰を使いません (すなわち、`-l' を含んでいます)。
+     全てのサブディレクトリの全てのファイルの新しいリビジョンの格納を 
+     CVS 強制するには、`-f -R' を使用する必要があります。
+
+`-m MESSAGE'
+     エディタを起動せず、MESSAGE をログ・メッセージとします。
+
+
+
+File: cvs-ja.info, Node: commit examples, Prev: commit options, Up: commit
+
+commit の使用例
+---------------
+
+
+
+枝に対して格納する
+..................
+
+オプション `-r' を用いて、枝リビジョン (リビジョン番号が偶数個のドット
+を含むもの) に格納することができます。枝リビジョンは `rtag' か `tag' 
+コマンドにオプション `-b' を指定して作成します (*Note Branching and
+merging::)。そして `checkout' か `update' で、新しく作成した枝からソー
+スを取り出します。その結果、この作業ソースに対する変更を `commit' する
+と、全て自動的に枝リビジョンの方に追加され、幹の開発系統は全く影響を受
+けません。例えば、バージョン 1.2 の製品に対するパッチを作成する必要が
+あるけれど、既にバージョン 2.0 の開発が始まっているような場合、以下の
+ようにします:
+
+     $ cvs rtag -b -r FCS1_2 FCS1_2_Patch product_module
+     $ cvs checkout -r FCS1_2_Patch product_module
+     $ cd product_module
+     [[ hack away ]]
+     $ cvs commit
+
+オプション `-r' は作業ディレクトリに貼り付けられるため、これを指定する
+必要はありません。
+
+
+編集後に枝を作成する
+....................
+
+例えば、先週取り出したリビジョンを元にして、極めて実験的な変更をソフト
+ウェアに加えてきたとします。ここで実験に他の開発者を加えたいけれど、幹
+の開発系統を妨げたくない場合は、その変更点を新しい枝に格納すれば良いで
+しょう。すると他の開発者も実験中のコードを取り出して、CVS の衝突解決の
+恩恵を全て受けることができます。このシナリオは次のようになるでしょう:
+
+     [[ hacked sources are present ]]
+     $ cvs tag -b EXPR1
+     $ cvs update -r EXPR1
+     $ cvs commit
+
+`update' コマンドで、全てのファイルにオプション `-r EXPR1' が貼り付け
+られます。このとき、`update' コマンドではファイルに対する変更が削除さ
+れないことに注意して下さい。`-r' が貼り付けられているため、`commit' す
+れば自動的に正しい枝に変更が格納されます。これは次の手順もあります:
+
+     [[ hacked sources are present ]]
+     $ cvs tag -b EXPR1
+     $ cvs commit -r EXPR1
+
+しかしこの場合、変更されていたファイルだけに `-r EXPR1' が貼り付けられ
+ます。従って別のファイルを変更して、フラグ `-r EXPR1' を付けずに格納し
+た場合、誤って幹に格納されてしまいます。
+
+他の開発者が実験に参加する際には、単純に以下のようにして下さい:
+
+     $ cvs checkout -r EXPR1 whatever_module
+
+
+
+File: cvs-ja.info, Node: diff, Next: export, Prev: commit, Up: CVS commands
+
+diff--リビジョン間の差分の表示
+==============================
+
+   * 書式: diff [-lR] [format_options] [[-r rev1 | -D date1] [-r rev2
+     | -D date2]] [files...]
+   * 必須: 作業ディレクトリ, リポジトリ
+   * 変更: なし
+
+`diff' コマンドは、別々のリビジョン間の差異を比較するのに使用します。
+特にオプションを指定しない場合、作業ファイルをその由来となったリビジョ
+ンと比較し、検出された全ての差異を報告します。
+
+ファイル名を指定した場合、そのファイルについてのみ比較します。ディレク
+トリを指定した場合、その下の全てのファイルを比較します。
+
+diff の終了状態は他の CVS コマンドと違います。詳細は *Note Exit
+status:: を参照してください。
+
+* Menu:
+
+* diff options::                diff のオプション
+* diff examples::               diff の使用例
+
+
+
+File: cvs-ja.info, Node: diff options, Next: diff examples, Prev: diff, Up: diff
+
+diff のオプション
+-----------------
+
+`diff' では、以下の標準オプションが利用できます (完全な記述は *Note
+Common options::):
+
+`-D DATE'
+     DATE 以前の最も新しいリビジョンを利用します。このオプションを比較
+     に用いた時の効果は `-r' を参照して下さい。
+
+`-k KFLAG'
+     KFALG に従ってキーワード置換を行います。*Note Keyword
+     substitution::, 参照。
+
+`-l'
+     Local、つまり現在の作業ディレクトリでのみコマンドが実行されます。
+
+`-R'
+     ディレクトリを再帰的に調べます。このオプションは指定しなくても実
+     行されます。
+
+`-r TAG'
+     リビジョン TAG と比較します。オプション `-r' は最大二つまで使用で
+     きます。オプション `-r' を指定しない場合、作業ファイルをその由来
+     となったリビジョンと比較します。オプション `-r' を一つ指定した場
+     合、指定したリビジョンと作業ファイルとを比較します。オプション 
+     `-r' を二つ指定した場合、指定した二つのリビジョンを比較します (作
+     業ファイルが結果に影響を与えることはありません)。
+
+     一つもしくは両方のオプション `-r' を、前述のオプション `-D DATE' 
+     と交換することができます。
+
+以下のオプションは出力の書式を指定します。意味は GNU diff と同じです。
+
+     -0 -1 -2 -3 -4 -5 -6 -7 -8 -9
+     --binary
+     --brief
+     --changed-group-format=ARG
+     -c
+       -C NLINES
+       --context[=LINES]
+     -e --ed
+     -t --expand-tabs
+     -f --forward-ed
+     --horizon-lines=ARG
+     --ifdef=ARG
+     -w --ignore-all-space
+     -B --ignore-blank-lines
+     -i --ignore-case
+     -I REGEXP
+        --ignore-matching-lines=REGEXP
+     -h
+     -b --ignore-space-change
+     -T --initial-tab
+     -L LABEL
+       --label=LABEL
+     --left-column
+     -d --minimal
+     -N --new-file
+     --new-line-format=ARG
+     --old-line-format=ARG
+     --paginate
+     -n --rcs
+     -s --report-identical-files
+     -p
+     --show-c-function
+     -y --side-by-side
+     -F REGEXP
+     --show-function-line=REGEXP
+     -H --speed-large-files
+     --suppress-common-lines
+     -a --text
+     --unchanged-group-format=ARG
+     -u
+       -U NLINES
+       --unified[=LINES]
+     -V ARG
+     -W COLUMNS
+       --width=COLUMNS
+
+
+
+File: cvs-ja.info, Node: diff examples, Prev: diff options, Up: diff
+
+diff の使用例
+-------------
+
+次の実行例は、`backend.c' のリビジョン 1.14 と 1.19 間の差分を、
+unidiff 形式 (フラグ `-u') で出力します。またキーワード置換を止めるた
+めに `-kk' を指定し、キーワード置換による差分を無視します。
+
+     $ cvs diff -kk -u -r 1.14 -r 1.19 backend.c
+
+タグ RELEASE_1_0 が付けられたファイルの集合から、実験用の枝 EXPR1 が派
+生していると仮定します。この枝に加えられた変更を見るには、次のようにし
+ます:
+
+     $ cvs diff -r RELEASE_1_0 -r EXPR1
+
+次の実行例では、二つのリリース間の差分を context 形式で出力します:
+
+     $ cvs diff -c -r RELEASE_1_0 -r RELEASE_1_1 > diffs
+
+ChangeLogs を運用している場合、変更を格納する前に次の行のようなコマン
+ドを実行すると、ChangeLogs の記載事項を入力するのに役立つでしょう。作
+業ファイルに加えた変更点のうち、格納していないもの全てを表示します。
+
+     $ cvs diff -u | less
+
+
+
+File: cvs-ja.info, Node: export, Next: history, Prev: diff, Up: CVS commands
+
+export--CVS からソースを取り出す, checkout に類似
+=================================================
+
+   * 書式: export [-flNnR] [-r rev|-D date] [-k subst] [-d dir]
+     module...
+   * 必須: リポジトリ
+   * 変更: 現在のディレクトリ
+
+このコマンドは `checkout' の変形で、MODULE のソースのコピーを、CVS の
+管理用ディレクトリを除いた状態で取り出します。例えば出荷用のソースを準
+備するときなどに `export' を使います。出荷したソースを後で再現できるこ
+とを確認するため、使用の際には (`-D' か `-r' による) 日付かタグの指定
+が要求されます。
+
+`cvs export' に `-kv' を指定すると便利です。この指定で全てのキーワード
+が展開されるため、出荷先で `import' されてもキーワードによるリビジョン
+情報が失われません。しかしモジュールがバイナリ・ファイルを含む場合は、
+正しく処理されない可能性があるので注意が必要です。また `-kv' を使用し
+た後では、`ident' コマンド (RCS を構成するコマンドの一つです---
+`ident(1)' を参照) を使用して、キーワード文字列を抜き出すことができま
+せん。従って `ident' を使用するつもりなら、`-kv' を指定してはいけませ
+ん。
+
+* Menu:
+
+* export options::              export のオプション
+
+
+
+File: cvs-ja.info, Node: export options, Prev: export, Up: export
+
+export のオプション
+-------------------
+
+`export' では、以下の標準オプションが利用できます (完全な記述は *Note
+Common options::):
+
+`-D DATE'
+     DATE 以前の最も新しいリビジョンを取り出します。
+
+`-f'
+     指定したリビジョンが見付からなかった場合、(そのファイルを無視せず
+     に) 最も新しいリビションを取り出します。
+
+`-l'
+     Local、つまり現在の作業ディレクトリでのみコマンドが実行されます。
+
+`-n'
+     ファイルを取り出したとき、通常実行されるプログラムを実行しません。
+
+`-R'
+     ディレクトリを再帰的に取り出します。このオプションは指定しなくて
+     も実行されます。
+
+`-r TAG'
+     TAG で指定されたリビジョンを取り出します。
+
+さらに (`checkout' と `export' で共通な) 以下のオプションも使用可能で
+す:
+
+`-d DIR'
+     モジュール名を使用する代りに DIR というディレクトリを作成します。
+     CVS がこのフラグを扱う方法の完全な詳細は *Note checkout
+     options::.
+
+`-k SUBST'
+     キーワード置換モードを設定します (*Note Substitution modes::)。
+
+`-N'
+     `-d DIR' と併用した場合にのみ有効です。CVS がこのフラグを扱う方法
+     の完全な詳細は *Note checkout options::.
+
+
+
+
+File: cvs-ja.info, Node: history, Next: import, Prev: export, Up: CVS commands
+
+history--ファイルと使用者の状態を表示
+=====================================
+
+   * 書式: history [-report] [-flags] [-options args] [files...]
+   * 必須: ファイル `$CVSROOT/CVSROOT/history'
+   * 変更: なし
+
+CVS は、`checkout', `commit', `rtag', `update', `release' コマンドの実
+行履歴を、ファイル `history' に記録しています。`history' を使って、様々
+な形式でこの情報を表示することができます。
+
+ログを記録したい場合は、ファイル `$CVSROOT/CVSROOT/history' を作成する
+必要があります。
+
+*警告:* `history' は、`-f', `-l', `-n', `-p' を通常の CVS コマンドで用
+いられるものとは異なる意味で使用しています (*Note Common options::)。
+
+* Menu:
+
+* history options::             history のオプション
+
+
+
+File: cvs-ja.info, Node: history options, Prev: history, Up: history
+
+history のオプション
+--------------------
+
+次のオプション (コマンド書式で `-report' の部分) によって、生成する報
+告の種類を決定します:
+
+`-c'
+     現在までに使用された `commit' (つまりリポジトリの変更) について報
+     告します。
+
+`-e'
+     全て (全記録種別) を報告します。全ての記録種別に `-x' を指定する
+     ことと等価です。もちろん、`-e' は将来のバージョンの CVS に加えら
+     れた記録種別も含みます。特定の記録種別だけを扱うことのできるスク
+     リプトを書いているなら、`-x' を指定する方が良いでしょう。
+
+`-m MODULE'
+     特定のモジュールについて報告します (必要ならば複数の `-m' をコマ
+     ンド行に並べても構いません)。
+
+`-o'
+     取り出されたモジュールについて報告します。
+
+`-T'
+     全てのタグについて報告します。
+
+`-x TYPE'
+     報告を受けたい記録種別の組を TYPE に指定して、CVS の実行履歴から
+     取り出します。種別は各々一文字で表され、これを組み合わせて指定し
+     ます。
+
+     以下のコマンドには、各々一つの記録種別を割り当てています:
+
+     `F'
+          release
+     `O'
+          checkout
+     `E'
+          export
+     `T'
+          rtag
+
+     更新の結果は、以下の四つの記録種別のうちのどれかになります:
+
+     `C'
+          マージを実行した結果、衝突が検出された場合 (手動でのマージが
+          必要)。
+     `G'
+          マージを実行して成功した場合。
+     `U'
+          作業ファイルがリポジトリからコピーされた場合。
+     `W'
+          (リポジトリから相当するファイルが削除されたため) 更新の際に
+          作業ファイルが削除された場合。
+
+     格納の結果は、以下の三つの記録種別のうちのどれかになります:
+
+     `A'
+          ファイルが初めて追加された場合。
+     `M'
+          ファイルが修正された場合。
+     `R'
+          ファイルが削除された場合。
+
+次のオプション (コマンド書式で `-flags' の部分) によって、報告の範囲を
+限定もしくは拡大します。引数はありません:
+
+`-a'
+     全ての使用者の情報を表示します (既定では `history' を実行した人物
+     の情報のみを表示します)。
+
+`-l'
+     最後の変更のみを表示します。
+
+`-w'
+     `history' を実行したのと同じ作業ディレクトリから行われた変更に関
+     する記録のみを表示します。
+
+次のオプション (コマンド書式で `-options ARGS' の部分) は、引数に基づ
+いて報告の範囲を限定します:
+
+`-b STR'
+     モジュール名, ファイル名, リポジトリのパスのいずれかに、文字列 
+     STR が含まれる記録のみを表示します。
+
+`-D DATE'
+     DATE 以降のデータを表示します。普通の `-D DATE' は DATE 以前の最
+     新リビジョンを選択しますから、少し意味が違います。
+
+`-f FILE'
+     特定のファイルのデータを表示します (`-f' オプションをコマンド行で
+     複数指定することができます)。これはコマンド行でファイルを指定する
+     のと等価です。
+
+`-n MODULE'
+     特定のモジュールのデータを表示します (複数の `-n' をコマンド行で
+     並べることができます)。
+
+`-p REPOSITORY'
+     指定したリポジトリのデータを表示します (必要ならば複数の `-p' を
+     コマンド行に並べても構いません。)
+
+`-r REV'
+     リビジョンもしくはタグを REV に指定して、このリビジョン以降の記録
+     を表示します。実行時に全ての RCS ファイルについて REV を検索しま
+     す。
+
+`-t TAG'
+     履歴ファイルにタグ TAG が追加された後の記録を表示します。このオプ
+     ションを指定した場合、RCS ファイルを検索せず、履歴ファイルのみを
+     参照するため、オプション `-r' の場合よりもかなり高速です。
+
+`-u NAME'
+     NAME で指定された使用者の記録を表示します。
+
+`-z TIMEZONE'
+     選択された登録の時間を UTC の代わりに指定された標準時を用いて表示
+     します。
+
+
+
+
+File: cvs-ja.info, Node: import, Next: log, Prev: history, Up: CVS commands
+
+import--CVS にソースを取り込む, ベンダー枝を使用
+================================================
+
+
+   * 書式: import [-options] repository vendortag releasetag...
+   * 必須: リポジトリ, ソースの配布ディレクトリ
+   * 変更: リポジトリ
+
+`import' を用いて、外部の供給元 (例えばソース・ベンダー) からのソース
+配布物全体を、自分のリポジトリに取り入れることができます。リポジトリを
+最初に作成する場合と、外部の供給元がモジュールを大幅に更新した場合の両
+方でこのコマンドを用います。この件については *Note Tracking sources::.
+
+REPOSITORY には、リポジトリにするディレクトリの名前 (もしくは、ディレ
+クトリへのパス) を、CVS のルート・ディレクトリからの相対パス名で指定し
+ます。指定したディレクトリが存在しなくても自動的に作成されます。
+
+(前回の import から) ずっと変更を加えてきたリポジトリに対し、ソースを
+更新するために import を用いると、互いの開発系統間で衝突が発生したファ
+イル全てが報告されます。この時 import から具体的な指示がありますので、
+それを参考にしながら `checkout -j' を使って変更点を取り入れて下さい。
+
+CVS は無視するように設定されたファイルは (*Note cvsignore::)、取り込ま
+ず、無視したことを示すため `I ' に続けてファイル名を表示します (出力に
+関する完全な説明は *Note import output::)。
+
+`$CVSROOT/CVSROOT/cvswrappers' が存在する場合、このファイルの記述に合
+致するファイルやディレクトリは各々一括して扱われ、リポジトリに取り込ま
+れる前に、適切なフィルタが適用されます。*Note Wrappers::.
+
+外部からのソースは第一層の枝、既定だと 1.1.1 に保存されます。以降の更
+新は全てこの枝の葉となります。例えば最初に取り込んだソース集合のファイ
+ルはリビジョン 1.1.1.1 になり、次の取り込みでそのファイルが更新された
+場合には 1.1.1.2 となり、以下同様に続きます。
+
+少なくとも次の三つの引数を指定する必要があります。まずソース集合を識別
+するために REPOSITORY が必要です。次の VENDORTAG は枝全体 (例えば 
+1.1.1) を示すタグ名です。そして `import' を実行する度に作成される葉の
+うち、どの葉のファイルかを識別するため、最低一つの RELEASETAG を指定し
+なくてはいけません。
+
+`import' はそれを起動したディレクトリを変更 *しない* ということに注意
+してください。特に、ディレクトリを CVS の作業ディレクトリとして設定し
+ないことに注意してください。もし作業をしたいなら、まずソースを取り込ん
+で、それから違うディレクトリに取り出してください (*Note Getting the
+source::)。
+
+* Menu:
+
+* import options::              import のオプション
+* import output::               import の出力
+* import examples::             import の使用例
+
+
+
+File: cvs-ja.info, Node: import options, Next: import output, Prev: import, Up: import
+
+import のオプション
+-------------------
+
+`import' では、以下の標準オプションが利用できます (完全な記述は *Note
+Common options::):
+
+`-m MESSAGE'
+     エディタを立ち上げる代りに、MESSAGE をログ情報に指定します。
+
+以下のような追加の特別なオプションがあります。
+
+`-b BRANCH'
+     *Note Multiple vendor branches:: 参照。
+
+`-k SUBST'
+     希望するキーワード置換モードを指定します。この設定は、新たに取り
+     入れる全てのファイルに適用されますが、リポジトリに既に存在するファ
+     イルには適用されません。`-k' に使用できる設定の一覧は *Note
+     Substitution modes:: 参照。
+
+`-I NAME'
+     取り込む際に無視するファイル名を指定します。無視したいファイルが
+     複数あるときは、このオプションを何個並べても構いません。全てのファ
+     イルを無視したくない場合は、(それらは既定では無視されるとしても)
+     `-I !' と指定して下さい。
+
+     NAME には、ファイル `.cvsignore' と同じファイル名形式が使用できま
+     す。*Note cvsignore::.
+
+`-W SPEC'
+     取り込む際に、フィルタを適用したいファイル名を指定します。フィル
+     タを適用したいファイルが複数あるときは、このオプションを何個並べ
+     ても構いません。
+
+     SPEC には、ファイル `.cvswrappers' と同じファイル名形式が使用でき
+     ます。*Note Wrappers::.
+
+
+
+File: cvs-ja.info, Node: import output, Next: import examples, Prev: import options, Up: import
+
+import の出力
+-------------
+
+`import' の進行状況を知らせるために、処理中のファイル名が一行ずつ表示
+され、行頭にはファイルの状態を示す文字が付加されます:
+
+`U FILE'
+     このファイルが既にリポジトリに存在し、かつ変更されてないことを示
+     します。(必要ならば) 新しいリビジョンが作成されます。
+
+`N FILE'
+     このファイルが新規であり、リポジトリに追加されたことを示します。
+
+`C FILE'
+     このファイルが既にリポジトリに存在し、かつ変更されていて、マージ
+     が必要であることを示します。
+
+`I FILE'
+     このファイルが無視されることを示します (*Note cvsignore::)。
+
+`L FILE'
+     このファイルがシンボリック・リンクであることを示します。`cvs
+     import' はシンボリック・リンクを無視します。いろんな人が定期的に
+     この振舞いは変更されるべきだと提案しますが、どれに変更されるべき
+     かについての同意があるとすれば、それは明らかでないように思われま
+     す。(管理用ファイル `modules' の各種オプションを checkout や 
+     update 等でシンボリック・リンクを再生成するために使うことができま
+     す。*Note modules::。)
+
+
+
+File: cvs-ja.info, Node: import examples, Prev: import output, Up: import
+
+import の使用例
+---------------
+
+*Note Tracking sources:: と *Note From files:: を参照して下さい。
+
+
+
+File: cvs-ja.info, Node: log, Next: rdiff, Prev: import, Up: CVS commands
+
+log--ファイルのログ情報を表示
+=============================
+
+   * 書式: log [options] [files...]
+   * 必須: リポジトリ, 作業ディレクトリ
+   * 変更: なし
+
+ファイルのログ情報を表示します。以前の `log' は RCS のコマンド `rlog' 
+を呼び出していましたが、現在はそうではありません。しかしこのような経緯
+から、このコマンドの出力やオプションは、他の CVS コマンドとは異なった
+ものになっています。
+
+このコマンドの出力には、RCS ファイルの所在、"先頭"リビジョン (幹の最新
+リビジョン)、全てのタグ名などが含まれます。各リビジョンに対しては、リ
+ビジョン番号、格納者、追加/削除された行数、ログ・メッセージが表示され
+ます。また時間は全て協定世界時 (UTC) で表示されます。(CVS の他の部分で
+は地方時間帯による時刻を表示します。)
+
+*警告:* `log' は `-R' を CVS 普通の使用と衝突する方法で使います (*Note
+Common options::)。
+
+* Menu:
+
+* log options::                 log のオプション
+* log examples::                log の例
+
+
+
+File: cvs-ja.info, Node: log options, Next: log examples, Prev: log, Up: log
+
+log のオプション
+----------------
+
+オプションを指定しなければ、`log' は利用できる全ての情報を表示します。
+つまりオプションは全て出力を制限するものです。
+
+`-b'
+     既定の枝 (通常は幹で最も大きな番号の枝) に関する情報を表示します。
+
+`-d DATES'
+     DATES に示されたリビジョンの情報を表示します。DATES には格納日時
+     の範囲をセミコロンで区切って記述します。日時の表現形式は他の CVS 
+     コマンドの `-D' オプションと同じです (*Note Common options::)。そ
+     れを次のように組み合わせて、格納日時の範囲を表現します:
+
+     `D1<D2'
+     `D2>D1'
+          D1 から D2 までの間に格納されたリビジョンを選択します。
+
+     `<D'
+     `D>'
+          D より前に格納された全てのリビジョンを選択します。
+
+     `D<'
+     `>D'
+          D より後に格納された全てのリビジョンを選択します。
+
+     `D'
+          D 以前の最新のリビジョンを一つ選択します。
+
+     `>' や `<' の後に `=' を付ければ、端を含まない範囲指定ではなく、
+     端を含むような範囲指定が可能です。
+
+     要素の区切りがセミコロン `;' であることに注意して下さい。
+
+`-h'
+     RCS ファイルの名前, 作業ディレクトリのファイル名, 先頭リビジョン, 
+     既定の枝, 利用者一覧, ロックモード, タグ名, 拡張子を表示します。
+
+`-l'
+     Local、つまり現在の作業ディレクトリでのみコマンドが実行されます。
+     (これを指定しない場合再帰的に実行されます)。
+
+`-N'
+     このファイルではタグ名の一覧を表示しません。タグ名を多く使用して
+     いると、その表示だけで3ページ以上のタグ情報を "more" することにな
+     ります。タグ名を省略したログ情報でも構わないときは、このオプショ
+     ンを指定すると便利です。
+
+`-R'
+     RCS ファイルの名前だけを表示します。
+
+`-rREVISIONS'
+     REVISIONS に示されたリビジョンの情報を表示します。REVISIONS には
+     リビジョンの範囲をカンマで区切って記述します。利用可能な範囲指定
+     の書式を次に示します:
+
+     `REV1:REV2'
+          REV1 から REV2 までのリビジョンを選択します (同じ枝である必
+          要があります)。
+
+     `:REV'
+          枝の最初から REV までのリビジョンを選択します。
+
+     `REV:'
+          REV から同じ枝の最後のリビジョンまでを選択します。
+
+     `BRANCH'
+          枝 BRANCH にある全てのリビジョンを選択します。
+
+     `BRANCH1:BRANCH2'
+          この範囲内の枝にある全てのリビジョンを選択します。
+
+     `BRANCH.'
+          枝 BRANCH の最新リビジョンを選択します。
+
+     リビジョンを指定せず `-r' だけを指定した場合、既定の枝、通常は幹
+     の最新リビジョンを選択します。従って `-r' と引数との間に空白を入
+     れないようにして下さい。
+
+`-s STATES'
+     STATES と状態が一致するリビジョンの情報を表示します。STATES には
+     ファイルの状態をカンマで区切って記述します。
+
+`-t'
+     `-h' の情報に、ファイルの説明文を追加して表示します。
+
+`-wLOGINS'
+     LOGINS に示された使用者が格納したリビジョンの情報を表示します。
+     LOGINS には使用者名をカンマで区切って記述します。LOGINS を省略し
+     た場合、コマンドを起動した人物の使用者名が用いられます。従って 
+     `-w' と引数との間に空白を入れないようにして下さい。
+
+`log' は、オプション `-d', `-s', `-w' の全てに適合し、かつ `-b', `-r' 
+のいずれかに適合したリビジョンに関する情報を表示します。
+
+
+
+File: cvs-ja.info, Node: log examples, Prev: log options, Up: log
+
+log の使用例
+------------
+
+使用例を募集しています。
+
+
+
+File: cvs-ja.info, Node: rdiff, Next: release, Prev: log, Up: CVS commands
+
+rdiff--リリース間の `patch' 形式の差分
+======================================
+
+   * 書式: rdiff [-flags] [-V vn] [-r t|-D d [-r t2|-D d2]] modules...
+   * 必須: リポジトリ
+   * 変更: なし
+   * 別名: patch
+
+二つのリリース間の差分を、Larry Wall の `patch(1)' ファイル形式で生成
+します。この出力を直接 `patch' プログラムに食わせて、古いリリースを新
+しいリリースに更新できます。(これは作業ディレクトリを必要とせず、直接
+リポジトリを操作する数少ない CVS コマンドの一つです。) このコマンドの
+実行結果は標準出力に送られます。
+
+一つないし二つのリビジョンか日付の組み合わせを (標準オプション `-r' や 
+`-D' を用いて) 指定することができます。リビジョンか日付を一つだけ指定
+した場合、指定したものと RCS ファイルの先頭リビジョンとの差分がパッチ・
+ファイルとして出力されます。
+
+ソフトウェア配布物が複数のディレクトリから構成される場合、別のディレク
+トリに置かれた古いソースを参照するために、`patch' コマンドにオプション 
+`-p' を指定する必要があるかも知れません。
+
+* Menu:
+
+* rdiff options::               rdiff のオプション
+* rdiff examples::              rdiff の使用例
+
+
+
+File: cvs-ja.info, Node: rdiff options, Next: rdiff examples, Prev: rdiff, Up: rdiff
+
+rdiff のオプション
+------------------
+
+`rdiff' では、以下の標準オプションが利用できます (完全な記述は *Note
+Common options::):
+
+`-D DATE'
+     DATE 以前の最も新しいリビジョンを利用します。
+
+`-f'
+     指定したリビジョンが見付からなかった場合、(そのファイルを無視せず
+     に) 最も新しいリビションを用います。
+
+`-l'
+     Local、つまり現在の作業ディレクトリでのみコマンドが実行されます。
+
+`-R'
+     ディレクトリを再帰的に検査します。このオプションは指定しなくても
+     実行されます。
+
+`-r TAG'
+     TAG で指定されたリビジョンを用います。
+
+さらに以下のオプションも使用可能です:
+
+`-c'
+     Context 形式で出力します。これが既定形式なので指定する必要はあり
+     ません。
+
+`-s'
+     パッチの代りに変更要旨だけが報告されます。指定したリリース間で変
+     更されたり追加されたファイルの情報が標準出力に送られます。これは
+     例えば、二つの日付やリビジョン間で変更されたファイルを一覧するの
+     に便利です。
+
+`-t'
+     先頭にある二つのリビジョン間の差分を標準出力に送ります。これは、
+     そのファイルの最新の変更点を見るときに使います。
+
+`-u'
+     Context 形式ではなく、unidiff 形式を用います。古いバージョンの 
+     `patch' プログラムは unidiff 形式を扱えないので、パッチをネットに
+     投稿するつもりならば、`-u' を使用しない方が賢明でしょう。
+
+`-V VN'
+     RCS のバージョン VN における展開方法に従って、キーワードを展開し
+     ます (RCS のバージョン 5 で展開方法が変更されました)。このオプショ
+     ンはもう使用できないことに注意してください。CVS は RCS バージョン 
+     5 がするように常にキーワードを展開します。
+
+
+
+File: cvs-ja.info, Node: rdiff examples, Prev: rdiff options, Up: rdiff
+
+rdiff の使用例
+--------------
+
+foo@example.net から、コンパイラ `tc' をリリース 1.2 から 1.4 へ更新し
+たい、というメールを受け取ったと仮定します。手元にそんなパッチがない場
+合でも、CVS なら次のようなコマンドを使って簡単に対応できます:
+
+     $ cvs rdiff -c -r FOO1_2 -r FOO1_4 tc | \
+     $$ Mail -s 'The patches you asked for' foo@example.net
+
+リリース 1.3 のバグ修正用に枝 `R_1_3fix' を作成し、修正後のリリース 
+1.3.1 にタグ `R_1_3_1' を付けたと仮定します。この枝に対して、修正版以
+降に加えられた開発の概略を知りたい場合は、次のようなコマンドを使います:
+
+     $ cvs patch -s -r R_1_3_1 -r R_1_3fix module-name
+     cvs rdiff: Diffing module-name
+     File ChangeLog,v changed from revision 1.52.2.5 to 1.52.2.6
+     File foo.c,v changed from revision 1.52.2.3 to 1.52.2.4
+     File bar.h,v changed from revision 1.29.2.1 to 1.2
+
+
+
+File: cvs-ja.info, Node: release, Next: update, Prev: rdiff, Up: CVS commands
+
+release--モジュールの放棄を表明する
+===================================
+
+   * 書式: release [-d] directories...
+   * 必須: 作業ディレクトリ
+   * 変更: 作業ディレクトリ, history のログ情報
+
+このコマンドは `cvs checkout' の効果を安全に消し去ります。CVS はファイ
+ルをロックしないため、このコマンドが絶対に必要なわけではありません。作
+業ディレクトリを単に削除したいなら、それでも構いません。ただしこの場合、
+うっかりすると変更内容を失う恐れがあります。またファイル `history'
+(*Note history file::) にも、作業ディレクトリを放棄したという情報が残
+りません。
+
+これらの問題を避けるためにも `cvs release' を使用して下さい。このコマ
+ンドは、未格納の変更点が残ってないかどうか調べます。次に CVS の作業ディ
+レクトリのすぐ上で実行しているかどうか調べます。さらに作業ディレクトリ
+に記録されたリポジトリが、モジュールに定義されているリポジトリと等しい
+かどうか調べます。
+
+上記全ての条件が満たされた場合にだけ、(作業ディレクトリを故意に放棄し
+た証拠として) CVS の履歴ログ に `cvs release' の実行記録が残されます。
+
+* Menu:
+
+* release options::             release のオプション
+* release output::              release の出力
+* release examples::            release の使用例
+
+
+
+File: cvs-ja.info, Node: release options, Next: release output, Prev: release, Up: release
+
+release のオプション
+--------------------
+
+`release' ではオプションが一つだけ利用できます:
+
+`-d'
+     放棄判定に成功したとき、作業ディレクトリを削除します。このフラグ
+     を指定しない場合、作業ディレクトリはそのまま残されます。
+
+     *警告:* `release' コマンドは全てのディレクトリとファイルを再帰的
+     に削除していきます。これには重篤な副作用があり、作業ディレクトリ
+     に作成したけれど、リポジトリには追加してないディレクトリ全てが、
+     (`add' コマンド使って。*Note Adding files::) 何の表示も無く削除さ
+     れます--その中身が空でなくても!
+
+
+
+File: cvs-ja.info, Node: release output, Next: release examples, Prev: release options, Up: release
+
+release の出力
+--------------
+
+`release' によって作業ディレクトリを放棄する前に、最新でないファイルそ
+れぞれについて一行ずつ状態を表示します。
+
+*警告:* 作成はしたけれど、`add' コマンドを用いて (*Note Adding
+files::) CVS のディレクトリ階層に加えてないディレクトリは、全て中身が
+あっても完全に無視され (`-d' が指定されていれば削除され) ます。
+
+`U FILE'
+`P FILE'
+     より新しいリビジョンがリポジトリに存在し、かつ作業ファイルが編集
+     されてないことを示します。(`U' と `P' は同じです。)
+
+`A FILE'
+     作業ディレクトリにファイルが追加されたけれど、まだリポジトリには
+     格納されてないことを示します。作業ディレクトリを削除すれば、この
+     ファイルは失なわれます。
+
+`R FILE'
+     作業ファイルは削除されているけれど、まだこの変更が格納されてない
+     ため、リポジトリからは削除されてないことを示します。*Note
+     commit::.
+
+`M FILE'
+     作業ディレクトでファイルが修正されています。リポジトリにも新しい
+     リビジョンがあるかもしれません。
+
+`? FILE'
+     作業ディレクトリに FILE というファイルがあるが、リポジトリには対
+     応するファイルが無く、CVS が無視するファイルの一覧にも入ってない
+     ことを示します (`-I' オプションの説明の参照と、*Note cvsignore::)。
+     作業ディレクトリを削除すれば、このファイルは失なわれます。
+
+
+
+File: cvs-ja.info, Node: release examples, Prev: release output, Up: release
+
+release の使用例
+----------------
+
+ディレクトリ `tc' の放棄判定をしてから作業ディレクトリを削除します。
+
+     $ cd ..         # `cvs release' は作業ディレクトリの
+                     # すぐ上で実行しなくてはいけません。
+     $ cvs release -d tc
+     You have [0] altered files in this repository.
+     Are you sure you want to release (and delete) directory `tc': y
+     $
+
+
+
+File: cvs-ja.info, Node: update, Prev: release, Up: CVS commands
+
+update--作業コピーをリポジトリと一致させる
+==========================================
+
+   * 書式: update [-AdflPpR] [-d] [-r tag|-D date] files...
+   * 必須: リポジトリ, 作業ディレクトリ
+   * 変更: 作業ディレクトリ
+
+共有するリポジトリから作業コピーを取り出した後でも、他の開発者はリポジ
+トリのソースを変更し続けるでしょう。開発工程の然るべき時に `update' コ
+マンドを使えば、最後の `checkout' や `update' 以降の、どのリビジョンで
+も取り入れることができます。
+
+* Menu:
+
+* update options::              update のオプション
+* update output::               update の出力
+
+
+
+File: cvs-ja.info, Node: update options, Next: update output, Prev: update, Up: update
+
+update のオプション
+-------------------
+
+`update' では、以下の標準オプションが利用できます (完全な記述は *Note
+Common options::):
+
+`-D date'
+     DATE 以前の最も新しいリビジョンを利用します。このオプションは貼り
+     付けられ、勝手に `-P' オプションも実行されます。貼り付いたタグ/日
+     付についての詳細は *Note Sticky tags::.
+
+`-f'
+     `-D DATE' や `-r TAG' と一緒に指定します。指定したリビジョンが見
+     付からなかった場合、(そのファイルを無視せずに) 最も新しいリビショ
+     ンを取り出します。
+
+`-k KFLAG'
+     キーワード置換モードを KFLAG に指定します。詳細は *Note
+     Substitution modes:: を参照。このオプションは貼り付けられます。つ
+     まりこれ以後、この作業ディレクトリでファイルが更新されるときには、
+     同じ KFLAG が使用され続けます。`status' コマンドを用いて貼り付い
+     たオプションを見ることができます。`status' コマンドの情報は *Note
+     Invoking CVS:: を参照してください。
+
+`-l'
+     Local、つまり現在の作業ディレクトリでのみコマンドが実行されます。
+     *Note Recursive behavior::.
+
+`-P'
+     空になったディレクトリを削除 (prune) します。*Note Moving
+     directories:: 参照。
+
+`-p'
+     ファイルを標準出力に送り (pipe) ます。
+
+`-R'
+     ディレクトリを再帰的に更新します (既定)。*Note Recursive
+     behavior::.
+
+`-r rev'
+     TAG で指定されたリビジョン/タグを取り出します。このオプションは貼
+     り付けられ、`-P' オプションも勝手に実行されます。貼り付いたタグ/
+     日付についての詳細は *Note Sticky tags::.
+
+さらに `update' では次の固有オプションも使用可能です。
+
+`-A'
+     貼り付いた全てのタグや日付、また `-k' オプションの指定を剥がしま
+     す。貼り付いたタグ/日付についての詳細は *Note Sticky tags::.
+
+`-C'
+     手元で修正されたファイルをリポジトリの無修正のもので上書きします 
+     (修正されたファイルは `.#FILE.REVISION' に保存されます。)
+
+`-d'
+     リポジトリに存在し、作業ディレクトリに無いディレクトリを作成しま
+     す。通常は作業ディレクトリに既に存在するものだけが、`update' の対
+     象となります。
+
+     最初に `checkout' した後にリポジトリに作成された、新たなディレク
+     トリを取り出すときに使用します。しかし残念なことに副作用がありま
+     す。作業ディレクトリを作成するときに、(モジュール名を利用したり、
+     コマンド行で望みのファイルやディレクトリを明示したりして) 特定の
+     ディレクトリを故意に避けていた場合、`-d' を使用すると余計なディレ
+     クトリまで作成されてしまいます。
+
+`-I NAME'
+     `update' の際に、NAME と一致するファイル名が無視されます。無視し
+     たいファイルが複数あるときは、コマンド行に `-I' を必要なだけ並べ
+     ても構いません。全てのファイルを無視したくない場合は、`-I !' と指
+     定して下さい。CVS にファイルを無視させる他の方法は *Note
+     cvsignore::.
+
+`-WSPEC'
+     `update' の際に、フィルタを掛けるべきファイル名を指定します。この
+     オプションは繰り返し利用することができます。
+
+     `.cvswrappers' と同じ形式を用いて、SPEC にファイル名を指定します。
+     *Note Wrappers::.
+
+`-jREVISION'
+     `-j' オプションを二つ指定した場合、最初に指定したリビションから次
+     に指定したリビジョンへの変更を、作業ディレクトリにマージします。
+
+     `-j' オプションが一つの場合、その分岐リビジョンから指定したリビジョ
+     ンへの変更を、作業ディレクトリにマージします。分岐リビジョンとは、
+     作業ディレクトリの元になったリビジョンと、`-j' で指定したリビジョ
+     ンとの共通の祖先です。
+
+     `-j' オプションに枝を指定する場合、日付の指定を付加することができ
+     ます。このとき選択されるリビジョンは、指定日以前のものに制限され
+     ます。日付の指定は、タグ名の後のコロン (:) に続けて記述します:
+     `-jSYMBOLIC_TAG:DATE_SPECIFIER'。
+
+     *Note Branching and merging::.
+
+
+
+
+File: cvs-ja.info, Node: update output, Prev: update options, Up: update
+
+update の出力
+-------------
+
+`update' や `checkout' の進行状況を知らせるために、処理中のファイル名
+が一行ずつ表示され、行頭にはファイルの状態を示す文字が付加されます:
+
+`U FILE'
+     リポジトリと一致するようにファイルが更新されたことを示します。リ
+     ポジトリに存在するファイルが作業ディレクトリに無かった場合や、修
+     正していない作業コピーよりも新しいバージョンがリポジトリに格納さ
+     れていた場合の処理です。
+
+`P FILE'
+     `U' と同様ですが、CVS サーバはファイル全体ではなく、パッチを送り
+     ます。2つ共結果は同じです。
+
+`A FILE'
+     作業ディレクトリにファイルが加えられ、それをリポジトリに反映する
+     ために `commit' の実行が必要な状態を示します。つまりファイルの格
+     納を忘れないように注意を促しています。
+
+`R FILE'
+     作業ディレクトリからファイルが削除され、それをリポジトリに反映す
+     るために `commit' の実行が必要な状態を示します。つまりファイルの
+     格納を忘れないように注意を促しています。
+
+`M FILE'
+     作業ディレクトリで修正されたファイルであることを示します。
+
+     `M' は、ファイルに対する次の二つの修正状態のうちの一方を示します。
+     一つ目は、リポジトリの当該ファイルが修正されていないため、このファ
+     イルはあなたが最後に見たときと同じ状態にある場合です。二つ目は、
+     作業コピーと同様に、リポジトリの当該ファイルも修正されていたため、
+     これらを作業ディレクトリでマージした結果、衝突することなく正常に
+     処理された場合です。
+
+     ファイルのマージが行われるとその旨が表示され、(`update' が実行さ
+     れる前と同じ内容の) 作業ファイルのバックアップ・コピーが生成され
+     ます。`update' の実行中にそのファイルの名前もちゃんと表示されます。
+
+`C FILE'
+     FILE の作業コピーへの変更とリポジトリでの変更をマージした際に、衝
+     突が見つかったことを示します。FILE (作業コピー) は2つのリビジョン
+     をマージしようとした結果に置き換えられ、元のファイルは 
+     `.#FILE.REVISION' という名前で、作業ディレクトリに保存されます。
+     ここで REVISION は、ファイルの修正を開始した時点での RCS リビジョ
+     ンです。*Note Conflicts example:: の説明を参考にして衝突を解決し
+     て下さい。(`.#' で始まるファイルを数日間利用しなかった場合、自動
+     的に削除するシステムがあることに注意して下さい。元のファイルを保
+     存したい場合は名前を変更すると良いでしょう。) VMS ではファイル名
+     の先頭に、`.#' ではなく `__' を使用します。
+
+`? FILE'
+     作業ディレクトリに FILE というファイルがあるけれど、リポジトリに
+     は対応するファイルが無く、CVS が無視するファイルの一覧にも入って
+     ないことを示します (`-I' オプションの説明及び *Note cvsignore:: 
+     を参照)。
+
+
+
+File: cvs-ja.info, Node: Invoking CVS, Next: Administrative files, Prev: CVS commands, Up: Top
+
+CVS コマンドの簡単な便覧
+************************
+
+この付録は、それぞれのコマンドや機能が詳しく説明されているところへの参
+照とともに、CVS の実行のしかたを説明します。他の参照は、`cvs
+--help' コマンドを実行するか、*Note Index:: を参照してください。
+
+CVS コマンドは以下の様になります:
+
+     cvs [ GLOBAL_OPTIONS ] COMMAND [ COMMAND_OPTIONS ] [ COMMAND_ARGS ]
+
+標準オプション:
+
+`--allow-root=ROOTDIR'
+     正しい CVSROOT ディレクトリを指定します (サーバのみ) (CVS 1.9 以
+     前にはありません)。 *Note Password authentication server:: 参照。
+
+`-a'
+     全ての通信を認証します (クライアントのみ) (CVS 1.9 以前にはありま
+     せん)。*Note Global options:: 参照。
+
+`-b'
+     RCS の位置を指定します (CVS 1.9 以前)。*Note Global options:: 参
+     照。
+
+`-d ROOT'
+     CVSROOT を指定します。*Note Repository:: 参照。
+
+`-e EDITOR'
+     EDITOR でメッセージを編集します。*Note Committing your changes:: 
+     参照。
+
+`-f'
+     `~/.cvsrc' ファイルを読み込みません。*Note Global options:: 参照。
+
+`-H'
+`--help'
+     ヘルプメッセージを印字します。*Note Global options:: 参照。
+
+`-l'
+     `$CVSROOT/CVSROOT/history' ファイルにログを残しません。*Note
+     Global options:: 参照。
+
+`-n'
+     どのファイルも変更しません。*Note Global options:: 参照。
+
+`-Q'
+     本当に出力を抑えます。*Note Global options:: 参照。
+
+`-q'
+     少しばかり出力を抑えます。*Note Global options:: 参照。
+
+`-r'
+     新しい作業ファイルを読み込み専用にします。*Note Global options:: 
+     参照。
+
+`-s VARIABLE=VALUE'
+     使用者変数を設定します。*Note Variables:: 参照。
+
+`-T TEMPDIR'
+     一時ファイルを TEMPDIR に置きます。*Note Global options:: 参照。
+
+`-t'
+     CVS の実行を追跡します。*Note Global options:: 参照。
+
+`-v'
+`--version'
+     CVS のバージョンと著作権情報を表示します。
+
+`-w'
+     新しいファイルを読み込み書き込み可にします。*Note Global
+     options:: 参照。
+
+`-x'
+     全ての通信を暗号化します (クライアントのみ)。*Note Global
+     options:: 参照。
+
+`-z GZIP-LEVEL'
+     圧縮の度合を設定します (クライアントのみ)。
+
+
+キーワード展開モード (*Note Substitution modes::):
+
+     -kkv  $Id: file1,v 1.1 1993/12/09 03:21:13 joe Exp $
+     -kkvl $Id: file1,v 1.1 1993/12/09 03:21:13 joe Exp harry $
+     -kk   $Id$
+     -kv   file1,v 1.1 1993/12/09 03:21:13 joe Exp
+     -ko   非展開
+     -kb   非展開、ファイルはバイナリ
+
+キーワード (*Note Keyword list::):
+
+     $Author: joe $
+     $Date: 1993/12/09 03:21:13 $
+     $Header: /home/files/file1,v 1.1 1993/12/09 03:21:13 joe Exp harry $
+     $Id: file1,v 1.1 1993/12/09 03:21:13 joe Exp harry $
+     $Locker: harry $
+     $Name: snapshot_1_14 $
+     $RCSfile: file1,v $
+     $Revision: 1.1 $
+     $Source: /home/files/file1,v $
+     $State: Exp $
+     $Log: file1,v $
+     Revision 1.1  1993/12/09 03:30:17  joe
+     Initial revision
+
+
+コマンド、コマンドのオプション、コマンドの引数:
+
+`add [OPTIONS] [FILES...]'
+     新しいファイル/ディレクトリを加えます。*Note Adding files:: 参照。
+
+     `-k KFLAG'
+          キーワード展開を設定します。
+
+     `-m MSG'
+          ファイルの説明を設定します。
+
+`admin [OPTIONS] [FILES...]'
+     リポジトリの履歴ファイルの管理です。*Note admin:: 参照。
+
+     `-b[REV]'
+          既定枝を設定します。*Note Reverting local changes:: 参照。
+
+     `-cSTRING'
+          註釈符を設定します。
+
+     `-kSUBST'
+          キーワード置換を設定します。*Note Keyword substitution:: 参
+          照。
+
+     `-l[REV]'
+          REV か、最新のリビジョンをロックします。
+
+     `-mREV:MSG'
+          リビジョン REV のログメッセージを MSG で置換します。
+
+     `-oRANGE'
+          リポジトリからリビジョンを消去します。*Note admin options:: 
+          参照。
+
+     `-q'
+          静かに実行します。診断情報を印字しません。
+
+     `-sSTATE[:REV]'
+          状態を設定します。
+
+     `-t'
+          標準入力からファイルの説明を設定します。
+
+     `-tFILE'
+          ファイルの説明を FILE から設定します。
+
+     `-t-STRING'
+          ファイルの説明を STRING にします。
+
+     `-u[REV]'
+          リビジョン REV か、最新のリビジョンのロックを外します。
+
+`annotate [OPTIONS] [FILES...]'
+     それぞれの行が修正された最新のリビジョンを表示します。*Note
+     annotate::参照。
+
+     `-D DATE'
+          DATE 以前で一番新しいリビジョンを annotate します。*Note
+          Common options:: 参照。
+
+     `-f'
+          タグ/日付が見つからない場合は先頭のリビジョンを使います。
+          *Note Common options:: 参照。
+
+     `-l'
+          Local、つまり現在の作業ディレクトリでのみコマンドが実行され
+          ます。*Note Recursive behavior::.
+
+     `-R'
+          再帰的に動作します (既定動作)。*Note Recursive behavior::.
+
+     `-r TAG'
+          リビジョン TAG を annotate します。*Note Common options:: 参
+          照。
+
+`checkout [OPTIONS] MODULES...'
+     ソースのコピーを取得します。*Note checkout:: 参照。
+
+     `-A'
+          貼り付いたタグ/日付/オプションを元に戻します。*Note Sticky
+          tags:: と *Note Keyword substitution:: 参照。
+
+     `-c'
+          モジュールデータベースを出力します。*Note checkout
+          options::.
+
+     `-D DATE'
+          DATE のリビジョンを取り出します (貼り付きます)。*Note Common
+          options:: 参照。
+
+     `-d DIR'
+          DIR に取り出します。*Note checkout options:: 参照。
+
+     `-f'
+          タグ/日付が見つからないと、先頭のリビジョンを使います。*Note
+          Common options:: 参照。
+
+     `-j REV'
+          変更をマージします。*Note checkout options:: 参照。
+
+     `-k KFLAG'
+          KFLAG キーワード展開を使います。*Note Substitution modes:: 
+          参照。
+
+     `-l'
+          Local、つまり現在の作業ディレクトリでのみコマンドが実行され
+          ます。*Note Recursive behavior::.
+
+     `-N'
+          -d が指定されたときにモジュールパスを "短く" しません。*Note checkout options:: 参照。
+
+     `-n'
+          モジュールプログラム (もしあれば) を実行しません。*Note
+          checkout options:: 参照。
+
+     `-P'
+          空のディレクトリを削除します。*Note Moving directories:: 参
+          照。
+
+     `-p'
+          ファイルを標準出力に取り出します (貼り付きを避けます)。*Note
+          checkout options::。
+
+     `-R'
+          再帰的に動作します(既定動作です)。*Note Recursive
+          behavior::.
+
+     `-r TAG'
+          リビジョン TAG を取り出します。*Note Common options:: 参照。
+
+     `-s'
+          -c と似ていますが、モジュールの状態を含みます。*Note checkout options:: 
+          参照。
+
+`commit [OPTIONS] [FILES...]'
+     変更をリポジトリに格納します。*Note commit:: 参照。
+
+     `-F FILE'
+          FILE からログメッセージを読み込みます。*Note commit
+          options:: 参照。
+
+     `-f'
+          ファイルを強制的に格納します。再帰的動作を使用不可にします。
+          *Note commit options:: 参照。
+
+     `-l'
+          Local、つまり現在の作業ディレクトリでのみコマンドが実行され
+          ます。*Note Recursive behavior::.
+
+     `-m MSG'
+          MSG をログメッセージとして使います。*Note commit options:: 
+          参照。
+
+     `-n'
+          モジュールプログラム (もしあれば) を実行しません。*Note
+          commit options::参照。
+
+     `-R'
+          再帰的に動作します (既定動作です)。*Note Recursive
+          behavior::.
+
+     `-r REV'
+          REV に格納します。*Note commit options:: 参照。
+
+`diff [OPTIONS] [FILES...]'
+     リビジョン間の差分を表示します。*Note diff:: 参照。以下のオプショ
+     ンに加えて、出力様式を変更するいろいろなオプションを受け付けます。
+     例えば、context diff のための `-c' です。
+
+     `-D DATE1'
+          作業ディレクトと日付のリビジョンの差分を取ります。*Note diff
+          options::参照。
+
+     `-D DATE2'
+          REV1/DATE1 と DATE2 間の差分を取ります。*Note diff options:: 
+          参照。
+
+     `-l'
+          Local、つまり現在の作業ディレクトリでのみコマンドが実行され
+          ます。*Note Recursive behavior:: 参照。
+
+     `-N'
+          追加されたり削除されたりしたファイルの差分も含みます。*Note
+          diff options:: 参照。
+
+     `-R'
+          再帰的に動作します (既定動作です)。*Note Recursive
+          behavior::.
+
+     `-r REV1'
+          リビジョン REV1 と作業ファイル間の差分を取ります。*Note diff
+          options:: 参照。
+
+     `-r REV2'
+          REV1/DATE1 と REV2 間の差分を取ります。*Note diff options:: 
+          参照。
+
+`edit [OPTIONS] [FILES...]'
+     監視下のファイルを編集する準備をします。*Note Editing files:: 参
+     照。
+
+     `-a ACTIONS'
+          一時監視のための動作を指定します。引数は `actions', `edit',
+          `unedit', `commit', `all', `none' のどれかです。*Note
+          Editing files:: 参照。
+
+     `-l'
+          Local、つまり現在の作業ディレクトリでのみコマンドが実行され
+          ます。*Note Recursive behavior::.
+
+     `-R'
+          再帰的に動作します (既定動作です)。*Note Recursive
+          behavior::.
+
+`editors [OPTIONS] [FILES...]'
+     誰が監視下のファイルを編集しているを見ます。*Note Watch
+     information:: 参照。
+
+     `-l'
+          Local、つまり現在の作業ディレクトリでのみコマンドが実行され
+          ます。*Note Recursive behavior:: 参照。
+
+     `-R'
+          再帰的に動作します (既定動作です)。*Note Recursive
+          behavior::.
+
+`export [OPTIONS] MODULES...'
+     CVS からフィルを export するときに使います。*Note export:: 参照。
+
+     `-D DATE'
+          DATE のリビジョンを取り出します。*Note Common options:: 参照。
+
+     `-d DIR'
+          DIR に取り出します。*Note export options:: 参照。
+
+     `-f'
+          タグ/日付が見つからないと、先頭のリビジョンを使います。*Note
+          Common options:: 参照。
+
+     `-k KFLAG'
+          KFLAG キーワード展開を使います。*Note Substitution modes:: 
+          参照。
+
+     `-l'
+          Local、つまり現在の作業ディレクトリでのみコマンドが実行され
+          ます。*Note Recursive behavior:: 参照。
+
+     `-N'
+          -d が指定されたときにモジュールパスを "短く" しません。*Note export options:: 参照。
+
+     `-n'
+          モジュールプログラム (もしあっても) を実行しません。*Note
+          export options:: 参照。
+
+     `-P'
+          空のディレクトリを削除します。*Note Moving directories:: 参
+          照。
+
+     `-R'
+          再帰的に動作します (既定動作です)。*Note Recursive
+          behavior::.
+
+     `-r TAG'
+          リビジョン TAG を取り出します。*Note Common options:: 参照。
+
+`history [OPTIONS] [FILES...]'
+     リポジトリ接続履歴を表示します。*Note history:: 参照。
+
+     `-a'
+          全ての使用者にします (既定は自分自身です)。*Note history
+          options:: 参照。
+
+     `-b STR'
+          モジュール名, ファイル名, リポジトリのパスのいずれかに、文字
+          列 STR が含まれる記録のみを表示します。*Note history
+          options::参照。
+
+     `-c'
+          格納された (修正された) ファイルについて報告します。*Note
+          history options:: 参照。
+
+     `-D DATE'
+          DATE から。*Note history options:: 参照。
+
+     `-e'
+          全ての記録種別について報告します。*Note history options:: 参
+          照。
+
+     `-l'
+          最後に修正された (格納されたか、修正されたという報告) もの。
+          *Note history options:: 参照。
+
+     `-m MODULE'
+          MODULE について報告します (繰り返し可能)。*Note history
+          options::参照。
+
+     `-n MODULE'
+          MODULE だけ。*Note history options:: 参照。
+
+     `-o'
+          取り出されたモジュールについて報告します。*Note history
+          options:: 参照。
+
+     `-r REV'
+          リビジョン REV から。*Note history options:: 参照。Since
+          revision REV.  See *Note history options::.
+
+     `-T'
+          全てのタグについて報告します。*Note history options:: 参照。
+
+     `-t TAG'
+          tag の記録が履歴ファイルに (誰かによって) 置かれてから。
+          *Note history options:: 参照。
+
+     `-u USER'
+          使用者 USER (繰り返し可能)。*Note history options:: 参照。
+
+     `-w'
+          作業ディレクトリが合わなくてはいけません。*Note history
+          options:: 参照。
+
+     `-x TYPES'
+          TYPES について報告します。`TOEFWUCGMAR' から1つ以上指定しま
+          す。*Note history options:: 参照。
+
+     `-z ZONE'
+          標準時間帯 ZONE で出力します。*Note history options:: 参照。
+
+`import [OPTIONS] REPOSITORY VENDOR-TAG RELEASE-TAGS...'
+     ベンダー枝を使用して CVS にファイルを持ち込みます。*Note import:: 
+     参照。
+
+     `-b BRA'
+          ベンダー枝 BRA に持ち込みます。*Note Multiple vendor
+          branches:: 参照。
+
+     `-d'
+          ファイルの修正時刻を持ち込みの時間として使用します。*Note
+          import options:: 参照。
+
+     `-k KFLAG'
+          既定のキーワード置換モードを設定します。*Note import
+          options:: 参照。
+
+     `-m MSG'
+          MSG をログメッセージに使います。*Note import options:: 参照。
+
+     `-I IGN'
+          無視するファイルです (無効にするためには ! を使います)。
+          *Note import options:: 参照。
+
+     `-W SPEC'
+          ラッパーです。*Note import options:: 参照。
+
+`init'
+     存在しない場合は CVS リポジトリを作成します。*Note Creating a
+     repository:: 参照。
+
+`log [OPTIONS] [FILES...]'
+     ファイルの履歴情報を印字します。*Note log:: 参照。
+
+     `-b'
+          既定枝のリビジョンのみを一覧表示します。*Note log options:: 
+          参照。
+
+     `-d DATES'
+          日付を指定します (範囲は D1<D2 で、それ以前の最新は D で)。
+          *Note log options:: 参照。Specify dates (D1<D2 for range, D
+          for latest before).  See *Note log options::.
+
+     `-h'
+          ヘッダーのみを印字します。*Note log options:: 参照。
+
+     `-l'
+          Local、つまり現在の作業ディレクトリでのみコマンドが実行され
+          ます。*Note Recursive behavior:: 参照。
+
+     `-N'
+          タグを一覧表示しません。*Note log options:: 参照。
+
+     `-R'
+          RCS ファイルの名前のみを印字します。*Note log options:: 参照。
+
+     `-rREVS'
+          リビジョン REVS のみを一覧表示します。*Note log options:: 参
+          照。
+
+     `-s STATES'
+          指定された状態のリビジョンのみを一覧表示します。*Note log
+          options:: 参照。
+
+     `-t'
+          ヘッダーと説明文のみを印字します。*Note log options:: 参照。
+
+     `-wLOGINS'
+          logins で指定された使用者が格納したリビジョンのみを一覧表示
+          します。*Note log options:: 参照。
+
+`login'
+     認証サーバのパスワードの入力を促進します。*Note Password
+     authentication client:: 参照。
+
+`logout'
+     保存されている認証サーバのパスワードを消去します。*Note Password
+     authentication client:: 参照。
+
+`rdiff [OPTIONS] MODULES...'
+     リリース間の差分を表示します。*Note rdiff:: 参照。
+
+     `-c'
+          Context diff 出力様式です (既定)。*Note rdiff options:: 参照。
+
+     `-D DATE'
+          DATE に基づいたリビジョンを選択します。*Note Common
+          options:: 参照。
+
+     `-f'
+          タグ/日付が見つからない場合は先頭のリビジョンを使用します。
+          *Note Common options:: 参照。
+
+     `-l'
+          Local、つまり現在の作業ディレクトリでのみコマンドが実行され
+          ます。*Note Recursive behavior:: 参照。
+
+     `-R'
+          再帰的に動作します (既定動作です)。*Note Recursive
+          behavior::.
+
+     `-r REV'
+          REV に基づいたリビジョンを選択します。*Note Common options:: 
+          参照。
+
+     `-s'
+          短いパッチです - ファイルにつき一行です。*Note rdiff
+          options:: 参照。
+
+     `-t'
+          先頭の2つの差分です - ファイルへの最後の変更です。*Note diff
+          options::参照。
+
+     `-u'
+          Unidiff 出力様式です。*Note rdiff options:: 参照。
+
+     `-V VERS'
+          RCS バージョン VERS をキーワード展開に使用します (旧式)。
+          *Note rdiff options:: 参照。
+
+`release [OPTIONS] DIRECTORY'
+     ディレクトリがもう使われていないことを示します。*Note release:: 
+     参照。
+
+     `-d'
+          与えられたディレクトリを消去します。*Note release options:: 
+          参照。
+
+`remove [OPTIONS] [FILES...]'
+     リポジトリから登録を消去します。*Note Removing files:: 参照。
+
+     `-f'
+          削除する前にファイルを消去します。*Note Removing files:: 参
+          照。
+
+     `-l'
+          Local、つまり現在の作業ディレクトリでのみコマンドが実行され
+          ます。*Note Recursive behavior:: 参照。
+
+     `-R'
+          再帰的に動作します (既定動作です)。*Note Recursive
+          behavior::.
+
+`rtag [OPTIONS] TAG MODULES...'
+     モジュールにタグ名を追加します。*Note Revisions:: と *Note
+     Branching and merging:: 参照。
+
+     `-a'
+          削除されたファイルからそうでない場合に付いているタグを消去し
+          ます。*Note Tagging add/remove:: 参照。
+
+     `-b'
+          TAG という名前の枝を作成します。*Note Branching and
+          merging:: 参照。
+
+     `-D DATE'
+          DATE のリビジョンにタグを付けます。*Note Tagging by
+          date/tag:: 参照。
+
+     `-d'
+          タグ を消去します。*Note Modifying tags:: 参照。
+
+     `-F'
+          既に タグ が存在していれば移動します。*Note Modifying tags:: 
+          参照。
+
+     `-f'
+          タグ/日付が見つからなければ、先頭のリビジョンとの合致を強制
+          します。*Note Tagging by date/tag:: 参照。
+
+     `-l'
+          Local、つまり現在の作業ディレクトリでのみコマンドが実行され
+          ます。*Note Recursive behavior:: 参照。
+
+     `-n'
+          タグプログラムを実行しません。*Note Common options:: 参照。
+
+     `-R'
+          再帰的に動作します (既定動作です)。*Note Recursive
+          behavior::.
+
+     `-r REV'
+          存在するタグ REV にタグを付けます。*Note Tagging by
+          date/tag:: 参照。
+
+`status [OPTIONS] FILES...'
+     作業ディレクトリの状態の情報を表示します。*Note File status:: 参
+     照。
+
+     `-l'
+          Local、つまり現在の作業ディレクトリでのみコマンドが実行され
+          ます。*Note Recursive behavior:: 参照。
+
+     `-R'
+          再帰的に動作します (既定動作です)。*Note Recursive
+          behavior::.
+
+     `-v'
+          ファイルにタグ情報を含めます。*Note Tags:: 参照。
+
+`tag [OPTIONS] TAG [FILES...]'
+     ファイルの取り出されたリビジョンにタグ名を追加します。*Note
+     Revisions::と *Note Branching and merging:: 参照。
+
+     `-b'
+          TAG という名前の枝を作成します。*Note Branching and
+          merging:: 参照。
+
+     `-c'
+          作業ファイルが無修正かどうかを調べます。*Note Tagging the
+          working directory:: 参照。
+
+     `-D DATE'
+          DATE の時点のリビジョンにタグを付けます。*Note Tagging by
+          date/tag:: 参照。
+
+     `-d'
+          タグ を消去します。*Note Modifying tags:: 参照。
+
+     `-F'
+          タグが存在していればそれを移動します。*Note Tagging by
+          date/tag:: 参照。
+
+     `-f'
+          タグ/日付が見つからなければ先頭のリビジョンとの合致を強制し
+          ます。*Note Tagging by date/tag:: 参照。
+
+     `-l'
+          Local、つまり現在の作業ディレクトリでのみコマンドが実行され
+          ます。*Note Recursive behavior:: 参照。
+
+     `-R'
+          再帰的に動作します (既定動作です)。*Note Recursive
+          behavior::.
+
+     `-r REV'
+          存在するタグ REV にタグを付けます。*Note Tagging by
+          date/tag:: 参照。
+
+`unedit [OPTIONS] [FILES...]'
+     edit コマンドの効果を取り消します。*Note Editing files:: 参照。
+
+     `-a ACTIONS'
+          ACTIONS は `edit', `unedit', `commit', `all', `none' のどれ
+          かです。*Note Editing files:: 参照。
+
+     `-l'
+          Local、つまり現在の作業ディレクトリでのみコマンドが実行され
+          ます。*Note Recursive behavior:: 参照。
+
+     `-R'
+          再帰的に動作します (既定動作です)。*Note Recursive
+          behavior::.
+
+`update [OPTIONS] [FILES...]'
+     作業木とリポジトリとの同期を取ります。*Note update:: 参照。
+
+     `-A'
+          貼り付いたタグ/日付/オプションを取ります。*Note Sticky
+          tags:: と*Note Keyword substitution:: 参照。
+
+     `-C'
+          手元で修正されたファイルをリポジトリの無修正のもので上書きし
+          ます (修正されたファイルは `.#FILE.REVISION' に保存されます。)
+
+     `-D DATE'
+          DATE 時点でのリビジョンを取り出します (貼り付きます)。*Note
+          Common options:: 参照。
+
+     `-d'
+          ディレクトリを作成します。*Note update options:: 参照。
+
+     `-f'
+          タグ/日付が見つからなければ先頭のリビジョンを使用します。
+          *Note Common options:: 参照。
+
+     `-I IGN'
+          ファイルを無視します (無効にするためには ! を使います)。
+          *Note import options:: 参照。
+
+     `-j REV'
+          変更をマージします。*Note update options:: 参照。
+
+     `-k KFLAG'
+          KFLAG キーワード展開を使います。*Note Substitution modes:: 
+          参照。
+
+     `-l'
+          Local、つまり現在の作業ディレクトリでのみコマンドが実行され
+          ます。*Note Recursive behavior:: 参照。
+
+     `-P'
+          空のディレクトリを削除します。*Note Moving directories:: 参
+          照。
+
+     `-p'
+          ファイルを標準出力に取り出します (貼り付きを回避します)。
+          *Note update options:: 参照。
+
+     `-R'
+          再帰的に動作します (既定動作です)。*Note Recursive
+          behavior::.
+
+     `-r TAG'
+          リビジョン TAG を取り出します (貼り付きます)。*Note Common
+          options:: 参照。
+
+     `-W SPEC'
+          ラッパーです。*Note import options:: 参照。
+
+`watch [on|off|add|remove] [OPTIONS] [FILES...]'
+
+     on/off: ファイルの読み込み専用取り出しを on/off します。*Note
+     Setting a watch:: 参照。
+
+     add/remove: 動作の通知を追加削除します。*Note Getting Notified:: 
+     参照。
+
+     `-a ACTIONS'
+          一時監視への動作を指定します。ACTIONS は `edit', `unedit',
+          `commit', `all', `none' のどれかです。*Note Editing files:: 
+          参照。
+
+     `-l'
+          Local、つまり現在の作業ディレクトリでのみコマンドが実行され
+          ます。*Note Recursive behavior:: 参照。
+
+     `-R'
+          再帰的に動作します (既定動作です)。*Note Recursive
+          behavior::.
+
+`watchers [OPTIONS] [FILES...]'
+     誰がファイル監視しているかを見ます。*Note Watch information:: 参
+     照。
+
+     `-l'
+          Local、つまり現在の作業ディレクトリでのみコマンドが実行され
+          ます。*Note Recursive behavior:: 参照。
+
+     `-R'
+          再帰的に動作します (既定動作です)。*Note Recursive
+          behavior::.
+
+
+
+
+File: cvs-ja.info, Node: Administrative files, Next: Environment variables, Prev: Invoking CVS, Up: Top
+
+管理用ファイル便覧
+******************
+
+リポジトリ中のディレクトリ `$CVSROOT/CVSROOT' に、CVS を支援する多くの
+ファイルが置かれます。これらのファイルが無いと CVS の能力が制限されて
+しまいますが、適切に設定すれば種々の操作を簡略化することができます。こ
+れらを編集する方法は *Note Intro administrative files:: 参照。
+
+これらの内で最も重要なファイルは `modules' で、リポジトリ内のモジュー
+ルを定義します。
+
+* Menu:
+
+* modules::                     モジュールを定義する
+* Wrappers::                    ファイル名の応じてバイナリかどうかを指定する
+* commit files::                格納を支援するファイル
+* commitinfo::                  格納前にチェックする
+* verifymsg::                   ログメッセージはどのように評価されるのか?
+* editinfo::                    ログ・メッセージの作成方法を指示
+                                (旧式)
+* loginfo::                     ログ・メッセージをどこに送るか?
+* rcsinfo::                     ログ・メッセージの雛型
+* cvsignore::                   無視するファイルを設定する
+* checkoutlist::                自分自身の管理ファイルを追加する
+* history file::                履歴情報を記録する
+* Variables::                   各種変数の展開
+* config::                      その他の CVS の設定
+
+
+
+File: cvs-ja.info, Node: modules, Next: Wrappers, Prev: Administrative files, Up: Administrative files
+
+The modules file
+================
+
+管理用ファイル `modules' には、ソース・コードの集合体の名前の定義を記
+述します。新たな定義を CVS に理解させるには、CVS を用いてファイル 
+`modules' を修正して下さい (`add', `commit' など普通のコマンドを使用し
+ます)。
+
+ファイル `modules' には、モジュールの定義だけでなく、空白行や註釈行 
+(`#' で始まる行) も記述できます。またバックスラッシュ (`\') を行の最後
+に加えて、長い行を次の行にまで続けることができます。
+
+モジュールには3つの種類があります: 別名モジュール、一般モジュール、ア
+ンドモジュールです。それらの違いはリポジトリのファイルの作業ディレクト
+リへの割り付け方法です。以下の全ての例では、最上位のリポジトリには 
+`first-dir' というディレクトリがあり、そこには `file1' と `file2' とい
+うファイルがあり、`sdir' というディレクトリがあります。
+`first-dir/sdir' には `sfile' というファイルがあります。
+
+
+* Menu:
+
+* Alias modules::             一番簡単なモジュール
+* Regular modules::
+* Ampersand modules::
+* Excluding directories::     モジュールからディレクトリを除外する
+* Module options::            一般とアンドモジュールはオプションを取れる
+* Module program options::    modules の "プログラムオプション" の
+                              プログラムの動作方法
+
+
+
+File: cvs-ja.info, Node: Alias modules, Next: Regular modules, Prev: modules, Up: modules
+
+別名モジュール
+--------------
+
+別名モジュールが一番簡単な種類のモジュールです:
+
+`MNAME -a ALIASES...'
+     これはモジュール MNAME の最も簡単な定義方法を表わします。`-a' フ
+     ラグは単純に別名の定義を行います: CVS に (コマンドの引数として)
+     MNAME が与えられると、ALIASES に記述された名前の一覧を代りに使用
+     します。ALIASES は他のモジュール名もしくはパス名から構成します。
+     ALIASES にパス名を使用した場合、CVS の引数にパス名を明示した場合
+     と同じく、`checkout' したとき途中の全てのディレクトリが作業ディレ
+     クトリに作成されます。
+
+例えば、モジュールファイルの内容が以下のようであると:
+
+     amodule -a first-dir
+
+次の2つのコマンドは等価です:
+
+     $ cvs co amodule
+     $ cvs co first-dir
+
+そして、それらは以下のような出力を出します:
+
+     cvs checkout: Updating first-dir
+     U first-dir/file1
+     U first-dir/file2
+     cvs checkout: Updating first-dir/sdir
+     U first-dir/sdir/sfile
+
+
+
+File: cvs-ja.info, Node: Regular modules, Next: Ampersand modules, Prev: Alias modules, Up: modules
+
+一般モジュール
+--------------
+
+`MNAME [ options ] DIR [ FILES... ]'
+     この形式のモジュール定義を最も単純にすると、`MNAME DIR' となりま
+     す。これはディレクトリ DIR の全てのファイルを、モジュール MNAME 
+     と定義します。DIR は (`$CVSROOT' から) ソースのあるディレクトリへ
+     の相対パス名です。この場合にソースを取り出すと、MNAME というディ
+     レクトリだけが作業ディレクトリに作成されます。つまり DIR が複数の
+     ディレクトリ階層から成るパス名であっても、既定では途中のディレク
+     トリ階層は使用されません。
+
+例えば、モジュールが以下で定義されていると:
+
+     regmodule first-dir
+
+regmodule は first-dir のファイルを含みます:
+
+     $ cvs co regmodule
+     cvs checkout: Updating regmodule
+     U regmodule/file1
+     U regmodule/file2
+     cvs checkout: Updating regmodule/sdir
+     U regmodule/sdir/sfile
+     $
+
+DIR の後で明示的にモジュールを指定することで、特定のファイルをディレク
+トリ DIR から選択することができます。例:
+
+     regfiles first-dir/sdir sfile
+
+この定義により、regfiles モジュールを取得すると、一覧に挙げられたファ
+イルがある単独のディレクトリ `regfiles' を作成し、それは CVS のソース
+リポジトリのより深いディレクトリから来ています。
+
+     $ cvs co regfiles
+     U regfiles/sfile
+     $
+
+
+
+File: cvs-ja.info, Node: Ampersand modules, Next: Excluding directories, Prev: Regular modules, Up: modules
+
+アンドモジュール
+----------------
+
+モジュール定義は定義に `&MODULE' を含めることで他のモジュールを参照す
+ることができます。
+     MNAME [ options ] &MODULE...
+
+そうすると、モジュールを取得したときに、モジュールのあるディレクトリで、
+それぞれのモジュールのためのサブディレクトリを作成します。
+
+     ampermod &first-dir
+
+そうすると、checkout は `ampermod' ディレクトリを作成し、それには 
+`first-dir' というディレクトリがあり、それは今度は自分の全てのファイル
+とディレクトリを持っています。例えば、コマンド
+
+     $ cvs co ampermod
+
+は以下のファイルを作成します:
+
+     ampermod/first-dir/file1
+     ampermod/first-dir/file2
+     ampermod/first-dir/sdir/sfile
+
+ここには、一つ癖/バグがあります: CVS が印字するメッセージは `ampermod' 
+を省略するので、ファイルが取り出された位置を正確に表示しません。
+
+     $ cvs co ampermod
+     cvs checkout: Updating first-dir
+     U first-dir/file1
+     U first-dir/file2
+     cvs checkout: Updating first-dir/sdir
+     U first-dir/sdir/sfile
+     $
+
+このバグっぽい動作に頼らないでください。CVS の将来のリリースでは修正さ
+れているかもしれません。
+
+
+
+
+File: cvs-ja.info, Node: Excluding directories, Next: Module options, Prev: Ampersand modules, Up: modules
+
+ディレクトリの除外
+------------------
+
+別名モジュールは、除外されるべき各ディレクトリ名の前に驚嘆符 (`!') を
+付けることで、特定のディレクトリを除外することができます。
+
+例えば、モジュールファイルが以下のようになっていると:
+
+     exmodule -a !first-dir/sdir first-dir
+
+モジュール `exmodule' を取り出すと、サブディレクトリ `first-dir/sdir' 
+にあるファイル以外の全てを取り出します。
+
+
+
+File: cvs-ja.info, Node: Module options, Next: Module program options, Prev: Excluding directories, Up: modules
+
+モジュールのオプション
+----------------------
+
+標準モジュールとアンドモジュールのどちらもオプションを含むことができ、
+それはモジュールの追加情報を提供します。
+
+`-d NAME'
+     作業ディレクトリの名前をモジュール名とは別のものにします。
+
+`-e PROG'
+     モジュールのファイルが export されたときに常に実行されるプログラ
+     ムPROG を指定します。PROG は単独の引数、モジュール名と共に実行さ
+     れます。
+
+`-i PROG'
+     モジュールのファイルが格納されたときに常に実行されるプログラム 
+     PROG を指定します。PROG はソースリポジトリの影響を受けるディレク
+     トリのフルパス名である唯一の引数と共に実行されます。`commitinfo',
+     `loginfo', `veryfymsg' ファイルは格納時にプログラムを呼ぶ他の方法
+     を提供します。
+
+`-o PROG'
+     ファイルのモジュールが取り出されたときに常に実行されるプログラム 
+     PROG を指定します。PROG は単独の引数、モジュール名と共に実行され
+     ます。
+
+`-s STATUS'
+     モジュールに状態を割当てます。モジュールファイルが `cvs checkout
+     -s' で印字されると、モジュールが主モジュール状態に従って並び換えられ、
+     それからモジュール名に従って並び換えられます。このオプションは他
+     に意味はありません。状態以外のいくつかのことにこのオプションを使
+     うことができます: 例えば、このモジュールに責任のある人の一覧など
+     です。
+
+`-t PROG'
+     モジュールのファイルが `rtag' でタグ付けされたときに常に実行され
+     るプログラム PROG を指定します。PROG は2つの引数と共に実行されま
+     す: モジュール名と `rtag' に指定されたタグ名です。`tag' が行われ
+     たときは実行されません。一般的に、taginfo の方が良い解決法です 
+     (*Note user-defined logging::)。
+
+`-u PROG'
+     取り出されたモジュールの最上位のディレクトリで `cvs' が行なわれた
+     ときに常に実行されるプログラム PROTG を指定します。PROG は単独の
+     引数、このモジュールのソースリポジトリのフルパスとともに実行され
+     ます。
+
+"プログラムオション" プログラムがどのように実行されているのかを見るた
+めに *Note Module program options:: も参照した方が良いでしょう。
+
+
+
+

@@ -1,0 +1,1105 @@
+Info file: automake-ja.info,    -*-Text-*-
+produced by `texinfo-format-buffer'
+from file `automake-ja.texi'
+using `texinfmt.el' version 2.38 of 3 July 1998.
+
+
+
+
+INFO-DIR-SECTION GNU programming tools
+START-INFO-DIR-ENTRY
+* automake(ja): (automake-ja).		Making Makefile.in's
+END-INFO-DIR-ENTRY
+
+
+INFO-DIR-SECTION Individual utilities
+START-INFO-DIR-ENTRY
+* aclocal(ja): (automake-ja)Invoking aclocal.          Generating aclocal.m4
+END-INFO-DIR-ENTRY
+
+
+このファイルでGNU automake 1.7を説明します．
+
+Copyright 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002 Free Software
+Foundation, Inc.
+
+Permission is granted to make and distribute verbatim copies of this
+manual provided the copyright notice and this permission notice are
+preserved on all copies.
+
+Permission is granted to copy and distribute modified versions of this
+manual under the conditions for verbatim copying, provided that the
+entire resulting derived work is distributed under the terms of a
+permission notice identical to this one.
+
+Permission is granted to copy and distribute translations of this manual
+into another language, under the above conditions for modified versions,
+except that this permission notice may be stated in a translation
+approved by the Foundation.
+
+
+
+
+
+
+
+
+File: automake-ja.info, Node: Miscellaneous, Next: Include, Prev: Options, Up: Top
+
+雑多な規則
+**********
+
+他のどこにも適さない少数の規則と変数があります．
+
+* Menu:
+
+* Tags::                        Interfacing to etags and mkid
+* Suffixes::                    Handling new file extensions
+* Multilibs::                   Support for multilibbing.
+
+
+
+
+File: automake-ja.info, Node: Tags, Next: Suffixes, Prev: Miscellaneous, Up: Miscellaneous
+
+`etags'のインターフェース
+=========================
+
+
+Automakeは，GNU Emacsで使用する`TAGS'ファイルを生成するための規則を生成
+する場合もあります．
+
+C，C++，またはFortran 77のソースコードやヘッダが存在している場合，`tags'
+と`TAGS'ターゲットがディレクトリに対して生成されます．
+
+複数のディレクトリがあるパッケージのトップディレクトリで，`tags'ターゲッ
+トファイルは実行時に生成され，それは実行時に，サブディレクトリにあるすべ
+ての`TAGS'の参照を含んでいる`TAGS'ファイルを生成します．
+
+変数`ETAGS_ARGS'が定義されている場合，`tags'ターゲットも生成されます．こ
+の変数は，`etags'が理解しないタグを使用しているソースを含んでいるディレ
+クトリでの使用を考慮しています．ユーザは`etags'に追加のフラグを渡すため
+に`ETAGSFLAGS'を使用することが可能です．`Makefile.am'で`AM_ETAGSFLAGS'を
+利用することもできます．
+
+ソースとTexinfoファイルのノードに対するタグをAutomakeで生成する方法は以
+下のようになります．
+
+     ETAGS_ARGS = automake.in --lang=none \
+      --regex='/^@node[ \t]+\([^,]+\)/\1/' automake.texi
+
+`ETAGS_ARGS'にファイル名を加える場合，おそらく`TAGS_DEPENDENCIES'も設定
+したいでしょう．この変数の中身は`tags'ターゲット対する依存性に直接追加さ
+れます．
+
+Automakeは，`vi'形式の`tags'ファイルのビルドで使用される，`ctags'ターゲッ
+トを生成します．変数`CTAGS'は，呼び出されるプログラムの名前です(デフォル
+トは`ctags')．`CTAGSFLAGS'は，ユーザが追加フラグを渡すために使用され，
+`AM_CTAGSFLAGS'は`Makefile.am'で使用されます．
+
+Automakeは，`mkid'をソース上で実行する`ID'ターゲットも生成します．これは
+ディレクトリ単位に基づくサポートだけです．
+
+AutomakeはGNU Global Tags program (http://www.gnu.org/software/global/)
+もサポートします．`GTAGS'ターゲットは，自動的にGlobal Tagを実行し，結果
+をビルドディレクトリに書き込みます．変数`GTAGS_ARGS'は，`gtags'に渡す引
+数を保持しています．
+
+
+
+
+File: automake-ja.info, Node: Suffixes, Next: Multilibs, Prev: Tags, Up: Miscellaneous
+
+新しいファイル拡張子の取り扱い
+==============================
+
+
+Automakeが知らないファイル形式を処理するために，新しい暗黙の規則を導入す
+ることが役に立つこともあります．
+
+例えば，`.foo'ファイルを`.o'ファイルにコンパイルするコンパイラがあると仮
+定します．その言語に対する接尾子規則を単純に定義するでしょう．
+
+     .foo.o:
+             foocc -c -o $@ $<
+
+そして，`_SOURCES'変数で`.foo'ファイルを直接使用し，正しい結果が期待され
+るでしょう．
+
+     bin_PROGRAMS = doit
+     doit_SOURCES = doit.foo
+
+これはより簡単で，より一般的な状況です．それ以外の状況では，定義している
+サフィックス規則を，Automakeが理解する手助けが必要です．通常これは，拡張
+子がドットで始まらないときに生じます．そのときにしなければならないことは，
+暗黙の規則を定義する*前に*，新しい接尾子のリストを`SUFFIXES' 変数に書き
+込むことです．
+
+例えば，以下の定義で，Automakeが`.idlC.cpp:'が`.idlC'を`.cpp'に変換して
+みるという誤解をしないようにします．
+
+     SUFFIXES = .idl C.cpp
+     .idlC.cpp:
+             # whatever
+
+注意事項のように，`SUFFIXES'変数`make'の`.SUFFIXES'特殊ターゲットのよう
+に動作します．`.SUFFIXES'を独自にいじくるべきではなく，その代わりに
+`SUFFIXES'を使用しAutomakeが`.SUFFIXES'に対する接尾子リストを生成するよ
+うにすべきです．与えられた全ての`SUFFIXES'は生成された接尾子リストの最初
+に書かれ，Automakeが生成するまだリストに無い接尾子が続きます．
+
+
+
+File: automake-ja.info, Node: Multilibs, Prev: Suffixes, Up: Miscellaneous
+
+Multilibのサポート
+==================
+
+Automakeには，multilibと呼ばれているあまり知られていない機能のサポートが
+あります．"multilib"は，一度に複数の異なるABIに対してビルドされるライブ
+ラリです．毎回，ライブラリが異なるターゲットフラグの組み合わせでビルドさ
+れます．これは，ライブラリがクロスコンパイルを目的としていて，コンパイラ
+がサポートしているライブラリに対して，ほとんど排他的に使用されるときだけ
+役に立ちます．
+
+multilibのサポートはまだ実験中です．multilibを理解していて，遭遇した問題
+をデバッグすることが可能な場合のみ，それを使用してください．
+
+
+
+
+File: automake-ja.info, Node: Include, Next: Conditionals, Prev: Miscellaneous, Up: Top
+
+インクルード
+************
+
+
+Automakeは，`automake'が実行されるときに，他の断片的な`Makefile'をインク
+ルードするために使用可能な，`include'指示語をサポートします．これらの断
+片は，`make'ではなく`automake'で読み込まれ解釈されることに注意してくださ
+い．条件文同様，`make'には`include'を使用する能力はありません．
+
+`include'には，二つの書式があります．
+
+`include $(srcdir)/file'
+     現在のソースディレクトリに相対的なところで見つかった断片をインクルー
+     ドします．
+
+`include $(top_srcdir)/file'
+     トップソースディレクトリに相対的なところで見つかった断片をインクルー
+     ドします．
+
+断片が条件文を含む場合，条件文は断片の内容全体に適用されることに注意して
+ください．
+
+`Makefile.in'をリビルドする必要があるので，この方法で含められるMakefile
+の断片は常に配布されます．
+
+
+
+File: automake-ja.info, Node: Conditionals, Next: Gnits, Prev: Include, Up: Top
+
+条件文
+******
+
+
+Automakeは単純な形式の条件文をサポートします．
+
+条件文を使用する前に，`configure.in'ファイルで`AM_CONDITIONAL' を使用し
+てそれを定義する必要があります(*Note Macros::)．
+
+ -- Macro: AM_CONDITIONAL (CONDITIONAL, CONDITION)
+     条件名CONDITIONALは，文字で始まり，文字，数字，そしてアンダースコア
+     のみを含む単純な文字列です．Automakeが`TRUE'と`FALSE'のどちらを保持
+     しているかで異なっているはずです．
+
+     シェルのCONDITION(シェルの`if'文で使用されるのに適切なもの)は，
+     `configure'が実行されるときに評価されます．*すべての*
+     `AM_CONDITIONAL'が毎回`configure'の実行で呼び出されるように調整する
+     必要があります -- `AM_CONDITIONAL'が条件つき(例えば，シェルの`if'文)
+     で実行される場合，結果としてautomakeが混乱します．
+
+
+条件文は一般的に，`configure'スクリプトでユーザが提供するオプションに依
+存します．ユーザが`--enable-debug'オプションを使用する場合，真の条件を書
+く方法の例は以下のようになります．
+
+     AC_ARG_ENABLE(debug,
+     [  --enable-debug    Turn on debugging],
+     [case "${enableval}" in
+       yes) debug=true ;;
+       no)  debug=false ;;
+       *) AC_MSG_ERROR(bad value ${enableval} for --enable-debug) ;;
+     esac],[debug=false])
+     AM_CONDITIONAL(DEBUG, test x$debug = xtrue)
+
+`Makefile.am'でその条件文を使用する方法の例は以下のようになります．
+
+
+     if DEBUG
+     DBG = debug
+     else
+     DBG =
+     endif
+     noinst_PROGRAMS = $(DBG)
+
+この簡単な例は，EXTRA_PROGRAMSを使用しているものを扱うことも可能でしょう
+(*Note Conditional Programs::)．
+
+`if'文で，`!'を使用した否定も可能な，単一の変数のみを調査したいかもしれ
+ません．`else'文は省略可能です．条件文は任意の深さにネスト可能です．
+`else'に引数を指定することも可能ですが，いずれの場合でも，現在の`if'に対
+して使用される条件の否定となっている必要があります．同様に，`end'で閉じ
+られた条件を指定することも可能です．
+
+     if DEBUG
+     DBG = debug
+     else !DEBUG
+     DBG =
+     endif !DEBUG
+
+非対称の条件文はエラーとなります．
+
+Automakeの条件文はGNU Makeの条件文とは同じでないことに注意してください．
+Automakeの条件文は，configure時に`configure'スクリプトでチェックされ，
+`Makefile.in'から`Makefile'への変換に影響を与えます．それらは，
+`configure'に渡すオプションと，`configure'がホストシステムについて発見し
+た結果に基づきます．GNU Makeの条件文は，`make'時に調査され，makeプログラ
+ムに渡された，あるいは`Makefile'で定義された変数に基づいています．
+
+Automakeの条件文は，どんなmakeプログラムでも動作します．
+
+
+
+
+File: automake-ja.info, Node: Gnits, Next: Cygnus, Prev: Conditionals, Up: Top
+
+`--gnu'と`--gnits'の効果
+************************
+
+
+`--gnu'オプション(あるいは`AUTOMAKE_OPTIONS'変数での`gnu')で，`automake'
+は以下のことを調査します．
+
+   * `INSTALL'，`NEWS'，`README'，`AUTHORS'，そして`ChangeLog'と，
+     `COPYING.LIB'，`COPYING.LESSER'，または`COPYING'のいずれかもう一つ
+     のファイルがパッケージのトップディレクトリにあることが必要です．
+
+   * `no-installman'と`no-installinfo'オプションは使用できません．
+
+このオプションは，それ以上の調査を行なうため将来拡張されることでしょう．
+GNU標準の正確な必要条件に精通することを勧めます．また，`--gnu'は，様々な
+管理者専用のターゲットで使用するために存在する，特定のGNU非標準のプログ
+ラムを要求するはずです．例えば将来は，`pathchk'が`make dist'に対して要求
+されるかもしれません．
+
+
+`--gnits'オプションは，`--gnu'が行なうすべての調査に加え以下のことも調査
+します．
+
+   * `make installcheck'は，`--help'と`--version'が，それぞれ本当に利用
+     方法のメッセージとバージョン文字列を確実に出力することを調査します．
+     これは，`std-options'オプションです(*Note Options::)．
+
+   * `make dist'を，`NEWS'ファイルが現在のバージョンに更新されたことを確
+     認するために調査します．
+
+   * `VERSION'は，その書式ががGnits standardに従っていることを確認するた
+     めに調査されます．
+
+   * これがアルファリリースだということを`VERSION'が示していて，ファイル
+     `README-alpha'がパッケージのトップディレクトリにある場合，それは配
+     布物に含められます．`--gnits'モードはバージョンナンバーの書式に制限
+     がある唯一のものであり，そのためAutomakeが自動的に`README-alpha'を
+     含めることを決定することが可能な唯一のモードなので，これは`--gnits' 
+     モードでなされますが他ではなされません．
+
+   * ファイル`THANKS'が必要です．
+
+
+
+
+File: automake-ja.info, Node: Cygnus, Next: Extending, Prev: Gnits, Up: Top
+
+`--cygnus'の効果
+****************
+
+
+特にGNU GCCとGNU gdbのようなパッケージには，Cygnus Support(その後，
+Cygnus Solutionsに名前が変更され，その後で Red Hat に買収されました)で通
+常書かれているビルド環境変数があります．この系統のパッケージは，"Cygnus"
+ツリーとして述べられるときもあります．
+
+Cygnusツリーには，`Makefile.in'を構築する方法に対して，わずかに異なった
+規則があります．`automake'へ`--cygnus'を渡すことで，生成されるすべての
+`Makefile.in'はCygnus規則に従います．
+
+`--cygnus'の正確な効果は以下のようになっています．
+
+   * Infoファイルは，ソースディレクトリでではなく，常にビルドディレクト
+     リで作成されます．
+
+   * `texinfo.tex'は，Texinfoソースファイルが指定されている場合でも，要
+     求されません．ファイルは提供されているのですが，Automakeが見つけら
+     れない場所にあると仮定します．この仮定は，一般的にCygnusパッケージ
+     をバンドルする方法のartifact(欠点)です．
+
+   * `make dist'はサポートされておらず，その規則は生成されません．Cygnus 
+     形式のツリーでは独自の配布メカニズムを使用します．
+
+   * ユーザの`PATH'同様にビルドツリーでも特定のツールを捜します．これら
+     のツールは，`runtest'，`expect'，`makeinfo'，そして`texi2dvi'です．
+
+   * `--foreign'を暗黙に指定します．
+
+   * オプション`no-installinfo'と`no-dependencies'を暗黙に指定します．
+
+   * マクロ`AM_MAINTAINER_MODE'と`AM_CYGWIN32'が要求されます．
+
+   * `check'ターゲットは`all'に依存しません．
+
+GNU管理者は，特別なCygnusモードではなく`gnu'の厳密さを使用してください．
+いつかはおそらく，CygnusツリーとGNUツリーの間の差が(例えば，GCCがより標
+準に準拠するように)なくなることでしょう．そのときは，特殊なCygnus モード
+は削除されるでしょう．
+
+
+
+
+File: automake-ja.info, Node: Extending, Next: Distributing, Prev: Cygnus, Up: Top
+
+Automakeが不十分なとき
+**********************
+
+Automakeの暗黙のコピーの意味は，単純にいくつかの`make'ターゲットと
+`Makefile.in'の規則を加えることで，多くの問題が解決可能だということを意
+味します．Automakeはこれらの追加を無視します．
+
+
+これを行なうときにはいくつか注意することがあります．すでにAutomakeで使用
+されているターゲットをオーバーロードすることが可能ですが，特にサブディレ
+クトリのあるパッケージのトップディレクトリでは，あまり勧められません．し
+かし，様々な有用なターゲットには，`Makefile.in'で指定可能な，`-local'バー
+ジョンがあります．Automakeはこれらのユーザが提供するターゲットを用いて標
+準ターゲットを補足します．
+
+
+ローカルバージョンをサポートするターゲットは，`all'，`info'，`dvi'，`ps'，
+`pdf'，`check'，`install-data'， `install-exec'，`uninstall'，
+`installdirs'，`installcheck'，そして様々な`clean'ターゲット
+(`mostlyclean'，`clean'，`distclean'，そして`maintainer-clean')です．
+`uninstall-exec-local'や`uninstall-data-local'ターゲットが無いことに注意
+してください．`uninstall-local'だけを使用してください．データだけ，ある
+いは実行可能プログラムだけをアンインストールすることには意味がありません．
+
+例えば，ファイルを`/etc'にインストールする一つの方法は，以下のようになり
+ます．
+
+     install-data-local:
+             $(INSTALL_DATA) $(srcdir)/afile $(DESTDIR)/etc/afile
+
+
+ターゲットには，"hook"と呼ばれる，その仕事が終った後にもう一つのターゲッ
+トを実行する方法もあります．フックは，主要なターゲットに`-hook' を追加し
+て命名します．フックが可能なターゲットは，`install-data'，`install-exec'，
+`uninstall'，`dist'，そして`distcheck'です．
+
+例えば，インストールしたプログラムにハードリンクを作成する方法は，以下の
+ようになります．
+
+     install-exec-hook:
+             ln $(DESTDIR)$(bindir)/program $(DESTDIR)$(bindir)/proglink
+
+
+
+
+File: automake-ja.info, Node: Distributing, Next: API versioning, Prev: Extending, Up: Top
+
+`Makefile.in'の配布
+*******************
+
+Automakeは，結果として生じる`Makefile.in'の配布に制限を置きません．我々
+は，ソフトウェアの著者にGPLのような用語の下でその仕事を流通させることを
+奨励しますが，そうすることはAutomakeを使用することにで要求されません．
+
+`--add-missing'スイッチによって自動的にインストールすることが可能なファ
+イルにはGPLに従うものもあります．しかし，選択したライセンスを気にせず，
+パッケージとともに配布することができるよう，これらにも特別な例外がありま
+す．
+
+
+
+
+File: automake-ja.info, Node: API versioning, Next: Macro and Variable Index, Prev: Distributing, Up: Top
+
+AutomakeのAPIのバージョン管理
+*****************************
+
+通常，新しいAutomakeのリリースにはバグの修正と新しい機能が含まれています．
+残念ながら，それらは新しいバグと非互換性ももたらす可能性があります．この
+ことは，パッケージがAutomakeの特定のバージョンを要求する可能性となる四つ
+の原因となります．
+
+大きなツリーのパッケージを管理するとき，それぞれが異なるバージョンの
+Automakeを要求することが問題になります．過去には，開発者(と時にはユーザ
+が)異なるバージョンのAutomakeを異なる場所にインストールし，それぞれのパッ
+ケージに対して適切な`$PATH'に切替える必要があったという意味です．
+
+バージョン1.6で開始していますが，Automakeはバージョン管理されたバイナリ
+をインストールします．これは同じ`$prefix'で複数のバージョンのAutomakeを
+インストールすることが可能で，`$PATH'で誤魔化すこと無く`automake-1.6'や
+`automake-1.7'を実行することで任意のバージョンのAutomakeを選択することが
+可能だということを意味します．さらに，Automake 1.6で生成された`Makefile'
+は，リビルドの規則で明示的に`automake-1.6'を使用します．
+
+`automake-1.6'の`1.6'は，AutomakeのバージョンではなくAutomake のAPIのバー
+ジョンだということに注意してください．バグの修正版が作成された場合，例え
+ばAutomake 1.6.1になりますが，APIのバージョンは1.6のままです．これは，
+Automake 1.6で動作するパッケージは1.6.1でも動作することを意味します．結
+局，これは人々がバグの修正版に期待するものになります．
+
+パッケージがリリースで導入された機能やバグの修正に依存している場合，古い
+リリースを使用しないことを確実にするため，Automakeへのオプションとしてこ
+のバージョンを渡すことが可能です．例えば，`configure.in'で以下の内容を使
+用してください．
+
+       AM_INIT_AUTOMAKE(1.6.1) dnl Require Automake 1.6.1 or better.  ま
+たは特定の`Makefile.am'で以下の内容を使用してください．
+
+       AUTOMAKE_OPTIONS = 1.6.1 # Require Automake 1.6.1 or better.
+Automakeのバージョンが要求されたバージョンより古い場合，Automakeはエラー
+メッセージを出力します．
+
+
+
+APIの中身
+=========
+
+Automakeのプログラミングインターフェースは簡単に定義できません．基本的に，
+全ての*ドキュメント化されている*変数と`Makefile.am'の著者が利用可能なター
+ゲットを少なくとも含めるべきで，動作はそれらに関連していて(例えば，
+`-hook'が実行される場所)，`automake'と`aclocal' のコマンドラインインター
+フェースがあって，...
+
+
+APIには無いもの
+===============
+
+ドキュメント化されていない変数，ターゲット，またはコマンドラインオプショ
+ンは全て，APIの一部ではありません．バージョンが変われば(バグの修正に役立
+つ場合は，バグの修正版でも) 変更されるかもしれないので，それらを使用する
+ことは避けるべきです．
+
+そのようなドキュメント化されていない機能を使用する必要があると判明した場
+合，automake@gnu.orgでコンタクトを取り，ドキュメントを書きテストスイート
+で試してみてください．
+
+
+
+File: automake-ja.info, Node: Macro and Variable Index, Next: General Index, Prev: API versioning, Up: Top
+
+マクロと変数の索引
+******************
+
+
+* Menu:
+
+* AM_CONDITIONAL:               Conditionals.           8.
+* SUFFIXES:                     Suffixes.               5.
+* GTAGS_ARGS:                   Tags.                   44.
+* TAGS_DEPENDENCIES:            Tags.                   31.
+* AM_ETAGSFLAGS:                Tags.                   21.
+* ETAGSFLAGS:                   Tags.                   21.
+* ETAGS_ARGS:                   Tags.                   21.
+* AM_INSTALLCHECK_STD_OPTIONS_EXEMPT: Options.          126.
+* AUTOMAKE_OPTIONS:             Options.                11.
+* AM_RUNTESTFLAGS:              Tests.                  61.
+* RUNTESTFLAGS:                 Tests.                  61.
+* RUNTEST:                      Tests.                  56.
+* EXPECT:                       Tests.                  56.
+* DEJATOOL:                     Tests.                  56.
+* RUNTESTDEFAULTFLAGS:          Tests.                  52.
+* XFAIL_TESTS:                  Tests.                  34.
+* TESTS_ENVIRONMENT:            Tests.                  30.
+* TESTS:                        Tests.                  30.
+* distcleancheck_listfiles:     Dist.                   120.
+* DISTCHECK_CONFIGURE_FLAGS:    Dist.                   100.
+* distuninstallcheck_listfiles: Dist.                   90.
+* distcleancheck_listfiles:     Dist.                   90.
+* DIST_SUBDIRS:                 Dist.                   74.
+* nodist_:                      Dist.                   48.
+* dist_:                        Dist.                   48.
+* EXTRA_DIST:                   Dist.                   37.
+* VERSION:                      Dist.                   15.
+* PACKAGE:                      Dist.                   15.
+* MAINTAINERCLEANFILES:         Clean.                  13.
+* DISTCLEANFILES:               Clean.                  13.
+* CLEANFILES:                   Clean.                  13.
+* MOSTLYCLEANFILES:             Clean.                  13.
+* DESTDIR:                      Install.                80.
+* man_MANS:                     Man pages.              11.
+* MANS:                         Man pages.              11.
+* TEXINFO_TEX:                  Texinfo.                69.
+* _TEXINFOS:                    Texinfo.                58.
+* TEXINFOS:                     Texinfo.                58.
+* AM_MAKEINFOFLAGS:             Texinfo.                53.
+* MAKEINFOFLAGS:                Texinfo.                53.
+* MAKEINFO:                     Texinfo.                53.
+* info_TEXINFOS:                Texinfo.                11.
+* TEXINFOS:                     Texinfo.                11.
+* pkgpyexecdir:                 Python.               
+* pyexecdir:                    Python.               
+* pkgpythondir:                 Python.               
+* pythondir:                    Python.               
+* PYTHON_PLATFORM:              Python.               
+* PYTHON_EXEC_PREFIX:           Python.               
+* PYTHON_PREFIX:                Python.               
+* PYTHON_VERSION:               Python.               
+* PYTHON:                       Python.               
+* CLASSPATH_ENV:                Java.                 
+* JAVAROOT:                     Java.                 
+* AM_JAVACFLAGS:                Java.                 
+* JAVACFLAGS:                   Java.                 
+* JAVAC:                        Java.                 
+* ELCFILES:                     Emacs Lisp.             13.
+* noinst_LISP:                  Emacs Lisp.             6.
+* lisp_LISP:                    Emacs Lisp.             6.
+* LISP:                         Emacs Lisp.             6.
+* BUILT_SOURCES:                Sources.                9.
+* pkgdata_DATA:                 Data.                   9.
+* localstate_DATA:              Data.                   9.
+* sharedstate_DATA:             Data.                   9.
+* sysconf_DATA:                 Data.                   9.
+* data_DATA:                    Data.                   9.
+* DATA:                         Data.                   8.
+* pkginclude_HEADERS:           Headers.                18.
+* oldinclude_HEADERS:           Headers.                18.
+* include_HEADERS:              Headers.                18.
+* HEADERS:                      Headers.                10.
+* noinst_HEADERS:               Headers.                6.
+* check_SCRIPTS:                Scripts.                24.
+* noinst_SCRIPTS:               Scripts.                24.
+* pkgdata_SCRIPTS:              Scripts.                24.
+* libexec_SCRIPTS:              Scripts.                24.
+* sbin_SCRIPTS:                 Scripts.                24.
+* bin_SCRIPTS:                  Scripts.                24.
+* SCRIPTS:                      Scripts.                10.
+* AUTOMAKE_OPTIONS:             Dependencies.           32.
+* AM_C_PROTOTYPES:              ANSI.                   30.
+* AUTOMAKE_OPTIONS:             ANSI.                   13.
+* AM_GCJFLAGS:                  Java Support.           24.
+* GCJFLAGS:                     Java Support.           14.
+* FLINK:                        Fortran 77 Support.   
+* F77COMPILE:                   Fortran 77 Support.   
+* AM_RFLAGS:                    Fortran 77 Support.   
+* RFLAGS:                       Fortran 77 Support.   
+* AM_FFLAGS:                    Fortran 77 Support.   
+* FFLAGS:                       Fortran 77 Support.   
+* F77:                          Fortran 77 Support.   
+* CCASFLAGS:                    Assembly Support.       11.
+* CCAS:                         Assembly Support.       11.
+* CXXLINK:                      C++ Support.          
+* CXXCOMPILE:                   C++ Support.          
+* AM_CXXFLAGS:                  C++ Support.          
+* CXXFLAGS:                     C++ Support.          
+* CXX:                          C++ Support.          
+* LINK:                         Program variables.    
+* AM_LDFLAGS:                   Program variables.    
+* COMPILE:                      Program variables.    
+* AM_CFLAGS:                    Program variables.    
+* INCLUDES:                     Program variables.    
+* AM_CPPFLAGS:                  Program variables.    
+* LIBS:                         Program variables.      11.
+* LDFLAGS:                      Program variables.      11.
+* DEFS:                         Program variables.      11.
+* CPPFLAGS:                     Program variables.      11.
+* CFLAGS:                       Program variables.      11.
+* CC:                           Program variables.      11.
+* check_LTLIBRARIES:            A Shared Library.       20.
+* noinst_LTLIBRARIES:           A Shared Library.       20.
+* pkglib_LTLIBRARIES:           A Shared Library.       20.
+* lib_LTLIBRARIES:              A Shared Library.       20.
+* LIBADD:                       A Library.              29.
+* _LIBADD:                      A Library.              29.
+* noinst_LIBRARIES:             A Library.              6.
+* pkglib_LIBRARIES:             A Library.              6.
+* lib_LIBRARIES:                A Library.              6.
+* EXTRA_PROGRAMS:               Conditional Programs.   15.
+* _LDFLAGS:                     Linking.                41.
+* _LDADD:                       Linking.                18.
+* AM_LDFLAGS:                   Linking.                10.
+* LDADD:                        Linking.                10.
+* SOURCES:                      Program Sources.        37.
+* _SOURCES:                     Program Sources.        37.
+* check_PROGRAMS:               Program Sources.        5.
+* noinst_PROGRAMS:              Program Sources.        5.
+* pkglib_PROGRAMS:              Program Sources.        5.
+* libexec_PROGRAMS:             Program Sources.        5.
+* sbin_PROGRAMS:                Program Sources.        5.
+* bin_PROGRAMS:                 Program Sources.        5.
+* ACLOCAL_AMFLAGS:              Rebuilding.             17.
+* DIST_SUBDIRS:                 Top level.              95.
+* MAKEFLAGS:                    Top level.              33.
+* MAKE:                         Top level.              33.
+* SUBDIRS:                      Top level.              13.
+* WITH_REGEX:                   Public macros.          145.
+* WITH_DMALLOC:                 Public macros.          138.
+* am_cv_sys_posix_termios:      Public macros.          132.
+* AM_PROG_GCJ:                  Public macros.          129.
+* AM_PATH_LISPDIR:              Public macros.          91.
+* VERSION, prevent definition:  Public macros.          74.
+* PACKAGE, prevent definition:  Public macros.          74.
+* AM_HEADER_TIOCGWINSZ_NEEDS_SYS_IOCTL: Public macros.  33.
+* AM_C_PROTOTYPES:              Public macros.          27.
+* AM_CONFIG_HEADER:             Public macros.          10.
+* AM_MAINTAINER_MODE:           Optional.               127.
+* AM_GNU_GETTEXT:               Optional.               119.
+* AM_C_PROTOTYPES:              Optional.               112.
+* AC_SUBST:                     Optional.               98.
+* AC_PROG_LEX:                  Optional.               95.
+* YACC:                         Optional.               90.
+* AC_PROG_YACC:                 Optional.               90.
+* AC_PROG_LIBTOOL:              Optional.               84.
+* AC_F77_LIBRARY_LDFLAGS:       Optional.               79.
+* AC_PROG_F77:                  Optional.               73.
+* AC_PROG_CXX:                  Optional.               67.
+* AC_PROG_RANLIB:               Optional.               62.
+* LIBOBJS:                      Optional.               57.
+* AC_LIBSOURCES:                Optional.               53.
+* AC_LIBSOURCE:                 Optional.               53.
+* AC_LIBOBJ:                    Optional.               53.
+* target_alias:                 Optional.               38.
+* build_alias:                  Optional.               38.
+* AC_CANONICAL_SYSTEM:          Optional.               38.
+* host_triplet:                 Optional.               32.
+* host_alias:                   Optional.               32.
+* AC_CANONICAL_HOST:            Optional.               32.
+* AC_CONFIG_AUX_DIR:            Optional.               24.
+* AC_CONFIG_HEADERS:            Optional.               16.
+* AC_OUTPUT:                    Requirements.           28.
+* AM_INIT_AUTOMAKE:             Requirements.           9.
+* WARNINGS:                     Invoking Automake.      170.
+* AUTOCONF:                     Invoking Automake.      27.
+* TEXINFOS:                     Uniform.                85.
+* MANS:                         Uniform.                85.
+* HEADERS:                      Uniform.                85.
+* DATA:                         Uniform.                85.
+* SCRIPTS:                      Uniform.                85.
+* JAVA:                         Uniform.                85.
+* PYTHON:                       Uniform.                85.
+* LISP:                         Uniform.                85.
+* LIBRARIES:                    Uniform.                85.
+* PROGRAMS:                     Uniform.                85.
+* PACKAGE, directory:           Uniform.                29.
+* pkgdatadir:                   Uniform.                20.
+* pkgincludedir:                Uniform.                20.
+* pkglibdir:                    Uniform.                20.
+* PROGRAMS:                     Uniform.                18.
+
+
+
+
+File: automake-ja.info, Node: General Index, Prev: Macro and Variable Index, Up: Top
+
+一般的な索引
+************
+
+
+* Menu:
+
+* dist-hook:                    Extending.              37.
+* uninstall-hook:               Extending.              37.
+* install-exec-hook:            Extending.              37.
+* install-data-hook:            Extending.              37.
+* hook targets:                 Extending.              32.
+* -hook targets:                Extending.              32.
+* installcheck-local:           Extending.              17.
+* installcheck:                 Extending.              17.
+* installdirs-local:            Extending.              17.
+* installdirs:                  Extending.              17.
+* distclean-local:              Extending.              17.
+* distclean:                    Extending.              17.
+* clean-local:                  Extending.              17.
+* clean:                        Extending.              17.
+* mostlyclean-local:            Extending.              17.
+* mostlyclean:                  Extending.              17.
+* uninstall-local:              Extending.              17.
+* uninstall:                    Extending.              17.
+* install-exec-local:           Extending.              17.
+* install-exec:                 Extending.              17.
+* install-data-local:           Extending.              17.
+* install:                      Extending.              17.
+* check-local:                  Extending.              17.
+* check:                        Extending.              17.
+* pdf-local:                    Extending.              17.
+* pdf:                          Extending.              17.
+* ps-local:                     Extending.              17.
+* ps:                           Extending.              17.
+* dvi-local:                    Extending.              17.
+* dvi:                          Extending.              17.
+* info-local:                   Extending.              17.
+* info:                         Extending.              17.
+* all-local:                    Extending.              17.
+* all:                          Extending.              17.
+* local targets:                Extending.              9.
+* -local targets:               Extending.              9.
+* Cygnus strictness:            Cygnus.                 5.
+* README-alpha:                 Gnits.                  39.
+* --gnits, complete description: Gnits.                 21.
+* --gnu, complete description:  Gnits.                  5.
+* --gnu, required files:        Gnits.                  5.
+* else:                         Conditionals.           38.
+* endif:                        Conditionals.           38.
+* if:                           Conditionals.           38.
+* Conditional example,  --enable-debug: Conditionals.   22.
+* Example conditional --enable-debug: Conditionals.     22.
+* --enable-debug, example:      Conditionals.           22.
+* Conditionals:                 Conditionals.           5.
+* Makefile fragment, including: Include.                5.
+* Including Makefile fragment:  Include.                5.
+* include:                      Include.                5.
+* SUFFIXES, adding:             Suffixes.               5.
+* Adding new SUFFIXES:          Suffixes.               5.
+* id:                           Tags.                   39.
+* tags:                         Tags.                   11.
+* TAGS support:                 Tags.                   5.
+* Option, warnings:             Options.                147.
+* Option, version:              Options.                141.
+* make installcheck:            Options.                121.
+* Options, std-options:         Options.                121.
+* Option, readme-alpha:         Options.                111.
+* Option, no-texinfo:           Options.                106.
+* Option, nostdinc:             Options.                101.
+* install-man:                  Options.                98.
+* Option, no-installman:        Options.                95.
+* install-info:                 Options.                92.
+* info:                         Options.                92.
+* Option, no-installinfo:       Options.                89.
+* Option, no-exeext:            Options.                79.
+* Option, no-dependencies:      Options.                72.
+* Option, no-define:            Options.                66.
+* dist-tarZ:                    Options.                63.
+* Option, dist-tarZ:            Options.                61.
+* dist-zip:                     Options.                58.
+* Option, dist-zip:             Options.                56.
+* dist-shar:                    Options.                53.
+* Option, dist-shar:            Options.                51.
+* dist-bzip2:                   Options.                48.
+* Option, dist-bzip2:           Options.                45.
+* Option, dejagnu:              Options.                41.
+* Option, check-news:           Options.                36.
+* Option, ansi2knr:             Options.                28.
+* Option, cygnus:               Options.                20.
+* Option, foreign:              Options.                20.
+* Option, gnu:                  Options.                20.
+* Option, gnits:                Options.                20.
+* `site.exp':                   Tests.                  62.
+* dejagnu:                      Tests.                  56.
+* Expected test failure:        Tests.                  31.
+* Tests, expected failure:      Tests.                  31.
+* Exit status 77, special interpretation: Tests.        20.
+* make check:                   Tests.                  5.
+* Test suites:                  Tests.                  5.
+* dist-gzip:                    Dist.                   157.
+* distcleancheck:               Dist.                   115.
+* distcheck:                    Dist.                   95.
+* make distuninstallcheck:      Dist.                   90.
+* make distcleancheck:          Dist.                   90.
+* make distcheck:               Dist.                   90.
+* dist-hook:                    Dist.                   75.
+* dist:                         Dist.                   15.
+* make dist:                    Dist.                   9.
+* make clean support:           Clean.                  5.
+* install-strip:                Install.                108.
+* installdirs:                  Install.                108.
+* uninstall:                    Install.                108.
+* Install hook:                 Install.                75.
+* install-data-local:           Install.                69.
+* install-exec-local:           Install.                69.
+* Install, two parts of:        Install.                47.
+* install:                      Install.                47.
+* install-exec:                 Install.                47.
+* install-data:                 Install.                47.
+* make install support:         Install.                5.
+* Installation support:         Install.                5.
+* install-man:                  Man pages.              38.
+* no-installman:                Man pages.              38.
+* noinstall-man target:         Man pages.              32.
+* install-man target:           Man pages.              32.
+* Target, noinstall-man:        Man pages.              32.
+* Target, install-man:          Man pages.              32.
+* Primary variable, MANS:       Man pages.              5.
+* MANS primary, defined:        Man pages.              5.
+* _MANS primary, defined:       Man pages.              5.
+* install-info:                 Texinfo.                83.
+* no-installinfo:               Texinfo.                83.
+* noinstall-info target:        Texinfo.                82.
+* install-info target:          Texinfo.                82.
+* Target, noinstall-info:       Texinfo.                82.
+* Target, install-info:         Texinfo.                82.
+* no-texinfo.tex:               Texinfo.                77.
+* texinfo.tex:                  Texinfo.                62.
+* mdate-sh:                     Texinfo.                20.
+* UPDATED-MONTH Texinfo flag:   Texinfo.                19.
+* EDITION Texinfo flag:         Texinfo.                19.
+* UPDATED Texinfo flag:         Texinfo.                19.
+* VERSION Texinfo flag:         Texinfo.                19.
+* Texinfo flag, UPDATED-MONTH:  Texinfo.                18.
+* Texinfo flag, EDITION:        Texinfo.                18.
+* Texinfo flag, UPDATED:        Texinfo.                18.
+* Texinfo flag, VERSION:        Texinfo.                18.
+* Primary variable, TEXINFOS:   Texinfo.                5.
+* TEXINFOS primary, defined:    Texinfo.                5.
+* _TEXINFOS primary, defined:   Texinfo.                5.
+* Primary variable, PYTHON:     Python.                 5.
+* PYTHON primary, defined:      Python.                 5.
+* _PYTHON primary, defined:     Python.                 5.
+* Restrictions for JAVA:        Java.                   13.
+* JAVA restrictions:            Java.                   13.
+* Primary variable, JAVA:       Java.                   5.
+* JAVA primary, defined:        Java.                   5.
+* _JAVA primary, defined:       Java.                   5.
+* Support for GNU Gettext:      gettext.                5.
+* Gettext support:              gettext.                5.
+* GNU Gettext support:          gettext.                5.
+* Primary variable, LISP:       Emacs Lisp.             5.
+* LISP primary, defined:        Emacs Lisp.             5.
+* _LISP primary, defined:       Emacs Lisp.             5.
+* BUILT_SOURCES, defined:       Sources.                5.
+* Primary variable, DATA:       Data.                   5.
+* DATA primary, defined:        Data.                   5.
+* _DATA primary, defined:       Data.                   5.
+* Installing headers:           Headers.                17.
+* HEADERS, installation directories: Headers.           17.
+* Primary variable, HEADERS:    Headers.                5.
+* HEADERS primary, defined:     Headers.                5.
+* _HEADERS primary, defined:    Headers.                5.
+* Installing scripts:           Scripts.                23.
+* SCRIPTS, installation directories: Scripts.           23.
+* Primary variable, SCRIPTS:    Scripts.                5.
+* SCRIPTS primary, defined:     Scripts.                5.
+* _SCRIPTS primary, defined:    Scripts.                5.
+* Windows:                      EXEEXT.                 5.
+* Extension, executable:        EXEEXT.                 5.
+* Executable extension:         EXEEXT.                 5.
+* Dependency tracking, disabling: Dependencies.         37.
+* Disabling dependency tracking: Dependencies.          37.
+* no-dependencies:              Dependencies.           32.
+* depcomp:                      Dependencies.           19.
+* Automatic dependency tracking: Dependencies.          9.
+* Dependency tracking:          Dependencies.           9.
+* ansi2knr:                     ANSI.                   13.
+* de-ANSI-fication, defined:    ANSI.                   5.
+* Support for Java:             Java Support.           5.
+* Java support:                 Java Support.           5.
+* Selecting the linker automatically: How the Linker is Chosen.  5.
+* Automatic linker selection:   How the Linker is Chosen.  5.
+* Example, mixed language:      Mixing Fortran 77 With C and C++.  36.
+* Mixed language example:       Mixing Fortran 77 With C and C++.  36.
+* FLIBS, defined:               Mixing Fortran 77 With C and C++.  23.
+* Mixing Fortran 77 with C and/or C++: Mixing Fortran 77 With C and C++.  5.
+* cfortran:                     Mixing Fortran 77 With C and C++.  5.
+* Linking Fortran 77 with C and C++: Mixing Fortran 77 With C and C++.  5.
+* Mixing Fortran 77 with C and C++: Mixing Fortran 77 With C and C++.  5.
+* Fortran 77, mixing with C and C++: Mixing Fortran 77 With C and C++.  5.
+* Ratfor programs:              Preprocessing Fortran 77.  5.
+* Fortran 77, Preprocessing:    Preprocessing Fortran 77.  5.
+* Preprocessing Fortran 77:     Preprocessing Fortran 77.  5.
+* Support for Fortran 77:       Fortran 77 Support.     5.
+* Fortran 77 support:           Fortran 77 Support.     5.
+* Support for C++:              C++ Support.            5.
+* C++ support:                  C++ Support.            5.
+* lex, multiple lexers:         Yacc and Lex.           45.
+* Multiple lex lexers:          Yacc and Lex.           45.
+* Multiple yacc parsers:        Yacc and Lex.           45.
+* yacc, multiple parsers:       Yacc and Lex.           45.
+* ylwrap:                       Yacc and Lex.           45.
+* @ALLOCA@, special handling:   LIBOBJS.                5.
+* @LIBOBJS@, special handling:  LIBOBJS.                5.
+* Objects in subdirectory:      Program and Library Variables.  51.
+* Subdirectory, objects in:     Program and Library Variables.  51.
+* @LTLIBOBJS@, special handling: A Shared Library.      33.
+* suffix .lo, defined:          A Shared Library.       27.
+* check_LTLIBRARIES, not allowed: A Shared Library.     21.
+* suffix .la, defined:          A Shared Library.       11.
+* Example of shared libraries:  A Shared Library.       10.
+* Primary variable, LTLIBRARIES: A Shared Library.      10.
+* LTLIBRARIES primary, defined: A Shared Library.       10.
+* _LTLIBRARIES primary, defined: A Shared Library.      10.
+* Shared libraries, support for: A Shared Library.      5.
+* Primary variable, LIBADD:     A Library.              25.
+* LIBADD primary, defined:      A Library.              25.
+* _LIBADD primary, defined:     A Library.              25.
+* Primary variable, LIBRARIES:  A Library.              5.
+* LIBRARIES primary, defined:   A Library.              5.
+* _LIBRARIES primary, defined:  A Library.              5.
+* EXTRA_PROGRAMS, defined:      Conditional Programs.   8.
+* EXTRA_prog_SOURCES, defined:  Conditional Sources.    17.
+* _DEPENDENCIES, defined:       Linking.                42.
+* _LDFLAGS, defined:            Linking.                37.
+* prog_LDADD, defined:          Linking.                11.
+* _SOURCES and header files:    Program Sources.        42.
+* Header files in _SOURCES:     Program Sources.        42.
+* Primary variable, SOURCES:    Program Sources.        32.
+* SOURCES primary, defined:     Program Sources.        32.
+* _SOURCES primary, defined:    Program Sources.        32.
+* PROGRAMS, bindir:             Program Sources.        5.
+* nodist_ and nobase_:          Alternative.            30.
+* dist_ and nobase_:            Alternative.            30.
+* nobase_ and dist_ or nodist_: Alternative.            30.
+* Avoiding path stripping:      Alternative.            23.
+* Path stripping, avoiding:     Alternative.            23.
+* nobase_:                      Alternative.            23.
+* `DIST_SUBDIRS', explained:    Top level.              132.
+* `AC_SUBST' and `SUBDIRS':     Top level.              106.
+* `SUBDIRS' and `AC_SUBST':     Top level.              106.
+* `AM_CONDITIONAL' and `SUBDIRS': Top level.            74.
+* `SUBDIRS' and `AM_CONDITIONAL': Top level.            74.
+* Conditional `SUBDIRS':        Top level.              49.
+* `SUBDIRS', conditional:       Top level.              49.
+* Conditional subdirectories:   Top level.              49.
+* Subdirectories, building conditionally: Top level.    49.
+* SUBDIRS, explained:           Top level.              9.
+* Extending aclocal:            Extending aclocal.      5.
+* aclocal, extending:           Extending aclocal.      5.
+* rx package:                   Public macros.          145.
+* regex package:                Public macros.          145.
+* --with-regex:                 Public macros.          145.
+* --with-dmalloc:               Public macros.          138.
+* dmalloc, support for:         Public macros.          138.
+* termios POSIX headers:        Public macros.          132.
+* POSIX termios headers:        Public macros.          132.
+* lex problems with HP-UX 10:   Public macros.          120.
+* HP-UX 10, lex problems:       Public macros.          120.
+* `dirlist':                    Macro search path.      67.
+* aclocal search path:          Macro search path.      5.
+* Macro search path:            Macro search path.      5.
+* --version:                    aclocal options.        39.
+* --verbose:                    aclocal options.        35.
+* --print-ac-dir:               aclocal options.        28.
+* --output:                     aclocal options.        24.
+* -I:                           aclocal options.        19.
+* --help:                       aclocal options.        15.
+* --acdir:                      aclocal options.        10.
+* Options, aclocal:             aclocal options.        5.
+* aclocal, Options:             aclocal options.        5.
+* aclocal, Invoking:            Invoking aclocal.       5.
+* Invoking aclocal:             Invoking aclocal.       5.
+* --enable-maintainer-mode:     Optional.               122.
+* Recognized macros by Automake: Optional.              5.
+* Macros Automake recognizes:   Optional.               5.
+* AC_OUTPUT, scanning:          Requirements.           13.
+* Requirements of Automake:     Requirements.           5.
+* Automake requirements:        Requirements.           5.
+* Scanning configure.in:        configure.              5.
+* configure.in, scanning:       configure.              5.
+* --warnings:                   Invoking Automake.      141.
+* -W:                           Invoking Automake.      141.
+* --version:                    Invoking Automake.      135.
+* --verbose:                    Invoking Automake.      130.
+* -v:                           Invoking Automake.      130.
+* --output-dir:                 Invoking Automake.      122.
+* -o:                           Invoking Automake.      122.
+* --no-force:                   Invoking Automake.      114.
+* --include-deps:               Invoking Automake.      108.
+* -i:                           Invoking Automake.      103.
+* --help:                       Invoking Automake.      97.
+* --gnu:                        Invoking Automake.      92.
+* --gnits:                      Invoking Automake.      87.
+* --foreign:                    Invoking Automake.      82.
+* --force-missing:              Invoking Automake.      75.
+* -f:                           Invoking Automake.      73.
+* --cygnus:                     Invoking Automake.      68.
+* --copy:                       Invoking Automake.      63.
+* -c:                           Invoking Automake.      61.
+* --libdir:                     Invoking Automake.      56.
+* --add-missing:                Invoking Automake.      44.
+* -a:                           Invoking Automake.      44.
+* config.guess:                 Invoking Automake.      39.
+* Files distributed with Automake: Invoking Automake.   39.
+* Extra files distributed with Automake: Invoking Automake.  39.
+* Strictness, command line:     Invoking Automake.      36.
+* Options, Automake:            Invoking Automake.      36.
+* Automake options:             Invoking Automake.      36.
+* Automake, invoking:           Invoking Automake.      5.
+* Invoking Automake:            Invoking Automake.      5.
+* Multiple configure.in files:  Invoking Automake.      5.
+* true Example:                 true.                   5.
+* false Example:                true.                   5.
+* Example, false and true:      true.                   5.
+* INCLUDES, example usage:      Hello.                  82.
+* Example, regression test:     Hello.                  73.
+* Regression test example:      Hello.                  73.
+* Example, handling Texinfo files: Hello.               64.
+* Texinfo file handling example: Hello.                 64.
+* Hello, configure.in:          Hello.                  16.
+* GNU Hello, configure.in:      Hello.                  16.
+* configure.in, from GNU Hello: Hello.                  16.
+* GNU Hello, example:           Hello.                  5.
+* Hello example:                Hello.                  5.
+* Example, GNU Hello:           Hello.                  5.
+* zardoz example:               Complete.               38.
+* acinclude.m4, defined:        Complete.               24.
+* aclocal.m4, preexisting:      Complete.               24.
+* aclocal program, introduction: Complete.              24.
+* AM_INIT_AUTOMAKE, example use: Complete.              11.
+* Complete example:             Complete.               5.
+* Auxiliary programs:           Auxiliary Programs.     5.
+* Programs, auxiliary:          Auxiliary Programs.     5.
+* user variables:               User Variables.         5.
+* variables, reserved for the user: User Variables.     5.
+* canonicalizing Automake variables: Canonicalization.  5.
+* check primary prefix, definition: Uniform.            78.
+* noinst primary prefix, definition: Uniform.           72.
+* HTML support, example:        Uniform.                65.
+* Installation directories, extending list: Uniform.    57.
+* Extending list of installation directories: Uniform.  57.
+* cpio example:                 Uniform.                38.
+* Example, EXTRA_PROGRAMS:      Uniform.                38.
+* EXTRA_PROGRAMS, defined:      Uniform.                38.
+* EXTRA_, prepending:           Uniform.                30.
+* pkgdatadir, defined:          Uniform.                19.
+* pkgincludedir, defined:       Uniform.                19.
+* pkglibdir, defined:           Uniform.                19.
+* Primary variable, defined:    Uniform.                11.
+* Primary variable, PROGRAMS:   Uniform.                11.
+* PROGRAMS primary variable:    Uniform.                11.
+* _PROGRAMS primary variable:   Uniform.                11.
+* Uniform naming scheme:        Uniform.                5.
+* gnits strictness:             Strictness.             10.
+* Strictness, gnits:            Strictness.             10.
+* gnu strictness:               Strictness.             10.
+* Strictness, gnu:              Strictness.             10.
+* foreign strictness:           Strictness.             10.
+* Strictness, foreign:          Strictness.             10.
+* Strictness, defined:          Strictness.             10.
+* Non-GNU packages:             Strictness.             5.
+* First line of Makefile.am:    General Operation.      63.
+* Makefile.am, first line:      General Operation.      63.
+* Comment, special to Automake: General Operation.      55.
+* Special Automake comment:     General Operation.      55.
+* ## (special Automake comment): General Operation.     55.
+* Example of recursive operation: General Operation.    44.
+* Automake, recursive operation: General Operation.     44.
+* Recursive operation of Automake: General Operation.   44.
+* Overriding make variables:    General Operation.      36.
+* Variables, overriding:        General Operation.      36.
+* Overriding make targets:      General Operation.      30.
+* Make targets, overriding:     General Operation.      30.
+* Append operator:              General Operation.      22.
+* GNU make extensions:          General Operation.      17.
+* cvs-dist:                     General Operation.      10.
+* cvs-dist, non-standard example: General Operation.    10.
+* Non-standard targets:         General Operation.      10.
+* E-mail, bug reports:          Introduction.           31.
+* Reporting BUGS:               Introduction.           31.
+* BUGS, reporting:              Introduction.           31.
+* Requirements, Automake:       Introduction.           26.
+* Automake requirements:        Introduction.           26.
+* Automake constraints:         Introduction.           20.
+* Constraints of Automake:      Introduction.           20.
+* GNU Makefile standards:       Introduction.           10.
+
+
+
+

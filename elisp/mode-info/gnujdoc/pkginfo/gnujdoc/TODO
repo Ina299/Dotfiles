@@ -1,0 +1,25 @@
+-*- Text -*-
+
+Write gnujdoc manual, which should include the information currently
+in the file `HACKING'.
+
+Make sure that the author fields in the file `MANUALS' are filled by
+suitable persons.
+
+Fix the multiple versions per software problem.
+
+Add automatic checkout support.
+
+configure should check if programs that the user can specify work
+correctly (emacs, ptex and texi2html).
+
+HTML support should be included in automake, and should be removed
+from our makefiles.
+
+Use makeinfo instead of Emacs when makeinfo will be internationalized.
+
+Add existing Japanese documents.
+
+Use new Autotools when server for GNUjdoc project will be installed them.
+
+Of course, translate more documents into Japanese!

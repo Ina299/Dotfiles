@@ -1,0 +1,1586 @@
+Info file: bison-ja.info,    -*-Text-*-
+produced by `texinfo-format-buffer'
+from file `bison-ja.texinfo'
+using `texinfmt.el' version 2.38 of 3 July 1998.
+
+
+
+
+
+
+
+
+
+START-INFO-DIR-ENTRY
+* bison-ja: (bison-ja). GNU Project parser generator (yacc replacement).
+END-INFO-DIR-ENTRY
+
+このファイルはBison構文解析器生成器の説明文書です。
+
+Copyright (C) 1988, 89, 90, 91, 92, 93, 95, 98, 1999 Free Software
+Foundation, Inc.
+
+Permission is granted to make and distribute verbatim copies of this
+manual provided the copyright notice and this permission notice are
+preserved on all copies.
+
+Permission is granted to copy and distribute modified versions of this
+manual under the conditions for verbatim copying, provided also that the
+sections entitled "GNU General Public License" and "Conditions for Using
+Bison" are included exactly as in the original, and provided that the
+entire resulting derived work is distributed under the terms of a
+permission notice identical to this one.
+
+Permission is granted to copy and distribute translations of this manual
+into another language, under the above conditions for modified versions,
+except that the sections entitled "GNU General Public License",
+"Conditions for Using Bison" and this permission notice may be included
+in translations approved by the Free Software Foundation instead of in
+the original English.
+
+
+
+
+
+File: bison-ja.info, Node: Parser States, Next: Reduce/Reduce, Prev: Contextual Precedence, Up: Algorithm
+
+構文解析器の状態
+================
+
+関数`yyparse'は、有限状態機械を使って実装されています。構文解析器のスタッ
+クに積まれる値は、トークン型番号だけでなく、スタックの先頭またはその近く
+にある終端記号と非終端記号の列を表現しています。現在の状態は、次にすべき
+ことに関連する、今までの入力の情報全体の集まりです。
+
+先読みトークンが読まれるたびに、先読みトークンの型と現在の構文解析器の状
+態によって、表が引かれます。この表の項目には、「先読みトークンをシフトし
+なさい」というようなことが書かれています。この場合、その表の項目は、先読
+みトークンが構文解析器スタックのトップに置かれた、構文解析器の新しい状態
+をも示しています。「N番目の規則を使って還元しなさい」というような項目も
+あります。これによって、決められた数のトークンまたはグループがスタックの
+トップから取り除かれ、1個のグループがスタックのトップに置かれます。言い
+換えると、その数の状態がスタックからポップされ、新しい1個の状態がスタッ
+クにプッシュされます。
+
+これには、1つの例外があります。先読みトークンが現在の状態に対してエラー
+であるという項目もあります。この場合には、エラー処理が起こります（*Note
+Error Recovery::）。
+
+
+
+
+File: bison-ja.info, Node: Reduce/Reduce, Next: Mystery Conflicts, Prev: Parser States, Up: Algorithm
+
+還元/還元衝突
+=============
+
+同一の入力列に対して2個以上の規則が適用可能であると、還元/還元衝突が起き
+ます。これは、通常、文法の重大なエラーを意味します。
+
+0個以上の`word'の並びをグループ化する、誤った試みの例を示します。
+
+     sequence: /* 空 */
+                     { printf ("empty sequence\n"); }
+             | maybeword
+             | sequence word
+                     { printf ("added word %s\n", $2); }
+             ;
+
+     maybeword: /* 空 */
+                     { printf ("empty maybeword\n"); }
+             | word
+                     { printf ("single word %s\n", $1); }
+             ;
+
+エラーは、あいまいさにあります。つまり、1個の`word'を`sequence'に構文解
+析する、2個以上の方法があります。`word'は、`maybeword'に還元され、第2の
+規則によって`sequence'になりえます。また、最初の規則で、空データが
+`sequence'に還元され、それが第3の規則によって`word'と組み合わされて
+`sequence'になりえます。
+
+さらに、空データが`sequence'に還元される方法が2つ以上あります。第1の規則
+で直接還元される方法と、`maybeword'を経由して第2の規則で還元される方法で
+す。
+
+この違いは、特定の入力が正当であるかどうかに関係ないので、ささいなことに
+思えるかもしれません。しかし、これは、どのアクションが実行されるかに影響
+します。ある構文解析手順では第2の規則のアクションが実行され、別の構文解
+析手順では第1の規則のアクションと第3の規則のアクションが実行されます。こ
+の例では、プログラムの出力が異なります。
+
+Bisonは、最初に現れた文法を選ぶことで、還元/還元衝突を解決しますが、これ
+に頼ることは非常に危険です。還元/還元衝突のそれぞれは、人間によって解析
+され、通常は取り除かれるべきです。`sequence'を定義する正しい方法を示しま
+す。
+
+     sequence: /* 空 */
+                     { printf ("empty sequence\n"); }
+             | sequence word
+                     { printf ("added word %s\n", $2); }
+             ;
+
+還元/還元衝突を起こす、別のありがちなエラーの例を示します。
+
+     sequence: /* 空 */
+             | sequence words
+             | sequence redirects
+             ;
+
+     words:    /* 空 */
+             | words word
+             ;
+
+     redirects:/* 空 */
+             | redirects redirect
+             ;
+
+ここは、`word'または`redirect'グループのどちらかを含む列の定義が目的です。
+`sequence'、`words'、`redirects'それぞれ個別の定義にエラーはありません。
+しかし、3個を合わせると、あいまいになります。空の入力には、無限個の構文
+解析方法があります。
+
+空データが`words'になったと仮定しましょう。それは、2個の`words'にも、3個
+の`words'にも、何個の`words'にもなりえます。あるいは、1個の`words'に3個
+の`redirects'ともう1個の`word'が続くことも考えられます。同様に、無限の解
+釈が可能です。
+
+これらの規則を直す方法が2つあります。第1に、1段階の列にする方法です。
+
+     sequence: /* 空 */
+             | sequence word
+             | sequence redirect
+             ;
+
+第2に、`words'と`redirects'が空になるのを防ぐ方法です。
+ 
+     sequence: /* 空 */
+             | sequence words
+             | sequence redirects
+             ;
+
+     words:    word
+             | words word
+             ;
+
+     redirects:redirect
+             | redirects redirect
+             ;
+
+
+
+
+File: bison-ja.info, Node: Mystery Conflicts, Next: Stack Overflow, Prev: Reduce/Reduce, Up: Algorithm
+
+不可解な還元/還元衝突
+=====================
+
+そうなるはずがないように見えるのに、ときどき還元/還元衝突が起きることが
+あります。例を示します。
+
+     %token ID
+
+     %%
+     def:    param_spec return_spec ','
+             ;
+     param_spec:
+                  type
+             |    name_list ':' type
+             ;
+     return_spec:
+                  type
+             |    name ':' type
+             ;
+     type:        ID
+             ;
+     name:        ID
+             ;
+     name_list:
+                  name
+             |    name ',' name_list
+             ;
+
+この文法は、1個のトークンの先読みによって、構文解析できるように見えます。
+たとえば、`pram_spec'が読まれた後で、`ID'はカンマかセミコロンが続くなら
+ば`name'、そうでなければ`type'となります。言い換えれば、この文法はLR(1)
+です。
+
+しかし、Bisonは、多くの構文解析器生成器と同様に、すべてのLR(1)文法を扱え
+るわけではありません。前述の例では、`ID'の後で、そこが`param_spec'の先頭
+であるという文脈と、そこが`return_spec'の先頭であるという文脈は、Bisonが
+同一であるとみなしてしまうほど似ています。これらの文脈が似てしまう原因は、
+同じ規則の集合が有効になる、つまり、`name'へ還元するための規則と、`type'
+へ還元するための規則の両方が有効なことです。Bisonは、その規則が2つの文脈
+で異なる先読みトークンを要求するような、処理の段階を決定できず、両者から
+1つの構文解析器状態ができてしまいます。2個の文脈の組み合わせは、後で衝突
+を起こします。構文解析器の用語でいえば、この問題の発生は、文法がLALR(1)
+でないことを意味します。
+
+一般に、このような欠点は解決して、文書化するべきです。しかし、この問題は
+本質的に解決困難です。LR(1)文法を扱える構文解析器生成器は、作成困難で、
+生成される構文解析器が巨大になってしまいます。実用上、Bisonは今のままで
+も有用です。
+
+このような問題が現れた場合に、混乱の元になっている2種類の構文解析器の状
+態を区別し、それらが違うという目印か何かを追加することによって、しばしば
+問題を解決できます。前述の例では、次のように`return_spec'に規則を追加し
+て、問題を解決できます。
+
+     %token BOGUS
+     ...
+     %%
+     ...
+     return_spec:
+                  type
+             |    name ':' type
+              /* この規則は決して使われない。  */
+             |    ID BOGUS
+             ;
+
+`ID'の次で`return_spec'の先頭である文脈で、追加の規則が有効になる可能性
+を導入して、問題を解決しています。この規則は、`param_spec'に関連する文脈
+では有効にならないので、2個の文脈は、異なる構文解析器状態を持ちます。
+`BOGUS'は`yylex'によっては決して生成されないので、追加された規則は入力が
+実際に構文解析される方法には影響しません。
+
+この具体例では、問題を解決する別の方法があります。つまり、`return_spec'
+の規則を、`name'経由ではなく`ID'を直接使うように書き換えるのです。
+`return_spec'に対する規則は、`name'に対する規則ではなく、`return_spec'に
+対する規則を有効にするので、2つの混乱していた文脈は異なる有効な規則の集
+まりを持ちます。
+
+     param_spec:
+                  type
+             |    name_list ':' type
+             ;
+     return_spec:
+                  type
+             |    ID ':' type
+             ;
+
+
+
+
+File: bison-ja.info, Node: Stack Overflow, Prev: Mystery Conflicts, Up: Algorithm
+
+スタックオーバーフローと防ぎ方
+==============================
+
+Bison構文解析器のスタックは、あまりにも多くのトークンがシフトされて還元
+されないでいると、オーバーフローする可能性があります。スタックがオーバー
+フローすると、オーバーフローを報告するために`yyerror' を呼び出して、関数
+`yyparse'は0でない値を返します。
+
+マクロ`YYMAXDEPTH'を定義して、スタックオーバーフローが起こらないように、
+構文解析器のスタックの深さを調節できます。マクロの値として、整数値を定義
+してください。この値は、オーバーフローする前に、シフトされたが還元されて
+いないトークンの最大数になります。マクロの値として、コンパイル時に決定可
+能な定数式を指定してください。
+
+指定されたスタック領域は、割り当てられる必要はありません。大きな
+`YYMAXDEPTH'を指定すると、構文解析器はまず小さなスタック領域を割り当て、
+必要に応じてより大きなスタック領域を割り当てます。この割り当ての増加は、
+何も表示せずに、自動的に行われます。したがって、スタックをあまり必要とし
+ない通常の入力に対してメモリを節約するために、`YYMAXDEPTH'を小さくする必
+要はありません。
+
+特に指定しないと、`YYMAXDEPTH'の値は10000になります。
+
+マクロ`YYINIDEPTH'を指定して、最初に割り当てられるスタックの量を調節でき
+ます。この値は、コンパイル時に決定可能な整定数の必要があります。特に指定
+しないと、200になります。
+
+
+
+
+File: bison-ja.info, Node: Error Recovery, Next: Context Dependency, Prev: Algorithm, Up: Top
+
+エラーからの回復
+****************
+
+構文解析エラーが起きた場合に、構文解析プログラムが止まることは、通常望ま
+しくありません。たとえば、コンパイラは入力の残りを構文解析して他のエラー
+を探せるようにエラーから回復するべきですし、電卓は次の式を受け入れるべき
+です。
+
+入力を1行ごとに処理する単純な対話的構文解析器は、エラーが発生した場合に
+`yyparse'が1を返し、入力行の残りを無視し、`yyparse'をもう一度呼び出して
+もかまいません。しかし、コンパイラでこのように処理すると、エラーに先立つ
+文法的文脈を忘れてしまうので不都合です。深い関数呼び出しの中で構文エラー
+が発生した場合に、コンパイラがエラーに続く行をソースファイルの先頭のよう
+に扱うべきではありません。
+
+特別なトークン`error'を認識するような規則を書くことによって、構文エラー
+から回復する方法を定義できます。`error'は定義済みの終端記号で、自分で宣
+言する必要はなく、エラー処理のために予約されています。Bison構文解析器は、
+構文エラーが起こるたびに、`error'トークンを生成します。現在の文脈で
+`error'トークンを認識できる規則を書いていれば、構文解析を継続できます。
+
+例を示します。
+
+     stmnts:  /* 空文字列 */
+             | stmnts '\n'
+             | stmnts exp '\n'
+             | stmnts error '\n'
+
+第4の規則は、`error'とそれに続く改行が、任意の`stmnts'に続くことを認めま
+す。
+
+`exp'の中で構文エラーが発生するとどうなるでしょうか。エラー回復規則は、
+厳密に解釈され、`stmnts'、`error'、改行からなる列に適用されます。`exp'の
+中で構文エラーが起きると、おそらく、いくつかの余分なトークンまたは部分式
+がスタック上の最後の`stmnts'の後に存在し、したがって、次の改行を読む前に
+読むべきトークンが存在するでしょう。したがって、この通常の方法では規則を
+適用できません。
+
+しかし、意味文脈と入力の一部を捨てることによって、Bisonは強制的にこの場
+合に規則を適用できます。まず、`error'トークンが受理可能な状態に戻るまで、
+状態とオブジェクトがスタックから捨てられます（これは、すでに構文解析され
+た部分式が捨てられ、最後の完全な`stmnts'に状態が戻ることを意味します）。
+この時点で、`error'トークンがシフトされます。そして、古い先読みトークン
+のシフトは受理不可能なので、受理可能なトークンを見つけるまで、構文解析器
+はトークンを読んで捨てます。前述の例では、次の改行がくるまで入力が読み捨
+てられ、したがって、第4の規則が適用可能になります。
+
+文法中のエラー規則の選択は、エラー回復の戦略の選択です。単純で便利な戦略
+の1つは、エラーを検出したら、単純に現在の入力行または文を読み飛ばすこと
+です。
+
+     stmnt: error ';'  /* エラーがあれば、「;」がくるまで読み飛ばす。 */
+
+すでに構文解析された開き区切りトークン (1) (*Note Error
+Recovery-Footnotes::)を、閉じ区切りトークンに対応させることは、エラー処
+理のうまい方法です。そうしなければ、閉じ区切りトークンが後で不適切に現れ
+て、別の重大なエラーを引き起こすでしょう。
+
+     primary:  '(' expr ')'
+             | '(' error ')'
+             ...
+             ;
+
+エラー回復の戦略は熟慮されるべきです。戦略が悪いと、1つの構文エラーがし
+ばしば別のエラーを引き起こします。前述の例では、エラー回復規則は、1個の
+`stmnt'の中で起きると仮定されています。そうでない可能性として、有効な
+`stmnt'の中に誤ってセミコロンがまぎれ込んでいることを考えてみましょう。
+エラー回復規則が最初のエラーを回復した後で、まぎれ込んだセミコロンに続く
+入力も無効な`stmnt'なので、もう1つの構文エラーがただちにみつかります。
+
+エラー報告の洪水を避けるために、最初の構文エラーが起きた直後の他の構文エ
+ラーに対しては、構文解析器はエラー報告を表示しないべきでしょう。3個の連
+続する入力トークンのシフトに成功してから、エラー報告を再開するべきです。
+
+`error'トークンを受け付ける規則も、他の規則と同様にアクションを持てるこ
+とに注意してください。
+
+アクションの中でマクロ`yyerrok'を使って、ただちにエラー報告を再開できま
+す。もし、エラー規則のアクションの中でこのマクロを使えば、エラー報告は抑
+制されません。このマクロに引数は不要で、`yyerrok;'は有効なCの文です。
+
+直前の先読みトークンは、エラーの直後に再解析されます。これが不都合ならば、
+マクロ`yyclearin'によって先読みトークンを消してください。すなわち、エラー
+規則のアクションに`yyclearin;'文を書いてください。
+
+たとえば、構文エラーにおいて、構文解析を再開すべき場所まで入力を進めるよ
+うな、エラー処理手続きを考えてみましょう。字句解析器から返される次の記号
+は、おそらく正しいでしょう。以前の先読みトークンは`yyclearin;'によって捨
+てられるべきです。
+
+マクロ`YYRECOVERING'は、式を表し、構文解析器がエラーから回復する途中にあ
+るならば値が1になり、通常の状態ならば値が0になります。値が1であるという
+ことは、新たな構文エラーに対するエラーの報告が、現在は抑制されていること
+を示します。
+
+
+
+File: bison-ja.info  Node: Error Recovery-Footnotes, Up: Error Recovery
+
+(1) 【訳注】C言語での`([{'、Pascal言語での`begin'など。
+
+
+
+File: bison-ja.info, Node: Context Dependency, Next: Debugging, Prev: Error Recovery, Up: Top
+
+文脈依存性の処理
+****************
+
+Bisonの枠組みは、まずトークンを読み、次にトークンをより大きな文法的単位
+にグループ化することです。多くの言語では、トークンの意味は文脈の影響を受
+けます。文脈依存性によってBisonの枠組みが壊れますが、（"kludges"として知
+られる）いくつかの技術を使って、このような言語に対するBison構文解析器を
+書けます。
+
+* Menu:
+
+* Semantic Tokens::   トークン構文解析は意味的文脈に依存する.
+* Lexical Tie-ins::   トークン構文解析は構文的文脈に依存する.
+* Tie-in Recovery::   字句結び付きはエラー回復規則を書く方法に影響する.
+
+（実際に、「kludge」は、仕事を可能にしますが、美しくも頑丈でもない技術を
+意味します）
+
+
+
+
+File: bison-ja.info, Node: Semantic Tokens, Next: Lexical Tie-ins, Prev: Context Dependency, Up: Context Dependency
+
+トークン型の意味情報
+====================
+
+C言語は文脈依存性をもっています。すなわち、識別子の使われ方は、それの現
+在の意味に依存します。次の例を考えてみてください。
+
+     foo (x);
+
+これは、関数を呼び出す文のように見えます。しかし、もし、`foo'が`typedef'
+された型名ならば、この文は`x'の宣言になります。C言語に対するBison構文解
+析器は、この入力を構文解析する方法をどのように決定できるでしょうか。
+
+GNU Cで使っている方法は、`IDENTIFIER'と`TYPENAME'という、2種類の異なるトー
+クン型を使うことです。`yylex'が識別子を見つけると、どちらのトークン型を
+返すか決めるために、識別子の現在の宣言を検索し、`typedef'として宣言され
+ていれば`TYPENAME'を返し、そうでなければ`IDENTIFIER'を返します。
+
+そして、認識するトークン型を選ぶことによって、文法規則は文脈依存性を表現
+できます。`IDENTIFIER'は、式として受け入れられますが、`TYPENAME'は受け入
+れられません。`TYPENAME'は、宣言の始まりとして受け入れられますが、
+`IDENTIFIER'は受け入れられません。識別子の意味の区別が*必要のない*文脈、
+たとえば`typedef'名を隠す宣言の中では、`TYPENAME'と`IDENTIFIER'の両方が
+受け入れられます。すなわち、2個のトークン型に対してそれぞれ1個の規則を書
+くことが可能です。
+
+この方法は、どの種類の識別子が許されるかの判断が、その識別子が構文解析さ
+れる場所の近くで行われるならば、単純に使えます。しかし、C言語で、いつも
+そうであるとは限りません。次の例のように、以前に指定された明示的な型に規
+定された`typedef'名の再宣言が許されているからです。
+
+     typedef int foo, bar, lose;
+     static foo (bar);        /* `bar'を静的変数として再宣言する。 */
+     static int foo (lose);   /* `foo'を関数として再宣言する。 */
+
+不幸にも、込み入った文法構造「宣言子(declarator)」によって、宣言された名
+前は、その宣言の構造自身から切り離されます。
+
+結果として、C言語に対するBison構文解析器は、すべての非終端記号の名前を変
+えて、二重化されました。第1は、`typedef'名が再定義されているかもしれない
+宣言を構文解析し、第2は、再定義が起こりえない宣言を構文解析します。二重
+化したものの一部分を、簡単にするためにアクションを省略して、示します。
+
+     initdcl:
+               declarator maybeasm '='
+               init
+             | declarator maybeasm
+             ;
+
+     notype_initdcl:
+               notype_declarator maybeasm '='
+               init
+             | notype_declarator maybeasm
+             ;
+
+ここで、`initdcl'は`typedef'名を再宣言できますが、`notype_initdcl'は再宣
+言できません。`declarator'と`notype_declarator'の違いも同様です。
+
+前述の技術と、後述の字句解析結び付きには、字句解析に影響する情報が入力の
+別の部分を構文解析しているときに変化させられるという、共通点があります。
+前者では、情報が広域的で、プログラム (1) (*Note Semantic
+Tokens-Footnotes::)の別の目的に使われることが異なります。本当の字句解析
+結び付きは、文脈によって制御される、特別の目的のフラグを持ちます。
+
+
+
+
+File: bison-ja.info  Node: Semantic Tokens-Footnotes, Up: Semantic Tokens
+
+(1) 【訳注】構文解析器。
+
+
+
+File: bison-ja.info, Node: Lexical Tie-ins, Next: Tie-in Recovery, Prev: Semantic Tokens, Up: Context Dependency
+
+字句解析結び付き
+================
+
+文脈依存性を処理する1つの方法は、"字句解析結び付き（lexical tie-in）"で、
+Bisonのアクションによって設定されるフラグが、トークンが構文解析される方
+法に影響します。
+
+たとえば、C言語によく似ていて、`hex (HEX-EXPR)'という特別な構造を持つ言
+語について、考えてみましょう。予約語`hex'がきた後にかっこで囲まれた式が
+続いて、そのかっこの中ではすべての整数が16進数になります。特に、トークン
+`a1b'は、このような文脈に現れれば、識別子ではなく整数として扱われる必要
+があります。どのようにすればよいかを示します。
+
+     %{
+     int hexflag;
+     %}
+     %%
+     ...
+     expr:   IDENTIFIER
+             | constant
+             | HEX '('
+                     { hexflag = 1; }
+               expr ')'
+                     { hexflag = 0;
+                        $$ = $4; }
+             | expr '+' expr
+                     { $$ = make_sum ($1, $3); }
+             ...
+             ;
+
+     constant:
+               INTEGER
+             | STRING
+             ;
+
+`yylex'は、`hexflag'の値が0でなければ、すべての整数が16進数であると字句
+解析し、英字で始まるトークンも可能な限り整数と解釈すると、仮定します。
+
+`hexflag'の宣言は、アクションから参照可能なように、文法ファイルのC宣言部
+に書かれる必要があります（*Note The C Declarations Section: C
+Declarations.）。同様に、`yylex'のプログラムにも、`hexflag'の宣言が必要
+です。
+
+
+
+
+File: bison-ja.info, Node: Tie-in Recovery, Prev: Lexical Tie-ins, Up: Context Dependency
+
+字句解析結び付きとエラー回復
+============================
+
+字句解析結び付きは、厳密なエラー回復規則を要求します。*Note Error
+Recovery::。
+
+その理由は、エラー回復規則の目的が、ある構成物の構文解析を中断し、より大
+きな構成物の構文解析を再開することです。前述のC言語に似ている言語の例で
+は、次のように、標準的なエラー回復規則は、次のセミコロンまでトークンを読
+み捨て、新しい文の構文解析を再開します。
+
+     stmt:   expr ';'
+             | IF '(' expr ')' stmt { ... }
+             ...
+             error ';'
+                     { hexflag = 0; }
+             ;
+
+もし、`hex (EXPR)'の途中で構文エラーが発生すれば、このエラー回復規則が適
+用され、完了した`hex EXPR)'に対するアクションは決して実行されません。す
+ると、`hexflag'は、入力の残りの間ずっと設定されたままでいるか、次の`hex'
+予約語の出現までそのままの状態でいて、識別子が16進整数と誤解されます。
+
+この問題を防ぐためには、エラー回復規則が`hexflag'を元に戻すべきです。
+
+さらに、式の内部で働くエラー回復規則があるかもしれません。たとえば、次の
+例のように、かっこの中でエラーが発生すると、閉じかっこまで読み捨てるよう
+なエラー回復規則が考えられます。
+
+     expr:   ...
+             | '(' expr ')'
+                     { $$ = $2; }
+             | '(' error ')'
+             ...
+
+もし、この規則が`hex'構造の中で働くならば、その構造の中の内側のかっこに
+適用されるので、構造を中断するべきではありません。したがって、このアクショ
+ンではフラグを戻すべきではなく、`hex'構造の残りはフラグを有効にしたまま
+構文解析されるべきです。
+
+状況に応じて、`hex'構造を中断できるかもしれないし、そうでないかもしれな
+いエラー回復規則があれば、どうなるでしょうか。`hex'構造を中断すべきかど
+うか決定できるアクションを書けません。そこで、もし、字句解析結び付きを使っ
+ているならば、あなたが書いたエラー回復規則がそのようになっていないことを
+確かめるべきです。それぞれの規則は、常にフラグを戻すべきか、あるいは常に
+フラグを戻さないべきか、決定できるべきです。
+
+
+
+
+File: bison-ja.info, Node: Debugging, Next: Invocation, Prev: Context Dependency, Up: Top
+
+構文解析器のデバッグ
+********************
+
+もし、Bison文法ファイルが正しくコンパイルされたのに、生成された構文解析
+器が思いどおりに動かない場合には、`yydebug'構文解析器追跡機能が、調査の
+役に立つでしょう。
+
+追跡機能のコンパイルを有効にするためには、構文解析器をコンパイルするとき
+に、マクロ`YYDEBUG'を定義する必要があります。そのためには、コンパイラの
+オプションに`-DYYDEBUG=1'を指定するか、あるいは、文法ファイルのC宣言部に
+`#define YYDEBUG 1'と書いておく必要があります（*Note The C Declarations
+Section: C Declarations.）。あるいは、Bisonを実行するときに(*Note
+Invoking Bison: Invocation.)、`-t'オプションを指定しておくと、`YYDEBUG'
+が定義され、追跡が可能になります。
+
+追跡機能は`stderr'を使うので、C宣言部に
+`#include <stdio.h>'と書いておく必要があります。
+
+追跡機能付で構文解析器をコンパイルしたら、構文解析器の実行時に、追跡機能
+を有効にするために、`yydebug'変数を0でない値にしてください。C言語のプロ
+グラム(おそらく`main'関数の中)でこの変数に代入するか、あるいは、デバッガ
+でこの変数の値を変えればいいでしょう。
+
+`yydebug'が0でない場合、構文解析器はそれぞれの段階で、1行まはた2行の追跡
+情報を生成し、`stderr'に出力します。追跡情報には、次のような情報が含まれ
+ています。
+
+   * 構文解析器が`yylex'を呼ぶたびに、読み込まれたトークンの種類が記録さ
+     れます。
+
+   * トークンがシフトされるたびに、状態スタックの深さと完全な内容が表示
+     されます（*Note Parser States::）。
+
+   * 規則が還元されるたびに、どの規則が使われるか、そして、還元後の状態
+     スタックの完全な内容が記録されます。
+
+
+この情報を理解するためには、Bisonに`-v'オプション（*Note Invoking Bison:
+Invocation.）を付けて実行すると生成される明細ファイルが参考になるでしょ
+う。このファイルには、さまざまな規則の中での位置による表現で各状態の意味
+が示され、また、各状態がそれぞれの可能な入力トークンによってどのように動
+作するかが示されています。連続する追跡の意味を読むことによって、明細ファ
+イルで仕様が示されている構文解析器の機能について、理解できるでしょう。何
+か望ましくないことが起きている部分を確認すれば、文法ファイルのどこに問題
+があるかわかるでしょう。
+
+構文解析器ファイルはC言語のプログラムなので、Cのデバッガを使えますが、何
+が起きているか調べることは困難です。構文解析器関数は、有限状態機械インター
+プリタで、アクションが実行されると、プログラムの同じ部分が何度も何度も実
+行されます。実用的なのは文法の中で変数の値を調べることだけでしょう。
+
+デバッグ情報には、通常、それぞれのトークンのトークン型だけが含まれ、トー
+クンの意味値は含まれません。マクロ`YYPRINT'を定義することで、トークンの
+意味値を表示させられます。`YYPRINT'の定義には、3個の引数がともないます。
+構文解析器は、`YYPRINT'に、標準入出力ストリーム、トークン型の数値番号、
+トークンの値（`yylval'による）を渡します。
+
+多機能電卓に適する`YYPRINT'の例を示します（*Note Declarations for
+`mfcalc': Mfcalc Decl.）。
+
+     #define YYPRINT(file, type, value)   yyprint (file, type, value)
+
+     static void
+     yyprint (file, type, value)
+          FILE *file;
+          int type;
+          YYSTYPE value;
+     {
+       if (type == VAR)
+         fprintf (file, " %s", value.tptr->name);
+       else if (type == NUM)
+         fprintf (file, " %d", value.val);
+     }
+
+
+
+
+File: bison-ja.info, Node: Invocation, Next: Table of Symbols, Prev: Debugging, Up: Top
+
+Bisonの実行
+***********
+
+通常、Bisonは次のように実行します。
+
+     bison INFILE
+
+ここで、INFILEは文法ファイルで、名前が通常`.y'で終わります。生成される構
+文解析器ファイルは、文法ファイルの名前の`.y'を`.tab.c'に変えたものです。
+したがって、`bison foo.y'によって`foo.tab.c'を得られますし、`bison
+hack/foo.y'によって`hack/foo.tab.c'を得られます。
+
+* Menu:
+
+* Bison Options::     全てのオプションが詳しく、短いオプションでアルファ
+                        ベット順に説明されている.
+* Option Cross Key::  長いオプションのアルファッベット順のリスト.
+* VMS Invocation::    VMSでのBisonのコマンド構文.
+
+
+
+
+File: bison-ja.info, Node: Bison Options, Next: Option Cross Key, Prev: Invocation, Up: Invocation
+
+Bisonのオプション
+=================
+
+Bisonは、伝統的な1文字のオプションと、記憶しやすい長いオプション名の両方
+を受け付けます。長いオプション名は、`-'の代わりに、`--'で指定します。一
+意性を失わない範囲で、長いオプション名を省略できます。長いオプションが引
+数をともなう場合、たとえば、`--file-prefix'では、オプション名と引数の間
+に`='を入れます。
+
+Bisonに対して指定可能なオプションの一覧を、アルファベット順に示します。
+さらに、長い名前のアルファベット順の対応を示します。
+
+`-b FILE-PREFIX'
+`--file-prefix=PREFIX'
+     Bisonが生成するすべてのファイルの名前の前半部分を指定します。入力さ
+     れる文法ファイルの名前が`PREFIX.y'であった場合と、同じ結果を得られ
+     ます。
+
+`-d'
+`--defines'
+     文法ファイル中で定義されたトークン型名に対するマクロ定義、意味値型
+     `YYSTYPE'、いくつかの`extern'変数宣言を含む、追加の出力ファイルを生
+     成します。
+
+     生成される構文解析ファイルの名前が`NAME.c'ならば、このファイルの名
+     前は`NAME.h'になります。
+
+     `yylex'関数を独立なソースファイルの中で定義しているならば、それはトー
+     クン型番号と変数`yylval'を必要とするので、このファイルを`#include'
+     する必要があります*Note Semantic Values of Tokens: Token Values。
+
+`-l'
+`--no-lines'
+     構文解析器ファイルの中に、`#line'プリプロセッサディレクティブを生成
+     しません。通常、Bisonはこれを生成し、Cコンパイラとデバッガが、文法
+     ファイルのどこでエラーが発生したかを見つけるために使います。このオ
+     プションは、エラーと構文解析器の行番号を結び付け、構文解析器を独立
+     なソースファイルとして扱います。
+
+`-n'
+`--no-parser'
+     構文解析器にCのプログラムを含めず、表だけを生成します。構文解析器ファ
+     イルは、`#define'ディレクティブと静的変数の宣言のみからなります。
+
+     このオプションにより、`FILENAME.act'という名前のファイルに、文法ア
+     クションに対するC言語のプログラムが書かれます。その書式は、`switch'
+     文に対応するブレースで囲まれたブロックです。
+
+`-o OUTFILE'
+`--output-file=OUTFILE'
+     生成される構文解析器ファイルの名前を指定します。
+
+     他の出力ファイルのファイル名の指定は`-v'と`-d'オプションの項を参照
+     してください。
+
+`-p PREFIX'
+`--name-prefix=PREFIX'
+     構文解析器が使う外部名を`yy'でなくPREFIXで始まるように変えます。影
+     響を受ける名前は、`yyparse'、`yylex'、`yyerror'、`yynerrs'、
+     `yylval'、`yychar'、`yydebug'です。
+
+     たとえば、`-p c'オプションを指定すれば、名前は`cparse'、`clex'など
+     になります。
+
+     *Note Multiple Parsers in the Same Program: Multiple Parsers。
+
+`-r'
+`--raw'
+     `%raw'が指定されたように振る舞います。*Note Decl Summary::。
+
+`-t'
+`--debug'
+     デバッグ機能がコンパイルされるように、マクロ`YYDEBUG'の定義を構文解
+     析器ファイルに入れます*Note Debugging Your Parser: Debugging。
+
+`-v'
+`--verbose'
+     構文解析器の状態についての詳細な説明と、それらの状態でそれぞれの先
+     読みトークンが現れると何が起きるか記述した、追加のファイルを生成し
+     ます。
+
+     このファイルは、演算子の優先順位によって解決したものも解決しなかっ
+     たものも含めて、衝突についての説明を含んでいます。
+
+     生成されるファイルの名前は、構文解析器のファイルの名前から、
+     `.tab.c'または`.c'を取り除いて、代わりに`.output'を付けたものです。
+
+     したがって、入力の文法ファイルの名前が`foo.y'ならば、特に指定しない
+     と、構文解析器ファイルの名前は`foo.tab.c'になり、詳細な説明のファイ
+     ルの名前は`foo.output'になります。
+
+`-V'
+`--version'
+     バージョン番号を表示して、Bisonを終了させます。
+
+`-h'
+`--help'
+     コマンドラインオプションの要約を表示して、Bisonを終了させます。
+
+`-y'
+`--yacc'
+`--fixed-output-files'
+     `-o y.tab.c'と等価です。構文解析器ファイルの名前は`y.tab.c'になり、
+     他の出力ファイルの名前は`y.output'と`y.tab.h'になります。このオプショ
+     ンの目的は、出力ファイルの名前をYaccに合わせることです。次のシェル
+     スクリプトは、Yaccの代用になります。
+
+          bison -y $*
+
+
+
+
+File: bison-ja.info, Node: Option Cross Key, Next: VMS Invocation, Prev: Bison Options, Up: Invocation
+
+オプション対応表
+================
+
+オプションを、長い名前のアルファベット順に一覧表記して、対応する1文字オ
+プションを書きます。
+
+
+     --debug                               -t
+     --defines                             -d
+     --file-prefix=PREFIX                  -b FILE-PREFIX
+     --fixed-output-files --yacc           -y
+     --help                                -h
+     --name-prefix=PREFIX                  -p NAME-PREFIX
+     --no-lines                            -l
+     --no-parser                           -n
+     --output-file=OUTFILE                 -o OUTFILE
+     --raw                                 -r			
+     --token-table                         -k
+     --verbose                             -v
+     --version                             -V
+
+
+
+
+File: bison-ja.info, Node: VMS Invocation, Prev: Option Cross Key, Up: Invocation
+
+VMS上での実行
+=============
+
+VMS上のBisonのコマンドライン構文は、VMSの慣習に合わせて、他のシステム上
+のBisonのコマンドライン構文と異なっています。
+
+VMSでは、すべてのBisonのオプションについて、`--'の代わりに`/'に続く長い
+名前のオプションを書き、オプション名中の`-'を`_'に変えます。VMS上での実
+行例を示します。
+
+     bison /debug/name_prefix=bar foo.y
+
+これは、POSIX上での次のコマンドラインと等価です。
+
+     bison --debug --name-prefix=bar foo.y
+
+VMSファイルシステムでは、`foo.tab.c'のようなファイル名が許されないので、
+構文解析器の名前は、上記の例の場合には、`foo_tab.c'になります。
+
+
+
+
+File: bison-ja.info, Node: Table of Symbols, Next: Glossary, Prev: Invocation, Up: Top
+
+Bisonの記号一覧
+***************
+
+`error'
+     エラー回復のために予約されているトークン名です。このトークンが文法
+     規則の中で使われていると、Bison構文解析器は、構文エラーを認識し、プ
+     ロセスの実行を中断しません。実質的には、エラーを含む文が、有効であ
+     ると認識されます。エラーが起きると、`error'トークンが現在の先読みトー
+     クンになります。`error'に対応するアクションが実行されて、先読みトー
+     クンがエラーの原因になったトークンに戻されます。*Note Error
+     Recovery::。
+
+`YYABORT'
+     回復不可能な構文エラーが発生した場合のためのマクロで、実行するとた
+     だちに`yyparse'が1を返します。エラー報告関数`yyerror'は呼び出されま
+     せん。*Note The Parser Function `yyparse': Parser Function。
+
+`YYACCEPT'
+     構文解析器が言語を完全に読み終えた場合のためのマクロで、実行すると
+     ただちに`yyparse'が0を返します。*Note The Parser Function
+     `yyparse': Parser Function。
+
+`YYBACKUP'
+     構文解析器のスタックから1個の値を捨て、先読みトークンのふりをさせま
+     す。*Note Special Features for Use in Actions: Action Features。
+
+`YYERROR'
+     構文エラーがちょうど検出された場合のためのマクロで、`yyerror'を呼び、
+     可能ならば通常のエラー回復処理（*Note Error Recovery::）を実行し、
+     不可能ならば`yyparse'が1を返します。*Note Error Recovery::。
+
+`YYERROR_VERBOSE'
+     Bison宣言部で`#define'によってこのマクロを定義すると、`yyerror'が呼
+     ばれたときに表示されるエラー報告が詳しくなります。
+
+`YYINITDEPTH'
+     構文解析器スタックの最初の大きさを指定するマクロです。*Note Stack
+     Overflow::。
+
+`YYLEX_PARAM'
+     `yyparse'が`yylex'に渡すための、追加の引数または引数の並びを指定す
+     るためのマクロです。*Note Calling Conventions for Pure Parsers:
+     Pure Calling。
+
+`YYLTYPE'
+     `yyloc'のデータ型を示すマクロで、4個のメンバからなる構造体です。
+     *Note Textual Positions of Tokens: Token Positions。
+
+`yyltype'
+     `YYLTYPE'の省略時の値です。
+
+`YYMAXDEPTH'
+     構文解析器のスタックの最大の大きさを指定するマクロです。*Note Stack
+     Overflow::。
+
+`YYPARSE_PARAM'
+     `yyparse'が受け取るべき引数の名前を指定するマクロです。*Note
+     Calling Conventions for Pure Parsers: Pure Calling。
+
+`YYRECOVERING'
+     構文解析器が構文エラーから回復している途中かどうかを示す値のマクロ
+     です。*Note Special Features for Use in Actions: Action Features。
+
+`YYSTYPE'
+     意味値のデータ型を指定するためのマクロで、省略すると`int'になります。
+     *Note Data Types of Semantic Values: Value Type。
+
+`yychar'
+     広域的な`int'型の変数で、現在の先読みトークンの番号を記憶しています
+     （再入可能な構文解析器では、この変数は`yyparse'に局所的です）。エラー
+     回復規則のアクションは、この変数の値を調べられます。*Note Special
+     Features for Use in Actions: Action Features。
+
+`yyclearin'
+     エラー回復規則のアクションで使われるマクロです。直前の先読みトーク
+     ンを消去します。*Note Error Recovery::。
+
+`yydebug'
+     `int'型の広域変数で、初期値は0です。`yydebug'の値が0でないと、構文
+     解析器は、読み込んだ記号と構文解析器のアクションに関する情報を表示
+     します。*Note Debugging Your Parser: Debugging。
+
+`yyerrok'
+     構文エラーの後で、構文解析器をただちに通常の状態に戻すためのマクロ
+     です。*Note Error Recovery::。
+
+`yyerror'
+     エラーが起きたときに`yyparse'から呼び出される、ユーザー定義関数です。
+     この関数は1個の引数を受け取り、その引数はエラーの報告を含む文字列へ
+     のポインタです。*Note The Error Reporting Function `yyerror': Error
+     Reporting。
+
+`yylex'
+     ユーザー定義の字句解析関数で、次のトークンを得るために、引数なしで
+     呼び出されます。*Note The Lexical Analyzer Function `yylex':
+     Lexical。
+
+`yylval'
+     トークンに関連する意味値を`yylex'が置くための広域変数です（再入可能
+     な構文解析器では、これは`yyparse'の局所変数で、その番地が`yylex'に
+     渡されます）。*Note Semantic Values of Tokens: Token Values。
+
+`yylloc'
+     トークンに関連する行番号と桁番号を`yylex'が置くための広域変数です
+     （再入可能な構文解析器では、この変数は`yyparse'に局所的で、その番地
+     が`yylex'に渡されます）。文法アクションで`@'機能を使わないならば、
+     この値を無視してかまいません。*Note Textual Positions of Tokens:
+     Token Positions。
+
+`yynerrs'
+     構文エラーが発生するたびにBisonが値を1増やす広域変数です（再入可能
+     な構文解析器では、この変数は`yyparse'に局所的です）。*Note The
+     Error Reporting Function `yyerror': Error Reporting。
+
+`yyparse'
+     Bisonによって生成される構文解析器関数で、この関数を呼び出すことによっ
+     て構文解析が始まります。*Note The Parser Function `yyparse': Parser
+     Function。
+
+`%left'
+     トークンに左結合性を与えるBison宣言です。*Note Operator Precedence:
+     Precedence Decl。
+
+`%no_lines'
+     構文解析器ファイルの中に`#line'ディレクティブを生成しないための
+     Bison宣言です。*Note Decl Summary::。
+
+`%nonassoc'
+     トークンに非結合性を与えるためのBison宣言です。*Note Operator
+     Precedence: Precedence Decl。
+
+`%prec'
+     指定された規則に優先順位を与えるためのBison宣言です。*Note
+     Context-Dependent Precedence: Contextual Precedence。
+
+`%pure_parser'
+     再入可能な構文解析器を生成するためのBison宣言です。*Note A Pure
+     (Reentrant) Parser: Pure Decl。
+
+`%raw'
+     通常のYacc互換トークン番号の代わりに、トークン表のBison内部トークン
+     番号を使うための、Bison宣言です。*Note Decl Summary::。
+
+`%right'
+     トークンに右結合性を与えるためのBison宣言です。*Note Operator
+     Precedence: Precedence Decl。
+
+`%start'
+     開始記号を指定するためのBison宣言です。*Note The Start-Symbol:
+     Start Decl。
+
+`%token'
+     優先順位を指定せずにトークンを宣言するためのBison宣言です。*Note
+     Token Type Names: Token Decl。
+
+`%token_table'
+     構文解析器ファイルの中でトークン名の表を挿入するためのBison宣言です。
+     *Note Decl Summary::。
+
+`%type'
+     非終端記号を宣言するためのBison宣言です。*Note Nonterminal Symbols:
+     Type Decl。
+
+`%union'
+     意味値として可能ないくつかのデータ型を指定するためのBison宣言です。
+     *Note The Collection of Value Types: Union Decl.
+
+Bison文法ファイルの中で使う、区切り記号があります。
+
+`%%'
+     Bison宣言部、文法規則部、（省略可能な）Cプログラム部を区切る記号で
+     す。*Note The Overall Layout of a Bison Grammar: Grammar Layout。
+
+`%{ %}'
+     文法ファイルの`%{'と`%}'の間に書かれたすべてのプログラムは、そのま
+     ま構文解析器ファイルに複写されます。このようなプログラムが、文法ファ
+     イルのC宣言部を構成します。*Note Outline of a Bison Grammar:
+     Grammar Outline。
+
+`/*...*/'
+     C言語と同様のコメントです。
+
+`:'
+     規則の結果と構成要素を分離する記号です。*Note Syntax of Grammar
+     Rules: Rules。
+
+`;'
+     規則の終わりの記号です。*Note Syntax of Grammar Rules: Rules。
+
+`|'
+     同一の非終端記号を結果とする複数の規則を区切る記号です。*Note
+     Syntax of Grammar Rules: Rules。
+
+
+
+
+File: bison-ja.info, Node: Glossary, Next: Index, Prev: Table of Symbols, Up: Top
+
+用語集
+******
+
+Backus-Naur Form（BNF）（バッカス-ナウア記法）
+     文脈自由文法を形式的に表現する方法です。BNFは、1963年の報告
+     `ALGOL-60'で初めて使われました。*Note Languages and Context-Free
+     Grammars: Language and Grammar。
+
+Context-free grammars（文脈自由文法）
+     文脈に関係なく適用される規則によって定められる文法です。したがって、
+     もし、整数は式として使われてもよいという規則があれば、式が許される*
+     あらゆる場所で*整数の利用が許されます。*Note Languages and
+     Context-Free Grammars: Language and Grammar。
+
+Dynamic allocation（動的割り当て）
+     プログラムをコンパイルするときでも、関数の実行を始めるときでもなく、
+     実行の途中でメモリを割り当てることです。
+
+Empty string（空文字列）
+     集合論での空集合と同様に、空文字列とは長さが0の文字列です。
+
+Finite-state stack machine（有限状態スタック機械）
+     その完全な状態が、各瞬間での状態で記述される「機械」です。機械への
+     入力が処理されると、機械の論理に応じて、機械の状態が別の状態に変わ
+     ります。本書では、入力とは構文解析されている言語で、状態とは文法規
+     則のさまざまな段階です。*Note The Bison Parser Algorithm: Algorithm。
+
+Grouping（グループ）
+     言語の構成要素で、（一般的に）文法的に分割可能なのもです。たとえば、
+     C言語の「式」や「宣言」です。*Note Languages and Context-Free
+     Grammars: Language and Grammar。
+
+Infix operator（中間記法演算子）
+     演算の対象となるオペランドの中間に置かれる算術演算子です。
+
+Input stream（入力ストリーム）
+     入出力装置またはプログラムの間での、連続的なデータの流れです。
+
+Language construct（言語構文）
+     言語の概要を示す典型的な方法の1つです。たとえば、C言語の構文の1つは
+     `if'文です。*Note Languages and Context-Free Grammars: Language and
+     Grammar。
+
+Left associativity（左結合性）
+     左結合性を持つ演算子は、左から右に向かって構文解析されます。たとえ
+     ば、`a+b+c'では、まず`a+b'が計算され、次に`c'との和が計算されます。
+     *Note Operator Precedence: Precedence。
+
+Left recursion（左再帰）
+     結果の記号が構成要素の最初の記号と等しいような規則です。たとえば、
+     `expseq1 : expseq1 ',' exp;'が左再帰です。*Note Recursive Rules:
+     Recursion。
+
+Left-to-right parsing（LR構文解析）
+     左側から右側に向かって、トークンを次々に解析していくような、言語の
+     構文解析方法です。*Note The Bison Parser Algorithm: Algorithm。
+
+Lexical analyzer（scanner）（字句解析器）
+     入力ストリームを読んで、トークンを1つずつ返す関数です。*Note The
+     Lexical Analyzer Function `yylex': Lexical。
+
+Lexical tie-in（字句解析結び付き）
+     文法規則によって設定されるフラグが、トークンが字句解析される方法に
+     影響することです。*Note Lexical Tie-ins::。
+
+Literal string token（リテラル文字列トークン）
+     2文字以上の決まった文字列からなるトークンです。*Note Symbols::。
+
+Look-ahead token（先読みトークン）
+     すでに読み込まれていて、シフトされていないトークンです。*Note
+     Look-Ahead Tokens: Look-Ahead。
+
+LALR(1)
+     Bison（または似ているほとんどの構文解析器）によって扱える、文脈自由
+     文法の一部分で、LR(1)の部分集合です。*Note Mysterious Reduce/Reduce
+     Conflicts: Mystery Conflicts。
+
+LR(1)
+     任意の入力のあいまいでない構文解析に対して、単に1個の先読みトークン
+     を必要とするような、文脈自由文法の一部分です。
+
+Nonterminal symbol（非終端記号）
+     文法的構成要素を表す文法記号で、文法規則によってより小さな構成要素
+     に分解できるものです。言い換えると、トークンでない構成要素です。
+     *Note Symbols::。
+
+Parse error（構文エラー）
+     入力ストリームを構文解析しているときに、誤った文法によって発生する
+     エラーです。*Note Error Recovery::。
+
+Parser（構文解析器）
+     字句解析器から渡されたトークンの集合の文法的構造を解析して、言語の
+     有効な文を認識する関数です。
+
+Postfix operator（後置演算子）
+     演算の対象のオペランドの後に置かれる算術演算子です。
+
+Reduction（還元）
+     文法規則に従って、非終端記号または終端記号の列を、1個の非終端記号に
+     置き換えることです。*Note The Bison Parser Algorithm: Algorithm。
+
+Reentrant（再入可能）
+     再入可能な手続きとは、複数の呼び出しの間での相互作用なしに、並行し
+     て任意の数を呼び出せる手続きです。 (1) (*Note Glossary-Footnotes::)
+     *Note A Pure (Reentrant) Parser: Pure Decl。
+
+Reverse polish notation（逆ポーランド記法）
+     すべての演算子が後置記法演算子であるような言語です。
+
+Right recursion（右再帰）
+     規則の結果の記号が、規則の最後の構成要素と同じ記号であるような規則
+     です。たとえば、`expseq1: exp ',' expseq1;'は右再帰です。*Note
+     Recursive Rules: Recursion.
+
+Semantics（意味）
+     計算機言語では、言語の各インスタンスが起こすアクションによって、意
+     味が指定されます。すなわち、各文の意味です。*Note Defining Language
+     Semantics: Semantics。
+
+Shift（シフト）
+     構文解析器がシフトするとは、すでに認識されているある規則によってた
+     だちに還元する代わりに、ストリームからのさらなる入力を分析すること
+     です。*Note The Bison Parser Algorithm: Algorithm。
+
+Single-character literal（1文字リテラル）
+     そのままに解釈される (2) (*Note Glossary-Footnotes::)1文字です。
+     *Note From Formal Rules to Bison Input: Grammar in Bison。
+
+Start symbol（開始記号）
+     構文解析された有効な言語の全体を表す非終端記号です。通常、言語仕様
+     に書かれた最初の非終端記号です。*Note The Start-Symbol: Start Decl。
+
+Symbol table（記号表）
+     繰り返し使われる記号の情報を認識して使うために、構文解析の途中で、
+     記号の名前と関連する情報を記憶するデータ構造です。*Note
+     Multi-function Calc::。
+
+Token（トークン）
+     言語の、基本的で、文法的に分割できない単位です。文法の中のトークン
+     を記述する記号を終端記号といいます。Bison構文解析器の入力は、字句解
+     析器からの、トークンの流れです。*Note Symbols::。
+
+Terminal symbol（終端記号）
+     文法規則を持たず、したがって文法的に分割できない文法記号です。これ
+     が表す文字の集まりをトークンといいます。*Note Languages and
+     Context-Free Grammars: Language and Grammar。
+
+
+
+File: bison-ja.info  Node: Glossary-Footnotes, Up: Glossary
+
+(1) 【訳注】ある関数が終了する前に、その同じ関数を非同期に呼び出し
+てもよいということ。
+
+(2) 【訳注】字句解析器によって
+
+
+
+File: bison-ja.info, Node: Index, Prev: Glossary, Up: Top
+
+索引
+****
+
+
+* Menu:
+
+* 用語集:                       Glossary.               4.
+* glossary:                     Glossary.               4.
+* Bisonの記号一覧:              Table of Symbols.       4.
+* 記号一覧, Bison:              Table of Symbols.       4.
+* symbols in Bison, table of:   Table of Symbols.       4.
+* Bison symbols, table of:      Table of Symbols.       4.
+* 実行, VMS上:                  VMS Invocation.         4.
+* VMS:                          VMS Invocation.         4.
+* invoking Bison under VMS:     VMS Invocation.         4.
+* オプション, Bison実行:        Invocation.             4.
+* Bison実行のオプション:        Invocation.             4.
+* 実行, Bison:                  Invocation.             4.
+* Bisonの実行:                  Invocation.             4.
+* options for invoking Bison:   Invocation.             4.
+* Bison invocation:             Invocation.             4.
+* invoking Bison:               Invocation.             4.
+* YYPRINT:                      Debugging.              53.
+* 構文解析器の追跡:             Debugging.              4.
+* 追跡, 構文解析器:             Debugging.              4.
+* tracing the parser:           Debugging.              4.
+* debugging:                    Debugging.              4.
+* yydebug:                      Debugging.              4.
+* YYDEBUG:                      Debugging.              4.
+* 字句解析結び付き:             Lexical Tie-ins.        4.
+* lexical tie-in:               Lexical Tie-ins.        4.
+* YYRECOVERING:                 Error Recovery.         92.
+* yyclearin:                    Error Recovery.         83.
+* yyerrok:                      Error Recovery.         79.
+* error:                        Error Recovery.         17.
+* 回復:                         Error Recovery.         4.
+* エラーからの回復:             Error Recovery.         4.
+* recovery from errors:         Error Recovery.         4.
+* error recovery:               Error Recovery.         4.
+* YYINITDEPTH:                  Stack Overflow.         25.
+* スタックの限界, 省略時:       Stack Overflow.         23.
+* 省略時のスタックの限界:       Stack Overflow.         23.
+* default stack limit:          Stack Overflow.         23.
+* YYMAXDEPTH:                   Stack Overflow.         10.
+* オーバーフロー, 構文解析器のスタック: Stack Overflow.  4.
+* 構文解析器のスタックオーバーフロー: Stack Overflow.   4.
+* スタックオーバーフロー:       Stack Overflow.         4.
+* overflow of parser stack:     Stack Overflow.         4.
+* parser stack overflow:        Stack Overflow.         4.
+* stack overflow:               Stack Overflow.         4.
+* LALR(1):                      Mystery Conflicts.      35.
+* LR(1):                        Mystery Conflicts.      35.
+* 衝突, 還元/還元:              Reduce/Reduce.          4.
+* 還元/還元衝突:                Reduce/Reduce.          4.
+* conflicts, reduce/reduce:     Reduce/Reduce.          4.
+* reduce/reduce conflict:       Reduce/Reduce.          4.
+* 状態, 構文解析器:             Parser States.          4.
+* 構文解析器の状態:             Parser States.          4.
+* 有限状態機械:                 Parser States.          4.
+* state (of parser):            Parser States.          4.
+* parser state:                 Parser States.          4.
+* finite-state machine:         Parser States.          4.
+* 優先順位, 単項演算子:         Contextual Precedence.  4.
+* 優先順位, 文脈依存:           Contextual Precedence.  4.
+* 単項演算子の優先順位:         Contextual Precedence.  4.
+* 文脈依存優先順位:             Contextual Precedence.  4.
+* %prec:                        Contextual Precedence.  4.
+* precedence, unary operator:   Contextual Precedence.  4.
+* precedence, context-dependent: Contextual Precedence.  4.
+* unary operator precedence:    Contextual Precedence.  4.
+* context-dependent precedence: Contextual Precedence.  4.
+* %nonassoc:                    Using Precedence.       4.
+* %right:                       Using Precedence.       4.
+* %left:                        Using Precedence.       4.
+* 結合性:                       Why Precedence.         39.
+* associativity:                Why Precedence.         39.
+* 優先順位, 演算子:             Precedence.             4.
+* 演算子の優先順位:             Precedence.             4.
+* precedence of operators:      Precedence.             4.
+* operator precedence:          Precedence.             4.
+* else, ぶらさがり:             Shift/Reduce.           4.
+* ぶらさがりelse:               Shift/Reduce.           4.
+* シフト還元衝突:               Shift/Reduce.           4.
+* 衝突:                         Shift/Reduce.           4.
+* else, dangling:               Shift/Reduce.           4.
+* dangling else:                Shift/Reduce.           4.
+* shift/reduce conflicts:       Shift/Reduce.           4.
+* conflicts:                    Shift/Reduce.           4.
+* yychar:                       Look-Ahead.             46.
+* 先読みトークン:               Look-Ahead.             4.
+* look-ahead token:             Look-Ahead.             4.
+* スタック, 構文解析器:         Algorithm.              4.
+* 構文解析器のスタック:         Algorithm.              4.
+* 還元:                         Algorithm.              4.
+* シフト:                       Algorithm.              4.
+* Bison構文解析器のアルゴリズム: Algorithm.             4.
+* stack, parser:                Algorithm.              4.
+* parser stack:                 Algorithm.              4.
+* reduction:                    Algorithm.              4.
+* shifting:                     Algorithm.              4.
+* algorithm of parser:          Algorithm.              4.
+* Bison parser algorithm :      Algorithm.              4.
+* @N:                           Action Features.        87.
+* YYERROR:                      Action Features.        57.
+* YYEMPTY:                      Action Features.        53.
+* YYBACKUP:                     Action Features.        40.
+* アクションの要約:             Action Features.        4.
+* 要約, アクション:             Action Features.        4.
+* action fetures summary:       Action Features.        4.
+* summary, action features:     Action Features.        4.
+* yynerrs:                      Error Reporting.        43.
+* YYERROR_VERBOSE:              Error Reporting.        17.
+* 文法エラー:                   Error Reporting.        4.
+* 構文解析エラー:               Error Reporting.        4.
+* エラー報告関数:               Error Reporting.        4.
+* syntax error:                 Error Reporting.        4.
+* parse error:                  Error Reporting.        4.
+* yyerror:                      Error Reporting.        4.
+* error reporting function:     Error Reporting.        4.
+* YYLEX_PARAM:                  Pure Calling.           66.
+* YYPARSE_PARAM:                Pure Calling.           26.
+* YYLTYPE:                      Token Positions.        15.
+* yylloc:                       Token Positions.        5.
+* yylval:                       Token Values.           5.
+* 字句解析器:                   Lexical.                4.
+* lexical analyzer:             Lexical.                4.
+* yylex:                        Lexical.                4.
+* YYABORT:                      Parser Function.        23.
+* YYACCEPT:                     Parser Function.        19.
+* yyparse:                      Parser Function.        4.
+* インターフェイス:             Interface.              4.
+* C言語インターフェイス:        Interface.              4.
+* interface:                    Interface.              4.
+* C-language interface:         Interface.              4.
+* 要約, Bison宣言:              Decl Summary.           4.
+* 宣言の要約:                   Decl Summary.           4.
+* Bison宣言の要約:              Decl Summary.           4.
+* summary, Bison declaration:   Decl Summary.           4.
+* declaration summary:          Decl Summary.           4.
+* Bison declaration summary:    Decl Summary.           4.
+* 純粋構文解析器:               Pure Decl.              4.
+* 再入可能構文解析器:           Pure Decl.              4.
+* %pure_parser:                 Pure Decl.              4.
+* pure parser:                  Pure Decl.              4.
+* reentrant parser:             Pure Decl.              4.
+* 省略時開始記号:               Start Decl.             4.
+* 宣言, 開始記号:               Start Decl.             4.
+* 開始記号の宣言:               Start Decl.             4.
+* %start:                       Start Decl.             4.
+* default start symbol:         Start Decl.             4.
+* start symbol, declaring:      Start Decl.             4.
+* declaring the start symbol:   Start Decl.             4.
+* 衝突, 警告の回避:             Expect Decl.            4.
+* 警告, 衝突:                   Expect Decl.            4.
+* 回避, 衝突警告:               Expect Decl.            4.
+* 衝突警告の回避:               Expect Decl.            4.
+* %expect:                      Expect Decl.            4.
+* conflicts, suppressing warnings of: Expect Decl.      4.
+* warnings, preventing:         Expect Decl.            4.
+* preventing warnings about conflicts: Expect Decl.     4.
+* suppressing conflict warnings: Expect Decl.           4.
+* 非終端記号, 値型の宣言:       Type Decl.              4.
+* 宣言, 非終端記号の値型:       Type Decl.              4.
+* 値型の宣言, 非終端記号:       Type Decl.              4.
+* %type:                        Type Decl.              4.
+* value types, nonterminals, declaring: Type Decl.      4.
+* declaring value types, nonterminals: Type Decl.       4.
+* 宣言, 値型:                   Union Decl.             4.
+* 値型の宣言:                   Union Decl.             4.
+* %union:                       Union Decl.             4.
+* value types, declaring:       Union Decl.             4.
+* declaring value types:        Union Decl.             4.
+* 演算子の優先順位:             Precedence Decl.        4.
+* 宣言, 演算子の優先順位:       Precedence Decl.        4.
+* 優先順位宣言:                 Precedence Decl.        4.
+* operator precedence, declaring: Precedence Decl.      4.
+* declaring operator precedence: Precedence Decl.       4.
+* precedence declarations:      Precedence Decl.        4.
+* リテラル文字列トークンの宣言: Token Decl.             4.
+* トークン型名, 宣言:           Token Decl.             4.
+* トークン型名の宣言:           Token Decl.             4.
+* %token:                       Token Decl.             4.
+* declaring literal string tokens: Token Decl.          4.
+* token type names, declaring:  Token Decl.             4.
+* declaring token type names:   Token Decl.             4.
+* Bison宣言:                    Declarations.           4.
+* 宣言, Bison:                  Declarations.           4.
+* Bison declarations:           Declarations.           4.
+* declarations, Bison:          Declarations.           4.
+* アクション, 規則の途中:       Mid-Rule Actions.       4.
+* 規則の途中のアクション:       Mid-Rule Actions.       4.
+* mid-rule actions:             Mid-Rule Actions.       4.
+* actions in mid-rule:          Mid-Rule Actions.       4.
+* データ型, アクション:         Action Types.           4.
+* アクションのデータ型:         Action Types.           4.
+* data types in actions:        Action Types.           4.
+* action data types:            Action Types.           4.
+* 省略時アクション:             Actions.                33.
+* default action:               Actions.                33.
+* $N:                           Actions.                4.
+* $$:                           Actions.                4.
+* アクション:                   Actions.                4.
+* action:                       Actions.                4.
+* 省略時データ型:               Value Type.             4.
+* 意味値のデータ型:             Value Type.             4.
+* 値型, 意味:                   Value Type.             4.
+* 意味値型:                     Value Type.             4.
+* default data type:            Value Type.             4.
+* data types of semantic values: Value Type.            4.
+* value type, semantic:         Value Type.             4.
+* semantic value type:          Value Type.             4.
+* 定義, 言語の意味:             Semantics.              4.
+* 言語の意味の定義:             Semantics.              4.
+* language semantics, defining : Semantics.             4.
+* defining language semantics:  Semantics.              4.
+* 相互再帰:                     Recursion.              29.
+* mutual recursion:             Recursion.              29.
+* 右再帰:                       Recursion.              14.
+* 左再帰:                       Recursion.              14.
+* right recursion:              Recursion.              14.
+* left recursion:               Recursion.              14.
+* 再帰的規則:                   Recursion.              4.
+* recursive rule:               Recursion.              4.
+* |:                            Rules.                  30.
+* 構文, 文法規則:               Rules.                  4.
+* 文法規則の構文:               Rules.                  4.
+* 規則の構文:                   Rules.                  4.
+* syntax of grammar rules:      Rules.                  4.
+* grammar rule syntax:          Rules.                  4.
+* rule syntax:                  Rules.                  4.
+* 複数文字リテラル:             Symbols.                50.
+* リテラル文字列トークン:       Symbols.                50.
+* 文字列トークン:               Symbols.                50.
+* multi-character literal:      Symbols.                50.
+* literal string token:         Symbols.                50.
+* string token:                 Symbols.                50.
+* 1文字リテラル:                Symbols.                30.
+* リテラルトークン:             Symbols.                30.
+* 文字トークン:                 Symbols.                30.
+* single-character literal:     Symbols.                30.
+* literal token:                Symbols.                30.
+* character token:              Symbols.                30.
+* 記号:                         Symbols.                4.
+* トークン型:                   Symbols.                4.
+* 終端記号:                     Symbols.                4.
+* 非終端記号:                   Symbols.                4.
+* symbol:                       Symbols.                4.
+* token type:                   Symbols.                4.
+* terminal symbol:              Symbols.                4.
+* nonterminal symbol:           Symbols.                4.
+* Cプログラム, 追加の:          C Code.                 4.
+* 追加のCプログラム部:          C Code.                 4.
+* C code, section for additional: C Code.               4.
+* additional C code section:    C Code.                 4.
+* 規則部,文法に対する:          Grammar Rules.          4.
+* 文法規則部:                   Grammar Rules.          4.
+* rules section for grammar:    Grammar Rules.          4.
+* grammar rules section:        Grammar Rules.          4.
+* 宣言, Bison（導入）:          Bison Declarations.     4.
+* Bison宣言（導入）:            Bison Declarations.     4.
+* declarations, Bison (introduction): Bison Declarations.  4.
+* Bison declarations (introduction): Bison Declarations.  4.
+* 宣言, C:                      C Declarations.         4.
+* C宣言部:                      C Declarations.         4.
+* declarations, C:              C Declarations.         4.
+* C declarations section:       C Declarations.         4.
+* 練習問題:                     Exercises.              4.
+* exercises:                    Exercises.              4.
+* 記号表の例:                   Mfcalc Symtab.          4.
+* symbol table example:         Mfcalc Symtab.          4.
+* 電卓, 多機能:                 Multi-function Calc.    4.
+* 多機能電卓:                   Multi-function Calc.    4.
+* calculator, multi-function:   Multi-function Calc.    4.
+* mfcalc:                       Multi-function Calc.    4.
+* multi-function calculator:    Multi-function Calc.    4.
+* エラー回復:                   Simple Error Recovery.  4.
+* error recovery, simple:       Simple Error Recovery.  4.
+* 中間記法:                     Infix Calc.             4.
+* calculator, infix notation:   Infix Calc.             4.
+* calc:                         Infix Calc.             4.
+* infix notation calculator:    Infix Calc.             4.
+* コンパイル:                   Rpcalc Compile.         4.
+* compiling the parser:         Rpcalc Compile.         4.
+* Bisonの実行:                  Rpcalc Gen.             4.
+* running Bison (introduction): Rpcalc Gen.             4.
+* エラー報告関数:               Rpcalc Error.           4.
+* error reporting routine:      Rpcalc Error.           4.
+* main関数:                     Rpcalc Main.            4.
+* 単純な例のmain関数:           Rpcalc Main.            4.
+* 制御関数:                     Rpcalc Main.            4.
+* main function in simple example: Rpcalc Main.         4.
+* controlling function:         Rpcalc Main.            4.
+* 字句解析器:                   Rpcalc Lexer.           4.
+* lexical analyzer, writing:    Rpcalc Lexer.           4.
+* writing a lexical analyzer:   Rpcalc Lexer.           4.
+* 電卓:                         RPN Calc.               4.
+* 逆ポーランド記法:             RPN Calc.               4.
+* calculator, simple:           RPN Calc.               4.
+* rpcalc:                       RPN Calc.               4.
+* polish notation calculator:   RPN Calc.               4.
+* reverse polish notation:      RPN Calc.               4.
+* 例:                           Examples.               4.
+* 単純な例:                     Examples.               4.
+* examples, simple:             Examples.               4.
+* simple examples:              Examples.               4.
+* ファイル書式:                 Grammar Layout.         4.
+* 文法ファイル:                 Grammar Layout.         4.
+* layout of Bison grammar:      Grammar Layout.         4.
+* format of grammar file:       Grammar Layout.         4.
+* file format:                  Grammar Layout.         4.
+* grammar file:                 Grammar Layout.         4.
+* Bisonの使用方法:              Stages.                 4.
+* 使用方法:                     Stages.                 4.
+* using Bison:                  Stages.                 4.
+* stages in using Bison:        Stages.                 4.
+* 構文解析器:                   Bison Parser.           4.
+* 字句解析器:                   Bison Parser.           4.
+* Bisonユーティリティ:          Bison Parser.           4.
+* Bison構文解析器:              Bison Parser.           4.
+* parser:                       Bison Parser.           4.
+* lexical analyzer, purpose:    Bison Parser.           4.
+* Bison utility:                Bison Parser.           4.
+* Bison parser:                 Bison Parser.           4.
+* アクション:                   Semantic Actions.       4.
+* 意味アクション:               Semantic Actions.       4.
+* actions, semantic:            Semantic Actions.       4.
+* semantic actions:             Semantic Actions.       4.
+* 値:                           Semantic Values.        4.
+* 意味値:                       Semantic Values.        4.
+* value, semantic:              Semantic Values.        4.
+* semantic value:               Semantic Values.        4.
+* error:                        Grammar in Bison.       18.
+* 形式文法:                     Grammar in Bison.       4.
+* formal grammar:               Grammar in Bison.       4.
+* grammar, Bison:               Grammar in Bison.       4.
+* Bison 文法:                   Grammar in Bison.       4.
+* Bison grammar:                Grammar in Bison.       4.
+* 開始記号:                     Language and Grammar.   71.
+* start symbol:                 Language and Grammar.   71.
+* グループ:                     Language and Grammar.   28.
+* 文法グループ:                 Language and Grammar.   28.
+* トークン:                     Language and Grammar.   28.
+* 非終端記号:                   Language and Grammar.   28.
+* 終端記号:                     Language and Grammar.   28.
+* 記号:                         Language and Grammar.   28.
+* シンボル:                     Language and Grammar.   28.
+* grouping, syntactic:          Language and Grammar.   28.
+* syntactic grouping:           Language and Grammar.   28.
+* token:                        Language and Grammar.   28.
+* symbols (abstract):           Language and Grammar.   28.
+* バッカス-ナウア記法:          Language and Grammar.   15.
+* Backus-Naur form:             Language and Grammar.   15.
+* BNF:                          Language and Grammar.   15.
+* 文法:                         Language and Grammar.   5.
+* 文脈自由文法:                 Language and Grammar.   5.
+* grammar, context-free:        Language and Grammar.   5.
+* context-free grammar:         Language and Grammar.   5.
+* まえがき:                     Introduction.           4.
+* introduction:                 Introduction.           4.
+
+
+
+

@@ -1,0 +1,6 @@
+
+init.el,307
+(define-key global-map (kbd "C-;") 'anything)global-map50,1259
+(defun my-anything-toggle-resplit-window ()my-anything-toggle-resplit-window71,2128
+(define-key anything-map "\C-j" 'my-anything-toggle-resplit-window)anything-map85,2612
+(defadvice find-tag (before c-tag-file activate)find-tag126,3901

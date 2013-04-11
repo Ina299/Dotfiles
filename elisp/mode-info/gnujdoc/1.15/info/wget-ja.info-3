@@ -1,0 +1,202 @@
+Info file: wget-ja.info,    -*-Text-*-
+produced by `texinfo-format-buffer'
+from file `wget-ja.texi'
+using `texinfmt.el' version 2.38 of 3 July 1998.
+
+
+
+
+
+INFO-DIR-SECTION Net Utilities
+INFO-DIR-SECTION World Wide Web
+START-INFO-DIR-ENTRY
+* Wget(ja): (wget-ja).         The non-interactive network downloader.
+END-INFO-DIR-ENTRY
+
+
+This file documents the the GNU Wget utility for downloading network
+data.
+
+Copyright (C) 1996, 1997, 1998, 2000, 2001 Free Software Foundation,
+Inc.
+
+Permission is granted to make and distribute verbatim copies of this
+manual provided the copyright notice and this permission notice are
+preserved on all copies.
+
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.1 or
+any later version published by the Free Software Foundation; with the
+Invariant Sections being "GNU General Public License" and "GNU Free
+Documentation License", with no Front-Cover Texts, and with no
+Back-Cover Texts.  A copy of the license is included in the section
+entitled "GNU Free Documentation License".
+
+
+
+
+File: wget-ja.info, Node: Concept Index, Prev: Copying, Up: Top
+
+³µÇ°¤Îº÷°ú
+**********
+
+* Menu:
+
+* no warranty:                  GNU General Public License.  282.
+* free software:                Copying.                4.
+* GFDL:                         Copying.                4.
+* GPL:                          Copying.                4.
+* copying:                      Copying.                4.
+* contributors:                 Contributors.           4.
+* security:                     Security Considerations.  4.
+* server maintenance:           Robots.                 4.
+* robots.txt:                   Robots.                 4.
+* robots:                       Robots.                 4.
+* hangup:                       Signals.                4.
+* signal handling:              Signals.                4.
+* operating systems:            Portability.            4.
+* portability:                  Portability.            4.
+* bug reports:                  Reporting Bugs.         4.
+* reporting bugs:               Reporting Bugs.         4.
+* bugs:                         Reporting Bugs.         4.
+* list:                         Mailing List.           4.
+* mailing list:                 Mailing List.           4.
+* latest version:               Distribution.           4.
+* proxies:                      Proxies.                4.
+* various:                      Various.                4.
+* mirroring:                    Very Advanced Usage.    5.
+* redirecting output:           Advanced Usage.         90.
+* examples:                     Examples.               4.
+* sample wgetrc:                Sample Wgetrc.          4.
+* wgetrc commands:              Wgetrc Commands.        4.
+* syntax of wgetrc:             Wgetrc Syntax.          4.
+* wgetrc syntax:                Wgetrc Syntax.          4.
+* location of wgetrc:           Wgetrc Location.        4.
+* wgetrc location:              Wgetrc Location.        4.
+* .netrc:                       Startup File.           4.
+* startup:                      Startup File.           4.
+* .wgetrc:                      Startup File.           4.
+* wgetrc:                       Startup File.           4.
+* startup file:                 Startup File.           4.
+* ftp time-stamping:            FTP Time-Stamping Internals.  4.
+* http time-stamping:           HTTP Time-Stamping Internals.  4.
+* usage, time-stamping:         Time-Stamping Usage.    4.
+* time-stamping usage:          Time-Stamping Usage.    4.
+* incremental updating:         Time-Stamping.          4.
+* updating the archives:        Time-Stamping.          4.
+* timestamping:                 Time-Stamping.          4.
+* time-stamping:                Time-Stamping.          4.
+* following ftp links:          FTP Links.              4.
+* relative links:               Relative Links.         4.
+* no parent:                    Directory-Based Limits.  48.
+* reject directories:           Directory-Based Limits.  31.
+* exclude directories:          Directory-Based Limits.  31.
+* directories, exclude:         Directory-Based Limits.  31.
+* accept directories:           Directory-Based Limits.  15.
+* include directories:          Directory-Based Limits.  15.
+* directories, include:         Directory-Based Limits.  15.
+* directory limits:             Directory-Based Limits.  4.
+* directories:                  Directory-Based Limits.  4.
+* suffixes, reject:             Types of Files.         34.
+* wildcards, reject:            Types of Files.         34.
+* reject suffixes:              Types of Files.         34.
+* reject wildcards:             Types of Files.         34.
+* suffixes, accept:             Types of Files.         13.
+* wildcards, accept:            Types of Files.         13.
+* accept suffixes:              Types of Files.         13.
+* accept wildcards:             Types of Files.         13.
+* types of files:               Types of Files.         4.
+* hosts, spanning:              Spanning Hosts.         4.
+* spanning hosts:               Spanning Hosts.         4.
+* following links:              Following Links.        4.
+* links:                        Following Links.        4.
+* recursive retrieval:          Recursive Retrieval.    4.
+* retrieving:                   Recursive Retrieval.    4.
+* recursion:                    Recursive Retrieval.    4.
+* tag-based recursive pruning:  Recursive Accept/Reject Options.  29.
+* follow FTP links:             Recursive Accept/Reject Options.  24.
+* required images, downloading: Recursive Retrieval Options.  89.
+* page requisites:              Recursive Retrieval Options.  89.
+* backing up converted files:   Recursive Retrieval Options.  73.
+* link conversion:              Recursive Retrieval Options.  34.
+* conversion of links:          Recursive Retrieval Options.  34.
+* filling proxy cache:          Recursive Retrieval Options.  18.
+* delete after retrieval:       Recursive Retrieval Options.  18.
+* proxy filling:                Recursive Retrieval Options.  18.
+* symbolic links, retrieving:   FTP Options.            53.
+* passive ftp:                  FTP Options.            47.
+* globbing, toggle:             FTP Options.            29.
+* .listing files, removing:     FTP Options.            5.
+* user-agent:                   HTTP Options.           160.
+* server response, save:        HTTP Options.           153.
+* referer, http:                HTTP Options.           146.
+* http referer:                 HTTP Options.           146.
+* proxy authentication:         HTTP Options.           139.
+* proxy password:               HTTP Options.           139.
+* proxy user:                   HTTP Options.           139.
+* header, add:                  HTTP Options.           123.
+* ignore length:                HTTP Options.           112.
+* Content-Length, ignore:       HTTP Options.           112.
+* cookies, saving:              HTTP Options.           107.
+* saving cookies:               HTTP Options.           107.
+* cookies, loading:             HTTP Options.           60.
+* loading cookies:              HTTP Options.           60.
+* cookies:                      HTTP Options.           50.
+* cache:                        HTTP Options.           38.
+* proxy:                        HTTP Options.           38.
+* authentication:               HTTP Options.           26.
+* http password:                HTTP Options.           26.
+* http user:                    HTTP Options.           26.
+* .html extension:              HTTP Options.           5.
+* directory prefix:             Directory Options.      58.
+* cut directories:              Directory Options.      31.
+* quota:                        Download Options.       231.
+* proxy:                        Download Options.       224.
+* random wait:                  Download Options.       205.
+* wait, random:                 Download Options.       205.
+* waiting between retries:      Download Options.       192.
+* retries, waiting between:     Download Options.       192.
+* wait:                         Download Options.       179.
+* pause:                        Download Options.       179.
+* timeout:                      Download Options.       166.
+* spider:                       Download Options.       155.
+* Wget as spider:               Download Options.       155.
+* server response, print:       Download Options.       149.
+* dot style:                    Download Options.       118.
+* progress indicator:           Download Options.       118.
+* resume download:              Download Options.       61.
+* incomplete downloads:         Download Options.       61.
+* continue retrieval:           Download Options.       61.
+* no-clobber:                   Download Options.       28.
+* downloading multiple times:   Download Options.       28.
+* clobbering, file:             Download Options.       28.
+* number of retries:            Download Options.       12.
+* tries:                        Download Options.       12.
+* retries:                      Download Options.       12.
+* IP address, client:           Download Options.       5.
+* client IP address:            Download Options.       5.
+* bind() address:               Download Options.       5.
+* base for relative links in input file: Logging and Input File Options.  78.
+* force html:                   Logging and Input File Options.  69.
+* input-file:                   Logging and Input File Options.  54.
+* verbose:                      Logging and Input File Options.  39.
+* quiet:                        Logging and Input File Options.  33.
+* debug:                        Logging and Input File Options.  20.
+* append to log:                Logging and Input File Options.  12.
+* log file:                     Logging and Input File Options.  5.
+* output file:                  Logging and Input File Options.  5.
+* execute wgetrc command:       Basic Startup Options.  25.
+* syntax of options:            Option Syntax.          4.
+* option syntax:                Option Syntax.          4.
+* URL syntax:                   URL Format.             4.
+* URL:                          URL Format.             4.
+* nohup:                        Invoking.               4.
+* arguments:                    Invoking.               4.
+* command line:                 Invoking.               4.
+* invoking:                     Invoking.               4.
+* features:                     Overview.               4.
+* overview:                     Overview.               4.
+
+
+
+

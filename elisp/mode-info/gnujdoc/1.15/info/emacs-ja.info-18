@@ -1,0 +1,1251 @@
+Info file: emacs-ja.info,    -*-Text-*-
+produced by `texinfo-format-buffer'
+from file `emacs-ja.texi'
+using `texinfmt.el' version 2.38 of 3 July 1998.
+
+
+Emacs 20.6版対応に改訂した`GNU Emacs Manual' 13版です。
+
+INFO-DIR-SECTION Editors
+START-INFO-DIR-ENTRY
+* Emacs: (emacs-ja).	The extensible self-documenting text editor.
+END-INFO-DIR-ENTRY
+
+
+Published by the Free Software Foundation 59 Temple Place, Suite 330
+Boston, MA 02111-1307 USA
+
+Copyright (C) 1985, 1986, 1987, 1993, 1994, 1995, 1996, 1997, 1998, 1999
+Free Software Foundation, Inc.
+
+Permission is granted to make and distribute verbatim copies of this
+manual provided the copyright notice and this permission notice are
+preserved on all copies.
+
+Permission is granted to copy and distribute modified versions of this
+manual under the conditions for verbatim copying, provided also that the
+sections entitled "The GNU Manifesto", "Distribution" and "GNU General
+Public License" are included exactly as in the original, and provided
+that the entire resulting derived work is distributed under the terms of
+a permission notice identical to this one.
+
+Permission is granted to copy and distribute translations of this manual
+into another language, under the above conditions for modified versions,
+except that the sections entitled "The GNU Manifesto", "Distribution"
+and "GNU General Public License" may be included in a translation
+approved by the Free Software Foundation instead of in the original
+English.
+
+
+
+
+
+File: emacs-ja.info, Node: Variable Index, Next: Concept Index, Prev: Command Index, Up: Top
+
+変数索引
+********
+
+* Menu:
+
+* w32-pass-alt-to-system:       Windows System Menu.    12.
+* dired-listing-switches （MS-DOS）: MS-DOS Processes.  34.
+* dos-unsupported-character-glyph: MS-DOS and MULE.     83.
+* dos-codepage:                 MS-DOS and MULE.        37.
+* dos-ps-printer:               MS-DOS Printing.        85.
+* dos-printer:                  MS-DOS Printing.        85.
+* ps-lpr-switches （MS-DOS）:   MS-DOS Printing.        52.
+* ps-lpr-command （MS-DOS）:    MS-DOS Printing.        52.
+* ps-printer-name （MS-DOS）:   MS-DOS Printing.        52.
+* lpr-switches （MS-DOS）:      MS-DOS Printing.        45.
+* lpr-command （MS-DOS）:       MS-DOS Printing.        45.
+* print-region-function （MS-DOS）: MS-DOS Printing.    45.
+* lpr-headers-switches （MS-DOS）: MS-DOS Printing.     34.
+* printer-name （MS-DOS）:      MS-DOS Printing.        12.
+* file-name-buffer-file-type-alist: Text and Binary.    21.
+* dos-display-scancodes:        MS-DOS Input.           61.
+* dos-keypad-mode:              MS-DOS Input.           16.
+* dos-hyper-key:                MS-DOS Input.           5.
+* dos-super-key:                MS-DOS Input.           5.
+* command-line-args:            Action Arguments.       35.
+* term-setup-hook:              Terminal Init.          29.
+* term-file-prefix:             Terminal Init.          25.
+* user-mail-address:            Init Examples.          28.
+* double-click-time:            Mouse Buttons.          67.
+* minibuffer-local-must-match-map: Minibuffer Maps.     5.
+* minibuffer-local-completion-map: Minibuffer Maps.     5.
+* minibuffer-local-ns-map:      Minibuffer Maps.        5.
+* minibuffer-local-map:         Minibuffer Maps.        5.
+* lisp-mode-map:                Local Keymaps.          16.
+* c-mode-map:                   Local Keymaps.          16.
+* mode-specific-map:            Prefix Keymaps.         37.
+* ctl-x-4-map:                  Prefix Keymaps.         35.
+* esc-map:                      Prefix Keymaps.         32.
+* help-map:                     Prefix Keymaps.         30.
+* ctl-x-map:                    Prefix Keymaps.         28.
+* desktop-files-not-to-save:    Saving Emacs Sessions.  30.
+* desktop-enable:               Saving Emacs Sessions.  10.
+* sort-fold-case:               Sorting.                103.
+* ps-font-info-database:        Postscript Variables.   29.
+* ps-font-size:                 Postscript Variables.   29.
+* ps-font-family:               Postscript Variables.   29.
+* ps-number-of-columns:         Postscript Variables.   26.
+* ps-landscape-mode:            Postscript Variables.   22.
+* ps-page-dimensions-database:  Postscript Variables.   17.
+* ps-paper-type:                Postscript Variables.   17.
+* ps-print-color-p:             Postscript Variables.   13.
+* ps-print-header:              Postscript Variables.   13.
+* ps-printer-name:              Postscript Variables.   5.
+* ps-lpr-switches:              Postscript Variables.   5.
+* ps-lpr-command:               Postscript Variables.   5.
+* lpr-add-switches:             Hardcopy.               29.
+* lpr-commands:                 Hardcopy.               29.
+* lpr-headers-switches:         Hardcopy.               29.
+* printer-name:                 Hardcopy.               27.
+* lpr-switches:                 Hardcopy.               20.
+* server-temp-file-regexp:      Emacs Server.           54.
+* server-window:                Emacs Server.           37.
+* rlogin-explicit-args:         Remote Host.            20.
+* shell-pushd-dunique:          Shell Options.          46.
+* shell-pushd-dextract:         Shell Options.          46.
+* shell-pushd-tohome:           Shell Options.          46.
+* shell-command-execonly:       Shell Options.          42.
+* comint-completion-autolist:   Shell Options.          27.
+* comint-completion-recexact:   Shell Options.          27.
+* comint-completion-addsuffix:  Shell Options.          27.
+* comint-input-ignoredups:      Shell Options.          22.
+* comint-scroll-to-bottom-on-output: Shell Options.     14.
+* comint-scroll-show-maximum-output: Shell Options.     9.
+* comint-scroll-to-bottom-on-input: Shell Options.      5.
+* comint-input-autoexpand:      History References.     18.
+* comint-prompt-regexp:         History References.     12.
+* shell-prompt-pattern:         History References.     12.
+* shell-input-ring-file-name:   Shell Ring.             49.
+* shell-command-regexp:         Shell Mode.             105.
+* comint-completion-fignore:    Shell Mode.             26.
+* shell-completion-fignore:     Shell Mode.             26.
+* shell-set-directory-error-hook: Interactive Shell.    52.
+* shell-cd-regexp:              Interactive Shell.      41.
+* shell-popd-regexp:            Interactive Shell.      41.
+* shell-pushd-regexp:           Interactive Shell.      41.
+* explicit-shell-file-name:     Interactive Shell.      24.
+* shell-command-default-error-buffer: Single Shell.     42.
+* shell-file-name:              Single Shell.           24.
+* calendar-daylight-savings-ends-time: Daylight Savings.  44.
+* calendar-daylight-time-offset: Daylight Savings.      41.
+* calendar-daylight-savings-ends: Daylight Savings.     10.
+* calendar-daylight-savings-starts: Daylight Savings.   10.
+* appt-issue-message:           Appointments.           49.
+* appt-display-diary:           Appointments.           41.
+* diary-hook:                   Appointments.           9.
+* european-calendar-style:      Date Formats.           39.
+* diary-file:                   Format of Diary File.   5.
+* diary-mail-days:              Diary Commands.         64.
+* calendar-daylight-time-zone-name: Sunrise/Sunset.     46.
+* calendar-standard-time-zone-name: Sunrise/Sunset.     46.
+* calendar-time-zone:           Sunrise/Sunset.         46.
+* calendar-latitude:            Sunrise/Sunset.         34.
+* calendar-longitude:           Sunrise/Sunset.         34.
+* calendar-location-name:       Sunrise/Sunset.         34.
+* calendar-week-start-day:      Move to Beginning or End.  25.
+* find-ls-option:               Dired and Find.         30.
+* dired-chown-program:          Operating on Files.     74.
+* dired-copy-preserve-time:     Operating on Files.     28.
+* dired-kept-versions:          Flagging Many Files.    40.
+* dired-garbage-files-regexp:   Flagging Many Files.    29.
+* dired-listing-switches:       Dired Enter.            5.
+* rmail-movemail-flags:         Movemail.               47.
+* rmail-pop-password-required:  Movemail.               42.
+* rmail-pop-password:           Movemail.               42.
+* rmail-preserve-inbox:         Movemail.               5.
+* rmail-edit-mode-hook:         Rmail Editing.          23.
+* rmail-highlighted-headers:    Rmail Display.          32.
+* rmail-ignored-headers:        Rmail Display.          13.
+* rmail-redisplay-summary:      Rmail Summary Edit.     47.
+* rmail-summary-line-count-flag: Rmail Make Summary.    42.
+* rmail-summary-window-size:    Rmail Make Summary.     42.
+* rmail-mail-new-frame:         Rmail Reply.            97.
+* rmail-retry-ignored-headers:  Rmail Reply.            52.
+* rmail-dont-reply-to-names:    Rmail Reply.            34.
+* rmail-output-file-alist:      Rmail Output.           68.
+* rmail-delete-after-output:    Rmail Output.           56.
+* rmail-secondary-file-regexp:  Rmail Files.            35.
+* rmail-secondary-file-directory: Rmail Files.          35.
+* rmail-primary-inbox-list:     Rmail Inbox.            13.
+* rmail-delete-message-hook:    Rmail Deletion.         37.
+* rmail-file-name:              Rmail Basics.           5.
+* rmail-mode-hook:              Rmail.                  4.
+* mail-user-agent:              Mail Methods.           12.
+* mail-setup-hook:              Mail Mode Misc.         42.
+* mail-mode-hook:               Mail Mode Misc.         42.
+* mail-signature:               Mail Mode Misc.         19.
+* mail-yank-prefix:             Citing Mail.            27.
+* sendmail-coding-system:       Mail Sending.           26.
+* mail-abbrevs:                 Mail Aliases.           61.
+* mail-personal-alias-file:     Mail Aliases.           46.
+* mail-aliases:                 Mail Aliases.           41.
+* mail-from-style:              Mail Headers.           92.
+* mail-default-reply-to:        Mail Headers.           70.
+* mail-archive-file-name:       Mail Headers.           49.
+* mail-self-blind:              Mail Headers.           39.
+* picture-tab-chars:            Tabs in Picture.        5.
+* picture-mode-hook:            Picture.                36.
+* dabbrev-abbrev-skip-leading-regexp: Dabbrev Customization.  38.
+* dabbrev-abbrev-char-regexp:   Dabbrev Customization.  31.
+* dabbrev-case-fold-search:     Dabbrev Customization.  18.
+* dabbrev-case-replace:         Dabbrev Customization.  14.
+* dabbrev-case-fold-search:     Dabbrev Customization.  8.
+* dabbrev-check-all-buffers:    Dynamic Abbrevs.        29.
+* dabbrev-limit:                Dynamic Abbrevs.        19.
+* save-abbrevs:                 Saving Abbrevs.         31.
+* abbrev-file-name:             Saving Abbrevs.         24.
+* abbrev-all-caps:              Expanding Abbrevs.      11.
+* abbrev-mode:                  Abbrev Concepts.        11.
+* inferior-lisp-program:        External Lisp.          10.
+* load-path:                    Lisp Libraries.         35.
+* jdb-mode-hook:                GUD Customization.      5.
+* pdb-mode-hook:                GUD Customization.      5.
+* perldb-mode-hook:             GUD Customization.      5.
+* xdb-mode-hook:                GUD Customization.      5.
+* sdb-mode-hook:                GUD Customization.      5.
+* dbx-mode-hook:                GUD Customization.      5.
+* gdb-mode-hook:                GUD Customization.      5.
+* gud-xdb-directories:          Starting GUD.           20.
+* compilation-scroll-output:    Compilation.            52.
+* compile-command:              Compilation.            30.
+* fortran-column-ruler:         Fortran Columns.        14.
+* fortran-break-before-delimiters: Fortran Autofill.    21.
+* fortran-comment-region:       Fortran Comments.       71.
+* comment-line-start-skip:      Fortran Comments.       61.
+* comment-line-start:           Fortran Comments.       61.
+* fortran-comment-indent-char:  Fortran Comments.       58.
+* fortran-comment-line-extra-indent: Fortran Comments.  43.
+* fortran-comment-indent-style: Fortran Comments.       43.
+* fortran-minimum-statement-indent...: ForIndent Vars.  5.
+* fortran-check-all-num...:     ForIndent Vars.         5.
+* fortran-continuation-indent:  ForIndent Vars.         5.
+* fortran-structure-indent:     ForIndent Vars.         5.
+* fortran-if-indent:            ForIndent Vars.         5.
+* fortran-do-indent:            ForIndent Vars.         5.
+* fortran-electric-line-number: ForIndent Num.          15.
+* fortran-line-number-indent:   ForIndent Num.          9.
+* fortran-analyze-depth:        ForIndent Cont.         30.
+* fortran-tab-mode-default:     ForIndent Cont.         30.
+* indent-tabs-mode （Fortranモード）: ForIndent Cont.   12.
+* fortran-continuation-string:  ForIndent Cont.         5.
+* c-hanging-comment-starter-p:  Comments in C.          28.
+* c-hanging-comment-ender-p:    Comments in C.          22.
+* c-comment-start-regexp:       Comments in C.          18.
+* c-comment-only-line-offset:   Comments in C.          9.
+* c-hungry-delete-key:          Hungry Delete.          17.
+* emerge-startup-hook:          Fine Points of Emerge.  19.
+* emerge-combine-versions-template: Combining in Emerge.  15.
+* find-tag-marker-ring-length:  Find Tag.               54.
+* tags-table-list:              Select Tags Table.      30.
+* tags-file-name:               Select Tags Table.      5.
+* Man-fontify-manpage-flag:     Documentation.          41.
+* which-func-modes:             Which Function.         8.
+* parens-require-spaces:        Balanced Editing.       22.
+* comment-indent-function:      Options for Comments.   41.
+* comment-multi-line:           Options for Comments.   33.
+* comment-end:                  Options for Comments.   26.
+* comment-start:                Options for Comments.   26.
+* comment-start-skip:           Options for Comments.   18.
+* comment-column:               Options for Comments.   5.
+* comment-padding:              Multi-Line Comments.    26.
+* blink-matching-delay:         Matching.               18.
+* blink-matching-paren-distance: Matching.              18.
+* blink-matching-paren:         Matching.               18.
+* c-default-style:              C Indent Styles.        11.
+* c-special-indent-hook:        Variables for C Indent.  24.
+* c-basic-offset:               Variables for C Indent.  20.
+* c-style-alist:                Variables for C Indent.  16.
+* c-offsets-alist:              Variables for C Indent.  10.
+* c-strict-syntax-p:            Indentation Calculation.  61.
+* c-syntactic-context:          Syntactic Analysis.     60.
+* lisp-body-indent:             Lisp Indent.            18.
+* lisp-indent-offset:           Lisp Indent.            14.
+* muddle-mode-hook:             Program Modes.          38.
+* scheme-mode-hook:             Program Modes.          38.
+* lisp-interaction-mode-hook:   Program Modes.          38.
+* emacs-lisp-mode-hook:         Program Modes.          38.
+* lisp-mode-hook:               Program Modes.          38.
+* c-mode-hook:                  Program Modes.          38.
+* default-justification:        Format Justification.   53.
+* standard-indent:              Format Indentation.     46.
+* enriched-translations:        Requesting Formatted Text.  32.
+* enriched-fill-after-visiting: Requesting Formatted Text.  24.
+* nroff-mode-hook:              Nroff Mode.             34.
+* plain-tex-mode-hook:          TeX Print.              127.
+* slitex-mode-hook:             TeX Print.              127.
+* latex-mode-hook:              TeX Print.              127.
+* tex-mode-hook:                TeX Print.              127.
+* tex-shell-hook:               TeX Print.              127.
+* tex-bibtex-command:           TeX Print.              118.
+* tex-main-file:                TeX Print.              108.
+* tex-start-options-string:     TeX Print.              104.
+* tex-show-queue-command:       TeX Print.              46.
+* tex-dvi-view-command:         TeX Print.              46.
+* tex-dvi-print-command:        TeX Print.              46.
+* slitex-run-command:           TeX Print.              46.
+* latex-run-command:            TeX Print.              46.
+* tex-run-command:              TeX Print.              46.
+* tex-directory:                TeX Print.              39.
+* latex-block-names:            LaTeX Editing.          15.
+* tex-default-mode:             TeX Mode.               14.
+* outline-level:                Outline Format.         49.
+* outline-regexp:               Outline Format.         35.
+* outline-mode-hook:            Outline Mode.           35.
+* outline-minor-mode-prefix:    Outline Mode.           5.
+* text-mode-hook:               Text Mode.              35.
+* adaptive-fill-function:       Adaptive Fill.          45.
+* adaptive-fill-regexp:         Adaptive Fill.          40.
+* adaptive-fill-mode:           Adaptive Fill.          40.
+* adaptive-fill-first-line-regexp: Adaptive Fill.       27.
+* fill-prefix:                  Fill Prefix.            70.
+* colon-double-space:           Fill Commands.          59.
+* sentence-end-double-space:    Fill Commands.          54.
+* fill-column:                  Fill Commands.          41.
+* page-delimiter:               Pages.                  52.
+* paragraph-separate:           Paragraphs.             38.
+* paragraph-start:              Paragraphs.             38.
+* sentence-end:                 Sentences.              42.
+* indent-tabs-mode:             Just Spaces.            5.
+* tab-stop-list:                Tab Stops.              10.
+* change-major-mode-with-file-name: Choosing Modes.     78.
+* default-major-mode:           Choosing Modes.         67.
+* interpreter-mode-alist:       Choosing Modes.         52.
+* auto-mode-alist:              Choosing Modes.         13.
+* unibyte-display-via-language-environment: Single-Byte European Support.  16.
+* enable-multibyte-characters:  Single-Byte European Support.  5.
+* standard-fontset-spec:        Defining Fontsets.      5.
+* highlight-wrong-size-font:    Fontsets.               34.
+* file-name-coding-system:      Specify Coding.         109.
+* default-buffer-file-coding-system: Specify Coding.    63.
+* rmail-file-coding-system:     Recognize Coding.       93.
+* rmail-decode-mime-charset:    Recognize Coding.       87.
+* sendmail-coding-system:       Recognize Coding.       78.
+* buffer-file-coding-system:    Recognize Coding.       70.
+* auto-coding-alist:            Recognize Coding.       63.
+* coding:                       Recognize Coding.       54.
+* inhibit-eol-conversion:       Recognize Coding.       49.
+* file-coding-system-alist:     Recognize Coding.       37.
+* default-input-method:         Select Input Method.    35.
+* current-input-method:         Select Input Method.    20.
+* input-method-highlight-flag:  Input Methods.          57.
+* input-method-verbose-flag:    Input Methods.          57.
+* exit-language-environment-hook: Language Environments.  44.
+* set-language-environment-hook: Language Environments.  39.
+* default-enable-multibyte-characters: Enabling Multibyte.  26.
+* enable-multibyte-characters:  Enabling Multibyte.     26.
+* font-lock-support-mode:       Fast or Lazy.           37.
+* lazy-lock-stealth-verbose:    Lazy Lock Mode.         48.
+* lazy-lock-stealth-lines:      Lazy Lock Mode.         48.
+* lazy-lock-stealth-time:       Lazy Lock Mode.         48.
+* lazy-lock-defer-contextually: Lazy Lock Mode.         37.
+* lazy-lock-defer-on-scrolling: Lazy Lock Mode.         31.
+* lazy-lock-defer-time:         Lazy Lock Mode.         25.
+* lazy-lock-minimum-size:       Lazy Lock Mode.         19.
+* fast-lock-save-others:        Fast Lock Mode.         31.
+* fast-lock-cache-directories:  Fast Lock Mode.         23.
+* fast-lock-minimum-size:       Fast Lock Mode.         19.
+* font-lock-beginning-of-syntax-function: Font Lock.    59.
+* font-lock-maximum-size:       Font Lock.              55.
+* font-lock-maximum-decoration: Font Lock.              44.
+* font-lock-mark-block-function: Font Lock.             32.
+* special-display-frame-alist:  Special Buffer Frames.  27.
+* special-display-regexps:      Special Buffer Frames.  22.
+* special-display-buffer-names: Special Buffer Frames.  5.
+* x-cut-buffer-max:             Mouse Commands.         112.
+* mouse-yank-at-point:          Mouse Commands.         93.
+* mouse-scroll-min-lines:       Mouse Commands.         25.
+* window-min-width:             Change Window.          64.
+* window-min-height:            Change Window.          64.
+* same-window-regexps:          Force Same Window.      23.
+* same-window-buffer-names:     Force Same Window.      11.
+* split-window-keep-point:      Split Window.           41.
+* truncate-partial-width-windows: Split Window.         33.
+* midnight-hook:                Kill Buffer.            43.
+* midnight-mode:                Kill Buffer.            43.
+* kill-buffer-hook:             Kill Buffer.            32.
+* buffer-read-only:             Misc Buffer.            14.
+* file-name-handler-alist:      Remote Files.           20.
+* ange-ftp-default-user:        Remote Files.           15.
+* compare-ignore-case:          Comparing Files.        29.
+* diff-switches:                Comparing Files.        5.
+* list-directory-verbose-switches: Directories.         37.
+* list-directory-brief-switches: Directories.           37.
+* vc-path:                      VC Command Execution.   15.
+* vc-command-messages:          VC Command Execution.   10.
+* vc-suppress-confirm:          VC Command Execution.   5.
+* vc-mistrust-permissions:      VC Status Retrieval.    18.
+* vc-consult-headers:           VC Status Retrieval.    14.
+* vc-follow-symlinks:           VC Workfile Handling.   16.
+* vc-keep-workfiles:            VC Workfile Handling.   10.
+* vc-make-backup-files:         VC Workfile Handling.   5.
+* vc-handle-cvs:                Backend Options.        35.
+* vc-static-header-alist:       Version Headers.        46.
+* vc-comment-alist:             Version Headers.        40.
+* vc-header-alist:              Version Headers.        25.
+* vc-directory-exclusion-list:  VC Dired Mode.          51.
+* vc-dired-recurse:             VC Dired Mode.          18.
+* vc-dired-terse-display:       VC Dired Mode.          10.
+* vc-initial-comment:           Registering.            28.
+* vc-default-init-version:      Registering.            23.
+* vc-default-back-end:          Registering.            11.
+* vc-log-mode-hook:             Log Buffer.             20.
+* find-file-visit-truename:     File Aliases.           21.
+* find-file-existing-other-name: File Aliases.          16.
+* auto-save-list-file-prefix:   Recover.                34.
+* auto-save-timeout:            Auto Save Control.      18.
+* auto-save-interval:           Auto Save Control.      14.
+* auto-save-default:            Auto Save Control.      5.
+* delete-auto-save-files:       Auto Save Files.        32.
+* auto-save-visited-file-name:  Auto Save Files.        28.
+* revert-without-query:         Reverting.              24.
+* backup-by-copying-when-mismatch: Backup Copying.      24.
+* backup-by-copying-when-linked: Backup Copying.        24.
+* backup-by-copying:            Backup Copying.         24.
+* delete-old-versions:          Backup Deletion.        17.
+* kept-new-versions:            Backup Deletion.        10.
+* kept-old-versions:            Backup Deletion.        10.
+* version-control:              Backup Names.           19.
+* backup-enable-predicate:      Backup.                 4.
+* vc-make-backup-files:         Backup.                 4.
+* make-backup-files:            Backup.                 4.
+* require-final-newline:        Saving.                 100.
+* find-file-not-found-hooks:    Visiting.               125.
+* find-file-hooks:              Visiting.               125.
+* find-file-run-dired:          Visiting.               75.
+* insert-default-directory:     File Names.             35.
+* default-directory:            File Names.             16.
+* ispell-dictionary:            Spelling.               131.
+* case-replace:                 Replacement and Case.   10.
+* case-fold-search:             Search Case.            5.
+* search-slow-window-lines:     Incremental Search.     144.
+* search-slow-speed:            Incremental Search.     141.
+* isearch-mode-map:             Incremental Search.     122.
+* baud-rate:                    Display Vars.           60.
+* tab-width:                    Display Vars.           39.
+* ctl-arrow:                    Display Vars.           33.
+* echo-keystrokes:              Display Vars.           29.
+* no-redraw-on-reenter:         Display Vars.           21.
+* visible-bell:                 Display Vars.           17.
+* inverse-video:                Display Vars.           14.
+* mode-line-inverse-video:      Display Vars.           8.
+* display-time-24hr-format:     Optional Mode Line.     29.
+* line-number-display-limit:    Optional Mode Line.     11.
+* selective-display-ellipses:   Selective Display.      24.
+* scroll-margin:                Scrolling.              93.
+* scroll-conservatively:        Scrolling.              86.
+* scroll-preserve-screen-position: Scrolling.           62.
+* next-screen-context-lines:    Scrolling.              54.
+* bookmark-search-size:         Bookmarks.              51.
+* bookmark-save-flag:           Bookmarks.              46.
+* kill-ring:                    Earlier Kills.          47.
+* kill-ring-max:                Earlier Kills.          44.
+* kill-whole-line:              Killing by Lines.       27.
+* mark-ring:                    Mark Ring.              36.
+* mark-ring-max:                Mark Ring.              31.
+* mark-even-if-inactive:        Transient Mark.         67.
+* highlight-nonselected-windows: Transient Mark.        55.
+* apropos-do-all:               Apropos.                49.
+* suggest-key-bindings:         M-x.                    42.
+* command-history:              Repetition.             38.
+* history-length:               Minibuffer History.     66.
+* completion-auto-help:         Completion Options.     14.
+* completion-ignored-extensions: Completion Options.    5.
+* enable-recursive-minibuffers: Minibuffer Edit.        43.
+* minibuffer-scroll-overlap:    Minibuffer Edit.        31.
+* truncate-lines:               Continuation Lines.     15.
+* undo-strong-limit:            Undo.                   66.
+* undo-limit:                   Undo.                   66.
+* next-line-add-newlines:       Moving Point.           64.
+* track-eol:                    Moving Point.           59.
+* read-quoted-char-radix:       Inserting Text.         53.
+* initial-major-mode:           Entering Emacs.         18.
+* eol-mnemonic-undecided:       Mode Line.              103.
+* eol-mnemonic-mac:             Mode Line.              103.
+* eol-mnemonic-dos:             Mode Line.              103.
+* eol-mnemonic-unix:            Mode Line.              103.
+* message-log-max:              Echo Area.              42.
+
+
+
+File: emacs-ja.info, Node: Concept Index, Prev: Variable Index, Up: Top
+
+概念索引
+********
+
+* Menu:
+
+* ディレクトリの一覧（MS-DOS）: MS-DOS Processes.       34.
+* 印刷（MS-DOS）:               MS-DOS Processes.       20.
+* 下位プロセス（MS-DOS）:       MS-DOS Processes.       5.
+* コンパイル（MS-DOS）:         MS-DOS Processes.       5.
+* モード行（MS-DOS）:           MS-DOS and MULE.        62.
+* 言語環境、MS-DOSでの自動選択: MS-DOS and MULE.        46.
+* unibyte operation （MS-DOS）: MS-DOS and MULE.        31.
+* DOSコードページ:              MS-DOS and MULE.        18.
+* コードページ、MS-DOS:         MS-DOS and MULE.        18.
+* 国際化対応（MS-DOS）:         MS-DOS and MULE.        4.
+* MS-DOSにおけるlprの使い方:    MS-DOS Printing.        45.
+* 無変換のファイルシステム:     Text and Binary.        51.
+* ポイント位置（MS-DOS）:       Text and Binary.        17.
+* カーソル位置（MS-DOS）:       Text and Binary.        17.
+* 行末変換（MS-DOS/MS-Windows）: Text and Binary.       9.
+* テキストファイルとバイナリファイル（MS-DOS）: Text and Binary.  4.
+* ホームディレクトリ（MS-DOS）: MS-DOS File Names.      35.
+* 長いファイル名（Windows 95/NT下のDOSボックス）: MS-DOS File Names.  27.
+* ファイル名（Windows 95/NT）:  MS-DOS File Names.      27.
+* バックアップファイルの名前（MS-DOS）: MS-DOS File Names.  22.
+* 初期化ファイル、デフォルト名（MS-DOS）: MS-DOS File Names.  4.
+* ファイル名（MS-DOS）:         MS-DOS File Names.      4.
+* フレームサイズ（MS-DOS）:     MS-DOS Display.         22.
+* フレーム（MS-DOS）:           MS-DOS Display.         16.
+* フォントのエミュレーション（MS-DOS）: MS-DOS Display.  4.
+* フェイス（MS-DOS）:           MS-DOS Display.         4.
+* Windowsのクリップボードの利用: MS-DOS Input.          42.
+* MS-DOSでのマウスの利用:       MS-DOS Input.           35.
+* MS-DOS上での中断:             MS-DOS Input.           28.
+* Super （MS-DOS）:             MS-DOS Input.           5.
+* Hyper （MS-DOS）:             MS-DOS Input.           5.
+* Meta （MS-DOS）:              MS-DOS Input.           5.
+* MS-DOSの癖:                   MS-DOS.                 4.
+* MS-DOG:                       MS-DOS.                 4.
+* MotifウィジェットのXリソース: Motif Resources.        4.
+* メニューのXリソース（Motifウィジェット）: Motif Resources.  4.
+* LucidウィジェットのXリソース: Lucid Resources.        4.
+* メニューのXリソース（Lucidウィジェット）: Lucid Resources.  4.
+* リソース:                     Resources X.            4.
+* アイコン（Xウィンドウシステム）: Icons X.             4.
+* 境界部分（Xウィンドウシステム）: Borders X.           4.
+* ジオメトリ（Xウィンドウシステム）: Window Size X.     4.
+* ウィンドウ表示色（Xウィンドウシステム）: Colors X.    4.
+* フォント名（Xウィンドウシステム）: Font X.            4.
+* `DISPLAY'（環境変数）:        Display X.              4.
+* 環境変数`DISPLAY':            Display X.              4.
+* ディスプレイ名（Xウィンドウシステム）: Display X.     4.
+* ユニバイト操作:               General Variables.      18.
+* 環境変数:                     Environment.            4.
+* ユニバイト操作:               Initial Options.        77.
+* バッチモード:                 Initial Options.        35.
+* 動作オプション（コマンド行）: Command Arguments.      32.
+* 初期化オプション（コマンド行）: Command Arguments.    32.
+* 起動（コマンド行引数）:       Command Arguments.      4.
+* スイッチ（コマンド行）:       Command Arguments.      4.
+* オプション（コマンド行）:     Command Arguments.      4.
+* 引数（コマンド行）:           Command Arguments.      4.
+* コマンド行引数:               Command Arguments.      4.
+* 修正を送る:                   Sending Patches.        5.
+* GNU Emacsに対する修正を送る:  Sending Patches.        5.
+* バグレポート用のバックトレース: Checklist.            190.
+* `TERM'（環境変数）:           Checklist.              95.
+* 環境変数`TERM':               Checklist.              95.
+* termscriptファイル:           Checklist.              95.
+* ドリブルファイル:             Checklist.              85.
+* バグを報告する:               Checklist.              5.
+* バグ:                         Bugs.                   5.
+* doctor:                       Total Frustration.      4.
+* Eliza:                        Total Frustration.      4.
+* メモリ不足:                   Memory Full.            4.
+* xon-xoff:                     Unasked-for Search.     14.
+* フロー制御:                   Unasked-for Search.     14.
+* 再帰編集をアボートする:       Quitting.               57.
+* NFSと中断:                    Quitting.               48.
+* 中断:                         Quitting.               25.
+* 中断:                         Quitting.               4.
+* 文字列の構文:                 Init Syntax.            20.
+* Lispの文字列の構文:           Init Syntax.            20.
+* 実行開始（初期化ファイル）:   Init File.              4.
+* キーバインディングの恒久的な変更: Init File.          4.
+* Emacs初期化ファイル:          Init File.              4.
+* 初期化ファイル:               Init File.              4.
+* 構文テーブル:                 Syntax.                 4.
+* キーボード変換:               Keyboard Translations.  13.
+* 使用禁止コマンド:             Disabling.              4.
+* トリプルクリック:             Mouse Buttons.          29.
+* ダブルクリック:               Mouse Buttons.          29.
+* ボタン押し下げイベント:       Mouse Buttons.          4.
+* 押し下げイベント:             Mouse Buttons.          4.
+* ドラッグイベント:             Mouse Buttons.          4.
+* クリックイベント:             Mouse Buttons.          4.
+* マウスボタンの再定義:         Mouse Buttons.          4.
+* マウスボタンイベント:         Mouse Buttons.          4.
+* キーバインディングの変更、 セッション内: Rebinding.   4.
+* ミニバッファキーマップ:       Minibuffer Maps.        5.
+* メジャーモードのキーのバイディング変更: Local Keymaps.  46.
+* マイナモードキーマップ:       Local Keymaps.          12.
+* ローカルキーマップ:           Local Keymaps.          5.
+* マウス:                       Keymaps.                47.
+* ファンクションキー:           Keymaps.                35.
+* グローバルキーマップ:         Keymaps.                15.
+* キーマップ:                   Keymaps.                4.
+* キーバインディング:           Key Bindings.           4.
+* キーボードマクロの保存:       Save Kbd Macro.         5.
+* キーボードマクロ:             Keyboard Macros.        5.
+* キーボードマクロの定義:       Keyboard Macros.        5.
+* ファイルにローカルな変数:     File Variables.         4.
+* ファイル中のローカル変数:     File Variables.         4.
+* バッファごとの変数:           Locals.                 24.
+* ローカル変数:                 Locals.                 13.
+* フック:                       Hooks.                  4.
+* フォントとフェイス:           Face Customization.     4.
+* イタリックフォント:           Face Customization.     4.
+* ボールドフォント:             Face Customization.     4.
+* フェイスのカスタマイズ:       Face Customization.     4.
+* オプションの値の保存:         Changing an Option.     96.
+* オプションの値の設定:         Changing an Option.     36.
+* アクティブフィールド（カスタマイズバッファ）: Customization Groups.  36.
+* 編集可能フィールド（カスタマイズバッファ）: Customization Groups.  36.
+* カスタマイズグループ:         Customization Groups.   4.
+* カスタマイズバッファ:         Easy Customization.     5.
+* 変数の設定:                   Examining.              4.
+* ユーザーオプション:           Variables.              4.
+* 変数:                         Variables.              4.
+* モード、Overwrite:            Minor Modes.            63.
+* 上書きモード（Overwrite mode）: Minor Modes.          63.
+* モード、マイナ:               Minor Modes.            4.
+* マイナモード（minor mode）:   Minor Modes.            4.
+* カスタマイズ:                 Customization.          4.
+* Zippy:                        Amusements.             23.
+* パズル:                       Amusements.             12.
+* 五目:                         Amusements.             9.
+* ハノイの塔:                   Amusements.             4.
+* 退屈したら:                   Amusements.             4.
+* マルコフ連鎖:                 Dissociated Press.      32.
+* vi:                           Emulation.              4.
+* EDT:                          Emulation.              4.
+* 他のエディタ:                 Emulation.              4.
+* 他のエディタのエミュレーション: Emulation.            4.
+* 再帰編集からの脱出:           Recursive Edit.         10.
+* 再帰編集レベル:               Recursive Edit.         4.
+* デスクトップ:                 Saving Emacs Sessions.  4.
+* セッションの保存:             Saving Emacs Sessions.  4.
+* バイナリファイルの編集:       Editing Binary Files.   5.
+* モード、hexl:                 Editing Binary Files.   5.
+* hexlモード:                   Editing Binary Files.   5.
+* 段の分割:                     Two-Column.             4.
+* 2段組み編集:                  Two-Column.             4.
+* 参照可能範囲:                 Narrowing.              4.
+* ナロイング:                   Narrowing.              4.
+* 範囲制限:                     Narrowing.              4.
+* ワイドニング:                 Narrowing.              4.
+* ソート:                       Sorting.                4.
+* 印刷:                         Hardcopy.               4.
+* `TEXEDIT'（環境変数）:        Emacs Server.           15.
+* 環境変数`TEXEDIT':            Emacs Server.           15.
+* `EDITOR'（環境変数）:         Emacs Server.           4.
+* 環境変数`EDITOR':             Emacs Server.           4.
+* Emacsをサーバーとして使う:    Emacs Server.           4.
+* サーバーとしてのEmacs:        Emacs Server.           4.
+* emacsclient:                  Emacs Server.           4.
+* Rlogin:                       Remote Host.            4.
+* Telnet:                       Remote Host.            4.
+* リモートホストへの接続:       Remote Host.            4.
+* リモートホスト:               Remote Host.            4.
+* 履歴参照:                     History References.     4.
+* モード、comint:               Shell Mode.             140.
+* Comintモード（Comint mode）:  Shell Mode.             140.
+* モード、shell:                Shell Mode.             4.
+* シェルモード（Shell mode）:   Shell Mode.             4.
+* `SHELL'（環境変数）:          Interactive Shell.      24.
+* 環境変数`SHELL':              Interactive Shell.      24.
+* `ESHELL'（環境変数）:         Interactive Shell.      24.
+* 環境変数`ESHELL':             Interactive Shell.      24.
+* 環境:                         Single Shell.           24.
+* シェルコマンド:               Shell.                  4.
+* サブシェル:                   Shell.                  4.
+* グループの非購読化:           Summary of Gnus.        35.
+* グループの購読:               Summary of Gnus.        35.
+* ネットニュースを読む:         Gnus.                   4.
+* gnus:                         Gnus.                   4.
+* 夏時間:                       Daylight Savings.       4.
+* 目覚し時計:                   Appointments.           45.
+* 約束の通知:                   Appointments.           4.
+* 日誌ファイル:                 Format of Diary File.   4.
+* 日誌:                         Diary.                  4.
+* マヤ暦カレンダーラウンド:     Mayan Calendar.         53.
+* マヤ暦ハアブ:                 Mayan Calendar.         46.
+* マヤ暦ゾルキン:               Mayan Calendar.         39.
+* マヤ暦ロングカウント:         Mayan Calendar.         25.
+* 追悼記念祭:                   From Other Calendar.    39.
+* 中国歴:                       Calendar Systems.       51.
+* ペルシア暦:                   Calendar Systems.       45.
+* エチオピア暦:                 Calendar Systems.       39.
+* コプト暦:                     Calendar Systems.       39.
+* マヤ暦:                       Calendar Systems.       33.
+* フランス革命暦:               Calendar Systems.       28.
+* イスラム暦:                   Calendar Systems.       20.
+* ヘブライ暦:                   Calendar Systems.       15.
+* 天文通算日:                   Calendar Systems.       11.
+* ユリウス日:                   Calendar Systems.       11.
+* ユリウス暦:                   Calendar Systems.       7.
+* ISO商用暦:                    Calendar Systems.       5.
+* グレゴリオ暦:                 Other Calendars.        5.
+* 朔弦望（新月、上弦、満月、下弦）: Lunar Phases.       4.
+* 日の出と日の入:               Sunrise/Sunset.         4.
+* 祝祭日:                       Holidays.               4.
+* カレンダーとLaTeX:            LaTeX Calendar.         4.
+* 通年日:                       General Calendar.       15.
+* カレンダーのスクロール:       Scroll Calendar.        5.
+* カレンダー、週の始め:         Move to Beginning or End.  25.
+* 週の始め:                     Move to Beginning or End.  25.
+* カレンダー内の移動:           Calendar Motion.        5.
+* 暦:                           Calendar/Diary.         4.
+* カレンダー:                   Calendar/Diary.         4.
+* `find'とdired:                Dired and Find.         4.
+* ソート（diredバッファ）:      Dired Updating.         54.
+* diredバッファのソート:        Dired Updating.         54.
+* diredでのソート:              Dired Updating.         54.
+* 隠蔽（dired）:                Hiding Subdirectories.  5.
+* ディレクトリのヘッダ行:       Subdirectory Motion.    8.
+* ヘッダ行（dired）:            Subdirectory Motion.    8.
+* 埋め込んだサブディレクトリ（dired）: Subdirectories in Dired.  19.
+* サブディレクトリの挿入（dired）: Subdirectories in Dired.  19.
+* diredでのサブディレクトリの展開: Subdirectories in Dired.  4.
+* サブディレクトリ（dired）:    Subdirectories in Dired.  4.
+* diredでのサブディレクトリ:    Subdirectories in Dired.  4.
+* シェルコマンド（dired）:      Shell Commands in Dired.  4.
+* ファイルの操作（dired）:      Operating on Files.     4.
+* diredでのファイルの操作:      Operating on Files.     4.
+* 印（dired）:                  Marks vs Flags.         5.
+* diredの印:                    Marks vs Flags.         5.
+* 抹消（dired）:                Dired Deletion.         30.
+* ファイルの削除（dired）:      Dired Deletion.         4.
+* ファイルにフラグを付ける（dired）: Dired Deletion.    4.
+* dired:                        Dired.                  4.
+* 逆順序のPOP inbox:            Movemail.               57.
+* Kerberos POP認証:             Movemail.               52.
+* POP inboxes:                  Movemail.               37.
+* `MAILHOST'（環境変数）:       Movemail.               37.
+* 環境変数`MAILHOST':           Movemail.               37.
+* movemail:                     Movemail.               23.
+* `movemail'プログラム:         Movemail.               4.
+* rot13暗号:                    Rmail Rot13.            4.
+* アンダイジェスト:             Rmail Digest.           4.
+* ダイジェストメッセージ:       Rmail Digest.           4.
+* サマリ（rmail）:              Rmail Summary.          4.
+* メッセージの転送:             Rmail Reply.            62.
+* 失敗したメッセージの再送信:   Rmail Reply.            52.
+* メッセージへの返信:           Rmail Reply.            26.
+* 属性（rmail）:                Rmail Labels.           4.
+* ラベル（rmail）:              Rmail Labels.           4.
+* `MAIL'（環境変数）:           Rmail Inbox.            13.
+* 環境変数`MAIL':               Rmail Inbox.            13.
+* inboxファイル:                Rmail Inbox.            4.
+* アンデリート（rmail）:        Rmail Deletion.         42.
+* 抹消（rmail）:                Rmail Deletion.         11.
+* 削除（rmail）:                Rmail Deletion.         5.
+* rmailの探索:                  Rmail Motion.           51.
+* メッセージ番号:               Rmail Basics.           19.
+* 主rmailファイル:              Rmail Basics.           5.
+* メイルを読む:                 Rmail.                  4.
+* rmail:                        Rmail.                  4.
+* メイル作成方式:               Mail Methods.           4.
+* NSA:                          Distracting NSA.        5.
+* citing mail:                  Citing Mail.            4.
+* モード、mail:                 Mail Mode.              4.
+* メイルモード（Mail mode）:    Mail Mode.              4.
+* mailrcファイル:               Mail Aliases.           4.
+* `.mailrc'ファイル:            Mail Aliases.           4.
+* メイルの別名:                 Mail Aliases.           4.
+* `REPLYTO'（環境変数）:        Mail Headers.           70.
+* 環境変数`REPLYTO':            Mail Headers.           70.
+* ヘッダフィールド（メイルメッセージ）: Mail Headers.   4.
+* メッセージ:                   Sending Mail.           4.
+* メイル:                       Sending Mail.           4.
+* メイルの送信:                 Sending Mail.           4.
+* ピクチャーモードと矩形領域:   Rectangles in Picture.  4.
+* 矩形領域とピクチャーモード:   Rectangles in Picture.  4.
+* ピクチャーモードでの編集:     Basic Picture.          5.
+* テキスト文字で書いた絵:       Picture.                4.
+* 絵:                           Picture.                4.
+* モード、Abbrev:               Abbrev Concepts.        11.
+* 略語モード（Abbrev mode）:    Abbrev Concepts.        11.
+* 略語展開:                     Abbrevs.                4.
+* 略語:                         Abbrevs.                4.
+* モード、Emacs-Lisp:           Lisp Eval.              4.
+* emacs-lispモード:             Lisp Eval.              4.
+* バイトコード:                 Lisp Libraries.         51.
+* 自動ロード:                   Lisp Libraries.         44.
+* ロード（Lispコード）:         Lisp Libraries.         4.
+* Lispコードのロード:           Lisp Libraries.         4.
+* ライブラリ:                   Lisp Libraries.         4.
+* PDB:                          Debuggers.              4.
+* JDB:                          Debuggers.              4.
+* Perldb:                       Debuggers.              4.
+* XDB:                          Debuggers.              4.
+* SDB:                          Debuggers.              4.
+* DBX:                          Debuggers.              4.
+* GDB:                          Debuggers.              4.
+* GUDライブラリ:                Debuggers.              4.
+* デバッガ:                     Debuggers.              4.
+* モード、Compilation:          Compilation Mode.       5.
+* コンパイルモード:             Compilation Mode.       5.
+* エラーログ:                   Compilation.            4.
+* コンパイルエラー:             Compilation.            4.
+* make:                         Compilation.            4.
+* 下位プロセス:                 Compilation.            4.
+* Lisp関数の実行:               Building.               4.
+* プログラムのコンパイル:       Building.               4.
+* モード、Asm:                  Asm Mode.               5.
+* asmモード:                    Asm Mode.               5.
+* Fortranの継続行:              ForIndent Cont.         4.
+* モード、Fortran:              Fortran.                4.
+* Fortranモード:                Fortran.                4.
+* プリプロセッサ強調表示:       Other C Commands.       41.
+* 展開、Cのマクロ:              Other C Commands.       19.
+* Cのマクロ展開:                Other C Commands.       19.
+* モード、Pike:                 C Modes.                4.
+* モード、CORBA IDL:            C Modes.                4.
+* モード、Objective C:          C Modes.                4.
+* モード、C:                    C Modes.                4.
+* モード、Java:                 C Modes.                4.
+* C++モード:                    C Modes.                4.
+* Objective Cモード:            C Modes.                4.
+* CORBA IDLモード:              C Modes.                4.
+* IDLモード:                    C Modes.                4.
+* Pikeモード:                   C Modes.                4.
+* Javaモード:                   C Modes.                4.
+* Cモード:                      C Modes.                4.
+* AバッファとBバッファ（emerge）: Overview of Emerge.   20.
+* 併合バッファ（emerge）:       Overview of Emerge.     20.
+* ファイルの併合:               Emerge.                 4.
+* emerge:                       Emerge.                 4.
+* 反復回数演算子（正規表現）:   Create Tags Table.      79.
+* `etags'プログラム:            Create Tags Table.      4.
+* タグテーブル:                 Tags.                   4.
+* モード、Change Log:           Change Log.             47.
+* change-logモード:             Change Log.             47.
+* 変更記録モード（Change Log mode）: Change Log.        47.
+* チェンジログ:                 Change Log.             5.
+* 変更記録:                     Change Log.             5.
+* モード、Eldoc:                Documentation.          16.
+* eldocモード:                  Documentation.          16.
+* Lisp中の補完:                 Symbol Completion.      25.
+* Lispシンボルの補完:           Symbol Completion.      25.
+* info索引補完:                 Symbol Completion.      15.
+* タグ補完:                     Symbol Completion.      15.
+* タグを用いた補完:             Symbol Completion.      15.
+* 補完（シンボル名）:           Symbol Completion.      4.
+* プログラム中の空行:           Multi-Line Comments.    5.
+* コメントの字下げ:             Comment Commands.       5.
+* コメント:                     Comments.               4.
+* モード、Show Paren:           Matching.               29.
+* show-parenモード:             Matching.               29.
+* 対応括弧表示（Show Paren）モード: Matching.           29.
+* 括弧:                         Matching.               4.
+* 対応している括弧:             Matching.               4.
+* Cの字下げスタイル:            C Indent Styles.        4.
+* 字下げ計算:                   Indentation Calculation.  4.
+* 構文シンボル:                 Syntactic Analysis.     60.
+* 構文構成要素:                 Syntactic Analysis.     60.
+* 構文解析:                     Syntactic Analysis.     4.
+* Lispの字下げのカスタマイズ:   Lisp Indent.            4.
+* プログラムの字下げ:           Program Indent.         4.
+* defun（関数定義）:            Defuns.                 4.
+* 関数定義（defun）:            Defuns.                 4.
+* 入れ替え:                     List Commands.          61.
+* 式:                           Lists.                  11.
+* S式:                          Lists.                  11.
+* リスト:                       Lists.                  11.
+* コントロール・メタ:           Lists.                  5.
+* モードフック:                 Program Modes.          38.
+* CPerlモード:                  Program Modes.          5.
+* Tclモード:                    Program Modes.          5.
+* Makefileモード:               Program Modes.          5.
+* Awkモード:                    Program Modes.          5.
+* Iconモード:                   Program Modes.          5.
+* Perlモード:                   Program Modes.          5.
+* プログラム言語向けモード:     Program Modes.          5.
+* プログラムの編集:             Programs.               4.
+* Cの編集:                      Programs.               4.
+* Lispの編集:                   Programs.               4.
+* 改行、ハードとソフト:         Hard and Soft Newlines.  4.
+* ソフト改行:                   Hard and Soft Newlines.  4.
+* ハード改行:                   Hard and Soft Newlines.  4.
+* 文書処理:                     Formatted Text.         5.
+* WYSIWYG:                      Formatted Text.         5.
+* 整形済みテキスト:             Formatted Text.         5.
+* モード、Enriched:             Formatted Text.         5.
+* enrichedモード:               Formatted Text.         5.
+* エンリッチモード（enrichedモード）: Formatted Text.   5.
+* nroff:                        Nroff Mode.             5.
+* ヘッダ（TeXモード）:          TeX Print.              82.
+* `TEXINPUTS'（環境変数）:      TeX Print.              39.
+* 環境変数`TEXINPUTS':          TeX Print.              39.
+* モード、SliTeX:               TeX Mode.               4.
+* モード、LaTeX:                TeX Mode.               4.
+* モード、TeX:                  TeX Mode.               4.
+* SliTeXモード:                 TeX Mode.               4.
+* LaTeXモード:                  TeX Mode.               4.
+* TeXモード:                    TeX Mode.               4.
+* 間接バッファとアウトライン:   Outline Views.          5.
+* 複数の視点を持つアウトライン: Outline Views.          5.
+* アウトラインの視点:           Outline Views.          5.
+* アウトラインに対する複数の視点: Outline Views.        5.
+* 部分木（アウトラインモード）: Outline Visibility.     46.
+* 本体行（アウトラインモード）: Outline Format.         5.
+* 見出し行（アウトラインモード）: Outline Format.       5.
+* 不可視行:                     Outline Mode.           4.
+* 選択的表示:                   Outline Mode.           4.
+* モード、Outline:              Outline Mode.           4.
+* outlineモード:                Outline Mode.           4.
+* アウトラインモード（Outline mode）: Outline Mode.     4.
+* モード、Paragraph-Indent Text: Text Mode.             23.
+* paragraph-indent-textモード:  Text Mode.              23.
+* 段落字下げ型テキストモード（Paragraph-Indent Text mode）: Text Mode.  23.
+* モード、Text:                 Text Mode.              4.
+* textモード:                   Text Mode.              4.
+* テキストモード（Text mode）:  Text Mode.              4.
+* 単語の頭文字の大文字化:       Case.                   19.
+* テキストの大文字／小文字への変換: Case.               19.
+* 大文字小文字変換、単語:       Case.                   19.
+* 単語の大文字小文字変換:       Case.                   19.
+* 大文字小文字変換:             Case.                   4.
+* 適応型詰め込み:               Adaptive Fill.          5.
+* 詰め込み接頭辞:               Fill Prefix.            5.
+* 中央揃え:                     Fill Commands.          37.
+* 幅揃え:                       Fill Commands.          30.
+* 単語の折り返し:               Auto Fill.              4.
+* モード、Auto Fill:            Auto Fill.              4.
+* auto-fillモード:              Auto Fill.              4.
+* 自動詰め込みモード（Auto Fill mode）: Auto Fill.      4.
+* テキストの詰め込み:           Filling.                4.
+* ページ送り:                   Pages.                  5.
+* ページ:                       Pages.                  5.
+* 段落の操作:                   Paragraphs.             4.
+* 段落:                         Paragraphs.             4.
+* 文の操作:                     Sentences.              4.
+* 文:                           Sentences.              4.
+* メタコマンドと単語:           Words.                  4.
+* 単語:                         Words.                  4.
+* テキストの操作:               Text.                   4.
+* テキスト:                     Text.                   4.
+* 字下げ、表を作る:             Tab Stops.              5.
+* 表のための字下げ:             Tab Stops.              5.
+* 表作成時のタブストップ:       Tab Stops.              5.
+* タブストップ:                 Tab Stops.              5.
+* コラム（字下げ）:             Indentation.            4.
+* 桁（字下げ）:                 Indentation.            4.
+* 字下げ:                       Indentation.            4.
+* メジャーモードの選択:         Choosing Modes.         5.
+* モード、メジャー:             Major Modes.            4.
+* メジャーモード:               Major Modes.            4.
+* `iso-transl' ライブラリ:      Single-Byte European Support.  48.
+* 8ビット表示:                  Single-Byte European Support.  29.
+* `iso-ascii'ライブラリ:        Single-Byte European Support.  23.
+* ユニバイト操作:               Single-Byte European Support.  5.
+* ISO Latin 文字集合:           Single-Byte European Support.  5.
+* アクセント文字:               Single-Byte European Support.  5.
+* ヨーロッパ文字集合:           Single-Byte European Support.  5.
+* スタートアップフォントセット: Defining Fontsets.      16.
+* 標準フォントセット:           Defining Fontsets.      5.
+* フォントセット:               Fontsets.               4.
+* Macintosh行末変換:            Coding Systems.         44.
+* MS-DOS行末変換:               Coding Systems.         44.
+* 行末変換:                     Coding Systems.         44.
+* 行末変換:                     Coding Systems.         20.
+* コーディングシステム:         Coding Systems.         4.
+* 言語環境:                     Language Environments.  4.
+* ベトナム語:                   International.          5.
+* チベット語:                   International.          5.
+* タイ語:                       International.          5.
+* ロシア語:                     International.          5.
+* ラオ語:                       International.          5.
+* 韓国語:                       International.          5.
+* 日本語:                       International.          5.
+* IPA:                          International.          5.
+* ギリシア語:                   International.          5.
+* エチオピア語:                 International.          5.
+* マラッタ語:                   International.          5.
+* ヒンディー語:                 International.          5.
+* デバナーガリー:               International.          5.
+* 中国語:                       International.          5.
+* 文字の符号化:                 International.          4.
+* マルチバイト文字:             International.          4.
+* 国際化文字:                   International.          4.
+* MULE:                         International.          4.
+* 単一フレーム端末:             Non-Window Terminals.   4.
+* 非ウィンドウ端末:             Non-Window Terminals.   4.
+* stealth fontification:        Lazy Lock Mode.         44.
+* モード、Lazy Lock:            Lazy Lock Mode.         4.
+* 遅延ロックモード（Lazy Lock mode）: Lazy Lock Mode.   4.
+* モード、Fast Lock:            Fast Lock Mode.         5.
+* 高速ロックモード（Fast Lock mode）: Fast Lock Mode.   5.
+* 構文の強調表示:               Font Lock.              4.
+* モード、Font Lock:            Font Lock.              4.
+* フォントロックモード（Font Lock mode）: Font Lock.    4.
+* フェイス`region':             Faces.                  61.
+* `region'フェイス:             Faces.                  61.
+* フェイス:                     Faces.                  4.
+* モード、Menu Bar:             Menu Bars.              4.
+* メニューバーモード（Menu Bar mode）: Menu Bars.       4.
+* モード、Scroll Bar:           Scroll Bars.            4.
+* スクロールバーモード（Scroll Bar mode）: Scroll Bars.  4.
+* フォント（主要）:             Frame Parameters.       60.
+* オートローワモード（Auto-Lower mode）: Frame Parameters.  4.
+* オートレイズモード（Auto-Raise mode）: Frame Parameters.  4.
+* 表示色:                       Frame Parameters.       4.
+* 複数ディスプレイ:             Multiple Displays.      4.
+* スピードバー:                 Speedbar.               4.
+* フォント（デフォルト）:       Creating Frames.        44.
+* initial-frame-alist:          Creating Frames.        39.
+* default-frame-alist:          Creating Frames.        39.
+* フレームの作成:               Creating Frames.        4.
+* セレクション、二次:           Secondary Selection.    4.
+* 二次セレクション:             Secondary Selection.    4.
+* セレクション、一次:           Mouse Commands.         112.
+* カットバッファ:               Mouse Commands.         112.
+* 一次セレクション:             Mouse Commands.         112.
+* Xでのカットとペースト:        Mouse Commands.         100.
+* ペーストとX:                  Mouse Commands.         100.
+* カットとX:                    Mouse Commands.         100.
+* マウスボタン（何をするか）:   Mouse Commands.         4.
+* フレーム:                     Frames.                 4.
+* 別のウィンドウにバッファを選択する: Pop Up Window.    5.
+* 選択されているウィンドウ:     Basic Window.           11.
+* Emacsの複数のウィンドウ:      Windows.                4.
+* Emacsのウィンドウ:            Windows.                4.
+* 基底バッファ:                 Indirect Buffers.       4.
+* 間接バッファ:                 Indirect Buffers.       4.
+* バッファメニュー:             Several Buffers.        4.
+* 真夜中モード（Midnight mode）: Kill Buffer.           43.
+* バッファの消去:               Kill Buffer.            5.
+* 読み出し専用バッファ:         Misc Buffer.            14.
+* カレントバッファの一覧:       List Buffers.           8.
+* バッファの切り替え:           Select Buffer.          4.
+* バッファの変更:               Select Buffer.          4.
+* カレントバッファ:             Buffers.                12.
+* 選択されたバッファ:           Buffers.                12.
+* バッファ:                     Buffers.                5.
+* ファイル名をクォートする:     Quoted File Names.      5.
+* ange-ftp:                     Remote Files.           15.
+* リモートファイルの参照:       Remote Files.           5.
+* FTP:                          Remote Files.           5.
+* gzip:                         Compressed Files.       4.
+* モード、Auto Compression:     Compressed Files.       4.
+* 自動圧縮モード（Auto Compression mode）: Compressed Files.  4.
+* 展開:                         Compressed Files.       4.
+* 圧縮:                         Compressed Files.       4.
+* ファイルのコピー:             Misc File Ops.          45.
+* ファイルの削除:               Misc File Ops.          30.
+* 削除（ファイル）:             Misc File Ops.          30.
+* モード、View:                 Misc File Ops.          9.
+* 閲覧モード（View mode）:      Misc File Ops.          9.
+* 閲覧:                         Misc File Ops.          9.
+* ファイルの比較:               Comparing Files.        4.
+* ディレクトリ一覧:             Directories.            5.
+* ファイルディレクトリ:         Directories.            5.
+* ファイルの監視（CVS）:        Backend Options.        27.
+* cvs監視機能:                  Backend Options.        27.
+* 環境変数CVSREAD（CVS）:       Backend Options.        18.
+* CVSREAD（環境変数）（CVS）:   Backend Options.        18.
+* ロック（CVS）:                Backend Options.        14.
+* ロック、弱い（RCS）:          Backend Options.        9.
+* 弱いロック（RCS）:            Backend Options.        9.
+* 版管理下のロック:             Backend Options.        5.
+* バックエンドのオプション（VC）: Backend Options.      5.
+* 名前付きのコンフィギュレーション（RCS）: Snapshot Caveats.  5.
+* スナップショットと版管理:     Snapshots.              4.
+* 矛盾の解消:                   Merging.                33.
+* 矛盾:                         Merging.                33.
+* 変更の併合:                   Merging.                5.
+* 先頭版:                       Branches.               19.
+* 幹（版管理）:                 Branches.               4.
+* 枝（版管理）:                 Branches.               4.
+* ロックと版管理:               VC Concepts.            22.
+* ファイルをチェックアウトする: VC Concepts.            11.
+* 作業ファイル:                 VC Concepts.            11.
+* 登録されたファイル:           VC Concepts.            5.
+* マスタファイル:               VC Concepts.            5.
+* SCCS:                         Version Systems.        19.
+* CVS:                          Version Systems.        13.
+* バックエンド（版管理）:       Version Systems.        5.
+* RCS:                          Version Systems.        5.
+* 版管理:                       Version Control.        4.
+* バージョンコントロール:       Version Control.        4.
+* ファイルの実名:               File Aliases.           21.
+* クラッシュ:                   Auto Save.              4.
+* モード、Auto Save:            Auto Save.              4.
+* 自動保存（Auto Save mode）:   Auto Save.              4.
+* 徹底的な変更:                 Reverting.              4.
+* 衝突:                         Interlocking.           22.
+* ファイルをロックする:         Interlocking.           16.
+* 同時編集:                     Interlocking.           5.
+* ファイルの日付:               Interlocking.           5.
+* `VERSION_CONTROL'（環境変数）: Backup Names.          36.
+* 環境変数`VERSION_CONTROL':    Backup Names.           36.
+* バックアップファイル:         Backup.                 4.
+* ファイルの新規作成:           Visiting.               61.
+* 変更されたバッファ:           Visiting.               38.
+* ファイルを保存する:           Visiting.               22.
+* ファイルを訪問する:           Visiting.               22.
+* ファイル、訪問と保存:         Visiting.               22.
+* ファイルを訪問する:           Visiting.               4.
+* ファイル名:                   File Names.             4.
+* ファイル:                     Files.                  4.
+* `ispell'プログラム:           Spelling.               125.
+* フライスペル（flyspell）モード: Spelling.             29.
+* 綴りの訂正:                   Spelling.               4.
+* 綴りの検査:                   Spelling.               4.
+* 綴り、検査と訂正:             Spelling.               4.
+* まちがい、訂正:               Fixit.                  4.
+* タイポ（打ちまちがい）、訂正: Fixit.                  4.
+* 問い合わせ型置換:             Query Replace.          4.
+* 大域的な置換:                 Replace.                4.
+* 文字列置換:                   Replace.                4.
+* 探索置換コマンド:             Replace.                4.
+* 置換:                         Replace.                4.
+* regexpの構文:                 Regexps.                4.
+* regexp:                       Regexp Search.          4.
+* 正規表現:                     Regexp Search.          4.
+* 単語探索:                     Word Search.            4.
+* 一括型探索:                   Nonincremental Search.  4.
+* 中断（探索）:                 Incremental Search.     79.
+* インクリメンタルサーチ:       Incremental Search.     5.
+* テキスト内での文字列探索:     Search.                 4.
+* 探索:                         Search.                 4.
+* 文字（テキスト中）:           Text Display.           4.
+* メイル（モード行）:           Optional Mode Line.     33.
+* 時刻表示（モード行）:         Optional Mode Line.     21.
+* モード行での時刻表示:         Optional Mode Line.     21.
+* モード、Column Number:        Optional Mode Line.     17.
+* 桁番号モード（Column Number mode）: Optional Mode Line.  17.
+* モード、Line Number:          Optional Mode Line.     5.
+* 行番号モード（line-number mode）: Optional Mode Line.  5.
+* モード、Follow:               Follow Mode.            4.
+* 追従モード（Follow mode）:    Follow Mode.            4.
+* モード、Hscroll:              Horizontal Scrolling.   31.
+* 水平スクロールモード（Hscroll mode）: Horizontal Scrolling.  31.
+* 水平スクロール:               Horizontal Scrolling.   4.
+* スクロール:                   Scrolling.              9.
+* ブックマーク:                 Bookmarks.              4.
+* レジスタ:                     Registers.              4.
+* テキストの矩形領域のキル:     Rectangles.             4.
+* 桁（と矩形領域）:             Rectangles.             4.
+* 矩形領域:                     Rectangles.             4.
+* 分散したテキストの蓄積:       Accumulating Text.      5.
+* 先にキルしたテキストのヤンク: Earlier Kills.          5.
+* テレビ:                       Appending Kills.        5.
+* キルテキストのリングへの追加: Appending Kills.        5.
+* ペースト:                     Yanking.                4.
+* ヤンク:                       Yanking.                4.
+* キルリング:                   Yanking.                4.
+* テキストのコピー:             Yanking.                4.
+* テキストの移動:               Yanking.                4.
+* 削除:                         Killing.                5.
+* テキストのカット:             Killing.                5.
+* テキストのキル:               Killing.                5.
+* グローバルマークリング:       Global Mark Ring.       4.
+* マークリング:                 Mark Ring.              5.
+* テキストの一部をマーク付けする: Marking Objects.      5.
+* マーク付けしたリージョンに対する操作: Using Region.   5.
+* zmacsモード:                  Transient Mark.         73.
+* リージョンの強調表示:         Transient Mark.         4.
+* 強調表示、リージョン:         Transient Mark.         4.
+* 暫定マークモード（Transient Mark mode）: Transient Mark.  4.
+* モード、Transient Mark:       Transient Mark.         4.
+* リージョン:                   Mark.                   4.
+* マークの設定:                 Mark.                   4.
+* マーク:                       Mark.                   4.
+* オンラインマニュアル:         Misc Help.              5.
+* マニュアル、オンライン:       Misc Help.              5.
+* info:                         Misc Help.              5.
+* アプロポス:                   Apropos.                5.
+* セルフドキュメント:           Help.                   4.
+* ヘルプ機能:                   Help.                   4.
+* 履歴、コマンド:               Repetition.             4.
+* コマンド履歴:                 Repetition.             4.
+* 履歴、ミニバッファ入力:       Minibuffer History.     4.
+* ミニバッファ入力履歴:         Minibuffer History.     4.
+* ミニバッファ履歴:             Minibuffer History.     4.
+* モード、Icomplete:            Completion Options.     25.
+* 補完示唆モード（Icomplete mode）: Completion Options.  25.
+* complete:                     Completion Options.     19.
+* 補完:                         Completion.             4.
+* ミニバッファの拡大:           Minibuffer Edit.        21.
+* ミニバッファのサイズ:         Minibuffer Edit.        21.
+* ミニバッファの高さ:           Minibuffer Edit.        21.
+* モード、Resize-Minibuffer:    Minibuffer Edit.        21.
+* ミニバッファリサイズモード（Resize-Minibuffer mode）: Minibuffer Edit.  21.
+* ファイル名中のスラッシュの繰り返し: Minibuffer File.  29.
+* ファイル名中のスラッシュ2個:  Minibuffer File.        29.
+* ファイル名中の//:             Minibuffer File.        29.
+* デフォルト引数:               Minibuffer.             17.
+* プロンプト:                   Minibuffer.             11.
+* ミニバッファ:                 Minibuffer.             4.
+* コマンドを繰り返す:           Repeating.              4.
+* 引数、前置:                   Arguments.              4.
+* 引数、数字:                   Arguments.              4.
+* 前置引数:                     Arguments.              4.
+* 数引数:                       Arguments.              4.
+* カーソル位置:                 Position Info.          21.
+* ポイント位置:                 Position Info.          21.
+* 行番号コマンド:               Position Info.          21.
+* 切り捨て:                     Continuation Lines.     15.
+* 行の折り返し:                 Continuation Lines.     5.
+* 折り返し:                     Continuation Lines.     5.
+* 継続行:                       Continuation Lines.     5.
+* 空行:                         Blank Lines.            12.
+* 空行の削除:                   Blank Lines.            5.
+* 空行の挿入:                   Blank Lines.            5.
+* キーのヘルプ表示:             Basic Help.             5.
+* アンドゥの限界:               Undo.                   66.
+* 選択的なアンドゥ:             Undo.                   34.
+* 変更、もとに戻す:             Undo.                   4.
+* アンドゥ（もとに戻す）:       Undo.                   4.
+* 文字や行の消去:               Erasing.                16.
+* 文字や行の削除:               Erasing.                16.
+* 文字や行のキル:               Erasing.                16.
+* カーソルの移動:               Moving Point.           5.
+* 移動:                         Moving Point.           5.
+* ポイントの移動:               Moving Point.           5.
+* 矢印キー:                     Moving Point.           5.
+* クォート:                     Inserting Text.         31.
+* 改行:                         Inserting Text.         18.
+* 図形文字:                     Inserting Text.         5.
+* 挿入:                         Inserting Text.         5.
+* Emacsの休止:                  Exiting.                4.
+* 休止:                         Exiting.                4.
+* Emacsの終了:                  Exiting.                4.
+* 終了:                         Exiting.                4.
+* Emacsの始動:                  Entering Emacs.         4.
+* Emacsの起動:                  Entering Emacs.         4.
+* 文字（テキスト中の）:         Text Characters.        4.
+* 関数定義:                     Commands.               5.
+* コマンド:                     Commands.               5.
+* 関数:                         Commands.               5.
+* バインディング:               Commands.               5.
+* プレフィックスキー:           Keys.                   11.
+* 完結キー:                     Keys.                   11.
+* キー:                         Keys.                   5.
+* キー列:                       Keys.                   5.
+* 入力イベント:                 User Input.             68.
+* METAキーにかわるESC:          User Input.             42.
+* M-:                           User Input.             42.
+* メタ:                         User Input.             42.
+* コントロール文字:             User Input.             4.
+* コントロール:                 User Input.             4.
+* C-:                           User Input.             4.
+* ASCII:                        User Input.             4.
+* 文字集合（キーボード）:       User Input.             4.
+* キーボード入力:               User Input.             4.
+* キーボードからの入力:         User Input.             4.
+* メニューバー:                 Menu Bar.               4.
+* モード行の表示、行末変換:     Mode Line.              93.
+* 行末変換、モード行の表示:     Mode Line.              93.
+* トップレベル:                 Mode Line.              4.
+* モード行:                     Mode Line.              4.
+* エコー領域から保存したメッセージ: Echo Area.          35.
+* 保存されたエコー領域メッセージ: Echo Area.            35.
+* `*Messages*'バッファ:         Echo Area.              35.
+* エコー領域のエラーメッセージ: Echo Area.              21.
+* エコー領域:                   Echo Area.              4.
+* カーソル:                     Point.                  4.
+* ポイント:                     Point.                  4.
+* 画面要素:                     Screen.                 4.
+* 画面:                         Screen.                 4.
+
+
+

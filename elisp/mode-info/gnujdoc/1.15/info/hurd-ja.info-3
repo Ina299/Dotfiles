@@ -1,0 +1,1329 @@
+Info file: hurd-ja.info,    -*-Text-*-
+produced by `texinfo-format-buffer'
+from file `hurd-ja.texi'
+using `texinfmt.el' version 2.38 of 3 July 1998.
+
+
+
+
+INFO-DIR-SECTION Kernel
+START-INFO-DIR-ENTRY
+* Hurd: (hurd).                 Using and programming the Hurd kernel servers.
+END-INFO-DIR-ENTRY
+
+
+Copyright (C) 1994-1998 Free Software Foundation, Inc.
+
+Permission is granted to make and distribute verbatim copies of this
+manual provided the copyright notice and this permission notice are
+preserved on all copies.
+
+
+Permission is granted to copy and distribute modified versions of this
+manual under the conditions for verbatim copying, provided also that the
+entire resulting derived work is distributed under the terms of a
+permission notice identical to this one.
+
+Permission is granted to copy and distribute translations of this manual
+into another language, under the above conditions for modified versions.
+
+
+
+
+
+File: hurd-ja.info, Node: Fshelp Library, Next: File Interface, Prev: Trivfs Library, Up: Files
+
+Fshelp Library
+==============
+
+The fshelp library implements various things that are generic to most
+implementors of the file protocol.  It presumes that you are using the
+iohelp library as well.  `libfshelp' is divided into separate facilities
+which may be used independently.  These functions are declared in
+`<hurd/fshelp.h>'.
+
+
+* Menu:
+
+* Passive Translator Linkage::  Invoking passive translators.
+* Active Translator Linkage::   Managing active translators.
+* Fshelp Locking::              Implementing file locking.
+* Fshelp Permissions::          Standard file access permission policies.
+* Fshelp Misc::                 Useful standalone routines.
+
+
+
+File: hurd-ja.info, Node: Passive Translator Linkage, Next: Active Translator Linkage, Prev: Fshelp Library, Up: Fshelp Library
+
+Passive Translator Linkage
+--------------------------
+
+These routines are self-contained and start passive translators,
+returning the control port.  They do not require multithreading or the
+ports library.
+
+ -- Typedef: typedef error_t (* fshelp_open_fn_t ) (int FLAGS, file_t *NODE, mach_msg_type_name_t *NODE_TYPE)
+     A callback used by the translator starting functions, which should
+     be a function that given some open flags, opens the appropiate
+     file, and returns the node port.
+
+ -- Function: error_t fshelp_start_translator_long (fshelp_open_fn_t UNDERLYING_OPEN_FN, char *NAME, char *ARGZ, int ARGZ_LEN, mach_port_t *FDS, mach_msg_type_name_t FDS_TYPE, int FDS_LEN, mach_port_t *PORTS, mach_msg_type_name_t PORTS_TYPE, int PORTS_LEN, int *INTS, int INTS_LEN, int TIMEOUT, fsys_t *CONTROL)
+     Start a passive translator NAME with arguments ARGZ (length
+     ARGZ_LEN).  Initialize the initports to PORTS (length PORTS_LEN),
+     the initints to INTS (length INTS_LEN), and the file descriptor
+     table to FDS (length FDS_LEN).  Return the control port in
+     `*CONTROL'.  If the translator doesn't respond or die in TIMEOUT
+     milliseconds (if TIMEOUT is greater than zero), return an
+     appropriate error.  If the translator dies before responding,
+     return `EDIED'.
+
+ -- Function: error_t fshelp_start_translator (fshelp_open_fn_t UNDERLYING_OPEN_FN, char *NAME, char *ARGZ, int ARGZ_LEN, int TIMEOUT, fsys_t *CONTROL)
+     Same as `fshelp_start_translator_long', except the initports and
+     ints are copied from our own state, FD[2] is copied from our own
+     stderr, and the other fds are cleared.
+
+
+
+File: hurd-ja.info, Node: Active Translator Linkage, Next: Fshelp Locking, Prev: Passive Translator Linkage, Up: Fshelp Library
+
+Active Translator Linkage
+-------------------------
+
+These routines implement the linkage to active translators needed by any
+filesystem which supports them.  They require the threads library and
+use the passive translator routines above, but they don't require the
+ports library at all.
+
+This interface is complex, because creating the ports and state
+necessary for `start_translator_long' is expensive.  The caller to
+`fshelp_fetch_root' should not need to create them on every call, since
+usually there will be an existing active translator.
+
+ -- Function: void fshelp_transbox_init (struct transbox *TRANSBOX, struct mutex *LOCK, void *COOKIE)
+     Initialize a transbox, which contains state information for active
+     translators.
+
+ -- Typedef: typedef error_t (* fshelp_fetch_root_callback1_t ) (void *COOKIE1, void *COOKIE2, uid_t *UID, gid_t *GID, char **ARGZ, size_t *ARGZ_LEN)
+     This routine is called by `fshelp_fetch_root' to fetch more
+     information.  Return the owner and group of the underlying
+     translated file in `*UID' and `*GID'; point `*ARGZ' at the entire
+     passive translator specification for the file (setting `*ARGZ_LEN'
+     to the length).  If there is no passive translator, then return
+     `ENOENT'.  COOKIE1 is the cookie passed in `fshelp_transbox_init'.
+     COOKIE2 is the cookie passed in the call to `fshelp_fetch_root'.
+
+ -- Typedef: typedef error_t (* fshelp_fetch_root_callback2_t ) (void *COOKIE1, void *COOKIE2, int FLAGS, mach_port_t *UNDERLYING, mach_msg_type_name_t *UNDERLYING_TYPE)
+     This routine is called by `fshelp_fetch_root' to fetch more
+     information.  Return an unauthenticated node for the file itself in
+     `*UNDERLYING' and `*UNDERLYING_TYPE' (opened with FLAGS).  COOKIE1
+     is the cookie passed in `fshelp_transbox_init'.  COOKIE2 is the
+     cookie passed in the call to `fshelp_fetch_root'.
+
+ -- Function: error_t fshelp_fetch_root (struct transbox *TRANSBOX, void *COOKIE, file_t DOTDOT, struct iouser *USER, int FLAGS, fshelp_fetch_root_callback1_t CALLBACK1, fshelp_fetch_root_callback2_t CALLBACK2, retry_type *RETRY, char *RETRYNAME, mach_port_t *ROOT)
+     Fetch the root from TRANSBOX.  DOTDOT is an unauthenticated port
+     for the directory in which we are looking; USER specifies the ids
+     of the user responsible for the call.  FLAGS are as for
+     `dir_pathtrans' (but `O_CREAT' and `O_EXCL' are not meaningful and
+     are ignored).  The transbox lock (as set by `fshelp_transbox_init')
+     must be held before the call, and will be held upon return, but may
+     be released during the operation of the call.
+
+ -- Function: int fshelp_translated (struct transbox *BOX)
+     Return true if and only if there is an active translator on this
+     box.
+
+ -- Function: error_t fshelp_set_active (struct transbox *BOX, fsys_t NEWACTIVE, int EXCL)
+     Atomically replace the existing active translator port for this box
+     with NEWACTIVE.  If EXCL is non-zero then don't modify an existing
+     active transbox; return `EBUSY' instead.
+
+ -- Function: error_t fshelp_fetch_control (struct transbox *BOX, mach_port_t *CONTROL)
+     Fetch the control port to make a request on it.  It's a bad idea to
+     use `fsys_getroot' with the result; use `fshelp_fetch_root'
+     instead.
+
+ -- Function: void fshelp_drop_transbox (struct transbox *BOX)
+     Clean transbox state so that deallocation or reuse is possible.
+
+
+
+
+File: hurd-ja.info, Node: Fshelp Locking, Next: Fshelp Permissions, Prev: Active Translator Linkage, Up: Fshelp Library
+
+Fshelp Locking
+--------------
+
+The `flock' call is in flux, as the current Hurd interface (as of
+version 0.2) is not suitable for implementing the POSIX record-locking
+semantics.
+
+
+
+
+File: hurd-ja.info, Node: Fshelp Permissions, Next: Fshelp Misc, Prev: Fshelp Locking, Up: Fshelp Library
+
+Fshelp Permissions
+------------------
+
+These functions are designed to aid with user permission checking.  It
+is a good idea to use these routines rather than to roll your own, so
+that Hurd users see consistent handling of file and directory permission
+bits.
+
+ -- Function: error_t fshelp_isowner (struct stat *ST, struct iouser *USER)
+     Check to see whether USER should be considered the owner of the
+     file identified by ST.  If so, return zero; otherwise return an
+     appropriate error code.
+
+ -- Function: error_t fshelp_access (struct stat *ST, int OP, struct iouser *USER)
+     Check to see whether the user USER can operate on the file
+     identified by ST.  OP is one of `S_IREAD', `S_IWRITE', and
+     `S_IEXEC'.  If the access is permitted, return zero; otherwise
+     return an appropriate error code.
+
+ -- Function: error_t fshelp_checkdirmod (struct stat *DIR, struct stat *ST, struct iouser *USER)
+     Check to see whether USER is allowed to modify DIR with respect to
+     existing file ST.  If there is no existing file, then ST should be
+     set to zero.  If the access is permissable return zero; otherwise
+     return an appropriate error code.
+
+
+
+
+File: hurd-ja.info, Node: Fshelp Misc, Prev: Fshelp Permissions, Up: Fshelp Library
+
+Fshelp Misc
+-----------
+
+The following functions are completely standalone:
+
+ -- Function: error_t fshelp_delegate_translation (char *SERVER_NAME, mach_port_t REQUESTOR, char **ARGV)
+     Try to hand off responsibility from a translator to the server
+     located on the node SERVER_NAME.  REQUESTOR is the translator's
+     bootstrap port, and ARGV is the command line.  If SERVER_NAME is
+     null, then a name is concocted by appending `argv[0]' to
+     `_servers'.
+
+ -- Function: error_t fshelp_exec_reauth (int SUID, uid_t UID, int SGID, gid_t GID, auth_t AUTH, error_t (*GET_FILE_IDS) (struct idvec *UIDS, struct idvec *GIDS), mach_port_t *PORTS, mach_msg_type_number_t NUM_PORTS, mach_port_t *FDS, mach_msg_type_number_t NUM_FDS, int *SECURE)
+     If SUID or SGID is true, adds UID and/or GID respectively to the
+     authentication in `PORTS[INIT_PORT_AUTH]', and replaces it with the
+     result.  All the other ports in PORTS and FDS are then
+     reauthenticated, using any privileges available through AUTH.  If
+     the auth port in `PORTS[INIT_PORT_AUTH]' is bogus, and GET_FILE_IDS
+     is non-null, it is called to get a list of uids and gids from the
+     file to use as a replacement.  If SECURE is non-null and any added
+     ids are new, then the variable it points to is set to nonzero,
+     otherwise zero.  If either the uid or gid case fails, then the
+     other may still apply.
+
+ -- Function: error_t fshelp_get_identity (struct port_bucket *BUCKET, ino_t FILENO, mach_port_t *PT)
+     Return an identity port in `*PT' for the node numbered FILENO,
+     suitable for returning from `io_identity'; exactly one send right
+     must be created from the returned value.  FILENO should be the same
+     value returned as the FILENO out-parameter in `io_identity', and in
+     the enclosing directory (except for mount points), and in the
+     `st_ino' stat field.  BUCKET should be a `libports' port bucket;
+     fshelp requires the caller to make sure port operations (for
+     no-senders notifications) are used.
+
+ -- Function: error_t fshelp_return_malloced_buffer (char *BUF, size_t LEN, char **RBUF, mach_msg_type_number_t *RLEN)
+     Put data from the malloced buffer BUF, LEN bytes long, into RBUF
+     (which is RLEN bytes long), suitable for returning from an RPC.  If
+     LEN is greater than zero, BUF is freed, regardless of whether an
+     error is returned or not.
+
+ -- Function: error_t fshelp_set_options (struct argp *ARGP, int FLAGS, char *ARGZ, size_t ARGZ_LEN, void *INPUT)
+     Invoke `argp_parse' in the standard way, with data from ARGZ and
+     ARGZ_LEN.
+
+ -- Function: void fshelp_touch (struct stat *ST, unsigned WHAT, volatile struct mapped_time_value *MAPTIME)
+     Change the stat times of NODE as indicated by WHAT to the current
+     time.  WHAT is a bitmask of one or more of the `TOUCH_ATIME',
+     `TOUCH_MTIME', and `TOUCH_CTIME' constants.
+
+
+
+
+File: hurd-ja.info, Node: File Interface, Next: Filesystem Interface, Prev: Fshelp Library, Up: Files
+
+File Interface
+==============
+
+This section documents the interface for operating on files.
+
+* Menu:
+
+* File Overview::               Basic concepts for the file interface.
+* Changing Status::             Changing the owner (etc.) of a file.
+* Program Execution::           Executing files.
+* File Locking::                Implementing the `flock' call.
+* File Frobbing::               Other active calls on files.
+* Opening Files::               Looking up files in directories.
+* Modifying Directories::       Creating and deleting nodes.
+* Notifications::               File and directory change callbacks.
+* File Translators::            How to set and get translators.
+
+
+
+File: hurd-ja.info, Node: File Overview, Next: Changing Status, Prev: File Interface, Up: File Interface
+
+File Overview
+-------------
+
+The file interface is a superset of the I/O interface (*Note I/O
+Interface::).  Servers which provide the file interface are required to
+support the I/O interface as well.  All objects reachable in the
+filesystem are expected to provide the file interface, even if they do
+not contain data.  (The `trivfs' library makes it easy to do so for
+ordinary sorts of cases.  *Note Trivfs Library::.)
+
+The interface definitions for the file interface are found in
+`<hurd/fs.defs>'.
+
+Files have various pieces of status information which are returned by
+`io_stat' (*Note Information Queries::).  Most of this status
+information can be directly changed by various calls in the file
+interface; some of it should vary implicitly as the contents of the file
+change.
+
+Many of these calls have general rules associated with them describing
+how security and privilege should operate.  The `diskfs' library (*Note
+Diskfs Library::) implements these rules for stored filesystems.  These
+rules have also been implemented in the fshelp library (*Note Fshelp
+Library::).  Trivfs-based servers generally have no need to implement
+these rules at all.
+
+In special cases, there may be a reason to implement a different
+security check from that specified here, or to implement a call to do
+something slightly different.  But such cases must be carefully
+considered; make sure that you will not confuse innocent user programs
+through excessive cleverness.
+
+If some operation cannot be implemented (for example, `chauthor' over
+FTP), then the call should return `EOPNOTSUPP'.  If it is merely
+difficult to implement a call, it is much better to figure out a way to
+implement it as a series of operations rather than returning errors to
+the user.
+
+
+
+File: hurd-ja.info, Node: Changing Status, Next: Program Execution, Prev: File Overview, Up: File Interface
+
+Changing Status
+---------------
+
+There are several RPCs available for users to change much of the status
+information associated with a file.  (The information is returned by the
+`io_stat' RPC; see *Note Information Queries::.)
+
+All these operations are restricted to root and the owner of the file.
+When attempted by another user, they should return `EPERM'.
+
+The `file_chown' RPC changes the owner and group of the file.  Only root
+should be able to change the owner, and changing the group to a group
+the caller is not in should also be prohibited.  Violating either of
+these conditions should return `EPERM'.
+
+The `file_chauthor' RPC changes the author of the file.  It should be
+legitimate to change the author to any value without restriction.
+
+The `file_chmod' RPC changes the file permission mode bits.
+
+The `file_chflags' RPC changes the flags of the file.  It should be
+legitimate to change the flags to any value without restriction.  No
+standard meanings have been assigned to the flags yet, but we intend to
+do so.  Do not assume that the flags format we choose will map
+identically to that of some existing filesystem format.
+
+The `file_utimes' RPC changes the ATIME and MTIME of the file.  Making
+this call must cause the CTIME to be updated as well, even if no actual
+change to either the MTIME or the ATIME occurs.
+
+The `file_set_size' RPC is special; not only does it change the status
+word specifing the size of the file, but it also changes the actual
+contents of the file.  If the file size is being reduced it should
+release secondary storage associated with the previous contents of the
+file.  If the file is being extended, the new region added to the file
+must be zero-filled.  Unlike the other RPCs in this section,
+`file_set_size' should be permitted to any user who is allowed to write
+the file.
+
+
+
+
+File: hurd-ja.info, Node: Program Execution, Next: File Locking, Prev: Changing Status, Up: File Interface
+
+Program Execution
+-----------------
+
+Execution of programs on the Hurd is done through fileservers with the
+`file_exec' RPC.  The fileserver is expected to verify that the user is
+allowed to execute the file, make whatever modifications to the ports
+are necessary for setuid execution, and then invoke the standard
+execserver found on `/servers/exec'.
+
+This section specifically addresses what fileservers are expected to do,
+with minimal attention to the other parts of the process.  *Note Running
+Programs::, for more general information.
+
+The file must be opened for execution; if it is not, `EBADF' should be
+returned In addition, at least one of the execute bits must be on.  A
+failure of this check should result in `EACCES'---not `ENOEXEC'.  It is
+not proper for the fileserver ever to respond to the `file_exec' RPC
+with `ENOEXEC'.
+
+If either the setuid or setgid bits are set, the server needs to
+construct a new authentication handle with the additional new ID's.
+Then all the ports passed to `file_exec' need to be reauthenticated with
+the new handle.  If the fileserver is unable to make the new
+authentication handle (for example, because it is not running as root)
+it is not acceptable to return an error; in such a case the server
+should simply silently fail to implement the setuid/setgid semantics.
+
+If the setuid/setgid transformation adds a new uid or gid to the user's
+authentication handle that was not previously present (as opposed to
+merely reordering them) then the `EXEC_SECURE' and `EXEC_NEWTASK' flags
+should both be added in the call to `exec_exec'.
+
+The server then needs to open a new port onto the executed file which
+will not share any file pointers with the port the user passed in,
+opened with `O_READ'.  Finally, all the information (mutated
+appropriately for setuid/setgid) should be sent to the execserver with
+`exec_exec'.  Whatever error code `exec_exec' returns should returned to
+the caller of `file_exec'.
+
+
+
+File: hurd-ja.info, Node: File Locking, Next: File Frobbing, Prev: Program Execution, Up: File Interface
+
+File Locking
+------------
+
+The `flock' call is in flux, as the current Hurd interface (as of
+version 0.2) is not suitable for implementing the POSIX record-locking
+semantics.
+
+You should ignore the `file_lock' and `file_lock_stat' calls until the
+new record-locking interface is implemented.
+
+
+
+
+File: hurd-ja.info, Node: File Frobbing, Next: Opening Files, Prev: File Locking, Up: File Interface
+
+File Frobbing
+-------------
+
+FIXME: Other active calls on files
+
+`file_sync'
+
+`file_getfh'
+
+`file_getlinknode'
+
+`file_check_access'
+
+These manipulate meta-information:
+
+`file_reparent'
+
+`file_statfs'
+
+`file_syncfs'
+
+`file_getcontrol'
+
+`file_get_storage_info'
+
+`file_get_fs_options'
+
+
+
+
+File: hurd-ja.info, Node: Opening Files, Next: Modifying Directories, Prev: File Frobbing, Up: File Interface
+
+Opening Files
+-------------
+
+FIXME: Looking up files in directories
+
+`dir_lookup'
+
+`dir_readdir'
+
+
+
+File: hurd-ja.info, Node: Modifying Directories, Next: Notifications, Prev: Opening Files, Up: File Interface
+
+Modifying Directories
+---------------------
+
+FIXME: Creating and deleting nodes
+
+`dir_mkfile'
+
+`dir_mkdir'
+
+`dir_rmdir'
+
+`dir_unlink'
+
+`dir_link'
+
+`dir_rename'
+
+
+
+File: hurd-ja.info, Node: Notifications, Next: File Translators, Prev: Modifying Directories, Up: File Interface
+
+Notifications
+-------------
+
+FIXME: File and directory change callbacks
+
+File change notifications are not yet implemented, but directory
+notifications are.
+
+`file_notice_changes'
+
+`dir_notice_changes'
+
+
+
+File: hurd-ja.info, Node: File Translators, Prev: Notifications, Up: File Interface
+
+File Translators
+----------------
+
+FIXME: How to set and get translators
+
+`file_set_translator'
+
+`file_get_translator'
+
+`file_get_translator_cntl'
+
+
+
+
+File: hurd-ja.info, Node: Filesystem Interface, Prev: File Interface, Up: Files
+
+Filesystem Interface
+====================
+
+The filesystem interface (described in `<hurd/fsys.defs>') is supported
+by translator control ports.
+
+FIXME: finish
+
+
+
+
+File: hurd-ja.info, Node: Special Files, Next: Stores, Prev: Files, Up: Top
+
+Special Files
+*************
+
+In Unix, any file that does not act as a general-purpose unit of storage
+is called a "special file".  These are FIFOs, Unix-domain sockets, and
+device nodes.  In the Hurd, there is no need for the "special file"
+distinction, since they are implemented by translators, just as regular
+files are.
+
+Nevertheless, the Hurd maintains this distinction, in order to provide
+backward-compatibility for Unix programs (which do not know about
+translators).  Studying the implementation of Hurd special files is a
+good way to introduce the idea of translators to people who are familiar
+with Unix.
+
+This chapter does not discuss `/dev/zero' or any of the
+microkernel-based devices, since these are translated by the generalized
+storeio server (FIXME xref).
+
+FIXME: finish
+
+
+fifo
+====
+
+ifsock
+======
+
+magic
+=====
+
+null
+====
+
+
+FIXME: a chapter on libtreefs and libdirmgt will probably go here
+
+
+
+
+File: hurd-ja.info, Node: Stores, Next: Stored Filesystems, Prev: Special Files, Up: Top
+
+Stores
+******
+
+A "store" is a fixed-size block of storage, which can be read and
+perhaps written to.  A store is more general than a file: it refers to
+any type of storage such as devices, files, memory, tasks, etc.  Stores
+can also be representations of other stores, which may be combined and
+filtered in various ways.
+
+* Menu:
+
+* Store Library::               An abstract interface to storage systems.
+
+
+storeinfo, storecat, storeread
+==============================
+
+storeio
+=======
+
+FIXME: finish
+
+
+
+File: hurd-ja.info, Node: Store Library, Prev: Stores, Up: Stores
+
+Store Library
+=============
+
+The store library (which is declared in `<hurd/store.h>') implements
+many different backends which support the store abstraction.  Hurd
+programs use `libstore' so that new storage types can be implemented
+with minimum impact.
+
+* Menu:
+
+* Store Arguments::             Parsing store command-line arguments.
+* Store Management::            Creating and manipulating stores.
+* Store I/O::                   Reading and writing data to stores.
+* Store Classes::               Ready-to-use storage backends.
+* Store RPC Encoding::          Transferring store descriptors via RPC.
+
+
+
+
+File: hurd-ja.info, Node: Store Arguments, Next: Store Management, Prev: Store Library, Up: Store Library
+
+Store Arguments
+---------------
+
+FIXME: describe startup sequence
+
+ -- Structure: struct store_parsed
+     The result of parsing a store, which should be enough information
+     to open it, or return the arguments.
+
+ -- Structure: struct store_argp_params  struct store_parsed *RESULT; const char *DEFAULT_TYPE; const struct store_class *const *CLASSES; 
+     This is the structure used to pass args back and forth from
+     STORE_ARGP.  RESULT is the resulting parsed result.  If
+     `--store-type' isn't specified, then DEFAULT_TYPE should be used as
+     the store type; zero is equivalent to `"query"'.  CLASSES is set of
+     classes used to validate store types and argument syntax.
+
+ -- Variable: extern struct argp store_argp
+     This is an argument parser that may be used for parsing a simple
+     command line specification for stores.  The accompanying input
+     parameter must be a pointer to a `struct store_argp_params'.
+
+ -- Function: void store_parsed_free (struct store_parsed *PARSED)
+     Free all resources used by PARSED.
+
+ -- Function: error_t store_parsed_open (const struct store_parsed *PARSED, int FLAGS, struct store **STORE)
+     Open the store specified by PARSED, and return it in STORE.
+
+ -- Function: error_t store_parsed_append_args (const struct store_parsed *PARSED, char **ARGZ, size_t *ARGZ_LEN)
+     Add the arguments used to create PARSED to ARGZ and ARGZ_LEN.
+
+ -- Function: error_t store_parsed_name (const struct store_parsed *PARSED, char **NAME)
+     Make an option string describing PARSED, and return it in malloced
+     storage in NAME.
+
+
+
+
+File: hurd-ja.info, Node: Store Management, Next: Store I/O, Prev: Store Arguments, Up: Store Library
+
+Store Management
+----------------
+
+The following functions provide basic management of stores:
+
+ -- Function: error_t store_create (file_t SOURCE, int FLAGS, const struct store_class *const *CLASSES, struct store **STORE)
+     Return a new store in STORE, which refers to the storage underlying
+     SOURCE.  CLASSES is used to select classes specified by the
+     provider; if zero, STORE_STD_CLASSES is used.  FLAGS is set with
+     `store_set_flags', with the exception of `STORE_INACTIVE', which
+     merely indicates that no attempt should be made to activate an
+     inactive store; if `STORE_INACTIVE' is not specified, and the store
+     returned for SOURCE is inactive, an attempt is made to activate it
+     (failure of which causes an error to be returned).  A reference to
+     SOURCE is created (but may be destroyed with `store_close_source').
+
+     It is usually better to use a specific store open or create
+     function such as `store_open' (*Note Store Classes::), since they
+     are tailored to the needs of a specific store.  Generally, you
+     should only use `store_create' if you are defining your own store
+     class, or you need options that are not provided by a more specific
+     store creation function.
+
+ -- Function: void store_close_source (struct store *STORE)
+     If STORE was created using `store_create', remove the reference to
+     the source from which it was created.
+
+ -- Function: void store_free (struct store *STORE)
+     Clean up and deallocate STORE's underlying stores.
+
+ -- Structure: struct store_run  off_t START, LENGTH; 
+     A `struct store_run' represents a contiguous region in a store's
+     address range.  These are used to designate active portions of a
+     store.  If START is -1, then the region is a "hole" (it is
+     zero-filled and doesn't correspond to any real addresses).
+
+ -- Function: error_t store_set_runs (struct store *STORE, const struct store_run *RUNS, size_t NUM_RUNS)
+     Set STORE's current runs list to (a copy of) RUNS and NUM_RUNS.
+
+ -- Function: error_t store_set_children (struct store *STORE, struct store *const *CHILDREN, size_t NUM_CHILDREN)
+     Set STORE's current children to (a copy of) CHILDREN and
+     NUM_CHILDREN (note that just the vector CHILDREN is copied, not the
+     actual children).
+
+ -- Function: error_t store_children_name (const struct store *STORE, char **NAME)
+     Try to come up with a name for the children in STORE, combining the
+     names of each child in a way that could be used to parse them with
+     `store_open_children'.  This is done heuristically, and so may not
+     succeed.  If a child doesn't have a name, `EINVAL' is returned.
+
+ -- Function: error_t store_set_name (struct store *STORE, const char *NAME)
+     Sets the name associated with STORE to a copy of NAME.
+
+ -- Function: error_t store_set_flags (struct store *STORE, int FLAGS)
+     Add FLAGS to STORE's currently set flags.
+
+ -- Function: error_t store_clear_flags (struct store *STORE, int FLAGS)
+     Remove FLAGS from STORE's currently set flags.
+
+ -- Function: error_t store_set_child_flags (struct store *STORE, int FLAGS)
+     Set FLAGS in all children of STORE, and if successful, add FLAGS to
+     STORE's flags.
+
+ -- Function: error_t store_clear_child_flags (struct store *STORE, int FLAGS)
+     Clear FLAGS in all children of STORE, and if successful, remove
+     FLAGS from STORE's flags.
+
+ -- Function: int store_is_securely_returnable (struct store *STORE, int OPEN_FLAGS)
+     Returns true if STORE can safely be returned to a user who has
+     accessed it via a node using OPEN_FLAGS, without compromising
+     security.
+
+ -- Function: error_t store_clone (struct store *FROM, struct store **TO)
+     Return a copy of FROM in TO.
+
+ -- Function: error_t store_remap (struct store *SOURCE, const struct store_run *RUNS, size_t NUM_RUNS, struct store **STORE)
+     Return a store in STORE that reflects the blocks in RUNS and
+     RUNS_LEN from source; SOURCE is consumed, but not RUNS.  Unlike the
+     `store_remap_create' function, this may simply modify SOURCE and
+     return it.
+
+
+
+
+File: hurd-ja.info, Node: Store I/O, Next: Store Classes, Prev: Store Management, Up: Store Library
+
+Store I/O
+---------
+
+The following functions allow you to read and modify the contents of a
+store:
+
+ -- Function: error_t store_map (const struct store *STORE, vm_prot_t PROT, mach_port_t *MEMOBJ)
+     Return a memory object paging on STORE.
+
+ -- Function: error_t store_read (struct store *STORE, off_t ADDR, size_t AMOUNT, void **BUF, size_t *LEN)
+     Read AMOUNT bytes from STORE at ADDR into BUF and LEN (which
+     follows the usual Mach buffer-return semantics) to STORE at ADDR.
+     ADDR is in BLOCKS (as defined by `STORE->block_size').  Note that
+     LEN is in bytes.
+
+ -- Function: error_t store_write (struct store *STORE, off_t ADDR, void *BUF, size_t LEN, size_t *AMOUNT)
+     Write LEN bytes from BUF to STORE at ADDR.  Returns the amount
+     written in AMOUNT (in bytes).  ADDR is in BLOCKS (as defined by
+     `STORE->block_size').
+
+
+
+
+File: hurd-ja.info, Node: Store Classes, Next: Store RPC Encoding, Prev: Store I/O, Up: Store Library
+
+Store Classes
+-------------
+
+The store library comes with a number of standard store class
+implementations:
+
+ -- Variable: extern const struct store_class *const store_std_classes[]
+     This is a null-terminated vector of the standard store classes
+     implemented by `libstore'.
+
+If you are building your own class vectors, the following function may
+be useful:
+
+ -- Variable: error_t store_concat_class_vectors (struct store_class **CV1, struct store_class **CV2, struct store_class ***CONCAT)
+     Concatenate the store class vectors in CV1 and CV2, and return a
+     new (malloced) vector in CONCAT.
+
+
+`query' store
+.............
+
+ -- Variable: extern const struct store_class store_query_class
+     This store is a virtual store which queries a filesystem node, and
+     delegates control to an appropriate store class.
+
+ -- Function: error_t store_open (const char *NAME, int FLAGS, const struct store_class *const *CLASSES, struct store **STORE)
+     Open the file NAME, and return a new store in STORE, which refers
+     to the storage underlying it.  CLASSES is used to select classes
+     specified by the provider; if it is zero, then STORE_STD_CLASSES is
+     used.  FLAGS is set with `store_set_flags'.  A reference to the
+     open file is created (but may be destroyed with
+     `store_close_source').
+
+
+`typed_open' store
+..................
+
+ -- Variable: extern const struct store_class store_typed_open_class
+     This store is special in that it doesn't correspond to any specific
+     store functions, rather it provides a way to interpret character
+     strings as specifications for other stores.
+
+ -- Function: error_t store_typed_open (const char *NAME, int FLAGS, const struct store_class *const *CLASSES, struct store **STORE)
+     Open the store indicated by NAME, which should consist of a store
+     type name followed by a `:' and any type-specific name, returning
+     the new store in STORE.  CLASSES is used to select classes
+     specified by the type name; if it is zero, STORE_STD_CLASSES is
+     used.
+
+ -- Function: error_t store_open_children (const char *NAME, int FLAGS, const struct store_class *const *CLASSES, struct store ***STORES, size_t *NUM_STORES)
+     Parse multiple store names in NAME, and open each individually,
+     returning all in the vector STORES, and the number in NUM_STORES.
+     The syntax of NAME is a single non-alphanumeric separator
+     character, followed by each child store name separated by the same
+     separator; each child name is `TYPE:NAME' notation as parsed by
+     `store_typed_open'.  If every child uses the same `TYPE:' prefix,
+     then it may be factored out and put before the child list instead
+     (the two notations are differentiated by whether or not the first
+     character of NAME is alphanumeric).
+
+
+`device' store
+..............
+
+ -- Variable: extern const struct store_class store_device_class
+     This store is a simple wrapper for a microkernel device driver. (1)
+     (*Note Store Classes-Footnotes::)
+
+ -- Function: error_t store_device_open (const char *NAME, int FLAGS, struct store **STORE)
+     Open the device named NAME, and return the corresponding store in
+     STORE.
+
+ -- Function: error_t store_device_create (device_t DEVICE, int FLAGS, struct store **STORE)
+     Return a new store in STORE referring to the microkernel device
+     DEVICE.  Consumes the DEVICE send right.
+
+
+`file' store
+............
+
+ -- Variable: extern const struct store_class store_file_class
+     This store reads and writes the contents of a Hurd file.
+
+ -- Function: error_t store_file_open (const char *NAME, int FLAGS, struct store **STORE)
+     Open the file NAME, and return the corresponding store in STORE.
+
+ -- Function: error_t store_file_create (file_t FILE, int FLAGS, struct store **STORE)
+     Return a new store in STORE referring to the file FILE.  Unlike
+     `store_create', this will always use file I/O, even it would be
+     possible to be more direct.  This may work in more cases, for
+     instance if the file has holes.  Consumes the FILE send right.
+
+
+`task' store
+............
+
+ -- Variable: extern const struct store_class store_task_class
+     This store provides access to the contents of a microkernel task.
+
+ -- Variable: error_t store_task_open (const char *NAME, int FLAGS, struct store **STORE)
+     Open the task NAME (NAME should be the task's pid), and return the
+     corresponding store in STORE.
+
+ -- Variable: error_t store_task_create (task_t TASK, int FLAGS, struct store **STORE)
+     Return a new store in STORE referring to the task TASK, consuming
+     the TASK send right.
+
+
+`zero' store
+............
+
+ -- Variable: extern const struct store_class store_zero_class
+     Reads to this store always return zero-filled buffers, no matter
+     what has been written into it.  This store corresponds to the Unix
+     `/dev/zero' device node.
+
+ -- Function: error_t store_zero_create (off_t SIZE, int FLAGS, struct store **STORE)
+     Return a new zero store SIZE bytes long in STORE.
+
+
+`copy' store
+............
+
+ -- Variable: extern const struct store_class store_copy_class
+     This store provides a temporary copy of another store.  This is
+     useful if you want to provide writable data, but do not wish to
+     modify the underlying store.  All changes to a copy store are lost
+     when it is closed.
+
+ -- Function: error_t store_copy_open (const char *NAME, int FLAGS, const struct store_class *const *CLASSES, struct store **STORE)
+     Open the copy store NAME (which consists of another store class
+     name, a `:', and a name for the store class to open) and return the
+     corresponding store in STORE.  CLASSES is used to select classes
+     specified by the type name; if it is zero, STORE_STD_CLASSES is
+     used.
+
+ -- Function: error_t store_copy_create (struct store *FROM, int FLAGS, struct store **STORE)
+     Return a new store in STORE which contains a snapshot of the
+     contents of the store FROM; FROM is consumed.
+
+ -- Function: error_t store_buffer_create (void *BUF, size_t BUF_LEN, int FLAGS, struct store **STORE)
+     Return a new store in STORE which contains the memory buffer BUF,
+     of length BUF_LEN.  BUF must be allocated with `vm_allocate', and
+     will be consumed.
+
+
+`gunzip' store
+..............
+
+ -- Variable: extern const struct store_class store_gunzip_class
+     This store provides transparent GNU zip decompression of a
+     substore.  Unfortunately, this store is currently read-only.
+
+ -- Variable: error_t store_gunzip_open (const char *NAME, int FLAGS, const struct store_class *const *CLASSES, struct store **STORE)
+     Open the gunzip store NAME (which consists of another store class
+     name, a `:', and a name for that store class to open), and return
+     the corresponding store in STORE.  CLASSES is used to select
+     classes specified by the type name; if it is zero,
+     STORE_STD_CLASSES is used.
+
+ -- Variable: error_t store_gunzip_create (struct store *FROM, int FLAGS, struct store **STORE)
+     Return a new store in STORE which contains a snapshot of the
+     uncompressed contents of the store FROM; FROM is consumed.
+     BLOCK_SIZE is the desired block size of the result.
+
+
+`concat' store
+..............
+
+ -- Variable: extern const struct store_class store_concat_class
+     This class provides a linear concatenation storage mode.  It
+     creates a new virtual store which consists of several different
+     substores appended to one another.
+
+     This mode is designed to increase storage capacity, so that when
+     one substore is filled, new data is transparently written to the
+     next substore.  Concatenation requires robust hardware, since a
+     failure in any single substore will wipe out a large section of the
+     data.
+
+ -- Function: error_t store_concat_open (const char *NAME, int FLAGS, const struct store_class *const *CLASSES, struct store **STORE)
+     Return a new store that concatenates the stores created by opening
+     all the individual stores described in NAME; for the syntax of
+     NAME, see `store_open_children'.
+
+ -- Function: error_t store_concat_create (struct store * const *STORES, size_t NUM_STORES, int FLAGS, struct store **STORE)
+     Return a new store in STORE that concatenates all the stores in
+     STORES (NUM_STORES of them).  The stores in STORES are consumed;
+     that is, they will be freed when this store is freed.  The STORES
+     *array*, however, is copied, and so should be freed by the caller.
+
+
+`ileave' store
+..............
+
+ -- Variable: extern const struct store_class store_ileave_class
+     This class provides a RAID-0 (2) (*Note Store Classes-Footnotes::)
+     storage mode (also called "disk striping").  It creates a new
+     virtual store by interleaving the contents of several different
+     substores.
+
+     This RAID mode is designed to increase storage performance, since
+     I/O will probably occur in parallel if the substores reside on
+     different physical devices.  Interleaving works best with
+     evenly-yoked substores... if the stores are different sizes, some
+     space will be not be used at the end of the larger stores; if the
+     stores are different speeds, then I/O will have to wait for the
+     slowest store; if some stores are not as reliable as others,
+     failures will wipe out every Nth storage block, where N is the
+     number of substores.
+
+ -- Function: error_t store_ileave_create (struct store * const *STRIPES, size_t num_stripes, off_t INTERLEAVE, int FLAGS, struct store **STORE)
+     Return a new store in STORE that interleaves all the stores in
+     STRIPES (NUM_STRIPES of them) every INTERLEAVE bytes; INTERLEAVE
+     must be an integer multiple of each stripe's block size.  The
+     stores in STRIPES are consumed; that is, they will be freed when
+     this store is freed.  The STRIPES *array*, however, is copied, and
+     so should be freed by the caller.
+
+
+`mvol' store
+............
+
+ -- Variable: extern const struct store_class store_mvol_class
+     This store provides access to multiple volumes using a
+     single-volume device.  One use of this store would be to provide a
+     store which consists of multiple floppy disks when there is only a
+     single disk drive.  It works by remapping a single linear address
+     range to multiple address ranges, and keeping track of the
+     currently active range.  Whenever a request maps to a range that is
+     not active, a callback is made in order to switch to the new range.
+
+     This class is not included in STORE_STD_CLASSES, because it
+     requires an application-specific callback.
+
+ -- Function: error_t store_mvol_create (struct store *PHYS, error_t (*SWAP_VOLS) (struct store *STORE, size_t NEW_VOL, ssize_t OLD_VOL), int FLAGS, struct store **STORE)
+     Return a new store in STORE that multiplexes multiple physical
+     volumes from PHYS as one larger virtual volume.  SWAP_VOLS is a
+     function that will be called whenever reads or writes refer to a
+     block which is not on addressable on the currently active volume.
+     PHYS is consumed.
+
+
+`remap' store
+.............
+
+ -- Variable: extern const struct store_class store_remap_class
+     This store translates I/O requests into different addresses on a
+     different store.
+
+ -- Function: error_t store_remap_create (struct store *SOURCE, const struct store_run *RUNS, size_t NUM_RUNS, int FLAGS, struct store **STORE)
+     Return a new store in STORE that reflects the blocks in RUNS
+     and RUNS_LEN from SOURCE; SOURCE is consumed, but
+     RUNS is not.  Unlike the `store_remap' function, this
+     function always operates by creating a new store of type `remap'
+     which has SOURCE as a child, and so may be less efficient than
+     store_remap for some types of stores.
+
+
+
+File: hurd-ja.info  Node: Store Classes-Footnotes, Up: Store Classes
+
+(1) It is important to note that device drivers are not provided by
+the Hurd, but by the underlying microkernel.  Hurd `devices' are
+just storeio-translated nodes which make the microkernel device
+drivers obey Hurd semantics.  If you wish to implement a new device
+driver, you will need to consult the appropriate microkernel
+documentation.
+
+(2) RAID is a "Redundant Array of Independent Disks", which
+refers to the idea of using several disks in parallel in order to
+achieve increased capacity, redundancy and/or performance.
+
+
+
+File: hurd-ja.info, Node: Store RPC Encoding, Prev: Store Classes, Up: Store Library
+
+Store RPC Encoding
+------------------
+
+The store library also provides some functions which help transfer
+stores between tasks via RPC:
+
+ -- Structure: struct store_enc
+     This structure is used to hold the various bits that make up the
+     representation of a store for transmission via RPC.  See
+     `<hurd/hurd_types.h>' for an explanation of the encodings for the
+     various storage types.
+
+ -- Function: void store_enc_init (struct store_enc *ENC, mach_port_t *PORTS, mach_msg_type_number_t NUM_PORTS, int *INTS, mach_msg_type_number_t NUM_INTS, off_t *OFFSETS, mach_msg_type_number_t NUM_OFFSETS, char *DATA, mach_msg_type_number_t DATA_LEN)
+     Initialize ENC.  The given vector and sizes will be used for the
+     encoding if they are big enough (otherwise new ones will be
+     automatically allocated).
+
+ -- Function: void store_enc_dealloc (struct store_enc *ENC)
+     Deallocate storage used by the fields in ENC (but nothing is done
+     with ENC itself).
+
+ -- Function: void store_enc_return (struct store_enc *ENC, mach_port_t **PORTS, mach_msg_type_number_t *NUM_PORTS, int **INTS, mach_msg_type_number_t *NUM_INTS, off_t **OFFSETS, mach_msg_type_number_t *NUM_OFFSETS, char **DATA, mach_msg_type_number_t *DATA_LEN)
+     Copy out the parameters from ENC into the given variables suitably
+     for returning from a `file_get_storage_info' RPC, and deallocate
+     ENC.
+
+ -- Function: error_t store_return (const struct store *STORE, mach_port_t **PORTS, mach_msg_type_number_t *NUM_PORTS, int **INTS, mach_msg_type_number_t *NUM_INTS, off_t **OFFSETS, mach_msg_type_number_t *NUM_OFFSETS, char **DATA, mach_msg_type_number_t *DATA_LEN)
+     Encode STORE into the given return variables, suitably for
+     returning from a `file_get_storage_info' RPC.
+
+ -- Function: error_t store_encode (const struct store *STORE, struct store_enc *ENC)
+     Encode STORE into ENC, which should have been prepared with
+     `store_enc_init', or return an error.  The contents of ENC may then
+     be returned as the value of `file_get_storage_info'; if for some
+     reason this can't be done, `store_enc_dealloc' may be used to
+     deallocate the mmemory used by the unsent vectors.
+
+ -- Function: error_t store_decode (struct store_enc *ENC, const struct store_class *const *CLASSES, struct store **STORE)
+     Decode ENC, either returning a new store in STORE, or an error.
+     CLASSES the mapping from Hurd storage class ids to store classes;
+     if it is zero, STORE_STD_CLASSES is used.  If nothing else is to be
+     done with ENC, its contents may then be freed using
+     `store_enc_dealloc'.
+
+ -- Function: error_t store_allocate_child_encodings (const struct store *STORE, struct store_enc *ENC)
+     Calls the `allocate_encoding' method in each child store of STORE,
+     propagating any errors.  If any child does not have such a method,
+     `EOPNOTSUPP' is returned.
+
+ -- Function: error_t store_encode_children (const struct store *STORE, struct store_enc *ENC)
+     Calls the encode method in each child store of STORE, propagating
+     any errors.  If any child does not hae such a method, `EOPNOTSUPP'
+     is returned.
+
+ -- Function: error_t store_decode_children (struct store_enc *ENC, int NUM_CHILDREN, const struct store_class *const *CLASSES, struct store **CHILDREN)
+     Decodes NUM_CHILDREN from ENC, storing the results into successive
+     positions in CHILDREN.
+
+ -- Function: error_t store_with_decoded_runs (struct store_enc *ENC, size_t NUM_RUNS, error_t (*FUN) (const struct store_run *RUNS, size_t NUM_RUNS))
+     Call FUN with the vector RUNS of length NUM_RUNS extracted from
+     ENC.
+
+ -- Function: error_t store_std_leaf_allocate_encoding (const struct store *STORE, struct store_enc *ENC)
+ -- Function: error_t store_std_leaf_encode (const struct store *STORE, struct store_enc *ENC)
+     Standard encoding used for most data-providing (as opposed to
+     filtering) store classes.
+
+ -- Typedef: typedef error_t (* store_std_leaf_create_t )(mach_port_t PORT, int FLAGS, size_t BLOCK_SIZE, const struct store_run *RUNS, size_t NUM_RUNS, struct store **STORE)
+     Creation function used by `store_std_leaf_decode'.
+
+ -- Function: error_t store_std_leaf_decode (struct store_enc *ENC, store_std_leaf_create_t CREATE, struct store **STORE)
+     Decodes the standard leaf encoding which is common to various
+     builtin formats, and calls CREATE to actually create the store.
+
+
+
+
+File: hurd-ja.info, Node: Stored Filesystems, Next: Twisted Filesystems, Prev: Stores, Up: Top
+
+Stored（FIXME-J:ストアード？）ファイルシステム
+**********************************************
+
+Stored（FIXME-J:ストアード？）ファイルシステムにより、ユーザはハード・ディ
+スク、フロッピ・ディスク、CD-ROMのようなランダム・アクセス可能なメディア
+をターゲットにして、パーシステント(永続的)なデータをセーブしたりロードし
+たりすることができる。Stored（FIXME-J:ストアード？）ファイルシステムは、
+スタンドアロンなワークステーションをbootstrap（FIXME-J:ブートストラップ？）
+する場合にも必要になる。
+
+* Menu:
+
+* Repairing Filesystems::       軽いファイルシステム・クラッシュからの回復。
+* Linux Extended 2 FS::         ポピュラーなLinuxファイルシステム・フォーマット。
+* BSD Unix FS::                 BSD Unix 4.xのFast File System。
+* ISO-9660 CD-ROM FS::          標準的なCD-ROMフォーマット。
+* Diskfs Library::              新しいファイルシステム・サーバの実装。
+
+
+
+
+File: hurd-ja.info, Node: Repairing Filesystems, Next: Linux Extended 2 FS, Prev: Stored Filesystems, Up: Stored Filesystems
+
+ファイルシステムの修復
+======================
+
+FIXME: finish
+
+
+
+
+File: hurd-ja.info, Node: Linux Extended 2 FS, Next: BSD Unix FS, Prev: Repairing Filesystems, Up: Stored Filesystems
+
+Linux Extended 2 FS
+===================
+
+FIXME: finish
+
+
+
+
+File: hurd-ja.info, Node: BSD Unix FS, Next: ISO-9660 CD-ROM FS, Prev: Linux Extended 2 FS, Up: Stored Filesystems
+
+BSD Unix FS
+===========
+
+FIXME: finish
+
+
+
+
+File: hurd-ja.info, Node: ISO-9660 CD-ROM FS, Next: Diskfs Library, Prev: BSD Unix FS, Up: Stored Filesystems
+
+ISO-9660 CD-ROM FS
+==================
+
+FIXME: finish
+
+
+
+
+File: hurd-ja.info, Node: Diskfs Library, Prev: ISO-9660 CD-ROM FS, Up: Stored Filesystems
+
+Diskfsライブラリ
+================
+
+diskfsライブラリは`<hurd/diskfs.h>'に宣言されており、stored（FIXME-J:ス
+トアード？）ファイルシステムの実装に係わる多くの仕事を行っている。
+`libdiskfs'は、threads、ports、iohelp、fshelp、storeの各ライブラリを必要
+とする。diskfsを使おうと試みる前に、これらすべてのライブラリのことを理解
+するべきである。また、pagerライブラリについても熟知しているべきである
+(*Note Pager Library::)。
+
+昔からのしがらみで、stored（FIXME-J:ストアード？）ファイルシステムを実装
+するライブラリは`libstorefs'ではなく`libdiskfs'と呼ばれている。しかしな
+がら、diskfsはI/Oを行うのにstoreライブラリを使っているので、ブロック単位
+にアドレス付けされるものでさえあれば、どのような記憶デバイス上に実装され
+ているファイルシステムにとっても有用なものであるということを覚えておいて
+いただきたい。
+
+diskfsのコールバック・インターフェイスは単純ではないので、stored
+（FIXME-J:ストアード？）ファイルシステムを実装するのは手の込んだ作業とな
+る可能性がある。本当のところは、ゼロから書き始めようとするよりも、既存の
+ファイルシステム・サーバのうち類似のもののソース・コードを調べて、それを
+例として模倣するのが最も良いのである。
+
+* Menu:
+
+* Diskfs Startup::              stored（FIXME-J:ストアード？）ファイルシステムの初期化。
+* Diskfs Arguments::            コマンドライン引数の解析。
+* Diskfs Globals::              グローバルな振る舞いの変更。
+* Diskfs Node Management::      割り当て、リファレンス・カウンティング、
+                                  キャッシング、その他のディスク・ノード・ルーチン。
+* Diskfs Callbacks::            必須のユーザ定義diskfs関数。
+* Diskfs Options::              任意選択のユーザ定義diskfs関数。
+* Diskfs Internals::            diskfsの細部の再実装。
+
+
+
+
+File: hurd-ja.info, Node: Diskfs Startup, Next: Diskfs Arguments, Prev: Diskfs Library, Up: Diskfs Library
+
+Diskfsスタートアップ
+--------------------
+
+このサブセクションでは、ファイルシステム・サーバを実装する際の一般的なス
+テップの概要を示す。これはチュートリアルというよりはむしろ、読者が記憶を
+新たにするのを助けたり、解説を提供したりしようとするものである。
+
+ファイルシステム・サーバが最初にしなければならないのは、コマンドライン引
+数を解析することである(*Note Diskfs Arguments::)。その後に、それがブート
+ストラップ・ファイルシステムであれば、標準出力ストリームと標準エラー・ス
+トリームをコンソールにリダイレクトして、エラー・メッセージが失われること
+がないようにしなければならない。
+
+ -- Function: void diskfs_console_stdio (void)
+     エラー・メッセージがユーザに見えるようにコンソールへリダイレクトす
+     る。
+
+以下に、サーバの初期化処理の残りの部分で呼出されるであろう関連する関数の
+リストを示す。繰り返しになるが、これらの関数がどのように使われるべきであ
+るかという点に関してなにか疑問があるなら、既に動いているファイルシステム
+の実装を参照するべきである。
+
+ -- Function: error_t diskfs_init_diskfs (void)
+     引数の解析後に、ライブラリを初期化するためにこの関数を呼出す。
+     diskfsオプションの解析が終了したら、他の任意のdiskfs関数を呼出す前
+     に、この関数を呼出さなければならない。
+
+ -- Function: void diskfs_spawn_first_thread (void)
+     (`diskfs_root_node'の設定を除く) フォーマット固有のすべての初期化処
+     理の完了後にこの関数を呼出す。この時点で、ページャを起動する準備が
+     できているはずである。
+
+ -- Function: mach_port_t diskfs_startup_diskfs (mach_port_t BOOTSTRAP, int FLAGS)
+     ファイルシステムの初期化が完全に終了した後にこの関数を呼出す。これ
+     は、新しいファイルシステムcontrol port（FIXME-J:コントロール・ポー
+     ト、制御ポート？）のことを親ファイルシステムに通知するためである。
+     もしBOOTSTRAPがセットされていれば、diskfsはそのポートに対して適宜
+     `fsys_startup'を呼出し、その呼出しによって返されたREALNODEを返す。
+     BOOTSTRAPがセットされていなければ、この関数は
+     `diskfs_start_bootstrap'を呼出し、`MACH_PORT_NULL'を返す。(O_*の集
+     合の要素を値として取る)FLAGSは、REALNODEをどのようにオープンするか
+     を指定する。
+
+以下の関数を直接呼出す必要はないはずである。なぜなら、
+`diskfs_startup_diskfs'が必要に応じてこの関数を呼出してくれるからである。
+
+ -- Function: void diskfs_start_bootstrap (void)
+     このファイルシステムがあたかもブートストラップ・ファイルシステムで
+     あるかのように、Hurdのbootstrap sequence（FIXME-J:ブートストラップ・
+     シーケンス？）を開始する。この関数を呼出す前に、ファイルシステムの
+     初期化処理はすべて完了していなければならない。
+
+
+
+
+File: hurd-ja.info, Node: Diskfs Arguments, Next: Diskfs Globals, Prev: Diskfs Startup, Up: Diskfs Library
+
+Diskfs引数
+----------
+
+以下の関数は、argp (*Note Argp: (libc)Argp.)  を使って、標準的なdiskfsコ
+マンドライン引数と実行時引数の解析処理を実装している。
+
+ -- Function: error_t diskfs_set_options (char *ARGZ, size_t ARGZ_LEN)
+     ARGZとARGZ_LENにより指定される実行時オプションを解析して実行する。
+     認識できないオプションがあれば`EINVAL'が返される。このルーチンのデ
+     フォルトの定義では、`diskfs_runtime_argp'を使用して実行時オプション
+     が解析される。
+
+ -- Function: error_t diskfs_append_args (char **ARGZ, unsigned *ARGZ_LEN)
+     mallocされた領域にある、長さ`*ARGZ_LEN'の文字列`*ARGZ'の末尾に、こ
+     のトランスレータに渡された引数をNULで区切られたリストにしたものを追
+     加する。このルーチンのデフォルトの定義では、単に
+     `diskfs_append_std_options'が呼出される。
+
+ -- Function: error_t diskfs_append_std_options (char **ARGZ, unsigned *ARGZ_LEN)
+     標準的なdiskfsオプション状態を説明する情報とともに、NULで区切られた
+     オプションをARGZの*末尾に追加*し、ARGZ_LENの値を適宜増加させる。
+     `diskfs_get_options'とは異なり、ARGZとARGZ_LENには既にまともな値が
+     入っていなければならない点に注意すること。
+
+ -- Variable: struct argp * diskfs_runtime_argp
+     これが定義されているか、もしくは、argp構造体を指すようセットされて
+     いると、デフォルトの`diskfs_set_options'が実行時オプションの解析処
+     理にこれを使うことになる。デフォルトの定義では、
+     `diskfs_std_runtime_argp'へのポインタとして初期化されている。
+
+ -- Variable: const struct argp diskfs_std_runtime_argp
+     標準的なdiskfs実行時オプション用のargp。`diskfs_runtime_argp'のデフォ
+     ルトの定義はこれを指す。ただし、ユーザがこれを独自のargpにつなぐよ
+     う再定義することは可能である。
+
+ -- Variable: const struct argp diskfs_startup_argp
+     標準的なdiskfsコマンドライン引数用のargp構造体。ユーザは、コマンド
+     ラインを解析するためにこれを使用して`argp_parse'を呼出すこともでき
+     るし、これを独自のargp構造体の末尾につなぐこともできる。また、これ
+     を完全に無視することもできる。
+
+ -- Variable: const struct argp diskfs_store_startup_argp
+     標準的なdiskfsコマンドライン引数用、および、store specification
+     （FIXME-J:指定、仕様？）用のargp構造体。結果として作成される`struct
+     store_parsed'構造体を返すべき場所のアドレスが、`argp_parse'への入力
+     引数として渡されなければならない。FIXME xref the declaration for
+     STORE_ARGP.
+
+
+
+

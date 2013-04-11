@@ -1,0 +1,136 @@
+Info file: flex-ja.info,    -*-Text-*-
+produced by `texinfo-format-buffer'
+from file `flex-ja.texi'
+using `texinfmt.el' version 2.38 of 3 July 1998.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+This file documents Version 2.3.7 - 2.5.4 of the Flex lexical scanner
+generator.
+
+This is Edition  1.03,  February 1993, 
+of the `Flex Version  2.3.7 - 2.5.4 Manual'.
+
+Copyright (C) 1992, 1993 Free Software Foundation, Inc.
+
+Permission is granted to make and distribute verbatim copies of this
+manual provided the copyright notice and this permission notice are
+preserved on all copies.
+
+
+Permission is granted to copy and distribute modified versions of this
+manual under the conditions for verbatim copying, provided that the
+entire resulting derived work is distributed under the terms of a
+permission notice identical to this one.
+
+Permission is granted to copy and distribute translations of this manual
+into another language, under the above conditions for modified versions,
+except that this permission notice may be stated in a translation
+approved by the Free Software Foundation.
+
+
+
+
+
+
+
+
+Indirect:
+flex-ja.info-1: 1062
+flex-ja.info-2: 52405
+flex-ja.info-3: 102414
+flex-ja.info-4: 155727
+
+Tag table:
+(Indirect)
+Node: Top1062
+Node: Introduction5668
+Node: Problem Solving7582
+Node: General Programming8732
+Node: Invoking Flex9601
+Node: Command Line Switches10552
+Node: Command Line Switches (Flex 2.5)12884
+Node: Flex Descriptions15603
+Node: Comments16491
+Node: Optional C Code16948
+Node: Definitions17805
+Node: %%19208
+Node: Rules19402
+Node: Pattern Matching20977
+Node: Characters21608
+Node: Strings27982
+Node: Character Classes28630
+Node: Character Class Expressions (Flex 2.5)29687
+Node: Regular Expressions30636
+Node: Start States33481
+Node: Start States Explained34207
+Node: Activating States36081
+Node: Start State Notes36932
+Node: Start State Notes (Flex 2.5)39290
+Node: Start State Example41906
+Node: %option (Flex 2.5)47845
+Node: Interfacing to Flex52626
+Node: Flex and C53566
+Node: Flex and C (Flex 2.5)73871
+Node: An Example of Flex and C75228
+Node: Flex and Bison78046
+Node: Interfacing Flex and Bison79023
+Node: YYSTYPE and yylval82645
+Node: Another Example of Flex and Bison83634
+Node: The Database Language84206
+Node: The Implementation85995
+Node: Notes on the Implementation90820
+Node: Flex and C++ (Flex 2.5)91453
+Node: Other Flex Features95211
+Node: Case Insensitive Scanners95931
+Node: The -i Switch97042
+Node: Interactive Scanners97865
+Node: Table Compression and Scanner Speed98899
+Node: Translation Tables102414
+Node: Multiple Input Buffers103152
+Node: Buffer Manipulation103986
+Node: Buffer Manipulation (Flex 2.5)105090
+Node: Example of Multiple Buffers106880
+Node: End-Of-File Rules109008
+Node: Optimization110566
+Node: Optimizing for Speed111085
+Node: Removing Backtracking113150
+Node: Optimizing for Size115738
+Node: More Examples116688
+Node: Example-Counting Words117211
+Node: Example-Pascal Lexical Scanner120234
+Node: Example-Jargon Converter124439
+Node: Flex and Lex140212
+Node: Flex140633
+Node: Flex and POSIX141267
+Node: Flex and POSIX (Flex 2.5)144771
+Node: Lex145186
+Node: Useful Code146226
+Node: Handling Comments146802
+Node: Handling Strings148392
+Node: Handling Numbers155727
+Node: Multiple Scanners162368
+Node: Miscellaneous164151
+Node: Summary165195
+Node: Switches Summary165941
+Node: Switches Summary (Flex 2.5)169599
+Node: Summary or Flex Variables and Functions171471
+Node: Summary or Flex Variables and Functions (Flex 2.5)175959
+Node: Summary of Flex Characters178314
+Node: Summary of Flex Rules180074
+Node: Index182542
+
+End tag table

@@ -1,0 +1,1344 @@
+Info file: emacs-ja.info,    -*-Text-*-
+produced by `texinfo-format-buffer'
+from file `emacs-ja.texi'
+using `texinfmt.el' version 2.38 of 3 July 1998.
+
+
+Emacs 20.6版対応に改訂した`GNU Emacs Manual' 13版です。
+
+INFO-DIR-SECTION Editors
+START-INFO-DIR-ENTRY
+* Emacs: (emacs-ja).	The extensible self-documenting text editor.
+END-INFO-DIR-ENTRY
+
+
+Published by the Free Software Foundation 59 Temple Place, Suite 330
+Boston, MA 02111-1307 USA
+
+Copyright (C) 1985, 1986, 1987, 1993, 1994, 1995, 1996, 1997, 1998, 1999
+Free Software Foundation, Inc.
+
+Permission is granted to make and distribute verbatim copies of this
+manual provided the copyright notice and this permission notice are
+preserved on all copies.
+
+Permission is granted to copy and distribute modified versions of this
+manual under the conditions for verbatim copying, provided also that the
+sections entitled "The GNU Manifesto", "Distribution" and "GNU General
+Public License" are included exactly as in the original, and provided
+that the entire resulting derived work is distributed under the terms of
+a permission notice identical to this one.
+
+Permission is granted to copy and distribute translations of this manual
+into another language, under the above conditions for modified versions,
+except that the sections entitled "The GNU Manifesto", "Distribution"
+and "GNU General Public License" may be included in a translation
+approved by the Free Software Foundation instead of in the original
+English.
+
+
+
+
+
+File: emacs-ja.info  Node: Glossary-Footnotes, Up: Glossary
+
+(1) 【訳注】Muleでは、quailマイナモードを起動する`quail-mode'に
+バインドされていた。
+
+
+File: emacs-ja.info, Node: Acknowledgments, Next: Screen, Prev: Concept Index, Up: Top
+
+Acknowledgments
+***************
+
+Many people have contributed code included in the Free Software
+Foundation's distribution of GNU Emacs.  To show our appreciation for
+their public spirit, we list here those who have written substantial
+portions.
+
+   * Per Abrahamsen wrote the customization buffer facilities, as well
+     as `double.el' for typing accented characters not normally
+     available from the keyboard, `xt-mouse.el' which handles mouse
+     commands through Xterm, and `cpp.el' which hides or highlights
+     parts of C programs according to preprocessor conditionals.
+
+   * Jay K. Adams wrote `jka-compr.el', providing automatic
+     decompression and recompression for compressed files.
+
+   * Joe Arceneaux wrote the original text property implementation, and
+     implemented support for X11.
+
+   * Boaz Ben-Zvi wrote `profile.el', to time Emacs Lisp functions.
+
+   * Jim Blandy wrote Emacs 19's input system, brought its configuration
+     and build process up to the GNU coding standards, and contributed
+     to the frame support and multi-face support.
+
+   * Terrence M. Brannon wrote `landmark.el', a neural-network robot
+     that learns landmarks.
+
+   * Frank Bresz wrote `diff.el', a program to display `diff' output.
+
+   * Peter Breton implemented `dirtrack' which does better tracking of
+     directory changes in shell buffers, `filecache.el' which records
+     which directories your files are in, `locate.el' which interfaces
+     to the `locate' command, `net-utils.el', and the "generic mode"
+     feature.
+
+   * Kevin Broadey wrote `foldout.el', providing folding extensions to
+     Emacs's outline modes.
+
+   * Vincent Broman wrote `ada.el', a mode for editing Ada code (since
+     replaced by `ada-mode.el').
+
+   * David M. Brown wrote `array.el', for editing arrays and other
+     tabular data.
+
+   * Bill Carpenter provided `feedmail.el'.
+
+   * Hans Chalupsky wrote `advice.el', an overloading mechanism for
+     Emacs Lisp functions, and `trace.el', a tracing facility for Emacs
+     Lisp.
+
+   * Bob Chassell wrote `texnfo-upd.el' and `makeinfo.el', modes and
+     utilities for working with Texinfo files.
+
+   * James Clark wrote `sgml-mode.el', a mode for editing SGML
+     documents, and contributed to Emacs's dumping procedures.
+
+   * Mike Clarkson wrote `edt.el', an emulation of DEC's EDT editor.
+
+   * Glynn Clements provided `gamegrid.el' and a couple of games that
+     use it, Snake and Tetris.
+
+   * Andrew Csillag wrote M4 mode (`m4-mode.el').
+
+   * Doug Cutting and Jamie Zawinski wrote `disass.el', a disassembler
+     for compiled Emacs Lisp code.
+
+   * Michael DeCorte wrote `emacs.csh', a C-shell script that starts a
+     new Emacs job, or restarts a paused Emacs if one exists.
+
+   * Gary Delp wrote `mailpost.el', an interface between RMAIL and the
+     `/usr/uci/post' mailer.
+
+   * Matthieu Devin wrote `delsel.el', a package to make newly-typed
+     text replace the current selection.
+
+   * Eric Ding contributed `goto-addr.el',
+
+   * Carsten Dominik wrote `reftex.el', a package for setting up labels
+     and cross-references for LaTeX.
+
+   * Scott Draves wrote `tq.el', help functions for maintaining
+     transaction queues between Emacs and its subprocesses.
+
+   * Viktor Dukhovni wrote support for dumping under SunOS version 4.
+
+   * John Eaton co-wrote Octave mode (`octave.el' and related files).
+
+   * Rolf Ebert co-wrote Ada mode (`ada-mode.el').
+
+   * Stephen Eglen implemented `mspools.el', for use with Procmail,
+     which tells you which mail folders have mail waiting in them, and
+     `iswitchb.el', a feature for incremental reading and completion of
+     buffer names.
+
+   * Torbj"orn Einarsson contributed F90 mode (`f90.el').
+
+   * Tsugutomo Enami co-wrote the support for international character
+     sets.
+
+   * Hans Henrik Eriksen wrote `simula.el', a mode for editing SIMULA 87
+     code.
+
+   * Michael Ernst wrote `reposition.el', a command for recentering a
+     function's source code and preceding comment on the screen.
+
+   * Ata Etemadi wrote `cdl.el', functions for working with Common Data
+     Language source code.
+
+   * Frederick Farnback implemented `morse.el', which converts text to
+     morse code.
+
+   * Fred Fish wrote the support for dumping COFF executable files.
+
+   * Karl Fogel wrote:
+        * `bookmark.el', for creating named placeholders, saving them
+          and jumping to them later,
+        * `mail-hist.el', a history mechanism for outgoing mail
+          messages, and
+        * `saveplace.el', for preserving point's location in files
+          between editing sessions.
+
+   * Gary Foster wrote the emulation for CRiSP: `crisp.el' and
+     `scroll-lock.el'.
+
+   * Noah Friedman wrote `rlogin.el', an interface to Rlogin, and
+     `type-break.el', which reminds you to take periodic breaks from
+     typing.  With Roland McGrath, he wrote `rsz-mini.el', a minor mode
+     to automatically resize the minibuffer to fit the text it contains.
+
+   * Keith Gabryelski wrote `hexl.el', a mode for editing binary files.
+
+   * Kevin Gallagher rewrote and enhanced the EDT emulation, and wrote
+     `flow-ctrl.el', a package for coping with unsuppressible XON/XOFF
+     flow control.
+
+   * Kevin Gallo added multiple-frame support for Windows NT.
+
+   * Howard Gayle wrote:
+        * the C and lisp code for display tables and case tables,
+        * `rot13.el', a command to display the plaintext form of a
+          buffer encoded with the Caesar cipher,
+        * much of the support for the ISO-8859 European character set
+          (which includes `iso-ascii.el', `iso-insert.el',
+          `iso-swed.el', `iso-syntax.el', `iso-transl.el', and
+          `swedish.el'), and
+        * `vt100-led.el', a package for controlling the LED's on
+          VT100-compatible terminals.
+
+   * Stephen Gildea made the Emacs quick reference card.
+
+   * David Gillespie wrote:
+        * Emacs 19's Common Lisp compatibility packages, replacing the
+          old package by Cesar Augusto Quiroz Gonzalez,
+        * `complete.el', a partial completion mechanism, and
+        * `edmacro.el', a package for editing keyboard macros.
+
+   * Bob Glickstein contributed the `sregex.el' feature.
+
+   * Boris Goldowsky wrote `avoid.el', a package to keep the mouse
+     cursor out of the way of the text cursor; `shadowfile.el', a
+     package for keeping identical copies of files in more than one
+     place; `enriched.el', a package for saving text properties in
+     files; and `facemenu.el', a package for specifying faces.
+
+   * Michelangelo Grigni wrote `ffap.el' which visits a file, taking the
+     file name from the buffer.
+
+   * Odd Gripenstam wrote `dcl-mode.el'.
+
+   * Michael Gschwind wrote `iso-cvt.el', a package to convert between
+     the ISO 8859-1 character set and the notations for non-`ASCII'
+     characters used by TeX and net tradition.
+
+   * Henry Guillaume wrote `find-file.el', a package to visit files
+     related to the currently visited file.
+
+   * Doug Gwyn wrote the portable `alloca' implementation.
+
+   * Ken'ichi Handa implemented most of the support for international
+     character sets.
+
+   * Chris Hanson wrote `netuname.el', a package to use HP-UX's Remote
+     File Access facility from Emacs.
+
+   * K. Shane Hartman wrote:
+        * `chistory.el' and `echistory.el', packages for browsing
+          command history lists,
+        * `electric.el' and `helper.el', providing an alternative
+          command loop and appropriate help facilities,
+        * `emacsbug.el', a package for reporting Emacs bugs,
+        * `picture.el', a mode for editing ASCII pictures, and
+        * `view.el', a package for perusing files and buffers without
+          editing them.
+
+   * John Heidemann wrote `mouse-copy.el' and `mouse-drag.el', which
+     provide alternative mouse-based editing and scrolling features.
+
+   * Markus Heritsch co-wrote Ada mode (`ada-mode.el').
+
+   * Karl Heuer wrote the original blessmail script, implemented the
+     `intangible' text property, and rearranged the structure of the
+     `Lisp_Object' type to allow for more data bits.
+
+   * Manabu Higashida ported Emacs to the MS-DOS operating system.
+
+   * Anders Holst wrote `hippie-exp.el', a versatile completion and
+     expansion package.
+
+   * Kurt Hornik co-wrote Octave mode (`octave.el' and related files).
+
+   * Tom Houlder wrote `mantemp.el', which generates manual C++ template
+     instantiations.
+
+   * Lars Ingebrigtsen did a major redesign of the GNUS newsreader.
+
+   * Andrew Innes contributed extensively to the Windows NT support.
+
+   * Kyle Jones wrote `life.el', a package to play Conway's "life" game,
+     and `mldrag.el', a package which allows the user to resize windows
+     by dragging mode lines and vertical window separators with the
+     mouse.
+
+   * Tomoji Kagatani implemented `smtpmail.el', used for sending out
+     mail with SMTP.
+
+   * David Kaufman wrote `yow.c', an essential utility program for the
+     hopelessly pinheaded.
+
+   * Henry Kautz wrote `bib-mode.el', a mode for maintaining
+     bibliography databases compatible with `refer' (the `troff'
+     version) and `lookbib', and `refbib.el', a package to convert those
+     databases to the format used by the LaTeX text formatting package.
+
+   * Howard Kaye wrote `sort.el', commands to sort text in Emacs
+     buffers.
+
+   * Michael Kifer wrote `ediff.el', an interactive interface to the
+     `diff' and `patch' programs, and Viper, the newest emulation for
+     VI.
+
+   * Richard King wrote the first version of `userlock.el' and
+     `filelock.c', which provide simple support for multiple users
+     editing the same file.
+
+   * Larry K. Kolodney wrote `cvtmail.c', a program to convert the mail
+     directories used by Gosling Emacs into RMAIL format.
+
+   * Robert Krawitz wrote the original `xmenu.c', part of Emacs's pop-up
+     menu support.
+
+   * Sebastian Kremer wrote Emacs 19's `dired-mode', with contributions
+     by Lawrence R. Dodd.
+
+   * Geoff Kuenning wrote Emacs 19's `ispell.el', based on work by Ken
+     Stevens and others.
+
+   * David K*agedal wrote `tempo.el', providing support for easy
+     insertion of boilerplate text and other common constructions.
+
+   * Daniel LaLiberte wrote:
+        * `edebug.el', a source-level debugger for Emacs Lisp,
+        * `cl-specs.el', specifications to help `edebug' debug code
+          written using David Gillespie's Common Lisp support,
+        * `cust-print.el', a customizable package for printing lisp
+          objects,
+        * `eval-reg.el', a re-implementation of `eval-region' in Emacs
+          Lisp, and
+        * `isearch.el', Emacs 19's incremental search minor mode.
+
+   * James R. Larus wrote `mh-e.el', an interface to the MH mail system.
+
+   * Frederic Lepied contributed `expand.el', which uses the abbrev
+     mechanism for inserting programming constructs.
+
+   * Lars Lindberg wrote `msb.el', which provides more flexible menus
+     for buffer selection, and rewrote `dabbrev.el'.
+
+   * Eric Ludlam wrote the Speedbar package and `checkdoc.el'.
+
+   * Neil M. Mager wrote `appt.el', functions to notify users of their
+     appointments.  It finds appointments recorded in the diary files
+     generated by Edward M. Reingold's `calendar' package.
+
+   * Ken Manheimer wrote `allout.el', a mode for manipulating and
+     formatting outlines, and `icomplete.el', which provides incremental
+     completion feedback in the minibuffer.
+
+   * Bill Mann wrote `perl-mode.el', a mode for editing Perl code.
+
+   * Brian Marick and Daniel LaLiberte wrote `hideif.el', support for
+     hiding selected code within C `#ifdef' clauses.
+
+   * Simon Marshall wrote:
+        * `fast-lock.el', which caches the face data computed by Font
+          Lock mode,
+        * `lazy-lock.el', which delays fontification in Font Lock mode
+          until text is actually displayed, and
+        * `regexp-opt.el', which generates a regular expression from a
+          list of strings.
+
+   * Bengt Martensson, Mark Shapiro, Mike Newton, Aaron Larson, and
+     Stefan Schoef, wrote `bibtex.el', a mode for editing BibTeX
+     bibliography files.
+ 
+   * Charlie Martin wrote `autoinsert.el', which provides automatic
+     mode-sensitive insertion of text into new files.
+
+   * Thomas May wrote `blackbox.el', a version of the traditional
+     blackbox game.
+
+   * Roland McGrath wrote:
+        * `compile.el', a package for running compilations in a buffer,
+          and then visiting the locations reported in error messages,
+        * `etags.el', a package for jumping to function definitions and
+          searching or replacing in all the files mentioned in a `TAGS'
+          file,
+        * `find-dired.el', for using `dired' commands on output from the
+          `find' program, with Sebastian Kremer,
+        * `map-ynp.el', a general purpose boolean question-asker,
+        * `autoload.el', providing semi-automatic maintenance of
+          autoload files, and
+        * `upd-copyr.el', providing semi-automatic maintenance of
+          copyright notices in source code.
+
+   * David Megginson wrote `derived.el', which allows one to define new
+     major modes by inheriting key bindings and commands from existing
+     major modes.
+
+   * Wayne Mesard wrote `hscroll.el' which does horizontal scrolling
+     automatically.
+
+   * Richard Mlynarik wrote:
+        * `cl-indent.el', a package for indenting Common Lisp code,
+        * `ebuff-menu.el', an "electric" browser for buffer listings,
+        * `ehelp.el', bindings for browsing help screens,
+        * `rfc822.el', a parser for E-mail addresses in the RFC-822
+          format, used in mail messages and news articles,
+        * `terminal.el', a terminal emulator for Emacs subprocesses, and
+        * `yow.el', an essential utility (try `M-x yow').
+
+   * Keith Moore wrote `aixcc.lex', a pre-processor designed to help
+     Emacs parse the error messages produced by the AIX C compiler.
+
+   * Erik Naggum wrote the time-conversion functions, and has tested the
+     latest source code daily.
+
+   * Thomas Neumann and Eric Raymond wrote `makefile.el', a mode for
+     editing makefiles.
+
+   * Jurgen Nickelsen wrote `ws-mode.el', providing WordStar emulation.
+
+   * Jeff Norden wrote `kermit.el', a package to help the Kermit dialup
+     communications program run comfortably in an Emacs shell buffer.
+
+   * Andrew Norman wrote `ange-ftp.el', providing transparent FTP
+     support.
+
+   * Jeff Peck wrote:
+        * `emacstool.c', support for running Emacs under SunView/Sun
+          Windows,
+        * `sun-curs.el', cursor definitions for Sun Windows, and
+        * `sun-fns.el', providing mouse support for Sun Windows.
+
+   * Damon Anton Permezel wrote `hanoi.el', an animated demonstration of
+     the "Towers of Hanoi" puzzle.
+
+   * Jens Petersen wrote `find-func.el', which makes it easy to find the
+     source code for an Emacs Lisp function or variable.
+
+   * Daniel Pfeiffer wrote:
+        * `executable.el'
+        * `sh-script.el', a mode for editing shell scripts,
+        * `skeleton.el', implementing a concise language for writing
+          statement skeletons, and
+        * `two-column.el', a minor mode for simultaneous two-column
+          editing.
+
+   * Fred Pierresteguy and Paul Reilly made Emacs work with X Toolkit
+     widgets.
+
+   * Christian Plaunt wrote `soundex.el', an implementation of the
+     Soundex algorithm for comparing English words by their
+     pronunciation.
+
+   * Francesco A. Potorti wrote `cmacexp.el', providing a command which
+     runs the C preprocessor on a region of a file and displays the
+     results.
+
+   * Michael D. Prange and Steven A. Wood wrote `fortran.el', a mode for
+     editing FORTRAN code.
+
+   * Ashwin Ram wrote `refer.el', commands to look up references in
+     bibliography files by keyword.
+
+   * Eric S. Raymond wrote:
+        * `vc.el', an interface to the RCS and SCCS source code version
+          control systems, with Paul Eggert,
+        * `gud.el', a package for running source-level debuggers like
+          GDB and SDB in Emacs,
+        * `asm-mode.el', a mode for editing assembly language code,
+        * `cookie1.el', support for "fortune-cookie" programs like
+          `yow.el' and `spook.el',
+        * `finder.el', a package for finding Emacs Lisp packages by
+          keyword and topic,
+        * `lisp-mnt.el', functions for working with the special headers
+          used in Emacs Lisp library files, and
+        * code to set and make use of the `load-history' lisp variable,
+          which records the source file from which each lisp function
+          loaded into Emacs came.
+
+   * Edward M. Reingold wrote the extensive calendar and diary support
+     (try `M-x calendar'), with contributions from Stewart Clamen, Paul
+     Eggert, and Lara Rios.  Andy Oram contributed to its documentation.
+     Reingold has also contributed to `tex-mode.el', a mode for editing
+     TeX files, as have William F. Schelter, Dick King, Stephen Gildea,
+     Michael Prange, and Jacob Gore.
+
+   * Rob Riepel contributed `tpu-edt.el' and its associated files,
+     providing an emulation of the VMS TPU text editor emulating the VMS
+     EDT editor, and `vt-control.el', providing some control functions
+     for the DEC VT line of terminals.
+
+   * Roland B. Roberts contributed much of the VMS support distributed
+     with Emacs 19, along with Joseph M. Kelsey, and `vms-pmail.el',
+     support for using Emacs within VMS MAIL.
+
+   * John Robinson wrote `bg-mouse.el', support for the mouse on the BBN
+     Bitgraph terminal.
+
+   * Danny Roozendaal implemented `handwrite.el', which converts text
+     into "handwriting."
+
+   * William Rosenblatt wrote `float.el', implementing a floating-point
+     numeric type using Lisp cons cells and integers.
+
+   * Guillermo J. Rozas wrote `scheme.el', a mode for editing Scheme
+     code, and `fakemail.c', an interface to the System V mailer.
+
+   * Ivar Rummelhoff provided `winner.el', which records recent window
+     configurations so you can move back to them.
+
+   * Wolfgang Rupprecht contributed Emacs 19's floating-point support
+     (including `float-sup.el' and `floatfns.c'), and `sup-mouse.el',
+     support for the Supdup mouse on lisp machines.
+
+   * James B. Salem and Brewster Kahle wrote `completion.el', providing
+     dynamic word completion.
+
+   * Masahiko Sato wrote `vip.el', an emulation of the VI editor.
+
+   * William Schelter wrote `telnet.el', support for `telnet' sessions
+     within Emacs.
+
+   * Ralph Schleicher contributed `battery.el', a package for displaying
+     laptop computer battery status, and `info-look.el', a package for
+     looking up Info documentation for symbols in the buffer.
+
+   * Gregor Schmid wrote `tcl.el', a mode for editing Tcl/Tk scripts.
+
+   * Michael Schmidt and Tom Perrine wrote `modula2.el', a mode for
+     editing Modula-2 code, based on work by Mick Jordan and Peter
+     Robinson.
+
+   * Ronald S. Schnell wrote `dunnet.el', a text adventure game.
+
+   * Philippe Schnoebelen wrote `gomoku.el', a Go Moku game played
+     against Emacs, and `mpuz.el', a multiplication puzzle.
+
+   * Randal Schwartz wrote `pp.el', a pretty-printer for lisp objects.
+
+   * Manuel Serrano contributed the Flyspell package that does spell
+     checking as you type.
+
+   * Stanislav Shalunov wrote `uce.el', for responding to unsolicited
+     commercial email.
+
+   * Richard Sharman contributed `hilit-chg.el', which uses colors to
+     inclidate recent editing changes.
+
+   * Olin Shivers wrote:
+        * `comint.el', a library for modes running interactive
+          command-line- oriented subprocesses,
+        * `cmuscheme.el', for running inferior Scheme processes,
+        * `inf-lisp.el', for running inferior Lisp process, and
+        * `shell.el', for running inferior shells.
+
+   * Sam Shteingold wrote `gulp.el'.
+
+   * Espen Skoglund wrote `pascal.el', a mode for editing Pascal code.
+
+   * Rick Sladkey wrote `backquote.el', a lisp macro for creating
+     mostly-constant data.
+
+   * Lynn Slater wrote `help-macro.el', a macro for writing interactive
+     help for key bindings.
+
+   * Chris Smith wrote `icon.el', a mode for editing Icon code.
+
+   * David Smith wrote `ielm.el', a mode for interacting with the Emacs
+     Lisp interpreter as a subprocess.
+
+   * Paul D. Smith wrote `snmp-mode.el'.
+
+   * William Sommerfeld wrote `scribe.el', a mode for editing Scribe
+     files, and `server.el', a package allowing programs to send files
+     to an extant Emacs job to be edited.
+
+   * Michael Staats wrote `pc-select.el', which rebinds keys for
+     selecting regions to follow many other systems.
+
+   * Ake Stenhoff and Lars Lindberg wrote `imenu.el', a framework for
+     browsing indices made from buffer contents.
+
+   * Peter Stephenson contributed `vcursor.el', which implements a
+     "virtual cursor" that you can move with the keyboard and use for
+     copying text.
+
+   * Sam Steingold wrote `midnight.el'.
+
+   * Jonathan Stigelman wrote `hilit19.el', a package providing
+     automatic highlighting in source code buffers, mail readers, and
+     other contexts.
+
+   * Steve Strassman did not write `spook.el', and even if he did, he
+     really didn't mean for you to use it in an anarchistic way.
+
+   * Jens T. Berger Thielemann wrote `word-help.el', which is part of
+     the basis for `info-look.el'.
+
+   * Spencer Thomas wrote the original `dabbrev.el', providing a command
+     which completes the partial word before point, based on other
+     nearby words for which it is a prefix.  He also wrote the original
+     dumping support.
+
+   * Jim Thompson wrote `ps-print.el', which converts Emacs text to
+     Postscript.
+
+   * Masanobu Umeda wrote:
+        * GNUS, a featureful reader for Usenet news,
+        * `prolog.el', a mode for editing Prolog code,
+        * `rmailsort.el', a package for sorting messages in RMAIL
+          folders,
+        * `metamail.el', an interface to the Metamail program,
+        * `tcp.el', emulation of the `open-network-stream' function for
+          some Emacs configurations which lack it, and
+        * `timezone.el', providing functions for dealing with time
+          zones.
+
+   * Neil W. Van Dyke wrote `webjump.el', a "hot links" package.
+
+   * Ulrik Vieth implemented `meta-mode.el', for editing MetaFont code.
+
+   * Geoffrey Voelker wrote the Windows NT support.
+
+   * Johan Vromans wrote `forms.el' and its associated files, defining a
+     mode for filling in forms, and `iso-acc.el', a minor mode providing
+     electric accent keys for text using the ISO-8859 character set.
+
+   * Barry Warsaw wrote:
+        * `assoc.el', a set of utility functions for working with
+          association lists,
+        * `cc-mode.el', a major mode for editing C and C++ code, based
+          on earlier work by Dave Detlefs, Stewart Clamen, and Richard
+          Stallman,
+        * `elp.el', a new profiler for Emacs Lisp programs.
+        * `man.el', a mode for reading UNIX manual pages,
+        * `regi.el', providing an AWK-like control structure for use in
+          lisp programs, and
+        * `reporter.el', providing customizable bug reporting for lisp
+          packages.
+        * `supercite.el', a minor mode for quoting sections of mail
+          messages and news articles,
+
+   * Morten Welinder wrote:
+        * `desktop.el', facilities for saving some of Emacs's state
+          between sessions,
+        * `s-region.el', commands for setting the region using the shift
+          key and motion commands, and
+        * `dos-fns.el', functions for use under MS-DOS.
+
+     He also helped port Emacs to MS-DOS.
+
+   * Joseph Brian Wells wrote:
+        * `apropos.el', a command to find commands, functions, and
+          variables whose names contain matches for a regular
+          expression,
+        * `resume.el', support for processing command-line arguments
+          after resuming a suspended Emacs job, and
+        * `mail-extr.el', a package for extracting names and addresses
+          from mail headers, with contributions from Jamie Zawinski.
+
+   * Rodney Whitby and Reto Zimmermann wrote `vhdl-mode.el'.
+
+   * Ed Wilkinson wrote `b2m.c', a program to convert mail files from
+     RMAIL format to Unix `mbox' format.
+
+   * Mike Williams wrote `mouse-sel.el', providing enhanced mouse
+     selection, and `thingatpt.el', a library of functions for finding
+     the "thing" (word, line, s-expression) containing point.
+
+   * Dale R. Worley wrote `emerge.el', a package for interactively
+     merging two versions of a file.
+
+   * Tom Wurgler wrote `emacs-lock.el', which makes it harder to exit
+     with valuable buffers unsaved.
+
+   * Eli Zaretskii made many standard Emacs features work on MS-DOS.
+
+   * Jamie Zawinski wrote:
+        * Emacs 19's optimizing byte compiler, with Hallvard Furuseth,
+        * much of the support for faces and X selections,
+        * `mailabbrev.el', a package providing automatic expansion of
+          mail aliases, and
+        * `tar-mode.el', providing simple viewing and editing commands
+          for tar files.
+
+   * Ian T. Zimmerman wrote `gametree.el'.
+
+   * Neal Ziring and Felix S. T. Wu wrote `vi.el', an emulation of the
+     VI text editor.
+
+Others too numerous to mention have reported and fixed bugs, and added
+features to many parts of Emacs.  We thank them for their generosity as
+well.
+
+This list intended to mention every contributor of a major package or
+feature we currently distribute; if you know of someone we have omitted,
+please report that as a manual bug.
+
+
+
+File: emacs-ja.info, Node: Key Index, Next: Command Index, Prev: Intro, Up: Top
+
+キー（文字）索引
+****************
+
+* Menu:
+
+* C-BREAK （MS-DOS）:           MS-DOS Input.           28.
+* C-g （MS-DOS）:               MS-DOS Input.           28.
+* BS （MS-DOS）:                MS-DOS Input.           23.
+* DEL （MS-DOS）:               MS-DOS Input.           23.
+* C-j （MS-DOS）:               MS-DOS Input.           16.
+* ESC ESC ESC:                  Quitting.               65.
+* C-]:                          Quitting.               57.
+* C-g:                          Quitting.               25.
+* C-h s:                        Syntax.                 15.
+* C-x q:                        Kbd Macro Query.        5.
+* C-x C-k:                      Basic Kbd Macro.        53.
+* C-x e:                        Basic Kbd Macro.        5.
+* C-x ):                        Basic Kbd Macro.        5.
+* C-x (:                        Basic Kbd Macro.        5.
+* S-TAB （カスタマイズバッファ）: Changing an Option.   86.
+* TAB （カスタマイズバッファ）: Changing an Option.     86.
+* M-TAB （カスタマイズバッファ）: Changing an Option.   48.
+* C-M-c:                        Recursive Edit.         10.
+* C-x 6 d:                      Two-Column.             55.
+* F2 d:                         Two-Column.             55.
+* C-x 6 1:                      Two-Column.             51.
+* F2 1:                         Two-Column.             51.
+* C-x 6 RET:                    Two-Column.             47.
+* F2 RET:                       Two-Column.             47.
+* C-x 6 b:                      Two-Column.             36.
+* F2 b:                         Two-Column.             36.
+* C-x 6 s:                      Two-Column.             23.
+* F2 s:                         Two-Column.             23.
+* C-x 6 2:                      Two-Column.             13.
+* F2 2:                         Two-Column.             13.
+* C-x n w:                      Narrowing.              39.
+* C-x n d:                      Narrowing.              34.
+* C-x n p:                      Narrowing.              34.
+* C-x n n:                      Narrowing.              30.
+* C-x #:                        Emacs Server.           21.
+* C-c RET （シェルモード）:     Shell History Copying.  13.
+* C-c C-n （シェルモード）:     Shell History Copying.  9.
+* C-c C-p （シェルモード）:     Shell History Copying.  5.
+* M-s （シェルモード）:         Shell Ring.             13.
+* M-r （シェルモード）:         Shell Ring.             13.
+* M-n （シェルモード）:         Shell Ring.             9.
+* M-p （シェルモード）:         Shell Ring.             5.
+* C-c C-l （シェルモード）:     Shell Mode.             116.
+* C-c C-b （シェルモード）:     Shell Mode.             111.
+* C-c C-f （シェルモード）:     Shell Mode.             105.
+* C-c C-e （シェルモード）:     Shell Mode.             100.
+* C-M-l （シェルモード）:       Shell Mode.             95.
+* C-c C-r （シェルモード）:     Shell Mode.             95.
+* C-c C-o （シェルモード）:     Shell Mode.             87.
+* C-c C-\ （シェルモード）:     Shell Mode.             81.
+* C-c C-z （シェルモード）:     Shell Mode.             75.
+* C-c C-c （シェルモード）:     Shell Mode.             69.
+* C-c C-w （シェルモード）:     Shell Mode.             65.
+* C-c C-u （シェルモード）:     Shell Mode.             60.
+* C-c C-a （シェルモード）:     Shell Mode.             44.
+* C-d （シェルモード）:         Shell Mode.             38.
+* M-? （シェルモード）:         Shell Mode.             33.
+* TAB （シェルモード）:         Shell Mode.             22.
+* RET （シェルモード）:         Shell Mode.             13.
+* M-|:                          Single Shell.           18.
+* M-!:                          Single Shell.           5.
+* M-s （gnusサマリモード）:     Summary of Gnus.        97.
+* s （gnusサマリモード）:       Summary of Gnus.        92.
+* C-p （gnusサマリモード）:     Summary of Gnus.        85.
+* C-n （gnusサマリモード）:     Summary of Gnus.        85.
+* C-p （gnusグループモード）:   Summary of Gnus.        85.
+* C-n （gnusグループモード）:   Summary of Gnus.        85.
+* p （gnus）:                   Summary of Gnus.        80.
+* n （gnus）:                   Summary of Gnus.        75.
+* DEL （gnus）:                 Summary of Gnus.        68.
+* SPC （gnus）:                 Summary of Gnus.        52.
+* C-k （gnus）:                 Summary of Gnus.        42.
+* u （gnusグループモード）:     Summary of Gnus.        35.
+* l （gnusグループモード）:     Summary of Gnus.        31.
+* L （gnusグループモード）:     Summary of Gnus.        25.
+* q （gnusグループモード）:     Summary of Gnus.        17.
+* i c （カレンダーモード）:     Special Diary Entries.  49.
+* i b （カレンダーモード）:     Special Diary Entries.  44.
+* i a （カレンダーモード）:     Special Diary Entries.  24.
+* i y （カレンダーモード）:     Adding to Diary.        22.
+* i m （カレンダーモード）:     Adding to Diary.        22.
+* i w （カレンダーモード）:     Adding to Diary.        22.
+* i d （カレンダーモード）:     Adding to Diary.        17.
+* s （カレンダーモード）:       Diary Commands.         43.
+* m （カレンダーモード）:       Diary Commands.         36.
+* d （カレンダーモード）:       Diary Commands.         27.
+* g m （カレンダーモード）:     Mayan Calendar.         32.
+* g CHAR （カレンダーモード）:  From Other Calendar.    9.
+* p （カレンダーモード）:       To Other Calendar.      10.
+* M （カレンダーモード）:       Lunar Phases.           15.
+* S （カレンダーモード）:       Sunrise/Sunset.         17.
+* a （カレンダーモード）:       Holidays.               37.
+* u （カレンダーモード）:       Holidays.               30.
+* x （カレンダーモード）:       Holidays.               30.
+* h （カレンダーモード）:       Holidays.               24.
+* t （カレンダーモード）:       LaTeX Calendar.         9.
+* q （カレンダーモード）:       General Calendar.       28.
+* SPC （カレンダーモード）:     General Calendar.       24.
+* C-c C-l （カレンダーモード）: General Calendar.       20.
+* p d （カレンダーモード）:     General Calendar.       15.
+* M-= （カレンダーモード）:     Counting Days.          8.
+* M-v （カレンダーモード）:     Scroll Calendar.        30.
+* C-v （カレンダーモード）:     Scroll Calendar.        30.
+* C-x > （カレンダーモード）:   Scroll Calendar.        24.
+* C-x < （カレンダーモード）:   Scroll Calendar.        24.
+* . （カレンダーモード）:       Specified Dates.        22.
+* o （カレンダーモード）:       Specified Dates.        19.
+* g d （カレンダーモード）:     Specified Dates.        15.
+* M-> （カレンダーモード）:     Move to Beginning or End.  24.
+* M-< （カレンダーモード）:     Move to Beginning or End.  21.
+* M-e （カレンダーモード）:     Move to Beginning or End.  18.
+* M-a （カレンダーモード）:     Move to Beginning or End.  15.
+* C-e （カレンダーモード）:     Move to Beginning or End.  12.
+* C-a （カレンダーモード）:     Move to Beginning or End.  9.
+* C-x [ （カレンダーモード）:   Calendar Unit Motion.   33.
+* C-x ] （カレンダーモード）:   Calendar Unit Motion.   33.
+* M-{ （カレンダーモード）:     Calendar Unit Motion.   33.
+* M-} （カレンダーモード）:     Calendar Unit Motion.   33.
+* C-p （カレンダーモード）:     Calendar Unit Motion.   25.
+* C-n （カレンダーモード）:     Calendar Unit Motion.   25.
+* C-b （カレンダーモード）:     Calendar Unit Motion.   25.
+* C-f （カレンダーモード）:     Calendar Unit Motion.   25.
+* s （dired）:                  Dired Updating.         54.
+* k （dired）:                  Dired Updating.         41.
+* l （dired）:                  Dired Updating.         32.
+* g （dired）:                  Dired Updating.         27.
+* M-$ （dired）:                Hiding Subdirectories.  16.
+* $ （dired）:                  Hiding Subdirectories.  10.
+* > （dired）:                  Subdirectory Motion.    38.
+* < （dired）:                  Subdirectory Motion.    32.
+* C-M-d （dired）:              Subdirectory Motion.    27.
+* C-M-u （dired）:              Subdirectory Motion.    23.
+* C-M-p （dired）:              Subdirectory Motion.    18.
+* C-M-n （dired）:              Subdirectory Motion.    13.
+* i （dired）:                  Subdirectories in Dired.  17.
+* M-= （dired）:                Comparison in Dired.    14.
+* = （dired）:                  Comparison in Dired.    9.
+* % S （dired）:                Transforming File Names.  27.
+* % H （dired）:                Transforming File Names.  25.
+* % C （dired）:                Transforming File Names.  23.
+* % R （dired）:                Transforming File Names.  21.
+* % l （dired）:                Transforming File Names.  15.
+* % u （dired）:                Transforming File Names.  7.
+* ! （dired）:                  Shell Commands in Dired.  5.
+* + （dired）:                  Operating on Files.     105.
+* Q （dired）:                  Operating on Files.     110.
+* A （dired）:                  Operating on Files.     101.
+* B （dired）:                  Operating on Files.     95.
+* L （dired）:                  Operating on Files.     90.
+* Z （dired）:                  Operating on Files.     85.
+* P （dired）:                  Operating on Files.     78.
+* O （dired）:                  Operating on Files.     69.
+* G （dired）:                  Operating on Files.     65.
+* M （dired）:                  Operating on Files.     59.
+* S （dired）:                  Operating on Files.     53.
+* H （dired）:                  Operating on Files.     47.
+* R （dired）:                  Operating on Files.     38.
+* D （dired）:                  Operating on Files.     33.
+* C （dired）:                  Operating on Files.     23.
+* C-_ （dired）:                Marks vs Flags.         124.
+* % m （dired）:                Marks vs Flags.         118.
+* * % （dired）:                Marks vs Flags.         107.
+* % m （dired）:                Marks vs Flags.         107.
+* * c （dired）:                Marks vs Flags.         86.
+* * t （dired）:                Marks vs Flags.         80.
+* * C-p （dired）:              Marks vs Flags.         76.
+* * C-n （dired）:              Marks vs Flags.         71.
+* * ? （dired）:                Marks vs Flags.         62.
+* * ! （dired）:                Marks vs Flags.         57.
+* * DEL （dired）:              Marks vs Flags.         52.
+* * u （dired）:                Marks vs Flags.         46.
+* u （dired）:                  Marks vs Flags.         46.
+* * s （dired）:                Marks vs Flags.         39.
+* * / （dired）:                Marks vs Flags.         33.
+* * @ （dired）:                Marks vs Flags.         28.
+* * * （dired）:                Marks vs Flags.         23.
+* * m （dired）:                Marks vs Flags.         17.
+* m （dired）:                  Marks vs Flags.         17.
+* v （dired）:                  Dired Visiting.         39.
+* C-o （dired）:                Dired Visiting.         28.
+* o （dired）:                  Dired Visiting.         21.
+* RET （dired）:                Dired Visiting.         17.
+* f （dired）:                  Dired Visiting.         12.
+* % d （dired）:                Flagging Many Files.    51.
+* . （dired）:                  Flagging Many Files.    40.
+* ~ （dired）:                  Flagging Many Files.    34.
+* # （dired）:                  Flagging Many Files.    34.
+* & （dired）:                  Flagging Many Files.    29.
+* x （dired）:                  Dired Deletion.         30.
+* DEL （dired）:                Dired Deletion.         23.
+* u （diredの削除）:            Dired Deletion.         23.
+* d （dired）:                  Dired Deletion.         17.
+* SPC （dired）:                Dired Commands.         15.
+* C-p （dired）:                Dired Commands.         11.
+* C-n （dired）:                Dired Commands.         11.
+* C-x 5 d:                      Dired Enter.            16.
+* C-x 4 d:                      Dired Enter.            16.
+* C-x d:                        Dired Enter.            5.
+* e （rmail）:                  Rmail Editing.          14.
+* t （rmail）:                  Rmail Display.          19.
+* q （rmailサマリ）:            Rmail Summary Edit.     52.
+* Q （rmailサマリ）:            Rmail Summary Edit.     52.
+* C-M-t （rmail）:              Rmail Make Summary.     36.
+* C-M-r （rmail）:              Rmail Make Summary.     32.
+* C-M-l （rmail）:              Rmail Make Summary.     28.
+* l （rmail）:                  Rmail Make Summary.     28.
+* h （rmail）:                  Rmail Make Summary.     24.
+* c （rmail）:                  Rmail Reply.            93.
+* m （rmail）:                  Rmail Reply.            87.
+* f （rmail）:                  Rmail Reply.            62.
+* M-m （rmail）:                Rmail Reply.            52.
+* r （rmail）:                  Rmail Reply.            26.
+* C-M-p （rmail）:              Rmail Labels.           33.
+* C-M-n （rmail）:              Rmail Labels.           33.
+* k （rmail）:                  Rmail Labels.           26.
+* a （rmail）:                  Rmail Labels.           26.
+* w （rmail）:                  Rmail Output.           39.
+* C-o （rmail）:                Rmail Output.           20.
+* o （rmail）:                  Rmail Output.           20.
+* g （rmail）:                  Rmail Files.            54.
+* i （rmail）:                  Rmail Files.            25.
+* u （rmail）:                  Rmail Deletion.         42.
+* x （rmail）:                  Rmail Deletion.         42.
+* C-d （rmail）:                Rmail Deletion.         29.
+* d （rmail）:                  Rmail Deletion.         29.
+* < （rmail）:                  Rmail Motion.           63.
+* > （rmail）:                  Rmail Motion.           63.
+* j （rmail）:                  Rmail Motion.           63.
+* M-s （rmail）:                Rmail Motion.           51.
+* M-p （rmail）:                Rmail Motion.           39.
+* M-n （rmail）:                Rmail Motion.           39.
+* p （rmail）:                  Rmail Motion.           39.
+* n （rmail）:                  Rmail Motion.           39.
+* . （rmail）:                  Rmail Scrolling.        20.
+* DEL （rmail）:                Rmail Scrolling.        16.
+* SPC （rmail）:                Rmail Scrolling.        16.
+* b （rmail）:                  Rmail Basics.           32.
+* q （rmail）:                  Rmail Basics.           32.
+* s （rmail）:                  Rmail Basics.           26.
+* C-c C-i （メイルモード）:     Mail Mode Misc.         36.
+* C-c C-w （メイルモード）:     Mail Mode Misc.         19.
+* C-c C-t （メイルモード）:     Mail Mode Misc.         16.
+* C-c C-q （メイルモード）:     Citing Mail.            37.
+* C-c C-r （メイルモード）:     Citing Mail.            32.
+* C-c C-y （メイルモード）:     Citing Mail.            17.
+* M-TAB （メイルモード）:       Header Editing.         32.
+* C-c C-f C-f （メイルモード）: Header Editing.         26.
+* C-c C-f C-b （メイルモード）: Header Editing.         26.
+* C-c C-f C-c （メイルモード）: Header Editing.         26.
+* C-c C-f C-s （メイルモード）: Header Editing.         26.
+* C-c C-f C-t （メイルモード）: Header Editing.         26.
+* C-c C-c （メイルモード）:     Mail Sending.           14.
+* C-c C-s （メイルモード）:     Mail Sending.           14.
+* C-c C-a （メイルモード）:     Mail Aliases.           66.
+* C-x 5 m:                      Sending Mail.           22.
+* C-x 4 m:                      Sending Mail.           22.
+* C-x m:                        Sending Mail.           22.
+* C-c C-x （ピクチャーモード）: Rectangles in Picture.  31.
+* C-c C-y （ピクチャーモード）: Rectangles in Picture.  31.
+* C-c C-w （ピクチャーモード）: Rectangles in Picture.  22.
+* C-c C-k （ピクチャーモード）: Rectangles in Picture.  22.
+* C-c TAB （ピクチャーモード）: Tabs in Picture.        21.
+* M-TAB （ピクチャーモード）:   Tabs in Picture.        5.
+* C-c C-b （ピクチャーモード）: Insert in Picture.      28.
+* C-c C-f （ピクチャーモード）: Insert in Picture.      28.
+* C-c \ （ピクチャーモード）:   Insert in Picture.      5.
+* C-c / （ピクチャーモード）:   Insert in Picture.      5.
+* C-c ' （ピクチャーモード）:   Insert in Picture.      5.
+* C-c ` （ピクチャーモード）:   Insert in Picture.      5.
+* C-c . （ピクチャーモード）:   Insert in Picture.      5.
+* C-c ^ （ピクチャーモード）:   Insert in Picture.      5.
+* C-c > （ピクチャーモード）:   Insert in Picture.      5.
+* C-c < （ピクチャーモード）:   Insert in Picture.      5.
+* C-c C-d （ピクチャーモード）: Basic Picture.          39.
+* C-M-/:                        Dynamic Abbrevs.        11.
+* M-/:                          Dynamic Abbrevs.        11.
+* C-c C-c （略語編集）:         Editing Abbrevs.        29.
+* M-':                          Expanding Abbrevs.      26.
+* C-x a i l:                    Defining Abbrevs.       35.
+* C-x a i g:                    Defining Abbrevs.       35.
+* C-x a l:                      Defining Abbrevs.       30.
+* C-x a g:                      Defining Abbrevs.       20.
+* C-M-x （lispモード）:         External Lisp.          30.
+* C-x C-z:                      External Lisp.          10.
+* C-x C-e:                      Lisp Eval.              47.
+* C-M-x （emacs-lispモード）:   Lisp Eval.              37.
+* M-::                          Lisp Eval.              31.
+* C-c C-f （GUD）:              Commands of GUD.        82.
+* TAB （GUD）:                  Commands of GUD.        76.
+* C-c > （GUD）:                Commands of GUD.        71.
+* C-c < （GUD）:                Commands of GUD.        64.
+* C-c C-t （GUD）:              Commands of GUD.        68.
+* C-c C-d （GUD）:              Commands of GUD.        60.
+* C-c C-r （GUD）:              Commands of GUD.        52.
+* C-c C-i （GUD）:              Commands of GUD.        46.
+* C-c C-n （GUD）:              Commands of GUD.        39.
+* C-c C-s （GUD）:              Commands of GUD.        32.
+* C-c C-l （GUD）:              Commands of GUD.        24.
+* C-x C-a （GUD）:              Commands of GUD.        18.
+* C-x SPC:                      Commands of GUD.        17.
+* C-x `:                        Compilation Mode.       17.
+* C-x n d （Fortranモード）:    Fortran Misc.           8.
+* C-c C-w （Fortranモード）:    Fortran Columns.        30.
+* C-c C-r （Fortranモード）:    Fortran Columns.        14.
+* C-c ; （Fortranモード）:      Fortran Comments.       71.
+* M-^ （Fortranモード）:        ForIndent Commands.     35.
+* C-M-j （Fortranモード）:      ForIndent Commands.     30.
+* C-M-q （Fortranモード）:      ForIndent Commands.     27.
+* C-j （Fortranモード）:        ForIndent Commands.     23.
+* C-c C-n （Fortranモード）:    Fortran Motion.         10.
+* C-c C-p （Fortranモード）:    Fortran Motion.         10.
+* C-M-h （Fortranモード）:      Fortran Motion.         10.
+* C-M-e （Fortranモード）:      Fortran Motion.         10.
+* C-M-a （Fortranモード）:      Fortran Motion.         10.
+* C-c C-s （Cモード）:          Other C Commands.       50.
+* C-c C-\ （Cモード）:          Other C Commands.       30.
+* C-c C-e （Cモード）:          Other C Commands.       19.
+* M-q （Cモード）:              Other C Commands.       12.
+* C-M-h （Cモード）:            Other C Commands.       7.
+* C-c C-t （Cモード）:          Hungry Delete.          16.
+* C-c C-d （Cモード）:          Hungry Delete.          11.
+* C-c : （Cモード）:            Electric C.             27.
+* C-c C-a （Cモード）:          Electric C.             18.
+* ESC e:                        Motion in C.            47.
+* ESC a:                        Motion in C.            31.
+* C-c C-n （Cモード）:          Motion in C.            25.
+* C-c C-p （Cモード）:          Motion in C.            19.
+* C-c C-u （Cモード）:          Motion in C.            10.
+* M-,:                          Tags Search.            24.
+* C-M-.:                        Find Tag.               62.
+* M-*:                          Find Tag.               54.
+* C-x 5 .:                      Find Tag.               44.
+* C-x 4 .:                      Find Tag.               44.
+* M-.:                          Find Tag.               27.
+* C-x 4 a:                      Change Log.             5.
+* C-h C-i:                      Documentation.          23.
+* M-TAB:                        Symbol Completion.      8.
+* M-):                          Balanced Editing.       11.
+* M-(:                          Balanced Editing.       11.
+* C-x ;:                        Options for Comments.   5.
+* C-M-j:                        Multi-Line Comments.    5.
+* C-u - C-x ;:                  Comment Commands.       54.
+* M-;:                          Comment Commands.       5.
+* C-c C-o （Cモード）:          Changing Indent Style.  43.
+* C-M-q （Cモード）:            C Indent.               14.
+* C-c C-q （Cモード）:          C Indent.               9.
+* C-u TAB:                      Multi-line Indent.      23.
+* C-M-q:                        Multi-line Indent.      16.
+* C-j:                          Basic Indent.           22.
+* TAB （プログラミングモード）: Basic Indent.           10.
+* C-M-h:                        Defuns.                 22.
+* C-M-e:                        Defuns.                 22.
+* C-M-a:                        Defuns.                 22.
+* C-M-@:                        List Commands.          68.
+* C-M-t:                        List Commands.          61.
+* C-M-d:                        List Commands.          50.
+* C-M-u:                        List Commands.          50.
+* C-M-p:                        List Commands.          44.
+* C-M-n:                        List Commands.          44.
+* C-M-DEL:                      List Commands.          40.
+* C-M-k:                        List Commands.          40.
+* C-M-b:                        List Commands.          26.
+* C-M-f:                        List Commands.          26.
+* DEL （プログラミングモード）: Program Modes.          25.
+* M-j u （エンリッチモード）:   Format Justification.   51.
+* M-S （エンリッチモード）:     Format Justification.   46.
+* M-j c （エンリッチモード）:   Format Justification.   46.
+* M-j f （エンリッチモード）:   Format Justification.   43.
+* M-j r （エンリッチモード）:   Format Justification.   40.
+* M-j l （エンリッチモード）:   Format Justification.   37.
+* C-x TAB （エンリッチモード）: Format Indentation.     12.
+* M-g o （エンリッチモード）:   Format Faces.           30.
+* M-g u （エンリッチ）:         Format Faces.           26.
+* M-g l （エンリッチモード）:   Format Faces.           22.
+* M-g i （エンリッチモード）:   Format Faces.           18.
+* M-g b （エンリッチモード）:   Format Faces.           14.
+* M-g d （エンリッチモード）:   Format Faces.           10.
+* M-? （nroffモード）:          Nroff Mode.             13.
+* M-p （nroffモード）:          Nroff Mode.             13.
+* M-n （nroffモード）:          Nroff Mode.             13.
+* C-c TAB （TeXモード）:        TeX Print.              118.
+* C-c C-f （TeXモード）:        TeX Print.              93.
+* C-c C-r （TeXモード）:        TeX Print.              74.
+* C-c C-l （TeXモード）:        TeX Print.              63.
+* C-c C-k （TeXモード）:        TeX Print.              63.
+* C-c C-q （TeXモード）:        TeX Print.              32.
+* C-c C-v （TeXモード）:        TeX Print.              32.
+* C-c C-p （TeXモード）:        TeX Print.              32.
+* C-c C-b （TeXモード）:        TeX Print.              32.
+* C-c C-e （LaTeXモード）:      LaTeX Editing.          25.
+* C-c C-o （LaTeXモード）:      LaTeX Editing.          15.
+* C-j （TeXモード）:            TeX Editing.            49.
+* C-c } （TeXモード）:          TeX Editing.            42.
+* C-c { （TeXモード）:          TeX Editing.            42.
+* " （TeXモード）:              TeX Editing.            22.
+* C-c C-o （アウトラインモード）: Outline Visibility.   72.
+* C-c C-q （アウトラインモード）: Outline Visibility.   68.
+* C-c C-a （アウトラインモード）: Outline Visibility.   62.
+* C-c C-t （アウトラインモード）: Outline Visibility.   62.
+* C-c C-i （アウトラインモード）: Outline Visibility.   58.
+* C-c C-k （アウトラインモード）: Outline Visibility.   53.
+* C-c C-l （アウトラインモード）: Outline Visibility.   53.
+* C-c C-d （アウトラインモード）: Outline Visibility.   46.
+* C-c C-s （アウトラインモード）: Outline Visibility.   46.
+* C-c C-e （アウトラインモード）: Outline Visibility.   41.
+* C-c C-c （アウトラインモード）: Outline Visibility.   41.
+* C-c C-u （アウトラインモード）: Outline Motion.       31.
+* C-c C-b （アウトラインモード）: Outline Motion.       31.
+* C-c C-f （アウトラインモード）: Outline Motion.       31.
+* C-c C-p （アウトラインモード）: Outline Motion.       24.
+* C-c C-n （アウトラインモード）: Outline Motion.       24.
+* C-c @ （アウトラインマイナモード）: Outline Mode.     28.
+* M-TAB （テキストモード）:     Text Mode.              30.
+* TAB （テキストモード）:       Text Mode.              13.
+* C-x C-u:                      Case.                   37.
+* C-x C-l:                      Case.                   37.
+* M-c:                          Case.                   19.
+* M-u:                          Case.                   19.
+* M-l:                          Case.                   19.
+* C-x .:                        Fill Prefix.            23.
+* C-x f:                        Fill Commands.          41.
+* M-s （テキストモード）:       Fill Commands.          37.
+* M-q:                          Fill Commands.          16.
+* C-x l:                        Pages.                  43.
+* C-x C-p:                      Pages.                  30.
+* C-x ]:                        Pages.                  24.
+* C-x [:                        Pages.                  24.
+* M-h:                          Paragraphs.             29.
+* M-}:                          Paragraphs.             4.
+* M-{:                          Paragraphs.             4.
+* C-x DEL:                      Sentences.              29.
+* M-k:                          Sentences.              29.
+* M-e:                          Sentences.              18.
+* M-a:                          Sentences.              18.
+* M-@:                          Words.                  61.
+* M-t:                          Words.                  52.
+* M-DEL:                        Words.                  44.
+* M-d:                          Words.                  36.
+* M-b:                          Words.                  27.
+* M-f:                          Words.                  27.
+* C-c C-c （タブストップの設定）: Tab Stops.            10.
+* M-i:                          Tab Stops.              5.
+* C-x TAB:                      Indentation Commands.   31.
+* C-M-\:                        Indentation Commands.   31.
+* M-^:                          Indentation Commands.   20.
+* C-M-o:                        Indentation Commands.   14.
+* M-m:                          Indentation Commands.   5.
+* TAB:                          Indentation.            36.
+* C-j （とメジャーモード）:     Major Modes.            4.
+* DEL （とメジャーモード）:     Major Modes.            4.
+* TAB （とメジャーモード）:     Major Modes.            4.
+* C-x 8:                        Single-Byte European Support.  48.
+* C-x RET p:                    Specify Coding.         101.
+* C-x RET X:                    Specify Coding.         94.
+* C-x RET x:                    Specify Coding.         94.
+* C-x RET k:                    Specify Coding.         81.
+* C-x RET t:                    Specify Coding.         69.
+* C-x RET c:                    Specify Coding.         41.
+* C-x RET f:                    Specify Coding.         34.
+* C-h C:                        Coding Systems.         33.
+* C-\:                          Select Input Method.    26.
+* C-x RET C-\:                  Select Input Method.    20.
+* C-h C-\:                      Select Input Method.    17.
+* C-h I:                        Select Input Method.    17.
+* C-h L:                        Language Environments.  32.
+* C-x RET:                      International Intro.    23.
+* C-h h:                        International Intro.    14.
+* C-x 5 o:                      Misc X.                 24.
+* C-x 5 0:                      Misc X.                 19.
+* C-z （Xウィンドウシステム）:  Misc X.                 9.
+* M-g M-g:                      Font Lock.              27.
+* C-x 5 r:                      Creating Frames.        42.
+* C-x 5 2:                      Creating Frames.        17.
+* C-x 5:                        Creating Frames.        5.
+* C-Mouse-3:                    Menu Mouse Clicks.      7.
+* Mouse-2 （セレクション）:     Mouse References.       4.
+* M-Mouse-2:                    Secondary Selection.    29.
+* M-Mouse-3:                    Secondary Selection.    23.
+* M-Mouse-1:                    Secondary Selection.    19.
+* M-Drag-Mouse-1:               Secondary Selection.    9.
+* Mouse-3:                      Mouse Commands.         14.
+* Mouse-2:                      Mouse Commands.         14.
+* Mouse-1:                      Mouse Commands.         14.
+* DELETE:                       Mouse Commands.         9.
+* C-x +:                        Change Window.          82.
+* C-x -:                        Change Window.          77.
+* C-x }:                        Change Window.          64.
+* C-x ^:                        Change Window.          64.
+* C-x 1:                        Change Window.          51.
+* C-x 4 0:                      Change Window.          47.
+* C-x 0:                        Change Window.          38.
+* C-x 4:                        Pop Up Window.          5.
+* C-M-v:                        Other Window.           28.
+* C-x o:                        Other Window.           17.
+* C-Mouse-2 （スクロールバー）: Split Window.           27.
+* C-x 3:                        Split Window.           21.
+* C-x 2:                        Split Window.           15.
+* C-x k:                        Kill Buffer.            16.
+* C-x C-q:                      Misc Buffer.            14.
+* C-x C-b:                      List Buffers.           8.
+* C-x b:                        Select Buffer.          14.
+* C-x 5 b:                      Select Buffer.          14.
+* C-x 4 b:                      Select Buffer.          14.
+* C-x C-d:                      Directories.            22.
+* C-x v h:                      Version Headers.        19.
+* C-x v a:                      Change Logs and VC.     11.
+* C-x v r:                      Making Snapshots.       15.
+* C-x v s:                      Making Snapshots.       9.
+* C-x v m:                      Merging.                14.
+* C-x v d:                      VC Dired Mode.          5.
+* C-x v c:                      VC Undo.                21.
+* C-x v u:                      VC Undo.                12.
+* C-x v l:                      VC Status.              8.
+* C-x v i:                      Registering.            5.
+* C-x v g:                      Old Versions.           50.
+* C-x v =:                      Old Versions.           27.
+* C-x v ~:                      Old Versions.           21.
+* C-x C-q （VC、版管理）:       Basic VC Editing.       12.
+* C-x v v:                      Basic VC Editing.       12.
+* C-x C-w:                      Saving.                 82.
+* M-~:                          Saving.                 58.
+* C-x s:                        Saving.                 33.
+* C-x C-s:                      Saving.                 20.
+* C-x 5 f:                      Visiting.               112.
+* C-x 4 f:                      Visiting.               104.
+* C-x C-v:                      Visiting.               94.
+* C-x C-r:                      Visiting.               90.
+* C-x C-f:                      Visiting.               43.
+* M-$:                          Spelling.               45.
+* M-- M-c:                      Fixing Case.            12.
+* M-- M-u:                      Fixing Case.            12.
+* M-- M-l:                      Fixing Case.            12.
+* C-M-t:                        Transpose.              26.
+* M-t:                          Transpose.              26.
+* C-x C-t:                      Transpose.              26.
+* C-t:                          Transpose.              14.
+* RET （出現モード）:           Other Repeating Search.  18.
+* C-M-%:                        Query Replace.          20.
+* M-%:                          Query Replace.          12.
+* C-M-r:                        Regexp Search.          10.
+* C-M-s:                        Regexp Search.          10.
+* C-r:                          Incremental Search.     99.
+* C-s:                          Incremental Search.     16.
+* C-x $:                        Selective Display.      4.
+* C-x >:                        Horizontal Scrolling.   19.
+* C-x <:                        Horizontal Scrolling.   19.
+* C-M-l:                        Scrolling.              81.
+* PRIOR:                        Scrolling.              42.
+* NEXT:                         Scrolling.              42.
+* M-v:                          Scrolling.              42.
+* C-v:                          Scrolling.              42.
+* C-l:                          Scrolling.              37.
+* C-x r l:                      Bookmarks.              33.
+* C-x r b:                      Bookmarks.              27.
+* C-x r m:                      Bookmarks.              27.
+* C-x r +:                      RegNumbers.             14.
+* C-x r n:                      RegNumbers.             11.
+* C-x r f:                      RegConfig.              5.
+* C-x r w:                      RegConfig.              5.
+* C-x r r:                      RegRect.                9.
+* C-x r i:                      RegText.                15.
+* C-x r s:                      RegText.                15.
+* C-x r j:                      RegPos.                 18.
+* C-x r SPC:                    RegPos.                 14.
+* C-x r t:                      Rectangles.             83.
+* C-x r o:                      Rectangles.             74.
+* C-x r y:                      Rectangles.             60.
+* C-x r d:                      Rectangles.             46.
+* C-x r k:                      Rectangles.             46.
+* M-y:                          Earlier Kills.          5.
+* C-M-w:                        Appending Kills.        39.
+* M-w:                          Kill Ring.              21.
+* C-y:                          Kill Ring.              12.
+* M-z:                          Other Kill Commands.    25.
+* C-w:                          Other Kill Commands.    4.
+* C-k:                          Killing by Lines.       8.
+* M-SPC:                        Deletion.               29.
+* M-\:                          Deletion.               29.
+* C-d:                          Deletion.               4.
+* DEL:                          Deletion.               4.
+* C-x C-SPC:                    Global Mark Ring.       16.
+* C-u C-@:                      Mark Ring.              5.
+* C-u C-SPC:                    Mark Ring.              5.
+* C-x h:                        Marking Objects.        27.
+* C-@:                          Setting Mark.           55.
+* C-x C-x:                      Setting Mark.           40.
+* C-SPC:                        Setting Mark.           26.
+* C-h C-p:                      Misc Help.              51.
+* C-h C-w:                      Misc Help.              51.
+* C-h C-d:                      Misc Help.              51.
+* C-h C-c:                      Misc Help.              51.
+* C-h n:                        Misc Help.              51.
+* C-h F:                        Misc Help.              51.
+* C-h b:                        Misc Help.              37.
+* C-h m:                        Misc Help.              32.
+* C-h l:                        Misc Help.              27.
+* C-h C-k:                      Misc Help.              15.
+* C-h C-f:                      Misc Help.              15.
+* C-h i:                        Misc Help.              5.
+* S-TAB （ヘルプモード）:       Help Mode.              26.
+* TAB （ヘルプモード）:         Help Mode.              26.
+* C-h p:                        Library Keywords.       5.
+* C-h a:                        Apropos.                5.
+* C-h w:                        Name Help.              36.
+* C-h f:                        Name Help.              5.
+* C-h k:                        Key Help.               14.
+* C-h c:                        Key Help.               5.
+* C-h C-h:                      Help.                   12.
+* F1:                           Help.                   4.
+* C-h:                          Help.                   4.
+* Help:                         Help.                   4.
+* M-x:                          M-x.                    15.
+* C-x ESC ESC:                  Repetition.             16.
+* M-s （ミニバッファ履歴）:     Minibuffer History.     45.
+* M-r （ミニバッファ履歴）:     Minibuffer History.     45.
+* M-n （ミニバッファ履歴）:     Minibuffer History.     26.
+* M-p （ミニバッファ履歴）:     Minibuffer History.     26.
+* SPC:                          Completion Commands.    19.
+* TAB （補完）:                 Completion Example.     5.
+* C-x z:                        Repeating.              5.
+* C-u:                          Arguments.              22.
+* M--:                          Arguments.              14.
+* M-1:                          Arguments.              14.
+* C-x =:                        Position Info.          38.
+* M-=:                          Position Info.          34.
+* C-x C-o:                      Blank Lines.            12.
+* C-o:                          Blank Lines.            12.
+* C-u C-x u:                    Undo.                   34.
+* C-_:                          Undo.                   19.
+* C-x u:                        Undo.                   19.
+* C-x C-n:                      Moving Point.           65.
+* M-r:                          Moving Point.           13.
+* M-<:                          Moving Point.           13.
+* M->:                          Moving Point.           13.
+* C-p:                          Moving Point.           13.
+* C-n:                          Moving Point.           13.
+* C-b:                          Moving Point.           13.
+* C-f:                          Moving Point.           13.
+* C-e:                          Moving Point.           13.
+* C-a:                          Moving Point.           13.
+* DOWN:                         Moving Point.           5.
+* UP:                           Moving Point.           5.
+* RIGHT:                        Moving Point.           5.
+* LEFT:                         Moving Point.           5.
+* C-q:                          Inserting Text.         31.
+* RET:                          Inserting Text.         18.
+* C-h t:                        Basic.                  5.
+* C-x C-c:                      Exiting.                47.
+* C-z:                          Exiting.                23.
+* F10:                          Menu Bar.               9.
+* M-`:                          Menu Bar.               9.
+
+
+
